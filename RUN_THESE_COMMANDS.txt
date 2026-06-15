@@ -1,0 +1,63 @@
+===========================================
+    RUN THESE COMMANDS IN ORDER
+===========================================
+
+1. RUN MIGRATION
+-----------------
+php artisan migrate --force
+
+
+2. CLEAR CACHE
+--------------
+php artisan cache:clear
+
+
+3. ASSIGN CATEGORIES TO BRANCHES (Optional)
+--------------------------------------------
+php artisan tinker
+
+Then type:
+
+# See all branches
+App\Models\Branch::all()->pluck('name', 'id');
+
+# See all categories
+App\Models\Category::all()->pluck('name', 'id');
+
+# Assign category to branch (example)
+App\Models\Category::where('name', 'Kacchi & Biryani')->update(['branch_id' => 1]);
+
+# Exit tinker
+exit
+
+
+4. TEST IN BROWSER
+------------------
+Frontend: http://127.0.0.1:8000/branches/agrabad
+Admin: http://127.0.0.1:8000/admin/branch
+
+
+===========================================
+    IF MIGRATION FAILS
+===========================================
+
+Run only the new migration:
+php artisan migrate --path=database/migrations/2026_06_06_140001_add_branch_id_to_categories_table.php --force
+
+
+===========================================
+    VERIFY SUCCESS
+===========================================
+
+php artisan tinker
+
+Then type:
+
+Schema::hasColumn('categories', 'branch_id');
+
+Should return: TRUE
+
+
+===========================================
+    DONE! ✅
+===========================================
