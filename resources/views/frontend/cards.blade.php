@@ -1,4 +1,8 @@
 @extends('frontend.layout')
+
+@section('meta_title', 'Membership Cards')
+@section('meta_description', 'Explore Degchi Dine Golden Card and Membership Card benefits. Apply for exclusive dining privileges and rewards.')
+
 @section('frontend_content')
 
 <main class="luxury-portal-container">

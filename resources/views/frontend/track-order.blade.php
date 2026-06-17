@@ -1,5 +1,9 @@
 @extends('frontend.layout')
 
+@section('meta_title', 'Track Your Order')
+@section('meta_description', 'Track your Degchi Dine order status online using your order number and phone number.')
+@section('meta_robots', 'noindex, follow')
+
 @push('front_css')
 <style>
 .track-order .to-main-box { margin-top: -100px; position: relative; z-index: 2; }

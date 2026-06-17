@@ -1,5 +1,8 @@
 @extends('frontend.layout')
 
+@section('meta_title', 'Order Confirmation')
+@section('meta_robots', 'noindex, nofollow')
+
 @push('front_css')
 <style>
 .order-confirm .oc-main-box { margin-top: -100px; position: relative; z-index: 2; }

@@ -1,4 +1,8 @@
 @extends('frontend.layout')
+
+@section('meta_title', 'Your Cart')
+@section('meta_robots', 'noindex, nofollow')
+
 @section('frontend_content')
 
 <style>

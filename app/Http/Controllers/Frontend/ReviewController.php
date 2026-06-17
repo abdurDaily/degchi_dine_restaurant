@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\Member;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -21,7 +22,11 @@ class ReviewController extends Controller
 
     public function contact()
     {
-        return view('frontend.contact');
+        $contactSettings = Setting::where('setting_group', 'contact_section')
+            ->get()
+            ->keyBy('key');
+
+        return view('frontend.contact', compact('contactSettings'));
     }
 
     public function verifyMember(Request $request)

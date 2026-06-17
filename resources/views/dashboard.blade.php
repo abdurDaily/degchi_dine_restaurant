@@ -286,7 +286,7 @@
         <div class="dd-dash-hero">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 position-relative" style="z-index:1;">
                 <div>
-                    <h2>Welcome back, {{ auth()->user()->name ?? 'Admin' }}</h2>
+                    <h2 style="color:#fff;">Welcome back, {{ auth()->user()->name ?? 'Admin' }}</h2>
                     <p>Degchi Dine control panel · {{ now()->format('l, F j, Y') }}</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">

@@ -1,5 +1,8 @@
 @extends('frontend.layout')
 
+@section('meta_title', 'Member Login')
+@section('meta_robots', 'noindex, nofollow')
+
 @push('front_css')
 <style>
 .member-login .md-login-box {

@@ -16,6 +16,7 @@ use App\Http\Requests\Settings\PusherSettingRequest;
 use App\Http\Requests\Settings\GeneralSettingRequest;
 use App\Http\Requests\Settings\OffDayMinManpowerRequest;
 use App\Http\Requests\Settings\ThemeCustomizationRequest;
+use App\Support\SeoSettings;
 
 class SettingController extends Controller
 {
@@ -428,5 +429,130 @@ class SettingController extends Controller
                 'message' => 'Something went wrong',
             ], 400);
         }
+    }
+
+    public function seoSetting()
+    {
+        $settings = Setting::where('setting_group', 'seo_setting')
+            ->pluck('value', 'key');
+
+        $ogImageUrl = $settings->get('seo_og_image')
+            ? asset('storage/seo/' . $settings->get('seo_og_image'))
+            : null;
+
+        return view('settings.seo-setting', compact('settings', 'ogImageUrl'));
+    }
+
+    public function seoSettingStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'seo_site_name' => 'required|string|max:120',
+            'seo_default_title' => 'required|string|max:160',
+            'seo_default_description' => 'required|string|max:320',
+            'seo_default_keywords' => 'nullable|string|max:500',
+            'seo_robots_default' => 'nullable|string|max:80',
+            'seo_og_type' => 'nullable|string|max:40',
+            'seo_twitter_card' => 'nullable|string|max:40',
+            'seo_twitter_handle' => 'nullable|string|max:80',
+            'seo_canonical_url' => 'nullable|url|max:255',
+            'seo_google_analytics_id' => 'nullable|string|max:40',
+            'seo_google_tag_manager_id' => 'nullable|string|max:40',
+            'seo_facebook_pixel_id' => 'nullable|string|max:40',
+            'seo_head_scripts' => 'nullable|string|max:5000',
+            'seo_robots_txt' => 'nullable|string|max:5000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $fields = [
+                'seo_site_name',
+                'seo_default_title',
+                'seo_default_description',
+                'seo_default_keywords',
+                'seo_robots_default',
+                'seo_og_type',
+                'seo_twitter_card',
+                'seo_twitter_handle',
+                'seo_canonical_url',
+                'seo_google_analytics_id',
+                'seo_google_tag_manager_id',
+                'seo_facebook_pixel_id',
+                'seo_head_scripts',
+                'seo_robots_txt',
+            ];
+
+            foreach ($fields as $key) {
+                Setting::updateOrCreate(
+                    ['key' => $key],
+                    [
+                        'setting_group' => 'seo_setting',
+                        'value' => $request->input($key, ''),
+                        'user_id' => Auth::id(),
+                    ]
+                );
+            }
+
+            DB::commit();
+            SeoSettings::clearCache();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'SEO settings updated successfully.',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong',
+            ], 400);
+        }
+    }
+
+    public function seoOgImageUpload(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'seo_og_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:1024|dimensions:min_width=600,min_height=315',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->errors()->first()], 422);
+        }
+
+        $existing = Setting::where('key', 'seo_og_image')->first();
+        $path = 'seo/';
+        $images = $this->uploadService->upload($request->only('seo_og_image'), $path);
+
+        if ($existing && $existing->value) {
+            $oldPath = $path . $existing->value;
+            if (Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            $existing->value = $images['seo_og_image'];
+            $existing->save();
+        } else {
+            Setting::create([
+                'key' => 'seo_og_image',
+                'setting_group' => 'seo_setting',
+                'value' => $images['seo_og_image'],
+                'user_id' => Auth::id(),
+            ]);
+        }
+
+        SeoSettings::clearCache();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Open Graph image uploaded successfully.',
+            'url' => asset('storage/seo/' . $images['seo_og_image']),
+        ]);
     }
 }

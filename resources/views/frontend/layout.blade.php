@@ -5,7 +5,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>Degchi Dine | ডেক্সি ডাইন</title>
+  @php
+    $pageMetaTitle = trim($__env->yieldContent('meta_title'));
+    $pageMetaDescription = trim($__env->yieldContent('meta_description'));
+    $pageMetaKeywords = trim($__env->yieldContent('meta_keywords'));
+    $pageMetaImage = trim($__env->yieldContent('meta_image'));
+    $pageMetaRobots = trim($__env->yieldContent('meta_robots'));
+    $pageMetaType = trim($__env->yieldContent('meta_type'));
+    $pageMetaCanonical = trim($__env->yieldContent('meta_canonical'));
+  @endphp
+  <x-seo-meta
+    :title="$pageMetaTitle ?: null"
+    :description="$pageMetaDescription ?: null"
+    :keywords="$pageMetaKeywords ?: null"
+    :image="$pageMetaImage ?: null"
+    :robots="$pageMetaRobots ?: null"
+    :type="$pageMetaType ?: null"
+    :canonical="$pageMetaCanonical ?: null"
+  />
 
   <link
     href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
@@ -32,6 +49,10 @@
 </head>
 
 <body class="hero-page">
+  @if(app(\App\Support\SeoSettings::class)->googleTagManagerId())
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ app(\App\Support\SeoSettings::class)->googleTagManagerId() }}"
+  height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+  @endif
   <nav id="desktopNavbar" class="navbar py-0 desktop-navbar d-none d-lg-block sticky-top">
     <div class="container px-4 px-xxl-5">
       <a class="navbar-brand" href="{{ route('frontend.home') }}">

@@ -1,4 +1,8 @@
 @extends('frontend.layout')
+
+@section('meta_title', 'Our Branches')
+@section('meta_description', 'Find Degchi Dine branch locations, menus and contact details across Chittagong.')
+
 @section('frontend_content')
 
 <style>

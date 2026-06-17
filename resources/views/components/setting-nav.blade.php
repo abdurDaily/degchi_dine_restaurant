@@ -39,6 +39,10 @@
                              @endcan
                             @can('general-setting')
                             <li class="nav-item">
+                                <a href="{{ route('seo-setting') }}" class="nav-link" data-key="t-seo-setting"> SEO & Tracking
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('sslcommerz-setting') }}" class="nav-link" data-key="t-sslcommerz-setting"> SSLCommerz Setting
                                 </a>
                             </li>

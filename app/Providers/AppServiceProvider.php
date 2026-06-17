@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Support\SeoSettings;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(SeoSettings::class, fn () => new SeoSettings());
     }
 
     /**
@@ -25,5 +27,8 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Super Admin') ? true : null;
         });
 
+        View::composer('frontend.layout', function ($view) {
+            $view->with('seoSettings', app(SeoSettings::class));
+        });
     }
 }

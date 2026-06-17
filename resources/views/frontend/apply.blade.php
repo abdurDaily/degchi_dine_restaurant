@@ -1,4 +1,8 @@
 @extends('frontend.layout')
+
+@section('meta_title', 'Apply for Membership')
+@section('meta_description', 'Apply for a Degchi Dine membership card and unlock exclusive dining benefits, rewards and priority service.')
+
 @push('front_css')
 <style>
     .dd-input-field[type="file"] {
@@ -47,7 +51,7 @@
                     <div class="dd-apply-card-stage">
                         <div class="dd-apply-glow"></div>
                         <!-- Reference your actual card image here -->
-                        <img src="./images/membership.svg" alt="Degchi Premium Card" class="dd-apply-card-img" />
+                        <img src="{{ asset('assets/frontend/images/membership.svg') }}" alt="Degchi Premium Card" class="dd-apply-card-img" />
                     </div>
                 </div>
 

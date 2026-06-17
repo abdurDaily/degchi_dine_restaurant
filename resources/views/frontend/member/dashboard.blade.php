@@ -1,5 +1,8 @@
 @extends('frontend.layout')
 
+@section('meta_title', 'Member Dashboard')
+@section('meta_robots', 'noindex, nofollow')
+
 @push('front_css')
 <style>
 .member-dashboard .md-hero-actions {

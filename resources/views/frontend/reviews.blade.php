@@ -1,5 +1,8 @@
 @extends('frontend.layout')
 
+@section('meta_title', 'Guest Reviews')
+@section('meta_description', 'Read what guests say about Degchi Dine. Real reviews from our members and diners in Chittagong.')
+
 @section('frontend_content')
 <main class="main-content">
     <section class="section-block reviews-section" id="testimonials">

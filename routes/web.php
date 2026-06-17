@@ -69,6 +69,9 @@ Route::middleware(['auth', 'setLocale'])->group(function () {
     Route::post('pusher-setting', [SettingController::class, 'pusherSettingStore'])->name('pusher-setting.store')->middleware('can:pusher-setting');
     Route::get('sslcommerz-setting', [SettingController::class, 'sslcommerzSetting'])->name('sslcommerz-setting')->middleware('can:general-setting');
     Route::post('sslcommerz-setting', [SettingController::class, 'sslcommerzSettingStore'])->name('sslcommerz-setting.store')->middleware('can:general-setting');
+    Route::get('seo-setting', [SettingController::class, 'seoSetting'])->name('seo-setting')->middleware('can:general-setting');
+    Route::post('seo-setting', [SettingController::class, 'seoSettingStore'])->name('seo-setting.store')->middleware('can:general-setting');
+    Route::post('seo-og-image-upload', [SettingController::class, 'seoOgImageUpload'])->name('seo-setting-og-image.store')->middleware('can:general-setting');
 
 
     Route::middleware('role:Super Admin')->group(function () {
@@ -138,6 +141,9 @@ Route::middleware(['auth', 'setLocale'])->group(function () {
 });
 
 Route::name('frontend.')->group(function () {
+
+    Route::get('/robots.txt', [App\Http\Controllers\Frontend\SeoController::class, 'robots'])->name('robots');
+    Route::get('/sitemap.xml', [App\Http\Controllers\Frontend\SeoController::class, 'sitemap'])->name('sitemap');
 
     //* HOME PAGE
     Route::get('/', [HomeController::class, 'home'])->name('home');
