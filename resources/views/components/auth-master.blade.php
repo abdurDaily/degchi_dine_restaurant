@@ -185,6 +185,7 @@
 
         })
     </script>
+    <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
 </body>
 
 </html>

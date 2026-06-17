@@ -430,6 +430,7 @@
         $('.select2').select2();
     </script>
     <script src="{{ asset('assets/js/auto-required.js') }}"></script>
+    <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
     @stack('scripts')
 </body>
 

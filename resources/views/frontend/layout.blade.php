@@ -442,6 +442,7 @@
   </div>
 
   <script src="{{ asset('assets/frontend/app.js') }}"></script>
+  <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
   @stack('front_js')
 </body>
 
