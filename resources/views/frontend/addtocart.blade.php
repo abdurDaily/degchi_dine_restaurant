@@ -8,10 +8,10 @@
     --glass-border: rgba(255, 255, 255, 0.9);
     --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
     --glass-blur: blur(24px);
-    --brand-dark: #111111;
-    --text-muted: #6b7280;
-    --border-light: rgba(0, 0, 0, 0.06);
-    --brand-accent: #ef8b1f; /* Updated Brand Color */
+    --brand-dark: #0a4554;
+    --text-muted: #5a7a85;
+    --border-light: rgba(17, 107, 131, 0.08);
+    --brand-accent: #e7ae07;
 }
 
 body {
@@ -24,7 +24,7 @@ body {
     padding-top: 3rem;
     padding-bottom: 5rem;
     background: 
-        radial-gradient(circle at 10% 20%, rgba(239, 139, 31, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 10% 20%, rgba(231, 174, 7, 0.04) 0%, transparent 40%),
         radial-gradient(circle at 90% 80%, rgba(0, 0, 0, 0.03) 0%, transparent 40%),
         linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
 }
@@ -58,7 +58,7 @@ body {
 
 .cart-count-badge {
     display: inline-block;
-    background: rgba(239, 139, 31, 0.1);
+    background: rgba(231, 174, 7, 0.1);
     color: var(--brand-accent);
     font-size: 0.9rem;
     font-weight: 700;
@@ -66,7 +66,7 @@ body {
     padding: 0.35rem 0.85rem;
     border-radius: 999px;
     vertical-align: middle;
-    border: 1px solid rgba(239, 139, 31, 0.2);
+    border: 1px solid rgba(231, 174, 7, 0.2);
 }
 
 /* --- Premium Breadcrumb Stepper --- */
@@ -86,7 +86,7 @@ body {
     font-weight: 600;
     background: #ffffff;
     color: #4b5563;
-    border: 1.5px solid rgba(239, 139, 31, 0.2); /* Brand tinted border */
+    border: 1.5px solid rgba(231, 174, 7, 0.2); /* Brand tinted border */
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -99,7 +99,7 @@ body {
     background: var(--brand-dark);
     color: #ffffff;
     border-color: var(--brand-dark);
-    box-shadow: 0 10px 20px -6px rgba(239, 139, 31, 0.4); /* Brand tinted glow */
+    box-shadow: 0 10px 20px -6px rgba(231, 174, 7, 0.4); /* Brand tinted glow */
     transform: translateY(-1px);
 }
 
@@ -431,8 +431,8 @@ body {
 .cart-empty-icon-wrap {
     width: 90px;
     height: 90px;
-    background: rgba(239, 139, 31, 0.05);
-    border: 1px dashed rgba(239, 139, 31, 0.3);
+    background: rgba(231, 174, 7, 0.05);
+    border: 1px dashed rgba(231, 174, 7, 0.3);
     border-radius: 50%;
     display: flex;
     align-items: center;

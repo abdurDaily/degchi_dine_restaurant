@@ -174,71 +174,75 @@
     @yield('frontend_content');
     <!-- Footer -->
     <footer id="contact" class="site-footer">
+      <div class="footer-accent-bar"></div>
+
       <div class="footer-top">
         <div class="container px-4 px-lg-5">
-          <div class="row g-5">
-            <div class="col-lg-4 col-md-6">
+          <div class="footer-grid">
+            <div class="footer-brand-block">
               <img src="{{ asset('assets/frontend/images/logo.webp') }}" alt="Degchi Dine" class="footer-logo mb-3" />
+              <p class="footer-tagline">Degchi Dine · ডেক্সি ডাইন</p>
               <p class="footer-about">
-                Degchi Dine - ডেক্সি ডাইন. A refined dining destination in
-                Halishahar, Chittagong, known for warm hospitality and
-                signature flavors.
+                A refined dining destination in Halishahar, Chittagong — warm hospitality, signature flavors, and memorable evenings.
               </p>
               <div class="footer-socials">
-                <a href="https://www.facebook.com/DegchiDine" target="_blank" rel="noopener noreferrer"
-                  aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.facebook.com/DegchiDine" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                 <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                 <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
                 <a href="#" aria-label="TripAdvisor"><i class="bi bi-star"></i></a>
               </div>
             </div>
 
-            <div class="col-lg-2 col-md-6 col-6">
-              <h6 class="footer-heading">Quick Links</h6>
-              <ul class="footer-links">
+            <div class="footer-col">
+              <h6 class="footer-heading"><span class="footer-heading-line"></span>Explore</h6>
+              <ul class="footer-links footer-links-grid">
                 <li><a href="{{ route('frontend.home') }}#home">Home</a></li>
                 <li><a href="{{ route('frontend.home') }}#about">About Us</a></li>
-                <li><a href="{{ route('frontend.home') }}#menu">Menu</a></li>
                 <li><a href="{{ route('frontend.completeMenu') }}">Full Menu</a></li>
                 <li><a href="{{ route('frontend.cards') }}">Privilege Card</a></li>
-                <li><a href="{{ route('frontend.home') }}#video">Video</a></li>
                 <li><a href="{{ route('frontend.reviews.index') }}">Reviews</a></li>
                 <li><a href="{{ route('frontend.contact') }}">Contact</a></li>
               </ul>
             </div>
 
-            <div class="col-lg-3 col-md-6 col-6">
-              <h6 class="footer-heading">Contact Us</h6>
+            <div class="footer-col">
+              <h6 class="footer-heading"><span class="footer-heading-line"></span>Member &amp; Orders</h6>
               <ul class="footer-links">
-                <li>
-                  <i class="bi bi-geo-alt me-2 text-brand"></i>Boropool
-                  Circle, Kaptan Villa, Halishahar, Chittagong, Bangladesh
-                </li>
-                <li>
-                  <i class="bi bi-telephone me-2 text-brand"></i>01898-795400
-                </li>
-                <li>
-                  <i class="bi bi-envelope me-2 text-brand"></i>degchidine@gmail.com
-                </li>
-                <li>
-                  <i class="bi bi-clock me-2 text-brand"></i>Daily, 5:00 PM
-                  &ndash; 11:30 PM
-                </li>
+                <li><a href="{{ route('frontend.card.apply') }}">Apply for Card</a></li>
+                <li><a href="{{ route('frontend.member.login') }}">Member Login</a></li>
+                <li><a href="{{ route('frontend.order.track') }}">Track Order</a></li>
+                <li><a href="{{ route('frontend.addtocart') }}">View Cart</a></li>
+                <li><a href="{{ route('frontend.checkout') }}">Checkout</a></li>
               </ul>
             </div>
 
-            <div class="col-lg-3 col-md-6">
-              <h6 class="footer-heading">Newsletter</h6>
-              <p class="footer-about">
-                Stay updated with seasonal menus and exclusive events.
-              </p>
-              <form class="footer-newsletter" onsubmit="return false;">
-                <input type="email" placeholder="Your email address" aria-label="Email for newsletter" />
-                <button type="submit" aria-label="Subscribe">
-                  <i class="bi bi-send"></i>
-                </button>
-              </form>
+            <div class="footer-col footer-contact-col">
+              <h6 class="footer-heading"><span class="footer-heading-line"></span>Visit Us</h6>
+              <ul class="footer-contact-list">
+                <li class="footer-contact-item">
+                  <span class="footer-contact-icon"><i class="bi bi-geo-alt"></i></span>
+                  <span>Boropool Circle, Kaptan Villa, Halishahar, Chittagong</span>
+                </li>
+                <li class="footer-contact-item">
+                  <span class="footer-contact-icon"><i class="bi bi-telephone"></i></span>
+                  <a href="tel:01898795400">01898-795400</a>
+                </li>
+                <li class="footer-contact-item">
+                  <span class="footer-contact-icon"><i class="bi bi-envelope"></i></span>
+                  <a href="mailto:degchidine@gmail.com">degchidine@gmail.com</a>
+                </li>
+                <li class="footer-contact-item">
+                  <span class="footer-contact-icon"><i class="bi bi-clock"></i></span>
+                  <span>Daily · 5:00 PM – 11:30 PM</span>
+                </li>
+              </ul>
             </div>
+          </div>
+
+          <div class="footer-quick-actions">
+            <a href="{{ route('frontend.completeMenu') }}" class="footer-action-pill"><i class="bi bi-grid-3x3-gap"></i> Browse Menu</a>
+            <a href="{{ route('frontend.order.track') }}" class="footer-action-pill"><i class="bi bi-truck"></i> Track Order</a>
+            <a href="{{ route('frontend.cards') }}" class="footer-action-pill footer-action-pill-gold"><i class="bi bi-credit-card-2-front"></i> Get Member Card</a>
           </div>
         </div>
       </div>
@@ -246,8 +250,7 @@
       <div class="footer-divider"></div>
 
       <div class="footer-bottom">
-        <div
-          class="container px-4 px-lg-5 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+        <div class="container px-4 px-lg-5 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
           <p class="mb-0">&copy; 2026 Degchi Dine. All rights reserved.</p>
           <div class="d-flex gap-3">
             <a href="#">Privacy Policy</a>
@@ -276,8 +279,14 @@
       </button>
       @endunless
     @else
-      <a href="{{ route('frontend.member.dashboard') }}" class="fab fab-track is-visible" aria-label="My Dashboard" title="My Dashboard">
-        <span class="fab-track-label">My Orders</span>
+      @unless(request()->routeIs('frontend.order.track'))
+      <a href="{{ route('frontend.order.track') }}" class="fab fab-track is-visible" aria-label="Track an order" title="Track Order">
+        <span class="fab-track-label">Track Order</span>
+        <iconify-icon icon="solar:delivery-linear" aria-hidden="true"></iconify-icon>
+      </a>
+      @endunless
+      <a href="{{ route('frontend.member.dashboard') }}" class="fab fab-track is-visible" aria-label="My Dashboard" title="My Dashboard" style="background: linear-gradient(135deg, #e7ae07, #c99606) !important;">
+        <span class="fab-track-label">Dashboard</span>
         <iconify-icon icon="solar:widget-5-bold" aria-hidden="true"></iconify-icon>
       </a>
     @endguest

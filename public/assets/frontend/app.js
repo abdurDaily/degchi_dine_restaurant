@@ -467,6 +467,11 @@ const renderCartDrawer = () => {
 
     subtotalNode.textContent = formatCurrency(getCartTotal(cart));
     updateCartBadges(cart);
+
+    const checkoutBtn = document.querySelector(".cart-drawer .cart-checkout-btn");
+    if (checkoutBtn) {
+        checkoutBtn.classList.toggle("is-cart-empty", !cart.length);
+    }
 };
 
 const renderCartPage = () => {
@@ -692,6 +697,10 @@ const initCartEvents = () => {
 };
 
 const initCartPages = () => {
+    if (new URLSearchParams(window.location.search).get("clear_cart") === "1") {
+        localStorage.removeItem(CART_STORAGE_KEY);
+    }
+
     renderCartDrawer();
     renderCartPage();
     renderCheckoutSummary();
@@ -1012,7 +1021,7 @@ $(function () {
         slidesToShow: 4,
         slidesToScroll: 1,
         arrows: true,
-        dots: false, // FIXED: Enabled dots so our custom CSS metric bars render properly
+        dots: false,
         infinite: true,
         autoplay: true,
         autoplaySpeed: 2600,
@@ -1021,23 +1030,15 @@ $(function () {
         speed: 420,
         swipe: true,
         touchThreshold: 10,
-        prevArrow: $menuSlider.find(".menu-slider-prev"), // Clean contextual selectors
+        prevArrow: $menuSlider.find(".menu-slider-prev"),
         nextArrow: $menuSlider.find(".menu-slider-next"),
-        appendDots: $menuSlider.find(".menu-slider-dots"),
-        customPaging: function (slider, i) {
-            // Formats slick dots into clean custom markup matching our CSS .menu-dot class
-            return (
-                '<button class="menu-dot" aria-label="Go to slide ' +
-                (i + 1) +
-                '"></button>'
-            );
-        },
         responsive: [
             {
                 breakpoint: 1200,
                 settings: {
                     slidesToShow: 3,
                     slidesToScroll: 1,
+                    dots: false,
                 },
             },
             {
@@ -1045,15 +1046,18 @@ $(function () {
                 settings: {
                     slidesToShow: 2,
                     slidesToScroll: 1,
+                    dots: false,
                 },
             },
             {
                 breakpoint: 768,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: 1,
                     slidesToScroll: 1,
                     arrows: false,
-                    dots: true, // Keeps the sleek custom dash bars active on mobile touch screens
+                    dots: false,
+                    centerMode: false,
+                    centerPadding: "0px",
                 },
             },
             {
@@ -1063,8 +1067,8 @@ $(function () {
                     slidesToScroll: 1,
                     arrows: false,
                     dots: false,
-                    centerMode: true,
-                    centerPadding: "20px", // Adjusted slightly for perfect geometric card balance
+                    centerMode: false,
+                    centerPadding: "0px",
                 },
             },
         ],
@@ -1082,7 +1086,7 @@ $(function () {
         slidesToShow: 4,
         slidesToScroll: 1,
         arrows: true,
-        dots: true,
+        dots: false,
         infinite: true,
         autoplay: true,
         autoplaySpeed: 3000,
@@ -1091,43 +1095,40 @@ $(function () {
         swipe: true,
         touchThreshold: 15,
 
-        /* FIX: Changed from bi-arrow-left to bi-chevron-left inside the inner span 
-       to match your existing menu slider structure perfectly.
-    */
         prevArrow:
             '<button type="button" class="slick-prev"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-left"></i></span></button>',
         nextArrow:
             '<button type="button" class="slick-next"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-right"></i></span></button>',
 
-        appendDots: $(".reels-section").find(".menu-slider-dots"),
-        customPaging: function (slider, i) {
-            return (
-                '<button class="menu-dot" aria-label="Go to slide ' +
-                (i + 1) +
-                '"></button>'
-            );
-        },
         responsive: [
             {
                 breakpoint: 1200,
-                settings: { slidesToShow: 3 },
+                settings: { slidesToShow: 3, dots: false },
+            },
+            {
+                breakpoint: 992,
+                settings: { slidesToShow: 2, dots: false },
             },
             {
                 breakpoint: 768,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
                     arrows: false,
-                    dots: true,
+                    dots: false,
+                    centerMode: false,
+                    centerPadding: "0px",
                 },
             },
             {
-                breakpoint: 480,
+                breakpoint: 576,
                 settings: {
                     slidesToShow: 1,
+                    slidesToScroll: 1,
                     arrows: false,
-                    dots: true,
-                    centerMode: true,
-                    centerPadding: "40px",
+                    dots: false,
+                    centerMode: false,
+                    centerPadding: "0px",
                 },
             },
         ],
@@ -1159,6 +1160,33 @@ $(function () {
     }, 7000);
 })();
 
+/* ── Floating Action Button: Track Order ───────────────── */
+(function () {
+    const trackBtns = document.querySelectorAll(".fab-track");
+    if (!trackBtns.length) return;
+
+    trackBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            btn.animate(
+                [
+                    { transform: "translateY(0) scale(1)" },
+                    { transform: "translateY(-2px) scale(0.95)" },
+                    { transform: "translateY(0) scale(1.06)" },
+                    { transform: "translateY(0) scale(1)" },
+                ],
+                { duration: 320, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
+            );
+        });
+    });
+
+    setInterval(() => {
+        trackBtns.forEach((btn) => {
+            btn.classList.add("is-nudging");
+            setTimeout(() => btn.classList.remove("is-nudging"), 700);
+        });
+    }, 5500);
+})();
+
 // review
 $(".reviews-slider").slick({
     centerMode: true,
@@ -1178,8 +1206,20 @@ $(".reviews-slider").slick({
             breakpoint: 768,
             settings: {
                 slidesToShow: 1,
-                centerMode: true,
-                centerPadding: "20px",
+                slidesToScroll: 1,
+                centerMode: false,
+                centerPadding: "0px",
+                dots: true,
+            },
+        },
+        {
+            breakpoint: 576,
+            settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                centerMode: false,
+                centerPadding: "0px",
+                dots: true,
             },
         },
     ],

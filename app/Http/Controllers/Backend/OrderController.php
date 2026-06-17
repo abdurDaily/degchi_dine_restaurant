@@ -81,6 +81,11 @@ class OrderController extends Controller
         }
 
         $order->load('member');
+
+        if (request()->ajax()) {
+            return view('backend.orders.partials.details', compact('order'));
+        }
+
         return view('backend.orders.show', compact('order'));
     }
 

@@ -14,9 +14,9 @@ class SSLCommerzService
 
     public function __construct()
     {
-        $this->storeId = (string) config('sslcommerz.store_id');
-        $this->storePassword = (string) config('sslcommerz.store_password');
-        $this->sandbox = (bool) config('sslcommerz.sandbox');
+        $this->storeId = (string) \App\Support\SslCommerzConfig::get('store_id', '');
+        $this->storePassword = (string) \App\Support\SslCommerzConfig::get('store_password', '');
+        $this->sandbox = (bool) \App\Support\SslCommerzConfig::get('sandbox', true);
         $this->apiUrl = $this->sandbox
             ? 'https://sandbox.sslcommerz.com'
             : 'https://securepay.sslcommerz.com';

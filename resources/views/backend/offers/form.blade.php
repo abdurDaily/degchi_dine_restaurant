@@ -1,4 +1,4 @@
-@extends('dashboard')
+@extends('layouts.dashboard')
 @section('title', isset($offer->id) ? 'Edit Offer' : 'Create Offer')
 
 @section('content')

@@ -11,10 +11,6 @@ class OrderRedirect
 {
     public static function url(Order $order): string
     {
-        if (auth('member')->check()) {
-            return route('frontend.member.dashboard', ['order' => $order->id]);
-        }
-
         session([
             'guest_order_id' => $order->id,
             'guest_order_phone' => $order->customer_phone,

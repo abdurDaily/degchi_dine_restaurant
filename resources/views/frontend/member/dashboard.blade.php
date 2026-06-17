@@ -319,6 +319,10 @@
             <p class="dd-apply-subhead">Track your orders, view membership perks, and manage your Degchi Dine rewards.</p>
 
             <div class="md-hero-actions">
+                <a href="{{ route('frontend.order.track') }}" class="md-hero-btn md-hero-btn-outline">
+                    <iconify-icon icon="solar:delivery-linear"></iconify-icon>
+                    Track Order
+                </a>
                 <a href="{{ route('frontend.completeMenu') }}" class="md-hero-btn md-hero-btn-solid">
                     <iconify-icon icon="solar:chef-hat-linear"></iconify-icon>
                     Order Food

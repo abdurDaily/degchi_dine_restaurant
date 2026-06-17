@@ -1,26 +1,7 @@
 @extends('frontend.layout')
 
 @section('frontend_content')
-<style>
-    /* Sticky Filter Sidebar */
-    .filter-sidebar {
-        transition: all 0.3s ease;
-    }
-
-    .filter-sidebar.is-sticky {
-        position: fixed;
-        top: 100px;
-        z-index: 50;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    @media (max-width: 991.98px) {
-        .filter-sidebar.is-sticky {
-            position: static;
-            box-shadow: none;
-        }
-    }
-</style>
+<div class="menu-page">
 <!-- COMPLETE MENU HEADER -->
 <section class="menu-hero-section py-5 text-center position-relative">
     <div class="container px-4 px-lg-5">
@@ -65,58 +46,24 @@
 </section>
 
 <!-- MAIN FILTER & GRID CONTAINER -->
-<section class="menu-grid-section py-5">
+<section class="menu-grid-section py-4 py-lg-5">
     <div class="container px-4 px-lg-5">
-        <div class="row g-4">
+        <div class="row g-4 menu-layout-row">
             
-            <!-- Sidebar Filter Panel -->
-            <div class="col-12 col-lg-3">
-                <div class="filter-sidebar p-4 shadow-sm sticky-filter">
-                    <h5 class="filter-title mb-4"><i class="bi bi-sliders2-vertical me-2"></i>Filters</h5>
-                    
-                    <!-- Category Section -->
-                    <div class="filter-group mb-5">
-                        <label class="filter-group-label mb-3">Categories</label>
-                        <div class="category-pills-column d-flex flex-column gap-2">
-                            <button type="button" class="btn category-pill-btn text-start {{ !$selectedCategorySlug ? 'active' : '' }}" data-category="">
-                                <span class="d-flex align-items-center justify-content-between">
-                                    <span>All Items</span>
-                                </span>
-                            </button>
-                            @foreach($categories as $category)
-                                <button type="button" class="btn category-pill-btn text-start {{ $selectedCategorySlug == $category->slug ? 'active' : '' }}" data-category="{{ $category->slug }}">
-                                    <span class="d-flex align-items-center justify-content-between">
-                                        <span>{{ $category->name }}</span>
-                                    </span>
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Price Section -->
-                    <div class="filter-group mb-2">
-                        <label class="filter-group-label mb-3">Price Range</label>
-                        <div class="price-slider-container px-2">
-                            
-                            <div class="dual-range-slider position-relative mb-4">
-                                <div class="slider-track" id="sliderTrack"></div>
-                                <input type="range" min="{{ $minPriceLimit }}" max="{{ $maxPriceLimit }}" value="{{ $minPrice }}" class="slider-input" id="minPriceInput">
-                                <input type="range" min="{{ $minPriceLimit }}" max="{{ $maxPriceLimit }}" value="{{ $maxPrice }}" class="slider-input" id="maxPriceInput">
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center text-muted mt-3">
-                                <span class="price-badge px-2 py-1 rounded bg-light border">৳ <span id="minPriceDisplay">{{ number_format($minPrice) }}</span></span>
-                                <span class="small text-uppercase fw-bold">to</span>
-                                <span class="price-badge px-2 py-1 rounded bg-light border">৳ <span id="maxPriceDisplay">{{ number_format($maxPrice) }}</span></span>
-                            </div>
-                        </div>
-                    </div>
-
+            <!-- Desktop sidebar filters -->
+            <div class="col-lg-3 filter-col filter-col-desktop d-none d-lg-block">
+                <div class="filter-sticky-boundary" id="filterStickyBoundary">
+                    @include('frontend.partials.menu_filters', ['suffix' => ''])
                 </div>
             </div>
 
             <!-- Menu Grid Column -->
-            <div class="col-12 col-lg-9">
+            <div class="col-12 col-lg-9 menu-grid-col">
+                <!-- Mobile: sticky filter bar at top, filter data below header -->
+                <div class="menu-mobile-sticky-filter d-lg-none" id="menuMobileStickyFilter">
+                    @include('frontend.partials.menu_filters', ['suffix' => 'Mobile'])
+                </div>
+
                 <div class="position-relative min-vh-50">
                     
                     <!-- Loading overlay spinner -->
@@ -137,104 +84,328 @@
         </div>
     </div>
 </section>
+</div>
 @endsection
 
 @push('front_js')
 <script>
     $(document).ready(function() {
-        const filterSidebar = document.querySelector('.filter-sidebar');
-        const menuGridSection = document.querySelector('.menu-grid-section');
-        const filterColumn = filterSidebar.closest('.col-12');
-        const container = menuGridSection.querySelector('.container');
-        
-        const sectionTop = menuGridSection.offsetTop;
-        const sectionHeight = menuGridSection.offsetHeight;
-        let filterWidth = filterSidebar.offsetWidth;
-        let filterLeftPos = 0;
-        let containerLeftPos = 0;
-        let scrollTimeout;
+        const filterSidebar = document.getElementById('filterSidebar');
+        const filterBoundary = document.getElementById('filterStickyBoundary');
+        const filterCol = document.querySelector('.filter-col-desktop');
+        const mobileFilterWrap = document.getElementById('menuMobileStickyFilter');
+        const mobileFilterSidebar = document.getElementById('filterSidebarMobile');
+        const menuGridContainer = document.getElementById('menuGridContainer');
+        const DESKTOP_MIN = 992;
 
-        // Calculate filter position relative to viewport
-        function calculatePositions() {
-            const filterRect = filterSidebar.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            
-            filterWidth = filterSidebar.offsetWidth;
-            filterLeftPos = filterRect.left + window.scrollX; // Absolute position from left
-            containerLeftPos = containerRect.left + window.scrollX; // Container absolute position
+        let stickStart = 0;
+        let stickEnd = 0;
+        let sidebarWidth = 0;
+        let sidebarLeft = 0;
+        let mobileStickStart = 0;
+        let mobileStickEnd = 0;
+        let mobileFilterHeight = 0;
+        let mobileFilterLeft = 0;
+        let mobileFilterWidth = 0;
+        let stickyTimer = null;
+
+        function setMobileFilterTopVar() {
+            const mobileNav = document.querySelector('.mobile-topbar');
+            const top = mobileNav ? mobileNav.offsetHeight : 72;
+            document.documentElement.style.setProperty('--menu-filter-top', top + 'px');
         }
 
-        // Handle window resize to update positions
-        window.addEventListener('resize', calculatePositions);
-        calculatePositions(); // Initial calculation
+        function getDesktopStickyTop() {
+            const desktopNav = document.getElementById('desktopNavbar');
+            return (desktopNav ? desktopNav.offsetHeight : 86) + 20;
+        }
 
-        // Throttle scroll event for smooth performance
-        window.addEventListener('scroll', function() {
-            clearTimeout(scrollTimeout);
-            
-            scrollTimeout = setTimeout(function() {
-                const scrollTop = window.scrollY;
-                const sectionBottom = sectionTop + sectionHeight;
+        function getMobileStickyTop() {
+            const mobileNav = document.querySelector('.mobile-topbar');
+            return mobileNav ? mobileNav.offsetHeight : 72;
+        }
 
-                // Check if we're within the menu grid section
-                if (scrollTop >= sectionTop && scrollTop < sectionBottom - 300) {
-                    // Add sticky class
-                    if (!filterSidebar.classList.contains('is-sticky')) {
-                        calculatePositions();
-                        filterSidebar.classList.add('is-sticky');
-                        // Set the left position to keep it in place
-                        filterSidebar.style.left = filterLeftPos + 'px';
-                        filterSidebar.style.width = filterWidth + 'px';
-                    }
-                } else {
-                    // Remove sticky class
-                    if (filterSidebar.classList.contains('is-sticky')) {
-                        filterSidebar.classList.remove('is-sticky');
-                        filterSidebar.style.left = 'auto';
-                        filterSidebar.style.width = 'auto';
-                    }
-                }
-            }, 10);
-        }, { passive: true });
+        function getMobileFilterBox() {
+            const container = mobileFilterWrap?.closest('.container');
+            if (container) {
+                const rect = container.getBoundingClientRect();
+                return { left: rect.left, width: rect.width };
+            }
+            if (mobileFilterWrap) {
+                const rect = mobileFilterWrap.getBoundingClientRect();
+                return { left: rect.left, width: rect.width };
+            }
+            return { left: 0, width: window.innerWidth };
+        }
 
-        const minInput = document.getElementById('minPriceInput');
-        const maxInput = document.getElementById('maxPriceInput');
-        const minDisplay = document.getElementById('minPriceDisplay');
-        const maxDisplay = document.getElementById('maxPriceDisplay');
-        const track = document.getElementById('sliderTrack');
-        const minLimit = parseFloat(minInput.min);
-        const maxLimit = parseFloat(maxInput.max);
+        function getVisibleFilterScope() {
+            return window.innerWidth < DESKTOP_MIN
+                ? document.getElementById('menuMobileStickyFilter')
+                : document.querySelector('.filter-col-desktop');
+        }
 
-        function updateSliderFill() {
+        function getCardsBottom() {
+            if (!menuGridContainer) return 0;
+
+            const pagination = menuGridContainer.querySelector('.modern-pagination')?.closest('.d-flex');
+            if (pagination) {
+                return pagination.getBoundingClientRect().top + window.scrollY;
+            }
+
+            const cardsRow = menuGridContainer.querySelector('.row');
+            if (cardsRow) {
+                const rect = cardsRow.getBoundingClientRect();
+                return rect.bottom + window.scrollY;
+            }
+
+            const rect = menuGridContainer.getBoundingClientRect();
+            return rect.bottom + window.scrollY;
+        }
+
+        function resetFilterSticky() {
+            if (filterSidebar) {
+                filterSidebar.classList.remove('is-sticky', 'is-sticky-bottom');
+                filterSidebar.style.position = '';
+                filterSidebar.style.top = '';
+                filterSidebar.style.left = '';
+                filterSidebar.style.width = '';
+                filterSidebar.style.bottom = '';
+                filterSidebar.style.zIndex = '';
+                filterSidebar.style.maxHeight = '';
+            }
+            if (filterBoundary) {
+                filterBoundary.style.minHeight = '';
+            }
+        }
+
+        function resetMobileFilterSticky() {
+            if (!mobileFilterWrap || !mobileFilterSidebar) return;
+            mobileFilterWrap.style.height = '';
+            mobileFilterWrap.classList.remove('is-js-sticky-active');
+            mobileFilterSidebar.classList.remove('is-sticky', 'is-sticky-bottom', 'is-mobile-fixed');
+            mobileFilterSidebar.style.position = '';
+            mobileFilterSidebar.style.top = '';
+            mobileFilterSidebar.style.left = '';
+            mobileFilterSidebar.style.width = '';
+            mobileFilterSidebar.style.right = '';
+            mobileFilterSidebar.style.bottom = '';
+            mobileFilterSidebar.style.zIndex = '';
+        }
+
+        function measureDesktopFilterSticky() {
+            resetFilterSticky();
+
+            if (window.innerWidth < DESKTOP_MIN || !filterSidebar || !filterBoundary || !filterCol) {
+                return;
+            }
+
+            const stickyTop = getDesktopStickyTop();
+            const boundaryTop = filterBoundary.getBoundingClientRect().top + window.scrollY;
+            const cardsBottom = getCardsBottom();
+            const cardsHeight = Math.max(cardsBottom - boundaryTop, filterSidebar.offsetHeight);
+
+            filterBoundary.style.minHeight = cardsHeight + 'px';
+
+            const colRect = filterCol.getBoundingClientRect();
+            sidebarWidth = colRect.width;
+            sidebarLeft = colRect.left;
+            stickStart = boundaryTop - stickyTop;
+            stickEnd = cardsBottom - stickyTop - filterSidebar.offsetHeight;
+
+            if (stickEnd < stickStart) {
+                stickEnd = stickStart;
+            }
+        }
+
+        function measureMobileFilterSticky() {
+            resetMobileFilterSticky();
+
+            if (window.innerWidth >= DESKTOP_MIN || !mobileFilterWrap || !mobileFilterSidebar) {
+                return;
+            }
+
+            const stickyTop = getMobileStickyTop();
+            const wrapTop = mobileFilterWrap.getBoundingClientRect().top + window.scrollY;
+            const cardsBottom = getCardsBottom();
+            const box = getMobileFilterBox();
+
+            mobileFilterHeight = mobileFilterSidebar.offsetHeight;
+            mobileFilterLeft = box.left;
+            mobileFilterWidth = box.width;
+            mobileStickStart = wrapTop - stickyTop;
+            mobileStickEnd = cardsBottom - stickyTop - mobileFilterHeight;
+
+            if (mobileStickEnd < mobileStickStart) {
+                mobileStickEnd = mobileStickStart;
+            }
+        }
+
+        function measureFilterSticky() {
+            setMobileFilterTopVar();
+            measureDesktopFilterSticky();
+            measureMobileFilterSticky();
+            updateFilterSticky();
+            updateMobileFilterSticky();
+        }
+
+        function updateDesktopFilterSticky() {
+            if (window.innerWidth < DESKTOP_MIN || !filterSidebar || !filterBoundary) {
+                resetFilterSticky();
+                return;
+            }
+
+            const stickyTop = getDesktopStickyTop();
+            const scrollY = window.scrollY;
+            const colRect = filterCol.getBoundingClientRect();
+            sidebarLeft = colRect.left;
+            sidebarWidth = colRect.width;
+
+            if (scrollY <= stickStart) {
+                resetFilterSticky();
+                return;
+            }
+
+            if (scrollY >= stickEnd) {
+                filterSidebar.classList.remove('is-sticky');
+                filterSidebar.classList.add('is-sticky-bottom');
+                filterSidebar.style.position = 'absolute';
+                filterSidebar.style.top = 'auto';
+                filterSidebar.style.bottom = '0';
+                filterSidebar.style.left = '0';
+                filterSidebar.style.width = '100%';
+                filterSidebar.style.zIndex = '30';
+                return;
+            }
+
+            filterSidebar.classList.add('is-sticky');
+            filterSidebar.classList.remove('is-sticky-bottom');
+            filterSidebar.style.position = 'fixed';
+            filterSidebar.style.top = stickyTop + 'px';
+            filterSidebar.style.left = sidebarLeft + 'px';
+            filterSidebar.style.width = sidebarWidth + 'px';
+            filterSidebar.style.bottom = 'auto';
+            filterSidebar.style.zIndex = '30';
+        }
+
+        function updateMobileFilterSticky() {
+            if (window.innerWidth >= DESKTOP_MIN || !mobileFilterWrap || !mobileFilterSidebar) {
+                resetMobileFilterSticky();
+                return;
+            }
+
+            const stickyTop = getMobileStickyTop();
+            const scrollY = window.scrollY;
+            const box = getMobileFilterBox();
+            mobileFilterLeft = box.left;
+            mobileFilterWidth = box.width;
+            mobileFilterHeight = mobileFilterSidebar.offsetHeight;
+
+            if (scrollY <= mobileStickStart) {
+                resetMobileFilterSticky();
+                return;
+            }
+
+            const stickTravel = mobileStickEnd - mobileStickStart;
+
+            if (scrollY >= mobileStickEnd) {
+                mobileFilterWrap.style.height = (stickTravel + mobileFilterHeight) + 'px';
+                mobileFilterWrap.classList.add('is-js-sticky-active');
+                mobileFilterSidebar.classList.remove('is-sticky', 'is-mobile-fixed');
+                mobileFilterSidebar.classList.add('is-sticky-bottom');
+                mobileFilterSidebar.style.position = 'absolute';
+                mobileFilterSidebar.style.top = stickTravel + 'px';
+                mobileFilterSidebar.style.left = '0';
+                mobileFilterSidebar.style.width = '100%';
+                mobileFilterSidebar.style.bottom = 'auto';
+                mobileFilterSidebar.style.zIndex = '1025';
+                return;
+            }
+
+            mobileFilterWrap.style.height = mobileFilterHeight + 'px';
+            mobileFilterWrap.classList.add('is-js-sticky-active');
+            mobileFilterSidebar.classList.add('is-sticky', 'is-mobile-fixed');
+            mobileFilterSidebar.classList.remove('is-sticky-bottom');
+            mobileFilterSidebar.style.position = 'fixed';
+            mobileFilterSidebar.style.top = stickyTop + 'px';
+            mobileFilterSidebar.style.left = mobileFilterLeft + 'px';
+            mobileFilterSidebar.style.width = mobileFilterWidth + 'px';
+            mobileFilterSidebar.style.bottom = 'auto';
+            mobileFilterSidebar.style.zIndex = '1025';
+        }
+
+        function updateFilterSticky() {
+            updateDesktopFilterSticky();
+            updateMobileFilterSticky();
+        }
+
+        function scheduleFilterSticky() {
+            clearTimeout(stickyTimer);
+            stickyTimer = setTimeout(measureFilterSticky, 50);
+        }
+
+        measureFilterSticky();
+        window.addEventListener('scroll', updateFilterSticky, { passive: true });
+        window.addEventListener('resize', scheduleFilterSticky, { passive: true });
+        window.addEventListener('load', scheduleFilterSticky);
+
+        function updateSliderFillForScope(scope) {
+            if (!scope) return;
+
+            const minInput = scope.querySelector('.menu-min-price');
+            const maxInput = scope.querySelector('.menu-max-price');
+            const minDisplay = scope.querySelector('.menu-min-display');
+            const maxDisplay = scope.querySelector('.menu-max-display');
+            const track = scope.querySelector('.slider-track');
+            if (!minInput || !maxInput || !track) return;
+
+            const minLimit = parseFloat(minInput.min);
+            const maxLimit = parseFloat(maxInput.max);
             let val1 = parseFloat(minInput.value);
             let val2 = parseFloat(maxInput.value);
-            
-            // Constrain minimum slider from passing maximum slider
+
             if (val1 > val2 - 10) {
                 minInput.value = val2 - 10;
                 val1 = val2 - 10;
             }
-
-            // Constrain maximum slider from passing minimum slider
             if (val2 < val1 + 10) {
                 maxInput.value = val1 + 10;
                 val2 = val1 + 10;
             }
 
-            minDisplay.textContent = Math.round(val1);
-            maxDisplay.textContent = Math.round(val2);
+            if (minDisplay) minDisplay.textContent = Math.round(val1);
+            if (maxDisplay) maxDisplay.textContent = Math.round(val2);
 
-            // Calculate fill percentages
             const percent1 = ((val1 - minLimit) / (maxLimit - minLimit)) * 100;
             const percent2 = ((val2 - minLimit) / (maxLimit - minLimit)) * 100;
-
             track.style.background = `linear-gradient(to right, #e9ecef ${percent1}%, var(--brand) ${percent1}%, var(--brand) ${percent2}%, #e9ecef ${percent2}%)`;
         }
 
+        function updateSliderFill() {
+            updateSliderFillForScope(document.querySelector('.filter-col-desktop'));
+            updateSliderFillForScope(document.getElementById('menuMobileStickyFilter'));
+        }
+
+        function syncSlidersFromSource(sourceScope) {
+            if (!sourceScope) return;
+            const minVal = sourceScope.querySelector('.menu-min-price')?.value;
+            const maxVal = sourceScope.querySelector('.menu-max-price')?.value;
+            [document.querySelector('.filter-col-desktop'), document.getElementById('menuMobileStickyFilter')].forEach(function(scope) {
+                if (!scope || scope === sourceScope) return;
+                const minInput = scope.querySelector('.menu-min-price');
+                const maxInput = scope.querySelector('.menu-max-price');
+                if (minInput && minVal !== undefined) minInput.value = minVal;
+                if (maxInput && maxVal !== undefined) maxInput.value = maxVal;
+                updateSliderFillForScope(scope);
+            });
+        }
+
         function fetchFilteredMenus(page = 1) {
+            const scope = getVisibleFilterScope();
+            const minInput = scope?.querySelector('.menu-min-price');
+            const maxInput = scope?.querySelector('.menu-max-price');
             const category = $('.category-pill-btn.active').data('category') || '';
-            const minPrice = Math.round(minInput.value);
-            const maxPrice = Math.round(maxInput.value);
+            const minPrice = Math.round(minInput?.value || 0);
+            const maxPrice = Math.round(maxInput?.value || 0);
 
             // Build page URL with parameters
             const url = new URL(window.location.href);
@@ -257,11 +428,14 @@
                 success: function(response) {
                     $('#menuGridContainer').html(response);
                     $('#menuLoader').removeClass('d-flex').addClass('d-none');
+                    scheduleFilterSticky();
                     
                     // Smoothly scroll back to the top of the grid list
                     $('html, body').animate({
                         scrollTop: $('#menuGridContainer').offset().top - 120
-                    }, 300);
+                    }, 300, function() {
+                        measureFilterSticky();
+                    });
                 },
                 error: function() {
                     $('#menuLoader').removeClass('d-flex').addClass('d-none');
@@ -272,19 +446,22 @@
         // Initialize slider track styling
         updateSliderFill();
 
-        // Listen for input slider drags
-        $(minInput).on('input', updateSliderFill);
-        $(maxInput).on('input', updateSliderFill);
+        $(document).on('input', '.menu-min-price, .menu-max-price', function() {
+            const scope = this.closest('.filter-col-desktop, .menu-mobile-sticky-filter');
+            updateSliderFillForScope(scope);
+            syncSlidersFromSource(scope);
+        });
 
-        // Listen for user finishing slider adjustments to fire filters
-        $(minInput).on('change', function() { fetchFilteredMenus(1); });
-        $(maxInput).on('change', function() { fetchFilteredMenus(1); });
+        $(document).on('change', '.menu-min-price, .menu-max-price', function() {
+            fetchFilteredMenus(1);
+        });
 
         // Category button filter trigger
         $(document).on('click', '.category-pill-btn', function(e) {
             e.preventDefault();
+            const category = $(this).data('category') || '';
             $('.category-pill-btn').removeClass('active');
-            $(this).addClass('active');
+            $('.category-pill-btn[data-category="' + category + '"]').addClass('active');
             fetchFilteredMenus(1);
         });
 

@@ -1,4 +1,17 @@
 <div class="row g-4 justify-content-center">
+    @if($menus->total() > 0)
+    <div class="col-12">
+        <div class="menu-results-bar">
+            <span class="menu-results-count">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                {{ $menus->total() }} item{{ $menus->total() !== 1 ? 's' : '' }}
+            </span>
+            @if($menus->hasPages())
+            <span class="menu-results-page text-muted">Page {{ $menus->currentPage() }} of {{ $menus->lastPage() }}</span>
+            @endif
+        </div>
+    </div>
+    @endif
     @forelse($menus as $menu)
         @php
             $firstVariation = $menu->variations->sortBy('price')->first();
@@ -59,9 +72,6 @@
                                 <span class="menu-offer-price">৳ {{ number_format((float) ($firstVariation?->price ?? 0), 2) }}</span>
                             @endif
                         </div>
-                        <span class="menu-offer-serve">
-                            <i class="bi bi-collection"></i> {{ $menu->variations->count() }} option{{ $menu->variations->count() > 1 ? 's' : '' }}
-                        </span>
                     </div>
                     <div class="menu-offer-actions" onclick="event.preventDefault()">
                         <button class="menu-offer-cart-btn" type="button" 

@@ -31,12 +31,18 @@
                                 </a>
                             </li>
                             @endcan
-                              @can('pusher-setting')
+                            @can('pusher-setting')
                             <li class="nav-item">
                                 <a href="{{route('pusher-setting')}}" class="nav-link" data-key="t-pusher-setting"> Pusher Setting
                                 </a>
                             </li>
                              @endcan
+                            @can('general-setting')
+                            <li class="nav-item">
+                                <a href="{{ route('sslcommerz-setting') }}" class="nav-link" data-key="t-sslcommerz-setting"> SSLCommerz Setting
+                                </a>
+                            </li>
+                            @endcan
                         </ul>
                     </div>
                 </li>

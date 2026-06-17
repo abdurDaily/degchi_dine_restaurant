@@ -93,6 +93,13 @@
 .order-confirm .oc-timeline-step.is-active .oc-timeline-dot { background: var(--dd-gold); border-color: var(--dd-gold); box-shadow: 0 0 0 4px rgba(223,166,83,0.2); }
 .order-confirm .oc-timeline-step strong { display: block; font-size: 0.88rem; }
 .order-confirm .oc-timeline-step span { font-size: 0.78rem; color: var(--dd-text-muted); }
+.order-confirm .oc-verify-box {
+    max-width: 520px; margin: 0 auto;
+    background: #fff; border-radius: 20px; border: 1px solid var(--dd-border);
+    padding: 32px; box-shadow: 0 20px 50px rgba(17, 107, 131, 0.1);
+}
+.order-confirm .oc-verify-box h2 { font-size: 1.45rem; font-weight: 700; margin-bottom: 8px; }
+.order-confirm .oc-verify-box > p { color: var(--dd-text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.55; }
 @media (max-width: 991px) {
     .order-confirm .oc-grid { grid-template-columns: 1fr; }
     .order-confirm .oc-main-box { margin-top: -60px; }
@@ -121,14 +128,47 @@
                 <span>Back to Home</span>
             </a>
 
-            <div class="oc-success-ring">✓</div>
-            <span class="dd-apply-badge">Order Confirmed</span>
-            <h1 class="dd-apply-headline" style="font-size: 2.4rem;">Thank You, {{ explode(' ', $order->customer_name)[0] }}!</h1>
-            <p class="dd-apply-subhead">Your order <strong>#{{ $order->id }}</strong> has been received. We're preparing it now.</p>
+            <div class="oc-success-ring">@if (!empty($needsPhoneVerification))<iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon>@else✓@endif</div>
+            <span class="dd-apply-badge">Order Tracking</span>
+            <h1 class="dd-apply-headline" style="font-size: 2.4rem;">Order #{{ $order->id }}</h1>
+            @if (!empty($needsPhoneVerification))
+            <p class="dd-apply-subhead">Enter the phone number used at checkout to view your order status and receipt.</p>
+            @else
+            <p class="dd-apply-subhead">Hi {{ explode(' ', $order->customer_name)[0] }} — here is your live order status and full receipt.</p>
+            @endif
         </div>
     </div>
 
     <div class="container px-4 px-lg-5 oc-main-box">
+        @if (!empty($needsPhoneVerification))
+        <div class="oc-verify-box">
+            <h2>Verify to view order</h2>
+            <p>For your security, confirm the phone number on order <strong>#{{ $order->id }}</strong> to see tracking details.</p>
+
+            @if ($errors->any())
+                <div class="alert alert-danger border-0 mb-4" style="border-radius: 12px;">{{ $errors->first() }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('frontend.order.track.submit') }}" class="dd-apply-form-element">
+                @csrf
+                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                <div class="dd-input-group">
+                    <input type="tel" name="phone" id="oc_verify_phone" class="dd-input-field" placeholder=" " value="{{ old('phone') }}" required autofocus>
+                    <label for="oc_verify_phone" class="dd-floating-label">Phone Number at Checkout</label>
+                </div>
+                <button type="submit" class="dd-submit-btn">
+                    <span>View Order Tracking </span>
+                    <iconify-icon icon="solar:magnifer-linear" class="dd-btn-icon"></iconify-icon>
+                </button>
+            </form>
+
+            <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--dd-border);">
+                <p class="text-muted mb-2" style="font-size: 0.85rem;">Have a member account?</p>
+                <a href="{{ route('frontend.member.login') }}" class="btn btn-sm btn-outline-dark me-1">Member Login</a>
+                <a href="{{ route('frontend.order.track') }}" class="btn btn-sm btn-outline-dark">Track Another Order</a>
+            </div>
+        </div>
+        @else
         <div class="oc-grid">
             {{-- Left: order details --}}
             <div>
@@ -200,6 +240,11 @@
                 </div>
 
                 <div class="oc-actions">
+                    @auth('member')
+                    <a href="{{ route('frontend.member.dashboard', ['order' => $order->id]) }}" class="oc-action-btn oc-action-btn-solid">
+                        <iconify-icon icon="solar:widget-5-linear"></iconify-icon> My Dashboard
+                    </a>
+                    @endauth
                     <a href="{{ route('frontend.completeMenu') }}" class="oc-action-btn oc-action-btn-solid">
                         <iconify-icon icon="solar:chef-hat-linear"></iconify-icon> Order Again
                     </a>
@@ -262,6 +307,7 @@
                 </div>
 
                 <div class="oc-panel">
+                    @guest('member')
                     <div class="oc-panel-title" style="margin-bottom: 12px;">
                         <iconify-icon icon="solar:card-2-linear" style="color: var(--dd-gold);"></iconify-icon>
                         Get a Member Account
@@ -271,9 +317,18 @@
                         <a href="{{ route('frontend.card.apply') }}" class="btn btn-sm btn-dark">Apply Now</a>
                         <a href="{{ route('frontend.member.login') }}" class="btn btn-sm btn-outline-dark">Member Login</a>
                     </div>
+                    @else
+                    <div class="oc-panel-title" style="margin-bottom: 12px;">
+                        <iconify-icon icon="solar:widget-5-linear" style="color: var(--dd-gold);"></iconify-icon>
+                        Member Account
+                    </div>
+                    <p class="text-muted mb-3" style="font-size: 0.88rem; line-height: 1.55;">View all your orders and membership details from your dashboard.</p>
+                    <a href="{{ route('frontend.member.dashboard') }}" class="btn btn-sm" style="background:#116b83;color:#fff;">Open Dashboard</a>
+                    @endguest
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </section>
 @endsection

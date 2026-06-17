@@ -50,17 +50,18 @@
     <!-- BRANCHES  -->
 
     <section class="branch-container" id="new_branch">
-      <div class="mb-5 text-center reveal py-lg-2">
-        <h2 class="section-title mt-2">Our Branches</h2>
-        <div class="elegant-divider mx-auto">
-          <span></span>
-          <i class="fa-solid fa-utensils"></i>
-          <span></span>
+      <div class="container px-3 px-sm-4 px-lg-5">
+        <div class="mb-4 mb-md-5 text-center reveal py-lg-2">
+          <h2 class="section-title mt-2">Our Branches</h2>
+          <div class="elegant-divider mx-auto">
+            <span></span>
+            <i class="fa-solid fa-utensils"></i>
+            <span></span>
+          </div>
+          <p class="section-subtitle">
+            Our signature experience across the city
+          </p>
         </div>
-        <p class="section-subtitle">
-          Our signature experience across the city
-        </p>
-      </div>
 
         <div class="branch-grid">
         @forelse($branches as $branch)
@@ -70,6 +71,7 @@
               <span class="phone-number">
                 <i class="fa-solid fa-phone"></i> {{ $branch->phone }}
               </span>
+              <p class="branch-address-mobile d-md-none">{{ $branch->location }}</p>
             </div>
             <div class="hover-state">
               <p class="branch-address">{{ $branch->location }}</p>
@@ -80,18 +82,19 @@
             <p class="text-muted">No branches are available at the moment.</p>
           </div>
         @endforelse
+        </div>
       </div>
     </section>
 
     <!-- MENU  -->
-    <section class="menu-section section-block py-5" id="menu">
+    <section class="menu-section section-block py-5 mt-lg-5" id="menu">
       <div class="container px-4 px-lg-5">
-        <div class="mb-5 text-center reveal">
-          <h2 class="section-title mt-2">Loved by Our Guests</h2>
+        <div class="mb-5 text-center reveal menu-section-header">
+          <span class="menu-kicker"><i class="bi bi-heart-fill me-1"></i> Guest Favorites</span>
+          <h2 class="section-title loved-by-title mt-3 mb-2 ">Loved by Our Guests</h2>
           <div class="elegant-divider mx-auto">
             <span></span>
             <i class="fa-solid fa-heart"></i>
-            <!-- Swapped to a heart icon to match the "loved" theme! -->
             <span></span>
           </div>
           <p class="section-subtitle">
@@ -108,6 +111,10 @@
                     ->flatten()
                     ->filter(fn($menu) => $menu->variations->isNotEmpty())
                     ->take(10);
+              @endphp
+
+              @php
+                $menuCardSubtitle = 'Discover the culinary creations our patrons keep coming back for.';
               @endphp
 
               @forelse($sliderMenus as $menu)
@@ -153,9 +160,7 @@
                     </div>
                     <div class="menu-offer-body">
                       <h5 class="menu-offer-title">{{ $menu->name }}</h5>
-                      <p class="menu-offer-meta mb-0">
-                        {{ \Illuminate\Support\Str::limit($menu->description ?? 'Freshly prepared signature dish from Degchi Dine.', 95) }}
-                      </p>
+                      <p class="menu-offer-meta mb-0">{{ $menuCardSubtitle }}</p>
                       <div class="menu-offer-divider"></div>
                       <div class="menu-offer-footer">
                         <div class="menu-offer-price-wrap">
@@ -171,7 +176,6 @@
                             <span class="menu-offer-price">৳ {{ number_format((float) ($firstVariation?->price ?? 0), 2) }}</span>
                           @endif
                         </div>
-                        <span class="menu-offer-serve"><i class="bi bi-collection"></i> {{ $menu->variations->count() }} option{{ $menu->variations->count() > 1 ? 's' : '' }}</span>
                       </div>
                       <div class="menu-offer-actions" onclick="event.preventDefault()">
                         <button class="menu-offer-cart-btn" type="button" 
@@ -203,11 +207,9 @@
           <button class="menu-slider-btn menu-slider-next" aria-label="Next">
             <span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
           </button>
-
-          <div class="menu-slider-dots"></div>
         </div>
 
-        <div class="menu-slider-footer">
+        <div class="menu-slider-footer reveal">
           <a href="{{ route('frontend.completeMenu') }}" class="btn menu-show-more-btn">
             <span>View Complete Menu <i class="bi bi-arrow-right-short ms-1"></i></span>
           </a>
@@ -419,7 +421,7 @@
     <!-- REELS -->
     <section class="section-block py-5 reels-section" id="video">
       <div class="container px-4 px-lg-5">
-        <div class="reels-header-shell reveal mb-5">
+        <div class="reels-header-shell reveal mb-5 reels-section-header-block">
           <div class="reels-section-header">
             <div class="reels-header-left">
               <!-- <span class="reels-kicker text-uppercase">
@@ -492,7 +494,7 @@
     <!-- ABOUT -->
     <section class="section-block py-5 about-section" id="about">
       <div class="container px-4 px-lg-5">
-        <div class="row align-items-center g-5">
+        <div class="row align-items-center g-4 g-lg-5">
           <div class="col-12 col-lg-6 reveal">
             <div class="about-content-block">
               @php
@@ -523,14 +525,14 @@
                 {!! $aboutParagraph !!}
               </div>
 
-              <div class="about-features-grid d-flex flex-wrap gap-4 mb-4">
-                <div class="about-feature-item d-flex align-items-center gap-3">
+              <div class="about-features-grid mb-4">
+                <div class="about-feature-item">
                   <div class="feature-icon-box">
                     <i class="{{ $aboutFeature1Icon }}"></i>
                   </div>
                   <span class="feature-text text-uppercase">{{ $aboutFeature1Text }}</span>
                 </div>
-                <div class="about-feature-item d-flex align-items-center gap-3">
+                <div class="about-feature-item">
                   <div class="feature-icon-box">
                     <i class="{{ $aboutFeature2Icon }}"></i>
                   </div>
@@ -569,9 +571,6 @@
     <section class="section-block reviews-section" id="testimonials">
       <div class="container px-4 px-lg-5">
         <div class="mb-5 text-center reveal">
-          <!-- <span class="badge badge-soft rounded-pill mb-3"
-              >Guest Impressions</span -->
-          >
           <h2 class="section-title">What Our Guests Say</h2>
           <div class="title-divider mx-auto"></div>
         </div>
@@ -642,10 +641,9 @@
     </section>
 
 
-    <section class="section-block pt-0" id="location">
+    <section class="section-block visit-us-section" id="location">
       <div class="container px-4 px-lg-5">
 
-        <!-- Elegant Header -->
         @php
           $contactTitle = optional($contactSettings->get('contact_section_title'))->value ?? 'Visit Us';
           $contactSubtitle = optional($contactSettings->get('contact_section_subtitle'))->value ?? 'We look forward to welcoming you';
@@ -657,63 +655,75 @@
           $contactMapEmbed = optional($contactSettings->get('contact_map_embed'))->value ?: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3690.669527376662!2d91.7766299!3d22.3283281!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE5JzQyLjAiTiA5McKwNDYnMzUuOSJF!5e0!3m2!1sen!2sbd!4v1620000000000!5m2!1sen!2sbd';
           $contactFacebookUrl = optional($contactSettings->get('contact_facebook_url'))->value ?? 'https://www.facebook.com/DegchiDine';
           $contactInstagramUrl = optional($contactSettings->get('contact_instagram_url'))->value ?? '#';
+          $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
         @endphp
 
-        <div class="mb-5 text-center reveal py-lg-2">
-          <h2 class="section-title mt-2">{{ $contactTitle }}</h2>
-          <div class="elegant-divider mx-auto">
-            <span></span>
-            <i class="fa-solid fa-map-location-dot"></i>
-            <span></span>
-          </div>
-          <p class="section-subtitle">{{ $contactSubtitle }}</p>
+        <div class="visit-us-header text-center reveal">
+          <span class="menu-kicker"><i class="bi bi-geo-alt-fill me-1"></i> Find Us</span>
+          <h2 class="section-title mt-3 mb-2">{{ $contactTitle }}</h2>
+          <p class="section-subtitle mx-auto">{{ $contactSubtitle }}</p>
         </div>
 
-        <!-- The Masterpiece Location Layout -->
-        <div class="location-container reveal">
-
-          <!-- LEFT COLUMN: The Premium Info Card -->
-          <div class="location-info-card">
-            <h3 class="info-title">{{ $contactName }}</h3>
-
-            <div class="info-list">
-              <!-- Item 1 -->
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
-                <div class="info-text">
-                  <strong>Address</strong>
-                  <p>{!! nl2br(e($contactAddress)) !!}</p>
-                </div>
+        <div class="visit-us-grid reveal">
+          <div class="visit-us-panel">
+            <div class="visit-us-panel-top">
+              <div>
+                <h3 class="visit-us-name">{{ $contactName }}</h3>
+                <p class="visit-us-tagline">Signature flavors · Warm hospitality</p>
               </div>
-
-              <!-- Item 2 -->
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
-                <div class="info-text">
-                  <strong>Opening Hours</strong>
-                  <p>{{ $contactHours }}</p>
-                </div>
-              </div>
-
-              <!-- Item 3 -->
-              <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
-                <div class="info-text">
-                  <strong>Reservations</strong>
-                  <p><a href="tel:{{ preg_replace('/\D+/', '', $contactPhone) }}">{{ $contactPhone }}</a></p>
-                </div>
-              </div>
+              <span class="visit-us-badge"><i class="bi bi-clock me-1"></i> Open Daily</span>
             </div>
 
-            <!-- Interactive CTA Button -->
-            <a href="{{ $contactMapLink }}" target="_blank" class="btn-directions">
-              Get Directions
-              <i class="fa-solid fa-arrow-right-long btn-arrow"></i>
-            </a>
+            <div class="visit-us-cards">
+              <article class="visit-us-card">
+                <div class="visit-us-card-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="visit-us-card-content">
+                  <h4>Address</h4>
+                  <p>{!! nl2br(e($contactAddress)) !!}</p>
+                </div>
+              </article>
+
+              <article class="visit-us-card">
+                <div class="visit-us-card-icon"><i class="fa-regular fa-clock"></i></div>
+                <div class="visit-us-card-content">
+                  <h4>Opening Hours</h4>
+                  <p>{{ $contactHours }}</p>
+                </div>
+              </article>
+
+              <article class="visit-us-card visit-us-card-accent">
+                <div class="visit-us-card-icon visit-us-card-icon-gold"><i class="fa-solid fa-phone"></i></div>
+                <div class="visit-us-card-content">
+                  <h4>Reservations</h4>
+                  <p><a href="tel:{{ $contactPhoneDigits }}">{{ $contactPhone }}</a></p>
+                  <span class="visit-us-card-note">Call ahead to secure your table</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="visit-us-actions">
+              <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer" class="visit-us-btn visit-us-btn-teal">
+                <i class="fa-solid fa-diamond-turn-right"></i>
+                Get Directions
+              </a>
+              <a href="tel:{{ $contactPhoneDigits }}" class="visit-us-btn visit-us-btn-gold">
+                <i class="fa-solid fa-phone"></i>
+                Call Now
+              </a>
+            </div>
+
+            <div class="visit-us-socials">
+              <span>Follow us</span>
+              <a href="{{ $contactFacebookUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+              <a href="{{ $contactInstagramUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            </div>
           </div>
 
-          <!-- RIGHT COLUMN: The Map -->
-          <div class="location-map-card">
+          <div class="visit-us-map">
+            <div class="visit-us-map-label">
+              <i class="bi bi-pin-map-fill"></i>
+              <span>Halishahar, Chittagong</span>
+            </div>
             <iframe
               src="{{ $contactMapEmbed }}"
               allowfullscreen=""
@@ -721,7 +731,6 @@
               referrerpolicy="no-referrer-when-downgrade"
               title="{{ $contactName }} location map"></iframe>
           </div>
-
         </div>
       </div>
     </section>

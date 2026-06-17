@@ -361,4 +361,72 @@ class SettingController extends Controller
             ], 400);
         }
     }
+
+    public function sslcommerzSetting()
+    {
+        $settings = Setting::select('key', 'value')
+            ->where('setting_group', 'sslcommerz_setting')
+            ->get()
+            ->pluck('value', 'key');
+
+        return view('settings.sslcommerz-setting', [
+            'storeId' => $settings->get('store_id', config('sslcommerz.store_id')),
+            'storePassword' => $settings->get('store_password', config('sslcommerz.store_password')),
+            'sandbox' => filter_var(
+                $settings->get('sandbox', config('sslcommerz.sandbox') ? '1' : '0'),
+                FILTER_VALIDATE_BOOLEAN
+            ),
+        ]);
+    }
+
+    public function sslcommerzSettingStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'store_id' => 'required|string|max:255',
+            'store_password' => 'required|string|max:255',
+            'sandbox' => 'nullable|in:0,1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $payload = [
+                'store_id' => $request->store_id,
+                'store_password' => $request->store_password,
+                'sandbox' => $request->input('sandbox', '0'),
+            ];
+
+            foreach ($payload as $key => $value) {
+                Setting::updateOrCreate(
+                    ['key' => $key],
+                    [
+                        'setting_group' => 'sslcommerz_setting',
+                        'value' => $value,
+                        'user_id' => Auth::id(),
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'SSLCommerz settings updated successfully.',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong',
+            ], 400);
+        }
+    }
 }

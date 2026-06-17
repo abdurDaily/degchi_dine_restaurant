@@ -29,9 +29,7 @@ class MemberAuthController extends Controller
         ]);
 
         $login = trim($request->login);
-        $member = Member::where('phone', $login)
-            ->orWhere('unique_card_number', $login)
-            ->first();
+        $member = Member::findByPhoneOrCard($login);
 
         if (!$member || !$member->password || !Hash::check($request->password, $member->password)) {
             if ($request->ajax()) {
@@ -93,23 +91,40 @@ class MemberAuthController extends Controller
 
     public function showTrackOrder(Request $request)
     {
-        if (Auth::guard('member')->check()) {
-            return redirect()->route('frontend.member.dashboard');
-        }
+        $member = Auth::guard('member')->user();
 
         return view('frontend.track-order', [
             'prefillOrderId' => $request->query('order'),
+            'prefillPhone' => old('phone', $member?->phone),
+            'member' => $member,
         ]);
     }
 
     public function trackOrder(Request $request)
     {
+        $member = Auth::guard('member')->user();
+
         $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'phone' => 'required|string|max:20',
+            'phone' => $member ? 'nullable|string|max:20' : 'required|string|max:20',
         ]);
 
         $order = Order::findOrFail($request->order_id);
+
+        if ($member) {
+            if ((int) $order->member_id === (int) $member->id) {
+                return redirect()->route('frontend.order.confirmation', $order);
+            }
+
+            $phoneToCheck = $request->filled('phone') ? $request->phone : $member->phone;
+            if ($this->phonesMatch($order->customer_phone, $phoneToCheck)) {
+                return redirect()->route('frontend.order.confirmation', $order);
+            }
+
+            return back()
+                ->withInput()
+                ->withErrors(['order_id' => 'This order was not found on your account. Check the order number or use the phone from checkout.']);
+        }
 
         if (!$this->phonesMatch($order->customer_phone, $request->phone)) {
             return back()
@@ -129,18 +144,14 @@ class MemberAuthController extends Controller
     {
         $member = Auth::guard('member')->user();
 
+        $needsPhoneVerification = false;
+
         if ($member) {
-            if ((int) $order->member_id === (int) $member->id) {
-                return redirect()->route('frontend.member.dashboard', ['order' => $order->id]);
+            if (!$this->memberCanViewOrder($order, $member)) {
+                abort(403, 'You do not have access to view this order.');
             }
-
-            abort(403);
-        }
-
-        if (!$this->guestCanViewOrder($order)) {
-            return redirect()
-                ->route('frontend.order.track', ['order' => $order->id])
-                ->with('info', 'Please enter your phone number to view this order.');
+        } elseif (!$this->guestCanViewOrder($order)) {
+            $needsPhoneVerification = true;
         }
 
         $contactPhone = Setting::where('setting_group', 'contact_section')
@@ -149,7 +160,22 @@ class MemberAuthController extends Controller
 
         $orderItems = is_array($order->items) ? $order->items : json_decode($order->items ?? '[]', true);
 
-        return view('frontend.order-confirmation', compact('order', 'contactPhone', 'orderItems'));
+        return view('frontend.order-confirmation', compact(
+            'order',
+            'contactPhone',
+            'orderItems',
+            'member',
+            'needsPhoneVerification'
+        ));
+    }
+
+    private function memberCanViewOrder(Order $order, Member $member): bool
+    {
+        if ((int) $order->member_id === (int) $member->id) {
+            return true;
+        }
+
+        return $this->phonesMatch($order->customer_phone, $member->phone);
     }
 
     private function guestCanViewOrder(Order $order): bool

@@ -8,10 +8,10 @@
             --glass-border: rgba(255, 255, 255, 0.9);
             --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
             --glass-blur: blur(24px);
-            --brand-dark: #111111;
-            --text-muted: #6b7280;
-            --border-light: rgba(0, 0, 0, 0.06);
-            --brand-accent: #e2136e;
+            --brand-dark: #0a4554;
+            --text-muted: #5a7a85;
+            --border-light: rgba(17, 107, 131, 0.08);
+            --brand-accent: #116b83;
         }
 
         body {
@@ -24,7 +24,7 @@
             padding-top: 3rem;
             padding-bottom: 5rem;
             background:
-                radial-gradient(circle at 10% 20%, rgba(226, 19, 110, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 10% 20%, rgba(17, 107, 131, 0.03) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(0, 0, 0, 0.03) 0%, transparent 40%),
                 linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
         }
@@ -70,7 +70,7 @@
             font-weight: 600;
             background: #ffffff;
             color: #4b5563;
-            border: 1.5px solid rgba(226, 19, 110, 0.15);
+            border: 1.5px solid rgba(17, 107, 131, 0.15);
             transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
@@ -83,7 +83,7 @@
             background: var(--brand-dark);
             color: #ffffff;
             border-color: var(--brand-dark);
-            box-shadow: 0 10px 20px -6px #ef8b1f85;
+            box-shadow: 0 10px 20px -6px #e7ae0785;
             transform: translateY(-1px);
         }
 
@@ -840,6 +840,9 @@
                     showToast(result === 'success' ? 'success' : 'error', message);
                     if (params.get('clear_cart') === '1') {
                         localStorage.removeItem('degchi_cart');
+                        if (typeof renderCartDrawer === 'function') {
+                            renderCartDrawer();
+                        }
                     }
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }

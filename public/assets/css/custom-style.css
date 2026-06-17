@@ -196,3 +196,143 @@
 /*-------------------------------------------
    Notice Module CSS End
 -------------------------------------------*/
+
+/* Admin order details (full page + modal) */
+.order-details-panel {
+  --od-teal: #116b83;
+  --od-teal-dark: #0d5566;
+  --od-gold: #e7ae07;
+}
+
+.order-details-card {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(17, 107, 131, 0.08);
+  overflow: hidden;
+}
+
+.order-details-card-header {
+  background: linear-gradient(135deg, #083844 0%, var(--od-teal) 100%);
+  color: #fff;
+  border: none;
+  padding: 0.9rem 1.15rem;
+}
+
+.order-details-card-header .card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.order-actions-header {
+  background: linear-gradient(135deg, var(--od-gold), #c99606);
+  color: #1a1512;
+}
+
+.order-member-header {
+  background: linear-gradient(135deg, var(--od-teal), var(--od-teal-dark));
+  color: #fff;
+}
+
+.order-meta-box {
+  background: rgba(17, 107, 131, 0.05);
+  border: 1px solid rgba(17, 107, 131, 0.1);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+}
+
+.order-meta-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 0.2rem;
+}
+
+.order-meta-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.order-items-table thead {
+  background: rgba(17, 107, 131, 0.06);
+}
+
+.order-items-table thead th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--od-teal-dark);
+  border-bottom: 1px solid rgba(17, 107, 131, 0.12);
+}
+
+.order-item-thumb {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.order-item-thumb-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--od-teal), var(--od-teal-dark));
+  color: #fff;
+}
+
+.order-info-list {
+  font-size: 0.88rem;
+}
+
+.order-info-list > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.order-info-list > div:last-child {
+  margin-bottom: 0;
+}
+
+.order-info-list strong {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #6b7280;
+}
+
+.order-save-btn {
+  background: linear-gradient(135deg, var(--od-gold), #c99606);
+  border: none;
+  color: #1a1512;
+  font-weight: 700;
+}
+
+.order-save-btn:hover {
+  background: linear-gradient(135deg, #f0bc1a, var(--od-gold));
+  color: #1a1512;
+}
+
+.order-summary-card .order-total-row {
+  color: var(--od-teal-dark);
+}
+
+#orderDetailsModal .modal-content {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+#orderDetailsModal .modal-header {
+  background: linear-gradient(135deg, #083844, var(--od-teal));
+  color: #fff;
+  border: none;
+}
+
+#orderDetailsModal .modal-body {
+  background: #f8fafb;
+  padding: 1.25rem;
+}

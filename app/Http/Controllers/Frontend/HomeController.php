@@ -152,7 +152,16 @@ class HomeController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                function ($attribute, $value, $fail) {
+                    if (Member::phoneExists($value)) {
+                        $fail('This phone number is already registered. Please sign in at Member Login or use a different number.');
+                    }
+                },
+            ],
             'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:8|confirmed',
             'dob' => 'required|date',
@@ -227,6 +236,22 @@ class HomeController extends Controller
         }
 
         return redirect()->route('frontend.member.dashboard')->with('success', $message);
+    }
+
+    public function checkMemberPhone(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $exists = Member::phoneExists($request->phone);
+
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists
+                ? 'This phone number is already registered. Please sign in or use a different number.'
+                : 'Phone number is available.',
+        ]);
     }
 
     /**

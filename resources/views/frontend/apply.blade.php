@@ -102,9 +102,10 @@
                     </div>
 
                     <div class="dd-input-group">
-                        <input type="tel" name="phone" id="dd_phone" class="dd-input-field" placeholder=" " required>
+                        <input type="tel" name="phone" id="dd_phone" class="dd-input-field" placeholder=" " required autocomplete="tel">
                         <label for="dd_phone" class="dd-floating-label">Phone Number</label>
                     </div>
+                    <div id="dd_phone_feedback" class="dd-phone-feedback d-none" role="status"></div>
 
                     <div class="dd-input-grid">
                         <div class="dd-input-group">
@@ -205,10 +206,18 @@
                     </div>
 
                     <button type="submit" id="privilegeSubmitBtn" class="dd-submit-btn">
-                        <span>Submit Application</span>
-                        <iconify-icon icon="solar:arrow-right-linear" class="dd-btn-icon"></iconify-icon>
+                        <span class="dd-submit-text">Submit Application</span>
+                        <iconify-icon icon="solar:arrow-right-linear" class="dd-btn-icon dd-submit-icon"></iconify-icon>
                     </button>
                 </form>
+
+                <div id="applyProcessingOverlay" class="dd-apply-processing d-none" aria-live="polite" aria-busy="true">
+                    <div class="dd-apply-processing-inner">
+                        <div class="dd-apply-spinner" role="presentation"></div>
+                        <strong>Processing your application</strong>
+                        <p>Please wait — we're creating your membership and sending confirmation. This may take a few seconds.</p>
+                    </div>
+                </div>
 
                 <div id="privilegeThanks" class="d-none mt-3 alert alert-success"></div>
 
@@ -222,6 +231,62 @@
 @push('front_js')
 <script>
     $(function(){
+        var phoneCheckTimer = null;
+        var phoneAvailable = false;
+
+        function setPhoneFeedback(type, message) {
+            var el = $('#dd_phone_feedback');
+            el.removeClass('d-none is-valid is-invalid is-checking')
+              .addClass(type === 'valid' ? 'is-valid' : (type === 'invalid' ? 'is-invalid' : 'is-checking'))
+              .html(message);
+        }
+
+        function checkPhoneAvailability() {
+            var phone = $('#dd_phone').val().trim();
+            if (phone.length < 10) {
+                phoneAvailable = false;
+                $('#dd_phone_feedback').addClass('d-none');
+                return;
+            }
+
+            setPhoneFeedback('checking', '<iconify-icon icon="svg-spinners:ring-resize"></iconify-icon> Checking phone number…');
+
+            $.get('{{ route('frontend.members.check-phone') }}', { phone: phone })
+                .done(function(res) {
+                    phoneAvailable = !!res.available;
+                    if (res.available) {
+                        setPhoneFeedback('valid', '<iconify-icon icon="solar:check-circle-linear"></iconify-icon> ' + res.message);
+                    } else {
+                        setPhoneFeedback('invalid', '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' + res.message + ' <a href="{{ route('frontend.member.login') }}">Sign in</a>');
+                    }
+                })
+                .fail(function() {
+                    phoneAvailable = false;
+                    $('#dd_phone_feedback').addClass('d-none');
+                });
+        }
+
+        $('#dd_phone').on('input blur', function() {
+            clearTimeout(phoneCheckTimer);
+            phoneCheckTimer = setTimeout(checkPhoneAvailability, 450);
+        });
+
+        function setProcessing(active) {
+            var btn = $('#privilegeSubmitBtn');
+            var overlay = $('#applyProcessingOverlay');
+            if (active) {
+                btn.prop('disabled', true).addClass('is-loading');
+                btn.find('.dd-submit-text').text('Submitting…');
+                overlay.removeClass('d-none');
+                $('body').addClass('dd-apply-busy');
+            } else {
+                btn.prop('disabled', false).removeClass('is-loading');
+                btn.find('.dd-submit-text').text('Submit Application');
+                overlay.addClass('d-none');
+                $('body').removeClass('dd-apply-busy');
+            }
+        }
+
         // Toggle student card upload input
         $('#dd_is_student').on('change', function() {
             if($(this).is(':checked')) {
@@ -304,9 +369,34 @@
                 return;
             }
 
-            submitBtn.prop('disabled', true).addClass('is-loading');
+            var phone = $('#dd_phone').val().trim();
+            if (phone.length < 10) {
+                showErrorPopup('Please enter a valid phone number.');
+                return;
+            }
 
-            var formData = new FormData(this);
+            setProcessing(true);
+
+            $.get('{{ route('frontend.members.check-phone') }}', { phone: phone })
+                .done(function(res) {
+                    if (!res.available) {
+                        setProcessing(false);
+                        phoneAvailable = false;
+                        setPhoneFeedback('invalid', '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' + res.message + ' <a href="{{ route('frontend.member.login') }}">Sign in</a>');
+                        showErrorPopup(res.message);
+                        return;
+                    }
+                    phoneAvailable = true;
+                    submitApplication(form);
+                })
+                .fail(function() {
+                    setProcessing(false);
+                    showErrorPopup('Could not verify phone number. Please try again.');
+                });
+        });
+
+        function submitApplication(form) {
+            var formData = new FormData(form[0]);
 
             $.ajax({
                 url: form.attr('action'),
@@ -316,29 +406,32 @@
                 contentType: false,
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 success: function(res){
-                    submitBtn.prop('disabled', false).removeClass('is-loading');
+                    setProcessing(false);
                     if(res.success){
-                        // Reset form
                         form[0].reset();
+                        phoneAvailable = false;
+                        $('#dd_phone_feedback').addClass('d-none');
                         $('#student_card_group').addClass('d-none');
                         $('#dd_student_card').prop('required', false);
                         $('#profile_image_preview_wrap').addClass('d-none');
                         $('#profile_image_preview').attr('src', '');
                         resetStudentCardPreview();
-
-                        // Show eye-catching success popup
                         showSuccessPopup(res.message, res.card, res.redirect_url);
                     }
                 },
                 error: function(xhr){
-                    submitBtn.prop('disabled', false).removeClass('is-loading');
+                    setProcessing(false);
                     var msg = xhr.responseJSON?.errors
                         ? Object.values(xhr.responseJSON.errors)[0][0]
                         : (xhr.responseJSON?.message || 'Unable to register. Please try again.');
+                    if (xhr.responseJSON?.errors?.phone) {
+                        phoneAvailable = false;
+                        setPhoneFeedback('invalid', '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' + msg + ' <a href="{{ route('frontend.member.login') }}">Sign in</a>');
+                    }
                     showErrorPopup(msg);
                 }
             });
-        });
+        }
 
         function showSuccessPopup(message, cardNumber, dashboardUrl){
             var overlay = $('<div>').css({
@@ -455,5 +548,70 @@
     20%, 60% { transform: translateX(-6px); }
     40%, 80% { transform: translateX(6px); }
 }
+.dd-phone-feedback {
+    font-size: 0.82rem;
+    margin-top: -4px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.45;
+}
+.dd-phone-feedback.is-valid { color: #116b83; }
+.dd-phone-feedback.is-invalid { color: #c0392b; }
+.dd-phone-feedback.is-checking { color: var(--dd-text-muted); }
+.dd-phone-feedback a { font-weight: 600; margin-left: 4px; }
+.dd-submit-btn.is-loading {
+    opacity: 0.85;
+    pointer-events: none;
+}
+.dd-submit-btn.is-loading .dd-submit-icon {
+    animation: ddSpin 0.8s linear infinite;
+}
+@keyframes ddSpin {
+    to { transform: rotate(360deg); }
+}
+.dd-apply-processing {
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    background: rgba(8, 56, 68, 0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+}
+.dd-apply-processing-inner {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 28px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+}
+.dd-apply-processing-inner strong {
+    display: block;
+    color: #116b83;
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+}
+.dd-apply-processing-inner p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #5a7a85;
+    line-height: 1.55;
+}
+.dd-apply-spinner {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 16px;
+    border: 3px solid rgba(17, 107, 131, 0.15);
+    border-top-color: #116b83;
+    border-radius: 50%;
+    animation: ddSpin 0.75s linear infinite;
+}
+body.dd-apply-busy { overflow: hidden; }
 </style>
 @endpush

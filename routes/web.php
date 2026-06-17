@@ -67,6 +67,8 @@ Route::middleware(['auth', 'setLocale'])->group(function () {
     Route::post('email-setting', [SettingController::class, 'emailSettingUpdate'])->name('email-setting.store')->middleware('can:email-setting');
     Route::get('pusher-setting', [SettingController::class, 'pusherSetting'])->name('pusher-setting')->middleware('can:pusher-setting');
     Route::post('pusher-setting', [SettingController::class, 'pusherSettingStore'])->name('pusher-setting.store')->middleware('can:pusher-setting');
+    Route::get('sslcommerz-setting', [SettingController::class, 'sslcommerzSetting'])->name('sslcommerz-setting')->middleware('can:general-setting');
+    Route::post('sslcommerz-setting', [SettingController::class, 'sslcommerzSettingStore'])->name('sslcommerz-setting.store')->middleware('can:general-setting');
 
 
     Route::middleware('role:Super Admin')->group(function () {
@@ -153,6 +155,7 @@ Route::name('frontend.')->group(function () {
     Route::get('/cards', [HomeController::class, 'cards'])->name('cards');
     Route::get('/card-apply', [HomeController::class, 'cardApply'])->name('card.apply');
     Route::post('/members/register', [HomeController::class, 'registerMember'])->name('members.register');
+    Route::get('/member/check-phone', [HomeController::class, 'checkMemberPhone'])->name('members.check-phone');
     Route::post('/golden-card/apply', [HomeController::class, 'applyGoldenCard'])->name('golden.card.apply');
     Route::post('/order', [HomeController::class, 'storeOrder'])->name('order.store');
     Route::get('/member/check', [HomeController::class, 'checkMemberCard'])->name('member.check');
