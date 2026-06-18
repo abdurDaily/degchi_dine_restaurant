@@ -1,0 +1,42 @@
+name: Deploy Laravel to Namecheap
+
+on:
+  push:
+    branches:
+      - master # Change this to 'master' if that is your default branch
+
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Update this to match the PHP version selected in your cPanel
+
+      - name: Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev
+
+      - name: Compile Frontend Assets (Optional)
+        # If you are using Vite or Laravel Mix, keep this step. Otherwise, delete it.
+        run: |
+          npm install
+          npm run build
+
+      - name: Sync Files to Namecheap via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /www.degchidine.com/ # This syncs files to the root of the FTP account's assigned directory
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .env.example
+            .env
