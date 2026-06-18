@@ -33,6 +33,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          timeout: 300000
           server-dir: /www.degchidine.com/ # This syncs files to the root of the FTP account's assigned directory
           exclude: |
             **/.git*
