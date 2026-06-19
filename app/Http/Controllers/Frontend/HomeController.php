@@ -436,21 +436,9 @@ class HomeController extends Controller
                     ->get();
 
                 if ($applicableOffers->isNotEmpty()) {
-                    foreach ($applicableOffers as $offer) {
-                        // Skip first-order offers if user is not a member or already used discount
-                        if ($offer->is_first_order) {
-                            if (!$member || $member->first_order_discount_used) {
-                                continue;
-                            }
-                            
-                            // For student members, check if they are approved by admin
-                            if ($member->is_student && $member->approval_status !== 'approved') {
-                                continue; // Skip first-order discount for unapproved students
-                            }
-                        }
-                        
-                        // Only apply offers that are not first-order, OR first-order offers to eligible members
-                        $bestOffer = $offer;
+                    $bestOffer = Offer::bestEligibleForMember($applicableOffers, $member);
+
+                    if ($bestOffer) {
                         $itemTotal = ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
                         $itemDiscount = round($itemTotal * ($bestOffer->discount_percent / 100), 2);
 
@@ -463,10 +451,8 @@ class HomeController extends Controller
                             'discount_amount' => $itemDiscount,
                         ];
 
-                        // Add offer details to item
                         $item['offer_id'] = $bestOffer->id;
                         $item['offer_discount'] = $itemDiscount;
-                        break; // Use the first applicable offer
                     }
                 }
             }
@@ -609,6 +595,7 @@ class HomeController extends Controller
             return response()->json([
                 'eligible' => true,
                 'member_name' => $member->name,
+                'member_type' => $member->type,
                 'total_purchase' => (float) $member->total_purchase,
                 'discount_rate' => 10,
                 'message' => 'Golden Card Holder: 10% discount applied to all food items.',
@@ -636,6 +623,7 @@ class HomeController extends Controller
                 return response()->json([
                     'eligible'       => true,
                     'member_name'    => $member->name,
+                    'member_type'    => 'golden',
                     'total_purchase' => $liveTotalPurchase,
                     'discount_rate'  => 10,
                     'message'        => 'Golden Card Holder: 10% discount applied to all food items.',
@@ -662,6 +650,7 @@ class HomeController extends Controller
             return response()->json([
                 'eligible' => false,
                 'member_name' => $member->name,
+                'member_type' => $member->type,
                 'total_purchase' => (float) $member->total_purchase,
                 'discount_rate' => 0,
                 'is_student' => true,
@@ -673,6 +662,7 @@ class HomeController extends Controller
         return response()->json([
             'eligible' => true,
             'member_name' => $member->name,
+            'member_type' => $member->type,
             'total_purchase' => (float) $member->total_purchase,
             'discount_rate' => $rate,
             'is_student' => $member->is_student,

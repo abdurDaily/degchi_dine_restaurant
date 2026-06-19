@@ -92,4 +92,60 @@ class Offer extends Model
         }
         return $this->menuVariations()->where('menu_variation_id', $variation->id)->exists();
     }
+
+    /**
+     * Whether this offer may apply for the given member (checkout / order).
+     * Student first-order offers require admin approval; membership vs student are mutually exclusive.
+     */
+    public function isEligibleForMember(?Member $member): bool
+    {
+        if (!$this->isValid()) {
+            return false;
+        }
+
+        if ($this->is_first_order) {
+            if (!$member) {
+                return false;
+            }
+            if ($member->expires_at && $member->expires_at->isPast()) {
+                return false;
+            }
+            if ($member->type === 'golden') {
+                return false;
+            }
+            if ($member->first_order_discount_used) {
+                return false;
+            }
+        }
+
+        return match ($this->applicable_to) {
+            'student' => $member
+                && $member->is_student
+                && $member->approval_status === 'approved',
+            'membership' => $member && !$member->is_student,
+            'golden' => $member && $member->type === 'golden',
+            'all' => $this->is_first_order
+                ? ($member !== null && $member->type !== 'golden' && !$member->first_order_discount_used)
+                : true,
+            default => true,
+        };
+    }
+
+    /**
+     * Pick the best eligible offer for a member from a collection (highest discount wins among eligible only).
+     */
+    public static function bestEligibleForMember(iterable $offers, ?Member $member): ?self
+    {
+        $best = null;
+        foreach ($offers as $offer) {
+            if (!$offer instanceof self || !$offer->isEligibleForMember($member)) {
+                continue;
+            }
+            if (!$best || $offer->discount_percent > $best->discount_percent) {
+                $best = $offer;
+            }
+        }
+
+        return $best;
+    }
 }

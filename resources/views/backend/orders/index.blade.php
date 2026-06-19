@@ -131,33 +131,6 @@
         50%       { opacity: .55; }
     }
 
-    /* ─── Toast ─── */
-    #newOrderToast {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 9999;
-        min-width: 300px;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    /* ─── Sound toggle ─── */
-    #soundToggleBtn {
-        position: fixed;
-        bottom: 24px;
-        left: 24px;
-        z-index: 9999;
-        border-radius: 50%;
-        width: 46px;
-        height: 46px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        box-shadow: 0 3px 12px rgba(0,0,0,.2);
-    }
-
     /* ─── Hide DataTable's own search box ─── */
     .dataTables_wrapper .dataTables_filter { display: none; }
 </style>
@@ -267,25 +240,6 @@
         </div>
     </div>
 
-    {{-- ══ New-order toast ══ --}}
-    <div id="newOrderToast" class="toast align-items-center border-0 shadow"
-         role="alert" aria-live="assertive" aria-atomic="true"
-         data-bs-autohide="true" data-bs-delay="7000"
-         style="background:linear-gradient(135deg,#1abc9c,#16a085);color:#fff;">
-        <div class="d-flex">
-            <div class="toast-body">
-                <span style="font-size:1.3rem;">🛎️</span>
-                <strong class="ms-1">New Order!</strong>
-                <div class="mt-1 small" id="newOrderCount"></div>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-
-    {{-- ══ Sound toggle ══ --}}
-    <button id="soundToggleBtn" class="btn btn-secondary" title="Toggle new order notification sound">
-        <i class="fas fa-bell" id="soundIcon"></i>
-    </button>
 @endsection
 
 @push('scripts')
@@ -480,75 +434,11 @@ $(function () {
     }
 
     /* ══════════════════════════════════════════════════
-       7. NEW ORDER POLLING + SOUND  (every 10 s)
+       7. REFRESH ON GLOBAL NEW-ORDER ALERT
     ══════════════════════════════════════════════════ */
-    let soundEnabled = true;
-    let lastKnownId  = 0;
-
-    $.get('{{ route('orders.latestId') }}', function (res) {
-        lastKnownId = res.latest_id || 0;
-    });
-
-    function playBeep() {
-        try {
-            // Use a simple beep sound (base64 encoded WAV file - short beep)
-            const beepSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj==');
-            beepSound.volume = 0.7;
-            beepSound.play().catch(err => {
-                console.log('Beep sound playback error (trying fallback):', err);
-                // Fallback: Try Web Audio API
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    if (AudioContext) {
-                        const ctx = new AudioContext();
-                        if (ctx.state === 'suspended') {
-                            ctx.resume();
-                        }
-                        const gain = ctx.createGain();
-                        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-                        gain.connect(ctx.destination);
-                        
-                        const osc = ctx.createOscillator();
-                        osc.frequency.setValueAtTime(1000, ctx.currentTime);
-                        osc.connect(gain);
-                        osc.start(ctx.currentTime);
-                        osc.stop(ctx.currentTime + 0.3);
-                    }
-                } catch (e) {
-                    console.warn('Web Audio fallback also failed:', e);
-                }
-            });
-        } catch (e) {
-            console.warn('Beep sound error:', e);
-        }
-    }
-
-    setInterval(function () {
-        $.get('{{ route('orders.latestId') }}', function (res) {
-            const newId = res.latest_id || 0;
-            if (lastKnownId > 0 && newId > lastKnownId) {
-                const diff = newId - lastKnownId;
-                if (soundEnabled) playBeep();
-                $('#newOrderCount').text(diff + ' new order' + (diff > 1 ? 's' : '') + ' just arrived.');
-                new bootstrap.Toast(document.getElementById('newOrderToast')).show();
-                table.draw(false);
-                refreshCounts();
-            }
-            lastKnownId = newId;
-        });
-    }, 3000);  // Check every 3 seconds instead of 10
-
-    /* ══════════════════════════════════════════════════
-       8. SOUND TOGGLE
-    ══════════════════════════════════════════════════ */
-    $('#soundToggleBtn').on('click', function () {
-        soundEnabled = !soundEnabled;
-        $('#soundIcon')
-            .toggleClass('fa-bell',      soundEnabled)
-            .toggleClass('fa-bell-slash', !soundEnabled);
-        $(this).toggleClass('btn-secondary', soundEnabled).toggleClass('btn-danger', !soundEnabled);
-        toastr.info('Order sound ' + (soundEnabled ? 'on' : 'off'));
+    window.addEventListener('dd:new-order', function () {
+        table.draw(false);
+        refreshCounts();
     });
 
 });
