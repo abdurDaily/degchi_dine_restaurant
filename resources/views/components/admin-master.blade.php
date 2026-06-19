@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
+    @auth
+        <meta name="orders-latest-url" content="{{ route('orders.latestId') }}">
+    @endauth
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ Session::get('favicon') }}">
 
@@ -43,6 +46,10 @@
 
     <!-- toastr css -->
     <link rel="stylesheet" href="{{ asset('assets/css/toastr.min.css') }}">
+
+    @auth
+        <link rel="stylesheet" href="{{ asset('assets/css/admin-order-alert.css') }}">
+    @endauth
 
     <!-- DateRange Picker CSS-->
     <link rel="stylesheet" type="text/css"
@@ -194,6 +201,37 @@
         <i class="ri-arrow-up-line"></i>
     </button>
     <!--end back-to-top-->
+
+    @auth
+        <div id="ddOrderAlertRoot">
+            <div id="ddOrderAlertToast" class="toast align-items-center border-0" role="alert" aria-live="assertive"
+                aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <span style="font-size:1.3rem;">🛎️</span>
+                        <strong class="ms-1">New Order!</strong>
+                        <div class="mt-1 small" id="ddOrderAlertCount"></div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+
+            <button type="button" id="ddOrderAlertGearBtn" title="Order alert sound settings">
+                <i class="ri-settings-3-line" id="ddOrderAlertGearIcon"></i>
+            </button>
+
+            <div id="ddOrderAlertPanel">
+                <h6><i class="ri-notification-3-line me-1"></i> Order alert sound</h6>
+                <label for="ddOrderAlertVolume">Volume</label>
+                <input type="range" id="ddOrderAlertVolume" min="20" max="100" step="5" value="100">
+                <div class="text-end"><span id="ddOrderAlertVolumeVal">100%</span></div>
+                <div class="dd-order-alert-actions">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="ddOrderAlertTestBtn">Test sound</button>
+                    <button type="button" class="btn btn-success btn-sm" id="ddOrderAlertToggleBtn">Mute alerts</button>
+                </div>
+            </div>
+        </div>
+    @endauth
     {{-- pri loader --}}
     <x-preloader></x-preloader>
 
@@ -431,6 +469,9 @@
     </script>
     <script src="{{ asset('assets/js/auto-required.js') }}"></script>
     <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
+    @auth
+        <script src="{{ asset('assets/js/admin-order-alert.js') }}" defer></script>
+    @endauth
     @stack('scripts')
 </body>
 

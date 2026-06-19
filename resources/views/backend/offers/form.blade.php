@@ -99,6 +99,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <div class="form-text">
+                                Student = approved student members only. Membership = non-student members. First-order student offers require admin approval under Members.
+                            </div>
                             @error('applicable_to')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
@@ -189,6 +192,7 @@
                             <input type="checkbox" class="form-check-input" name="is_first_order" id="isFirstOrder"
                                    value="1" {{ old('is_first_order', $offer->is_first_order ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label fw-semibold" for="isFirstOrder">First Order Only</label>
+                            <div class="form-text">Pair with Applicable To: membership (30%) or student (35%, admin-approved only).</div>
                         </div>
                     </div>
 

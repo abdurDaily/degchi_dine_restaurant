@@ -698,7 +698,37 @@
                     eligible: false,
                     is_student: false,
                     approval_status: 'approved',
+                    member_type: 'standard',
                 };
+
+                function offerEligibleForVerifiedMember(offer) {
+                    if (offer.applicable_to === 'golden') {
+                        return verifiedMember.verified && verifiedMember.eligible && verifiedMember.member_type === 'golden';
+                    }
+                    if (offer.applicable_to === 'student') {
+                        return verifiedMember.verified
+                            && verifiedMember.eligible
+                            && verifiedMember.is_student
+                            && verifiedMember.approval_status === 'approved';
+                    }
+                    if (offer.applicable_to === 'membership') {
+                        return verifiedMember.verified
+                            && verifiedMember.eligible
+                            && !verifiedMember.is_student;
+                    }
+                    if (offer.is_first_order === true || offer.is_first_order === 1) {
+                        if (!verifiedMember.verified || !verifiedMember.eligible) {
+                            return false;
+                        }
+                        if (verifiedMember.is_student && verifiedMember.approval_status !== 'approved') {
+                            return false;
+                        }
+                        if (verifiedMember.member_type === 'golden') {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
 
                 // Calculate offer discount for cart items
                 function calculateOfferDiscount(cartItems) {
@@ -713,21 +743,12 @@
                     const hasMembershipCard = memberCardInput && memberCardInput.value.trim() !== '';
 
                     const applicableOffers = activeOffers.filter(offer => {
-                        if (offer.is_first_order === true || offer.is_first_order === 1) {
-                            if (!hasMembershipCard) {
-                                return false;
-                            }
-                            if (!verifiedMember.verified) {
-                                return false;
-                            }
-                            if (verifiedMember.is_student && verifiedMember.approval_status !== 'approved') {
-                                return false;
-                            }
-                            if (!verifiedMember.eligible) {
+                        if (!hasMembershipCard) {
+                            if (offer.is_first_order || ['student', 'membership', 'golden'].includes(offer.applicable_to)) {
                                 return false;
                             }
                         }
-                        return true;
+                        return offerEligibleForVerifiedMember(offer);
                     });
 
                     // For each cart item, find applicable offers
@@ -853,7 +874,7 @@
 
                 async function checkMemberCardEligibility(cardNumber) {
                     if (!cardNumber) {
-                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved' };
+                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard' };
                         membershipFeedback.textContent =
                             'Enter your membership card number to check eligibility for first-order or golden card discounts.';
                         membershipFeedback.classList.remove('text-success', 'text-danger', 'text-warning');
@@ -872,6 +893,7 @@
                             eligible: !!result.eligible,
                             is_student: !!result.is_student,
                             approval_status: result.approval_status || 'approved',
+                            member_type: result.member_type || 'standard',
                         };
 
                         if (!response.ok) {
@@ -901,7 +923,7 @@
                             : 0;
                         updateDiscountDisplay(currentMemberDiscount);
                     } catch (error) {
-                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved' };
+                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard' };
                         membershipFeedback.textContent = 'Unable to verify membership card at the moment.';
                         membershipFeedback.classList.remove('text-success', 'text-warning');
                         membershipFeedback.classList.add('text-danger');
@@ -918,7 +940,7 @@
                 if (memberCardInput) {
                     memberCardInput.addEventListener('input', function() {
                         if (!this.value.trim()) {
-                            verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved' };
+                            verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard' };
                             currentMemberDiscount = 0;
                         }
                         const subtotal = parseFloat(orderTotalInput.value) || 0;

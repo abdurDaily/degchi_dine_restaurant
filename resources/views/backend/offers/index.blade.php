@@ -15,6 +15,14 @@
             </div>
 
             <div class="card-body p-0">
+                <div class="alert alert-info border-0 rounded-0 mb-0 py-3 px-4">
+                    <strong><i class="ri-information-line me-1"></i> First-order offers</strong>
+                    <ul class="mb-0 mt-2 small ps-3">
+                        <li><strong>Membership First Order (30%)</strong> — non-student members only, first order.</li>
+                        <li><strong>Student Membership First Order (35%)</strong> — approved students only. Pending or rejected students never receive this offer.</li>
+                        <li>At checkout, the system applies the <strong>highest discount among eligible offers only</strong> — not the global maximum.</li>
+                    </ul>
+                </div>
                 @if($offers->isEmpty())
                     <div class="text-center py-5 text-muted">
                         <i class="ri-price-tag-3-line" style="font-size:3rem;opacity:.3;"></i>
