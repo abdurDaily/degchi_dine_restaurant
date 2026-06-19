@@ -1159,6 +1159,7 @@ h6,
     box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.4s ease;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 .menu-offer-card:hover {
@@ -1170,7 +1171,7 @@ h6,
 .menu-offer-image-wrap {
   position: relative;
   overflow: hidden;
-  padding: 10px;
+  padding: 6px 8px 4px;
 }
 
 .menu-offer-image {
@@ -1179,12 +1180,11 @@ h6,
   height: auto;
   object-fit: cover;
   display: block;
-  border-radius: 12 !important;
+  border-radius: 10px !important;
   transition:
     transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     opacity 0.4s ease;
   background-color: #fff;
-  border-radius: 10px;
 }
 
 .menu-offer-card:hover .menu-offer-image {
@@ -1339,7 +1339,7 @@ h6,
 
 /* --- Card Body Elements --- */
 .menu-offer-body {
-  padding: 1.5rem;
+  padding: 0.5rem 1rem 1rem;
   display: flex;
   flex-direction: column;
   flex: 1; /* Automatically absorbs extra vertical space to keep footers perfectly aligned */
@@ -1347,9 +1347,9 @@ h6,
 }
 
 .menu-offer-title {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.35rem 0;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 800;
   color: #116b83;
   text-transform: uppercase; /* Clean uniform grid feel */
   letter-spacing: 0.5px;
@@ -1359,21 +1359,20 @@ h6,
 .menu-offer-meta {
   color: #666666;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.5;
   flex-grow: 1; /* Pushes shorter item text content down dynamically to keep layouts uniform */
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.menu-offer-divider {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(17, 107, 131, 0.15),
-    transparent
-  );
-  margin-bottom: 1.2rem;
-  margin-top: auto; /* Ensures the divider sits exactly above footer container regardless of text height */
+/* Struck-through original price when an offer is active */
+.menu-offer-price-old {
+  text-decoration: line-through;
+  opacity: 0.6;
+  font-size: 0.9em;
 }
 
 /* --- FIXED: Footer Flex Matrix Layout --- */
@@ -1431,28 +1430,33 @@ h6,
   margin-top: 1.2rem;
 }
 
+/* Compact round "+" icon button shown inline beside the price */
 .menu-offer-cart-btn {
-  width: 100%;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   border: 1px solid #116b83;
-  border-radius: 0 !important; /* Forcing sharp profile edges */
-  background: transparent;
-  color: #116b83;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  border-radius: 50% !important;
+  background: #116b83;
+  color: #ffffff;
+  font-size: 1.25rem;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.75rem 1rem;
+  padding: 0;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.menu-offer-cart-btn i {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 /* Active action interactions inside the clickable link scope wrapper */
 .menu-offer-card:hover .menu-offer-cart-btn {
-  background-color: #116b83;
+  background-color: #0a4554;
   color: #ffffff;
 }
 
@@ -1460,6 +1464,7 @@ h6,
   background-color: #e7ae07 !important; /* Highlights completely orange when single item hovered */
   border-color: #e7ae07 !important;
   color: #ffffff !important;
+  transform: scale(1.08);
 }
 
 /* --- Slider Navigation Arrows Layout --- */
@@ -7171,16 +7176,18 @@ footer[id],
       line-height: 1.55;
     }
     .menu-offer-body {
-      padding: 0.82rem 0.82rem 0.9rem;
+      padding: 0.45rem 0.82rem 0.85rem;
     }
     .menu-offer-title {
       font-size: 1rem;
       line-height: 1.25;
+      margin-bottom: 0.3rem;
     }
     .menu-offer-meta {
       font-size: 0.84rem;
       line-height: 1.35;
-      min-height: 3.4rem;
+      min-height: 0;
+      margin-bottom: 0.65rem;
     }
     .menu-offer-price {
       font-size: 1.2rem;
@@ -7190,8 +7197,10 @@ footer[id],
       padding: 0.24rem 0.55rem;
     }
     .menu-offer-cart-btn {
-      font-size: 0.78rem;
-      padding: 0.5rem 0.82rem;
+      width: 42px;
+      height: 42px;
+      font-size: 1.2rem;
+      padding: 0;
     }
     .mc-slider-wrap {
       padding: 0.25rem 1rem 2.4rem;
@@ -7477,7 +7486,7 @@ footer[id],
     }
     .menu-slide-item {
       flex: 0 0 100%;
-      width: min(100%, 340px);
+      width: 100%;
       margin: 0 auto;
     }
     #menuSlider .slick-slide {
@@ -7497,9 +7506,6 @@ footer[id],
       padding: 0.74rem 1.05rem;
       font-size: 0.95rem;
     }
-    .menu-offer-image {
-      height: 190px;
-    }
     .menu-slider-dots {
       bottom: -0.4rem;
     }
@@ -7507,7 +7513,7 @@ footer[id],
       min-height: 0;
     }
     .menu-offer-footer {
-      align-items: flex-start;
+      align-items: center;
     }
     .hero-title {
       font-size: 2.2rem;
@@ -10996,10 +11002,10 @@ body {
     padding: 0.35rem 0.9rem;
   }
 
-  /* Loved by Our Guests — taller full-width cards on mobile */
+  /* Loved by Our Guests — match /menu card width on mobile */
   .menu-section .menu-slider {
-    padding-left: 2.85rem;
-    padding-right: 2.85rem;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .menu-slider-mobile-hint {
@@ -11017,11 +11023,11 @@ body {
   }
 
   .menu-slider-prev {
-    left: 0;
+    left: -0.65rem;
   }
 
   .menu-slider-next {
-    right: 0;
+    right: -0.65rem;
   }
 
   .menu-slider-btn:hover,
@@ -11036,7 +11042,7 @@ body {
   }
 
   #menuSlider .slick-slide {
-    padding: 0.65rem 0;
+    padding: 0.5rem 0;
   }
 
   .menu-slide-item {
@@ -11045,55 +11051,18 @@ body {
     margin: 0;
   }
 
-  .menu-offer-card {
-    min-height: 480px;
-    border-radius: 0 !important;
-    box-shadow: 0 14px 36px rgba(8, 56, 68, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-  }
-
-  .menu-offer-image-wrap {
-    padding: 0;
-  }
-
-  .menu-offer-image {
-    height: 240px;
-    min-height: 240px;
-    aspect-ratio: auto;
-    border-radius: 0 !important;
-  }
-
-  .menu-offer-body {
-    padding: 1.1rem 1.05rem 1.2rem;
-    flex: 1;
-  }
-
-  .menu-offer-title {
-    font-size: 1.05rem;
-    margin-bottom: 0.65rem;
-  }
-
-  .menu-offer-meta {
-    min-height: 4rem;
-    font-size: 0.88rem;
-    line-height: 1.55;
-    margin-bottom: 1rem;
-  }
-
   .menu-offer-footer {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
     gap: 0.65rem;
   }
 
   .menu-offer-cart-btn {
-    width: 100%;
+    width: 46px;
+    height: 46px;
     justify-content: center;
-    padding: 0.72rem 1rem;
-    font-size: 0.88rem;
-  }
-
-  .menu-offer-actions {
-    margin-top: 0.35rem;
+    padding: 0;
+    font-size: 1.3rem;
   }
 
   /* Watch Us on Reels — taller full-width cards on mobile */
@@ -11751,7 +11720,7 @@ body {
 }
 
 .menu-page .menu-offer-footer {
-  justify-content: flex-start;
+  justify-content: space-between;
 }
 
 .menu-page .menu-offer-card {

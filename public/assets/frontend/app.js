@@ -362,35 +362,40 @@ const buildCartItemId = (item) => {
         .replace(/[^a-z0-9]+/g, "-");
 };
 
-const createMenuItemFromCard = (button) => {
-    const card =
-        button.closest(".menu-slide-item") ||
-        button.closest(".menu-offer-card");
-    if (!card) return null;
+const createMenuItemFromCard = (card) => {
+    const menuCard = card?.closest?.(".menu-offer-card") || card;
+    if (!menuCard?.classList?.contains("menu-offer-card")) return null;
 
-    const title = card.querySelector(".menu-offer-title")?.textContent.trim();
+    const cartBtn = menuCard.querySelector(".menu-offer-cart-btn");
+    if (!cartBtn) return null;
+
+    const title = menuCard.querySelector(".menu-offer-title")?.textContent.trim();
     const image =
-        card.querySelector(".menu-offer-image")?.getAttribute("src") || "";
+        menuCard.querySelector(".menu-offer-image")?.getAttribute("src") || "";
     const quantityText =
-        card.querySelector(".menu-offer-serve")?.textContent || "1 person";
-    
-    // Get variation_id from the button's data attribute
-    const variationId = button.getAttribute("data-variation-id") || button.dataset.variationId;
-    
-    // Get ORIGINAL price from data attribute (most reliable)
-    const originalPriceAttr = button.getAttribute("data-original-price") || button.dataset.originalPrice;
+        menuCard.querySelector(".menu-offer-serve")?.textContent || "1 person";
+
+    const variationId =
+        cartBtn.getAttribute("data-variation-id") || cartBtn.dataset.variationId;
+
+    const originalPriceAttr =
+        cartBtn.getAttribute("data-original-price") ||
+        cartBtn.dataset.originalPrice;
     let price = parseFloat(originalPriceAttr) || 0;
-    
-    // Fallback: try to parse from displayed price if data attribute not available
+
     if (price === 0) {
-        const allPrices = card.querySelectorAll(".menu-offer-price");
+        const allPrices = menuCard.querySelectorAll(".menu-offer-price");
         if (allPrices.length > 1) {
-            // Multiple prices: first is original (strikethrough)
-            const priceText = allPrices[0].textContent.replace(/,/g, "").replace(/[^\d.]/g, "").trim();
+            const priceText = allPrices[0].textContent
+                .replace(/,/g, "")
+                .replace(/[^\d.]/g, "")
+                .trim();
             price = parseFloat(priceText) || 0;
         } else if (allPrices.length === 1) {
-            // Single price
-            const priceText = allPrices[0].textContent.replace(/,/g, "").replace(/[^\d.]/g, "").trim();
+            const priceText = allPrices[0].textContent
+                .replace(/,/g, "")
+                .replace(/[^\d.]/g, "")
+                .trim();
             price = parseFloat(priceText) || 0;
         }
     }
@@ -403,11 +408,10 @@ const createMenuItemFromCard = (button) => {
         note: quantityText.trim() || "1 person",
         variation_id: variationId ? parseInt(variationId) : null,
     };
-    
-    // Generate ID after we have variation_id
+
     item.id = buildCartItemId(item);
-    
-    console.log('Creating cart item:', item);
+
+    console.log("Creating cart item:", item);
     return item;
 };
 
@@ -646,10 +650,10 @@ const openCartDrawer = () => {
 
 const initCartEvents = () => {
     document.addEventListener("click", (event) => {
-        const button = event.target.closest(".menu-offer-cart-btn");
-        if (button) {
+        const menuCard = event.target.closest(".menu-offer-card");
+        if (menuCard?.querySelector(".menu-offer-cart-btn")) {
             event.preventDefault();
-            const item = createMenuItemFromCard(button);
+            const item = createMenuItemFromCard(menuCard);
             if (item) {
                 addToCart(item);
                 openCartDrawer();
