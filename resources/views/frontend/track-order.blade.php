@@ -53,6 +53,51 @@
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 2rem; color: var(--dd-gold); margin-bottom: 16px;
 }
+
+.member-login .dd-apply-hero-banner .container,
+.track-order .dd-apply-hero-banner .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.member-login .dd-apply-back-btn,
+.track-order .dd-apply-back-btn {
+    position: relative;
+    top: auto;
+    left: auto;
+    align-self: center;
+    margin-bottom: 1rem;
+}
+
+.member-login .dd-apply-hero-content,
+.track-order .dd-apply-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 560px;
+}
+
+.member-login .dd-apply-headline,
+.track-order .dd-apply-headline {
+    width: 100%;
+    text-align: center;
+}
+
+.member-login .dd-apply-subhead,
+.track-order .dd-apply-subhead {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.track-order .dd-apply-badge {
+    margin-left: auto;
+    margin-right: auto;
+}
 @media (max-width: 991px) {
     .track-order .to-grid { grid-template-columns: 1fr; }
     .track-order .to-main-box { margin-top: -60px; }
@@ -73,19 +118,20 @@
 <section class="dd-apply-wrapper track-order">
 
     <div class="dd-apply-hero-banner">
-        <div class="container px-4 px-lg-5 text-center position-relative">
-            <a href="{{ route('frontend.home') }}" class="dd-apply-back-btn ">
+        <div class="container px-4 px-lg-5 position-relative">
+            <a href="{{ route('frontend.home') }}" class="dd-apply-back-btn">
                 <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
                 <span>Back to Home</span>
             </a>
 
-            <div class="to-icon-ring">
-                <iconify-icon icon="solar:delivery-linear"></iconify-icon>
+            <div class="dd-apply-hero-content">
+                <div class="to-icon-ring">
+                    <iconify-icon icon="solar:delivery-linear"></iconify-icon>
+                </div>
+                <span class="dd-apply-badge">Order Tracking</span>
+                <h1 class="dd-apply-headline">Track Your Order</h1>
+                <p class="dd-apply-subhead">Find your order status anytime using your order number and phone.</p>
             </div>
-            <br> <br>
-            <span class="dd-apply-badge">Order Tracking</span>
-            <h1 class="dd-apply-headline" style="font-size: 2.4rem;">Track Your Order</h1>
-            <p class="dd-apply-subhead">Find your order status anytime using your order number and phone.</p>
         </div>
     </div>
 

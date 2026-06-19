@@ -292,7 +292,7 @@
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{{ route('orders.index') }}" class="btn btn-light btn-sm fw-semibold"><i class="ri-shopping-cart-2-line me-1"></i> Orders</a>
                     <a href="{{ route('members.index') }}" class="btn btn-warning btn-sm fw-semibold text-dark"><i class="ri-user-star-line me-1"></i> Members</a>
-                </div>git
+                </div>
             </div>
         </div>
 
