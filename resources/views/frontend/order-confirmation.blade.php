@@ -5,108 +5,335 @@
 
 @push('front_css')
 <style>
-.order-confirm .oc-main-box { margin-top: -100px; position: relative; z-index: 2; }
+/* Layout Base Setup */
+.order-confirm .oc-main-box { 
+    margin-top: -120px; 
+    position: relative; 
+    z-index: 10; 
+}
+
+/* Success / Lock Ring Indicator */
 .order-confirm .oc-success-ring {
-    width: 88px; height: 88px; border-radius: 50%;
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: #fff; display: inline-flex; align-items: center; justify-content: center;
-    font-size: 2.4rem; margin-bottom: 16px;
-    box-shadow: 0 12px 32px rgba(40,167,69,0.35);
-    animation: ocPop 0.5s cubic-bezier(.34,1.56,.64,1) both;
+    width: 96px; 
+    height: 96px; 
+    border-radius: 50%;
+    background: linear-gradient(135deg, #24b44b, #1cb88a);
+    color: #fff; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 2.6rem; 
+    margin-bottom: 20px;
+    box-shadow: 0 16px 36px rgba(40,167,69,0.3);
+    animation: ocPop 0.6s cubic-bezier(.34,1.56,.64,1) both;
 }
-@keyframes ocPop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.order-confirm .oc-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; }
+@keyframes ocPop { 
+    from { transform: scale(0.6); opacity: 0; } 
+    to { transform: scale(1); opacity: 1; } 
+}
+
+/* Base Panel Definitions */
+.order-confirm .oc-grid { 
+    display: grid; 
+    grid-template-columns: 1.25fr 0.75fr; 
+    gap: 30px; 
+}
 .order-confirm .oc-panel {
-    background: #fff; border-radius: 20px; border: 1px solid var(--dd-border);
-    padding: 28px; box-shadow: 0 20px 50px rgba(31,20,18,0.06);
+    background: #fff; 
+    border-radius: 24px; 
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 32px; 
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.order-confirm .oc-panel:hover {
+    box-shadow: 0 32px 72px rgba(0, 0, 0, 0.06);
+}
+
+/* Header UI Components */
 .order-confirm .oc-panel-title {
-    font-size: 1.15rem; font-weight: 700; color: var(--dd-text-main);
-    margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--dd-border);
-    display: flex; align-items: center; gap: 10px;
+    font-size: 1.25rem; 
+    font-weight: 700; 
+    color: var(--dd-text-main);
+    margin-bottom: 24px; 
+    padding-bottom: 16px; 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
 }
-.order-confirm .oc-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.order-confirm .oc-meta-item small { display: block; font-size: 0.75rem; color: var(--dd-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-.order-confirm .oc-meta-item strong { font-size: 0.95rem; color: var(--dd-text-main); }
-.order-confirm .oc-meta-item strong.oc-total { font-size: 1.25rem; color: #28a745; }
+
+/* Meta grids details */
+.order-confirm .oc-meta-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 20px; 
+    margin-bottom: 24px; 
+}
+.order-confirm .oc-meta-item small { 
+    display: block; 
+    font-size: 0.75rem; 
+    color: var(--dd-text-muted); 
+    text-transform: uppercase; 
+    letter-spacing: 0.08em; 
+    margin-bottom: 6px; 
+    font-weight: 600;
+}
+.order-confirm .oc-meta-item strong { 
+    font-size: 1rem; 
+    color: var(--dd-text-main); 
+    font-weight: 600;
+}
+.order-confirm .oc-meta-item strong.oc-total { 
+    font-size: 1.35rem; 
+    color: #24b44b; 
+    font-weight: 700;
+}
+
+/* Order Badges styling */
 .order-confirm .oc-badge {
-    display: inline-block; padding: 5px 12px; border-radius: 50px;
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    display: inline-flex; 
+    padding: 6px 14px; 
+    border-radius: 50px;
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
-.order-confirm .oc-badge-pending { background: #fff3cd; color: #856404; }
-.order-confirm .oc-badge-confirmed { background: #cce5ff; color: #004085; }
-.order-confirm .oc-badge-completed { background: #d4edda; color: #155724; }
-.order-confirm .oc-badge-canceled { background: #f8d7da; color: #721c24; }
+.order-confirm .oc-badge-pending { background: #fef6dd; color: #856404; }
+.order-confirm .oc-badge-confirmed { background: #e3f2fd; color: #0d47a1; }
+.order-confirm .oc-badge-completed { background: #e8f5e9; color: #1b5e20; }
+.order-confirm .oc-badge-canceled { background: #ffebee; color: #b71c1c; }
+
+/* Item Rows definitions */
 .order-confirm .oc-item-row {
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
-    padding: 14px 0; border-bottom: 1px dashed var(--dd-border);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 16px;
+    padding: 18px 0; 
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
 }
 .order-confirm .oc-item-row:last-child { border-bottom: none; }
-.order-confirm .oc-item-name { font-weight: 600; font-size: 0.92rem; color: var(--dd-text-main); }
-.order-confirm .oc-item-qty { font-size: 0.8rem; color: var(--dd-text-muted); margin-top: 2px; }
-.order-confirm .oc-item-price { font-weight: 700; color: var(--dd-text-main); white-space: nowrap; }
-.order-confirm .oc-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.9rem; }
-.order-confirm .oc-summary-row.total { border-top: 2px solid var(--dd-border); margin-top: 8px; padding-top: 14px; font-size: 1.05rem; font-weight: 700; }
+.order-confirm .oc-item-name { font-weight: 600; font-size: 1rem; color: var(--dd-text-main); }
+.order-confirm .oc-item-qty { font-size: 0.85rem; color: var(--dd-text-muted); margin-top: 4px; }
+.order-confirm .oc-item-price { font-weight: 700; color: var(--dd-text-main); white-space: nowrap; font-size: 1.05rem; }
+
+/* Summaries blocks */
+.order-confirm .oc-summary-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 0.95rem; color: var(--dd-text-muted); }
+.order-confirm .oc-summary-row.total { 
+    border-top: 2px dashed rgba(0, 0, 0, 0.08); 
+    margin-top: 12px; 
+    padding-top: 18px; 
+    font-size: 1.15rem; 
+    font-weight: 700; 
+    color: var(--dd-text-main);
+}
+
+/* Dark Accent Cards styling */
 .order-confirm .oc-contact-card {
-    background: linear-gradient(160deg, #1f1412 0%, #2d1f1a 100%);
-    border-radius: 16px; padding: 24px; color: #fff; margin-bottom: 20px;
+    background: linear-gradient(145deg, #231815 0%, #150e0c 100%);
+    border-radius: 24px; 
+    padding: 32px; 
+    color: #fff; 
+    margin-bottom: 24px;
+    box-shadow: 0 20px 48px rgba(35, 24, 21, 0.15);
 }
-.order-confirm .oc-contact-card h6 { color: var(--dd-gold); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-.order-confirm .oc-contact-card p { font-size: 0.88rem; color: rgba(255,255,255,0.7); line-height: 1.55; margin-bottom: 16px; }
+.order-confirm .oc-contact-card h6 { color: var(--dd-gold); font-size: 0.88rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+.order-confirm .oc-contact-card p { font-size: 0.92rem; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 20px; }
+
+/* Premium CTA styling */
 .order-confirm .oc-call-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--dd-gold); color: #1f1412; padding: 10px 20px;
-    border-radius: 50px; font-weight: 700; font-size: 0.88rem; text-decoration: none;
-    transition: background 0.2s;
+    display: inline-flex; 
+    align-items: center; 
+    gap: 10px;
+    background: var(--dd-gold); 
+    color: #1f1412; 
+    padding: 12px 26px;
+    border-radius: 50px; 
+    font-weight: 700; 
+    font-size: 0.9rem; 
+    text-decoration: none;
+    transition: transform 0.25s, background 0.25s, box-shadow 0.25s;
+    box-shadow: 0 10px 24px rgba(223, 166, 83, 0.2);
 }
-.order-confirm .oc-call-btn:hover { background: var(--dd-gold-hover); color: #1f1412; }
+.order-confirm .oc-call-btn:hover { background: var(--dd-gold-hover); color: #1f1412; transform: translateY(-2px); box-shadow: 0 14px 30px rgba(223, 166, 83, 0.3); }
+
+/* Tips contextual frame */
 .order-confirm .oc-track-tip {
-    background: rgba(223,166,83,0.08); border: 1px dashed rgba(223,166,83,0.35);
-    border-radius: 14px; padding: 18px; margin-bottom: 20px;
+    background: rgba(223,166,83,0.05); 
+    border: 1px dashed rgba(223,166,83,0.3);
+    border-radius: 20px; 
+    padding: 24px; 
+    margin-bottom: 24px;
 }
-.order-confirm .oc-track-tip h6 { font-size: 0.82rem; font-weight: 700; color: var(--dd-gold); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
-.order-confirm .oc-track-tip p { font-size: 0.85rem; color: var(--dd-text-muted); margin-bottom: 12px; line-height: 1.55; }
-.order-confirm .oc-track-tip code { background: rgba(0,0,0,0.06); padding: 2px 8px; border-radius: 4px; font-size: 0.82rem; }
-.order-confirm .oc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.order-confirm .oc-track-tip h6 { font-size: 0.88rem; font-weight: 700; color: var(--dd-gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+.order-confirm .oc-track-tip p { font-size: 0.9rem; color: var(--dd-text-muted); margin-bottom: 16px; line-height: 1.6; }
+.order-confirm .oc-track-tip code { background: rgba(0,0,0,0.04); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; color: #1f1412; font-weight: 600; }
+
+/* Global Buttons list setup */
+.order-confirm .oc-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 .order-confirm .oc-action-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 18px; border-radius: 50px; font-size: 0.85rem;
-    font-weight: 600; text-decoration: none; transition: all 0.25s ease;
+    display: inline-flex; 
+    align-items: center; 
+    gap: 10px;
+    padding: 12px 24px; 
+    border-radius: 50px; 
+    font-size: 0.9rem;
+    font-weight: 600; 
+    text-decoration: none; 
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .order-confirm .oc-action-btn-solid {
-    background: var(--dd-gold); border: 1px solid var(--dd-gold); color: #1f1412;
+    background: var(--dd-gold); 
+    border: 1px solid var(--dd-gold); 
+    color: #1f1412;
+    box-shadow: 0 8px 20px rgba(223,166,83,0.15);
 }
-.order-confirm .oc-action-btn-solid:hover { background: var(--dd-gold-hover); color: #1f1412; }
+.order-confirm .oc-action-btn-solid:hover { background: var(--dd-gold-hover); border-color: var(--dd-gold-hover); color: #1f1412; transform: translateY(-2px); }
 .order-confirm .oc-action-btn-outline {
-    background: transparent; border: 1px solid var(--dd-border); color: var(--dd-text-main);
+    background: transparent; 
+    border: 1px solid rgba(0, 0, 0, 0.12); 
+    color: var(--dd-text-main);
 }
-.order-confirm .oc-action-btn-outline:hover { border-color: var(--dd-gold); color: var(--dd-gold); }
-.order-confirm .oc-timeline { position: relative; padding-left: 28px; }
+.order-confirm .oc-action-btn-outline:hover { border-color: var(--dd-gold); color: var(--dd-gold); background: rgba(223,166,83,0.03); transform: translateY(-2px); }
+
+/* Timeline UI Pipeline */
+.order-confirm .oc-timeline { position: relative; padding-left: 32px; }
 .order-confirm .oc-timeline::before {
-    content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
-    width: 2px; background: var(--dd-border);
+    content: ''; 
+    position: absolute; 
+    left: 8px; 
+    top: 12px; 
+    bottom: 12px;
+    width: 2px; 
+    background: rgba(0,0,0,0.06);
 }
-.order-confirm .oc-timeline-step { position: relative; padding-bottom: 18px; }
+.order-confirm .oc-timeline-step { position: relative; padding-bottom: 24px; }
 .order-confirm .oc-timeline-step:last-child { padding-bottom: 0; }
 .order-confirm .oc-timeline-dot {
-    position: absolute; left: -28px; top: 2px; width: 18px; height: 18px;
-    border-radius: 50%; background: #fff; border: 2px solid var(--dd-border);
+    position: absolute; 
+    left: -32px; 
+    top: 3px; 
+    width: 18px; 
+    height: 18px;
+    border-radius: 50%; 
+    background: #fff; 
+    border: 3px solid rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
-.order-confirm .oc-timeline-step.is-done .oc-timeline-dot { background: #28a745; border-color: #28a745; }
-.order-confirm .oc-timeline-step.is-active .oc-timeline-dot { background: var(--dd-gold); border-color: var(--dd-gold); box-shadow: 0 0 0 4px rgba(223,166,83,0.2); }
-.order-confirm .oc-timeline-step strong { display: block; font-size: 0.88rem; }
-.order-confirm .oc-timeline-step span { font-size: 0.78rem; color: var(--dd-text-muted); }
+.order-confirm .oc-timeline-step.is-done .oc-timeline-dot {
+  background: #24b44b;
+  border-color: #24b44b;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.order-confirm .oc-timeline-step.is-done .oc-timeline-dot::before {
+  content: '✓';
+}
+.order-confirm .oc-timeline-step.is-active .oc-timeline-dot {
+  background: var(--dd-gold);
+  border-color: var(--dd-gold);
+  box-shadow: 0 0 0 5px rgba(223,166,83,0.25);
+}
+.order-confirm .oc-timeline-step.is-active .oc-timeline-dot::before {
+  content: none;
+}
+.order-confirm .oc-timeline-step.is-canceled .oc-timeline-dot {
+  background: #e03a3a;
+  border-color: #e03a3a;
+  box-shadow: 0 0 0 5px rgba(224, 58, 58, 0.18);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.order-confirm .oc-timeline-step.is-canceled .oc-timeline-dot::before {
+  content: '✕';
+}
+.order-confirm .oc-timeline-step.is-canceled strong {
+  color: #b71c1c;
+}
+.order-confirm .oc-timeline-step.is-done:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 21px;
+  width: 2px;
+  height: calc(100% - 6px);
+  background: #24b44b;
+  z-index: 0;
+}
+.order-confirm .oc-remarks-box {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #fff5f5;
+  border: 1px solid rgba(224, 58, 58, 0.2);
+}
+.order-confirm .oc-remarks-box small {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #b54747;
+  margin-bottom: 0.35rem;
+}
+.order-confirm .oc-remarks-box p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: #5c3d3d;
+}
+.order-confirm .oc-success-ring.is-canceled {
+  background: linear-gradient(135deg, #e03a3a, #c62828);
+  box-shadow: 0 16px 36px rgba(224, 58, 58, 0.28);
+}
+.order-confirm .oc-timeline-step strong { display: block; font-size: 0.95rem; font-weight: 600; color: var(--dd-text-main); }
+.order-confirm .oc-timeline-step span { font-size: 0.82rem; color: var(--dd-text-muted); }
+
+/* Verification Box Styling */
 .order-confirm .oc-verify-box {
-    max-width: 520px; margin: 0 auto;
-    background: #fff; border-radius: 20px; border: 1px solid var(--dd-border);
-    padding: 32px; box-shadow: 0 20px 50px rgba(17, 107, 131, 0.1);
+    max-width: 540px; 
+    margin: 0 auto;
+    background: #fff; 
+    border-radius: 24px; 
+    border: 1px solid rgba(0,0,0,0.03);
+    padding: 40px; 
+    box-shadow: 0 32px 72px rgba(17, 107, 131, 0.08);
 }
-.order-confirm .oc-verify-box h2 { font-size: 1.45rem; font-weight: 700; margin-bottom: 8px; }
-.order-confirm .oc-verify-box > p { color: var(--dd-text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.55; }
+.order-confirm .oc-verify-box h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 10px; color: var(--dd-text-main); }
+.order-confirm .oc-verify-box > p { color: var(--dd-text-muted); font-size: 0.95rem; margin-bottom: 28px; line-height: 1.6; }
+
+/* Responsive Adaptations */
 @media (max-width: 991px) {
-    .order-confirm .oc-grid { grid-template-columns: 1fr; }
-    .order-confirm .oc-main-box { margin-top: -60px; }
-    .order-confirm .oc-meta-grid { grid-template-columns: 1fr; }
+    /* Center aligning header contents on small devices explicitly */
+    .dd-apply-hero-banner .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .dd-apply-badge {
+        margin-left: auto;
+        margin-right: auto;
+        display: inline-block;
+    }
+    
+    .order-confirm .oc-grid { grid-template-columns: 1fr; gap: 24px; }
+    .order-confirm .oc-main-box { margin-top: -80px; }
+    .order-confirm .oc-meta-grid { grid-template-columns: 1fr; gap: 14px; }
+    .order-confirm .oc-panel { padding: 24px; }
+    .order-confirm .oc-verify-box { padding: 30px 20px; }
+    .order-confirm .oc-actions { justify-content: center; }
 }
 </style>
 @endpush
@@ -131,9 +358,20 @@
                 <span>Back to Home</span>
             </a>
 
-            <div class="oc-success-ring">@if (!empty($needsPhoneVerification))<iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon>@else✓@endif</div>
+            <div class="oc-success-ring {{ $order->status === 'canceled' ? 'is-canceled' : '' }}">
+                @if (!empty($needsPhoneVerification))
+                    <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon>
+                @elseif ($order->status === 'canceled')
+                    ✕
+                @elseif ($order->status === 'completed')
+                    ✓
+                @else
+                    <iconify-icon icon="solar:delivery-linear"></iconify-icon>
+                @endif
+            </div>
+            <br>
             <span class="dd-apply-badge">Order Tracking</span>
-            <h1 class="dd-apply-headline" style="font-size: 2.4rem;">Order #{{ $order->id }}</h1>
+            <h1 class="dd-apply-headline" style="font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; margin-top: 8px;">Order #{{ $order->id }}</h1>
             @if (!empty($needsPhoneVerification))
             <p class="dd-apply-subhead">Enter the phone number used at checkout to view your order status and receipt.</p>
             @else
@@ -149,26 +387,26 @@
             <p>For your security, confirm the phone number on order <strong>#{{ $order->id }}</strong> to see tracking details.</p>
 
             @if ($errors->any())
-                <div class="alert alert-danger border-0 mb-4" style="border-radius: 12px;">{{ $errors->first() }}</div>
+                <div class="alert alert-danger border-0 mb-4" style="border-radius: 14px; padding: 14px 20px; font-size: 0.9rem;">{{ $errors->first() }}</div>
             @endif
 
             <form method="POST" action="{{ route('frontend.order.track.submit') }}" class="dd-apply-form-element">
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->id }}">
-                <div class="dd-input-group">
+                <div class="dd-input-group mb-4">
                     <input type="tel" name="phone" id="oc_verify_phone" class="dd-input-field" placeholder=" " value="{{ old('phone') }}" required autofocus>
                     <label for="oc_verify_phone" class="dd-floating-label">Phone Number at Checkout</label>
                 </div>
-                <button type="submit" class="dd-submit-btn">
-                    <span>View Order Tracking </span>
-                    <iconify-icon icon="solar:magnifer-linear" class="dd-btn-icon"></iconify-icon>
+                <button type="submit" class="dd-submit-btn w-100 justify-content-center py-3">
+                    <span>View Order Tracking</span>
+                    <iconify-icon icon="solar:magnifer-linear" class="dd-btn-icon ms-2"></iconify-icon>
                 </button>
             </form>
 
-            <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--dd-border);">
-                <p class="text-muted mb-2" style="font-size: 0.85rem;">Have a member account?</p>
-                <a href="{{ route('frontend.member.login') }}" class="btn btn-sm btn-outline-dark me-1">Member Login</a>
-                <a href="{{ route('frontend.order.track') }}" class="btn btn-sm btn-outline-dark">Track Another Order</a>
+            <div class="text-center mt-4 pt-4" style="border-top: 1px solid rgba(0,0,0,0.06);">
+                <p class="text-muted mb-3" style="font-size: 0.88rem;">Have a member account?</p>
+                <a href="{{ route('frontend.member.login') }}" class="btn btn-sm btn-outline-dark me-2 px-3" style="border-radius: 50px;">Member Login</a>
+                <a href="{{ route('frontend.order.track') }}" class="btn btn-sm btn-outline-dark px-3" style="border-radius: 50px;">Track Another Order</a>
             </div>
         </div>
         @else
@@ -177,7 +415,7 @@
             <div>
                 <div class="oc-panel mb-4">
                     <div class="oc-panel-title">
-                        <iconify-icon icon="solar:clipboard-list-linear" style="color: var(--dd-gold);"></iconify-icon>
+                        <iconify-icon icon="solar:clipboard-list-linear" style="color: var(--dd-gold); font-size: 1.4rem;"></iconify-icon>
                         Order Details
                     </div>
 
@@ -196,8 +434,16 @@
                         </div>
                         <div class="oc-meta-item">
                             <small>Status</small>
-                            <span class="oc-badge {{ $statusClass }}">{{ ucfirst($order->status) }}</span>
+                            <div>
+                                <span class="oc-badge {{ $statusClass }}">{{ ucfirst($order->status) }}</span>
+                            </div>
                         </div>
+                        @if ($order->status === 'canceled' && !empty($order->status_remarks))
+                        <div class="oc-meta-item" style="grid-column: 1 / -1;">
+                            <small>Cancellation Remarks</small>
+                            <strong style="font-weight: 500; color: #b54747; line-height: 1.5;">{{ $order->status_remarks }}</strong>
+                        </div>
+                        @endif
                         <div class="oc-meta-item" style="grid-column: 1 / -1;">
                             <small>Delivery Address</small>
                             <strong>{{ $order->customer_address }}</strong>
@@ -213,8 +459,8 @@
                     </div>
 
                     @if (!empty($items))
-                        <div class="oc-panel-title" style="border-top: 1px solid var(--dd-border); padding-top: 18px; margin-top: 4px;">
-                            <iconify-icon icon="solar:bag-3-linear" style="color: var(--dd-gold);"></iconify-icon>
+                        <div class="oc-panel-title" style="border-top: 1px solid rgba(0,0,0,0.06); padding-top: 24px; margin-top: 12px;">
+                            <iconify-icon icon="solar:bag-3-linear" style="color: var(--dd-gold); font-size: 1.4rem;"></iconify-icon>
                             Items Ordered
                         </div>
                         @foreach ($items as $item)
@@ -232,10 +478,10 @@
                             </div>
                         @endforeach
 
-                        <div class="mt-3 pt-2">
+                        <div class="mt-4 pt-2">
                             <div class="oc-summary-row"><span>Subtotal</span><span>৳{{ number_format($order->total_amount, 2) }}</span></div>
                             @if ((float) $order->discount_amount > 0)
-                                <div class="oc-summary-row text-success"><span>Discount</span><span>- ৳{{ number_format($order->discount_amount, 2) }}</span></div>
+                                <div class="oc-summary-row text-success fw-semibold"><span>Discount</span><span>- ৳{{ number_format($order->discount_amount, 2) }}</span></div>
                             @endif
                             <div class="oc-summary-row total"><span>Total Paid</span><span class="text-success">৳{{ number_format($order->final_amount, 2) }}</span></div>
                         </div>
@@ -261,49 +507,74 @@
             <div>
                 <div class="oc-panel mb-4">
                     <div class="oc-panel-title">
-                        <iconify-icon icon="solar:delivery-linear" style="color: var(--dd-gold);"></iconify-icon>
+                        <iconify-icon icon="solar:delivery-linear" style="color: var(--dd-gold); font-size: 1.4rem;"></iconify-icon>
                         Order Progress
                     </div>
                     <div class="oc-timeline">
                         @php
                             $steps = [
-                                ['key' => 'placed', 'label' => 'Order Placed', 'desc' => 'We received your order'],
+                                ['key' => 'pending', 'label' => 'Order Placed', 'desc' => 'We received your order'],
                                 ['key' => 'confirmed', 'label' => 'Confirmed', 'desc' => 'Kitchen is preparing'],
                                 ['key' => 'completed', 'label' => 'Delivered', 'desc' => 'Enjoy your meal!'],
                             ];
-                            $current = $order->status === 'canceled' ? 'placed' : $order->status;
+                            $statusIndex = match ($order->status) {
+                                'pending' => 0,
+                                'confirmed' => 1,
+                                'completed' => 2,
+                                default => -1,
+                            };
+                            $isCanceled = $order->status === 'canceled';
                         @endphp
-                        @foreach ($steps as $i => $step)
-                            @php
-                                $isDone = ($current === 'completed') || ($current === 'confirmed' && $i < 2) || ($current === 'pending' && $i === 0);
-                                $isActive = ($current === 'pending' && $i === 0) || ($current === 'confirmed' && $i === 1) || ($current === 'completed' && $i === 2);
-                                if ($order->status === 'canceled') { $isDone = $i === 0; $isActive = false; }
-                            @endphp
-                            <div class="oc-timeline-step {{ $isDone ? 'is-done' : '' }} {{ $isActive ? 'is-active' : '' }}">
+
+                        @if ($isCanceled)
+                            <div class="oc-timeline-step is-done">
                                 <div class="oc-timeline-dot"></div>
-                                <strong>{{ $step['label'] }}</strong>
-                                <span>{{ $step['desc'] }}</span>
+                                <strong>Order Placed</strong>
+                                <span>We received your order</span>
                             </div>
-                        @endforeach
+                            <div class="oc-timeline-step is-canceled">
+                                <div class="oc-timeline-dot"></div>
+                                <strong>Order Canceled</strong>
+                                <span>This order will not be delivered.</span>
+                            </div>
+                            @if (!empty($order->status_remarks))
+                                <div class="oc-remarks-box">
+                                    <small>Remarks</small>
+                                    <p>{{ $order->status_remarks }}</p>
+                                </div>
+                            @endif
+                        @else
+                            @foreach ($steps as $i => $step)
+                                @php
+                                    $isDone = $i <= $statusIndex;
+                                    $isActive = $i === $statusIndex && $order->status !== 'completed';
+                                @endphp
+                                <div class="oc-timeline-step {{ $isDone ? 'is-done' : '' }} {{ $isActive ? 'is-active' : '' }}">
+                                    <div class="oc-timeline-dot"></div>
+                                    <strong>{{ $step['label'] }}</strong>
+                                    <span>{{ $step['desc'] }}</span>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
 
                 <div class="oc-contact-card">
-                    <h6><iconify-icon icon="solar:phone-calling-linear" class="me-1"></iconify-icon> Need Help?</h6>
+                    <h6><iconify-icon icon="solar:phone-calling-linear" class="me-2"></iconify-icon>Need Help?</h6>
                     <p>For order updates or any questions about order <strong>#{{ $order->id }}</strong>, call us and mention your order number.</p>
-                    <a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}" class="oc-call-btn">
+                    <a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}" class="oc-call-btn w-100 justify-content-center">
                         <iconify-icon icon="solar:phone-linear"></iconify-icon>
                         Call {{ $contactPhone }}
                     </a>
                 </div>
 
                 <div class="oc-track-tip">
-                    <h6><iconify-icon icon="solar:bookmark-linear" class="me-1"></iconify-icon> View this order later</h6>
+                    <h6><iconify-icon icon="solar:bookmark-linear" class="me-2"></iconify-icon>View this order later</h6>
                     <p>
                         Save your <strong>Order #{{ $order->id }}</strong> and phone number <strong>{{ $order->customer_phone }}</strong>.
-                        Go to <a href="{{ route('frontend.order.track') }}">Track Order</a> anytime and enter both to see this page again.
+                        Go to <a href="{{ route('frontend.order.track') }}" class="text-decoration-underline fw-semibold" style="color: var(--dd-text-main);">Track Order</a> anytime to see this page again.
                     </p>
-                    <a href="{{ route('frontend.order.track', ['order' => $order->id]) }}" class="btn btn-sm btn-outline-dark">
+                    <a href="{{ route('frontend.order.track', ['order' => $order->id]) }}" class="btn btn-sm btn-outline-dark p-3 w-100" style="border-radius: 50px;">
                         <iconify-icon icon="solar:magnifer-linear" class="me-1"></iconify-icon>
                         Track Order #{{ $order->id }}
                     </a>
@@ -311,22 +582,22 @@
 
                 <div class="oc-panel">
                     @guest('member')
-                    <div class="oc-panel-title" style="margin-bottom: 12px;">
-                        <iconify-icon icon="solar:card-2-linear" style="color: var(--dd-gold);"></iconify-icon>
+                    <div class="oc-panel-title" style="margin-bottom: 14px; border-bottom: none; padding-bottom: 0;">
+                        <iconify-icon icon="solar:card-2-linear" style="color: var(--dd-gold); font-size: 1.4rem;"></iconify-icon>
                         Get a Member Account
                     </div>
-                    <p class="text-muted mb-3" style="font-size: 0.88rem; line-height: 1.55;">Apply for a membership card to track all orders in one dashboard and unlock exclusive discounts.</p>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">Apply for a membership card to track all orders in one dashboard and unlock exclusive discounts.</p>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('frontend.card.apply') }}" class="btn btn-sm btn-dark">Apply Now</a>
-                        <a href="{{ route('frontend.member.login') }}" class="btn btn-sm btn-outline-dark">Member Login</a>
+                        <a href="{{ route('frontend.card.apply') }}" class="btn btn-sm btn-dark px-3 py-2" style="border-radius: 50px; font-weight: 600;">Apply Now</a>
+                        <a href="{{ route('frontend.member.login') }}" class="btn btn-sm btn-outline-dark px-3 py-2" style="border-radius: 50px; font-weight: 600;">Member Login</a>
                     </div>
                     @else
-                    <div class="oc-panel-title" style="margin-bottom: 12px;">
-                        <iconify-icon icon="solar:widget-5-linear" style="color: var(--dd-gold);"></iconify-icon>
+                    <div class="oc-panel-title" style="margin-bottom: 14px; border-bottom: none; padding-bottom: 0;">
+                        <iconify-icon icon="solar:widget-5-linear" style="color: var(--dd-gold); font-size: 1.4rem;"></iconify-icon>
                         Member Account
                     </div>
-                    <p class="text-muted mb-3" style="font-size: 0.88rem; line-height: 1.55;">View all your orders and membership details from your dashboard.</p>
-                    <a href="{{ route('frontend.member.dashboard') }}" class="btn btn-sm" style="background:#116b83;color:#fff;">Open Dashboard</a>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">View all your orders and membership details from your dashboard.</p>
+                    <a href="{{ route('frontend.member.dashboard') }}" class="btn btn-sm w-100 py-2 fw-semibold" style="background:#116b83; color:#fff; border-radius: 50px;">Open Dashboard</a>
                     @endguest
                 </div>
             </div>

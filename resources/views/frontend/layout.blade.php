@@ -393,35 +393,41 @@
 
   <!-- CART -->
   <div class="offcanvas offcanvas-end cart-drawer" tabindex="-1" id="cartDrawer" aria-labelledby="cartDrawerLabel">
-    <div class="offcanvas-header border-bottom">
-      <h5 class="offcanvas-title text-uppercase" id="cartDrawerLabel">
-        <i class="bi bi-bag-check me-2" aria-hidden="true"></i>Your Cart
-      </h5>
+    <div class="offcanvas-header cart-drawer-header">
+      <div class="cart-drawer-heading">
+        <h5 class="offcanvas-title" id="cartDrawerLabel">Your Cart</h5>
+        <p class="cart-drawer-subtitle mb-0" id="cartDrawerCount">No items yet</p>
+      </div>
       <button type="button" class="btn-close-custom" data-bs-dismiss="offcanvas" aria-label="Close">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
 
-    <div class="offcanvas-body d-flex flex-column">
+    <div class="offcanvas-body cart-drawer-body d-flex flex-column">
       <div id="cartDrawerItems" class="cart-drawer-items flex-grow-1">
-        <p style="text-align: center; color: #999; padding: 40px 20px;">Your cart is empty</p>
+        <div class="cart-drawer-empty">
+          <div class="cart-drawer-empty-icon" aria-hidden="true">
+            <i class="bi bi-bag"></i>
+          </div>
+          <p class="cart-drawer-empty-title">Your cart is empty</p>
+          <p class="cart-drawer-empty-text">Add dishes from the menu to get started.</p>
+        </div>
       </div>
 
-      <div class="cart-drawer-footer border-top pt-4 mt-auto">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <span class="cart-total-label text-uppercase">Subtotal</span>
+      <div class="cart-drawer-footer">
+        <div class="cart-drawer-total-row">
+          <span class="cart-total-label">Subtotal</span>
           <strong id="cartDrawerSubtotal" class="cart-total-value">৳ 0.00</strong>
         </div>
-        <div class="d-grid gap-3">
+        <div class="cart-drawer-actions d-grid gap-2">
           <a href="{{ route('frontend.addtocart') }}" class="btn cart-view-btn">View Full Cart</a>
           <a href="{{ route('frontend.checkout') }}" class="btn cart-checkout-btn">
-            <span>Proceed To Checkout <i class="bi bi-arrow-right ms-1"></i></span>
+            <span>Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i></span>
           </a>
         </div>
       </div>
     </div>
   </div>
-
   <!-- Membership prompt modal shown at checkout when user is not registered -->
   <div class="modal fade" id="memberPromptModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

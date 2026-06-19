@@ -491,6 +491,14 @@
                                     </span>
                                 @endif
                             </div>
+                            @if ($order->status === 'canceled' && !empty($order->status_remarks))
+                                <p class="text-danger mb-2" style="font-size: 0.78rem; line-height: 1.45;">
+                                    <strong>Remarks:</strong> {{ $order->status_remarks }}
+                                </p>
+                            @endif
+                            <a href="{{ route('frontend.order.confirmation', $order) }}" class="btn btn-sm btn-outline-dark mt-1" style="border-radius: 50px; font-size: 0.78rem;">
+                                View Order Details
+                            </a>
                         </div>
                     @empty
                         <div class="md-empty-state">
