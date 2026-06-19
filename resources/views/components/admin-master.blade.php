@@ -9,7 +9,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
     @auth
+        @can('orders-show')
         <meta name="orders-latest-url" content="{{ route('orders.latestId') }}">
+        @endcan
     @endauth
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ Session::get('favicon') }}">
@@ -48,7 +50,9 @@
     <link rel="stylesheet" href="{{ asset('assets/css/toastr.min.css') }}">
 
     @auth
+        @can('orders-show')
         <link rel="stylesheet" href="{{ asset('assets/css/admin-order-alert.css') }}">
+        @endcan
     @endauth
 
     <!-- DateRange Picker CSS-->
@@ -203,6 +207,7 @@
     <!--end back-to-top-->
 
     @auth
+        @can('orders-show')
         <div id="ddOrderAlertRoot">
             <div id="ddOrderAlertToast" class="toast align-items-center border-0" role="alert" aria-live="assertive"
                 aria-atomic="true">
@@ -231,6 +236,7 @@
                 </div>
             </div>
         </div>
+        @endcan
     @endauth
     {{-- pri loader --}}
     <x-preloader></x-preloader>
@@ -470,7 +476,9 @@
     <script src="{{ asset('assets/js/auto-required.js') }}"></script>
     <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
     @auth
+        @can('orders-show')
         <script src="{{ asset('assets/js/admin-order-alert.js') }}" defer></script>
+        @endcan
     @endauth
     @stack('scripts')
 </body>

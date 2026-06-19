@@ -31,6 +31,7 @@ class UserRequest extends FormRequest
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'roles' => 'nullable|array|min:1',
             'roles.*' => 'nullable|string|exists:roles,name',
+            'status' => 'nullable|boolean',
         ];
 
         if($this->method() == 'POST')

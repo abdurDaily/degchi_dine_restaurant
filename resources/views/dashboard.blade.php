@@ -277,6 +277,40 @@
 
         .dd-member-chip.golden { background: var(--dd-gold-soft); color: #92680a; }
         .dd-member-chip.standard { background: rgba(17, 107, 131, 0.1); color: var(--dd-teal-dark); }
+
+        .dd-dash-empty {
+            border: 1px dashed rgba(17, 107, 131, 0.22);
+            border-radius: 14px;
+            background: rgba(17, 107, 131, 0.04);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+        }
+
+        .dd-dash-empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(17, 107, 131, 0.1);
+            color: var(--dd-teal);
+            font-size: 1.75rem;
+        }
+
+        .dd-dash-empty h5 {
+            color: var(--dd-teal-dark);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dd-dash-empty p {
+            color: #6b7280;
+            margin: 0;
+            max-width: 420px;
+            margin-inline: auto;
+        }
     </style>
     @endpush
 
@@ -290,14 +324,27 @@
                     <p>Degchi Dine control panel · {{ now()->format('l, F j, Y') }}</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
+                    @can('orders-show')
                     <a href="{{ route('orders.index') }}" class="btn btn-light btn-sm fw-semibold"><i class="ri-shopping-cart-2-line me-1"></i> Orders</a>
+                    @endcan
+                    @can('members-show')
                     <a href="{{ route('members.index') }}" class="btn btn-warning btn-sm fw-semibold text-dark"><i class="ri-user-star-line me-1"></i> Members</a>
+                    @endcan
                 </div>
             </div>
         </div>
 
+        @if(!$hasDashboardWidgets)
+        <div class="dd-dash-empty mb-4">
+            <div class="dd-dash-empty-icon"><i class="ri-dashboard-line"></i></div>
+            <h5>Your dashboard is ready</h5>
+            <p>No overview widgets are assigned to your account yet. Use the sidebar menu to open the modules you have access to.</p>
+        </div>
+        @else
+
         {{-- Primary stats --}}
         <div class="row g-3 mb-4">
+            @can('orders-show')
             <div class="col-sm-6 col-xl-3">
                 <div class="card dd-stat-card">
                     <div class="card-body d-flex align-items-center gap-3">
@@ -325,18 +372,6 @@
             <div class="col-sm-6 col-xl-3">
                 <div class="card dd-stat-card">
                     <div class="card-body d-flex align-items-center gap-3">
-                        <div class="dd-stat-icon green"><i class="ri-user-heart-line"></i></div>
-                        <div>
-                            <div class="dd-stat-label">Members</div>
-                            <div class="dd-stat-value">{{ number_format($stats['members_total']) }}</div>
-                            <div class="dd-stat-meta">{{ $stats['members_golden'] }} golden · {{ $stats['members_pending'] }} pending approval</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-xl-3">
-                <div class="card dd-stat-card">
-                    <div class="card-body d-flex align-items-center gap-3">
                         <div class="dd-stat-icon orange"><i class="ri-time-line"></i></div>
                         <div>
                             <div class="dd-stat-label">Pending Orders</div>
@@ -346,10 +381,26 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('members-show')
+            <div class="col-sm-6 col-xl-3">
+                <div class="card dd-stat-card">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="dd-stat-icon green"><i class="ri-user-heart-line"></i></div>
+                        <div>
+                            <div class="dd-stat-label">Members</div>
+                            <div class="dd-stat-value">{{ number_format($stats['members_total']) }}</div>
+                            <div class="dd-stat-meta">{{ $stats['members_golden'] }} golden · {{ $stats['members_pending'] }} pending approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endcan
         </div>
 
         {{-- Secondary stats --}}
         <div class="row g-3 mb-4">
+            @can('menu-list')
             <div class="col-6 col-md-4 col-xl-2">
                 <div class="card dd-stat-card">
                     <div class="card-body text-center py-3">
@@ -359,6 +410,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('category-list')
             <div class="col-6 col-md-4 col-xl-2">
                 <div class="card dd-stat-card">
                     <div class="card-body text-center py-3">
@@ -368,6 +421,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('offers-show')
             <div class="col-6 col-md-4 col-xl-2">
                 <div class="card dd-stat-card">
                     <div class="card-body text-center py-3">
@@ -377,6 +432,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('reviews-show')
             <div class="col-6 col-md-4 col-xl-2">
                 <div class="card dd-stat-card">
                     <div class="card-body text-center py-3">
@@ -395,6 +452,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('branch-list')
             <div class="col-6 col-md-4 col-xl-2">
                 <div class="card dd-stat-card">
                     <div class="card-body text-center py-3">
@@ -404,9 +463,11 @@
                     </div>
                 </div>
             </div>
+            @endcan
         </div>
 
         <div class="row g-3">
+            @can('orders-show')
             {{-- Recent orders --}}
             <div class="col-xl-8">
                 <div class="card dd-panel">
@@ -458,9 +519,11 @@
                     </div>
                 </div>
             </div>
+            @endcan
 
             {{-- Sidebar panels --}}
-            <div class="col-xl-4">
+            <div class="{{ auth()->user()->can('orders-show') ? 'col-xl-4' : 'col-xl-12' }}">
+                @can('orders-show')
                 <div class="card dd-panel mb-3">
                     <div class="card-header">
                         <h5 class="card-title"><i class="ri-pie-chart-2-line me-1"></i> Orders by Status</h5>
@@ -482,12 +545,14 @@
                         </div>
                     </div>
                 </div>
+                @endcan
 
                 <div class="card dd-panel mb-3">
                     <div class="card-header">
                         <h5 class="card-title"><i class="ri-links-line me-1"></i> Quick Actions</h5>
                     </div>
                     <div class="card-body">
+                        @can('orders-show')
                         <a href="{{ route('orders.index') }}" class="dd-quick-link">
                             <span class="ql-icon"><i class="ri-shopping-cart-2-line"></i></span>
                             <span>Manage Orders</span>
@@ -495,6 +560,8 @@
                                 <span class="ql-badge">{{ $stats['orders_new'] }} new</span>
                             @endif
                         </a>
+                        @endcan
+                        @can('members-edit')
                         <a href="{{ route('members.index', ['approval' => 'pending']) }}" class="dd-quick-link">
                             <span class="ql-icon"><i class="ri-user-follow-line"></i></span>
                             <span>Student Approvals</span>
@@ -502,6 +569,8 @@
                                 <span class="ql-badge">{{ $stats['members_pending'] }}</span>
                             @endif
                         </a>
+                        @endcan
+                        @can('reviews-moderate')
                         <a href="{{ route('admin.reviews.index') }}" class="dd-quick-link">
                             <span class="ql-icon"><i class="ri-star-line"></i></span>
                             <span>Review Moderation</span>
@@ -509,21 +578,29 @@
                                 <span class="ql-badge">{{ $stats['reviews_pending'] }}</span>
                             @endif
                         </a>
+                        @endcan
+                        @can('menu-list')
                         <a href="{{ route('admin.menu.index') }}" class="dd-quick-link">
                             <span class="ql-icon"><i class="ri-restaurant-line"></i></span>
                             <span>Menu Management</span>
                         </a>
+                        @endcan
+                        @can('offers-show')
                         <a href="{{ route('offers.index') }}" class="dd-quick-link">
                             <span class="ql-icon"><i class="ri-price-tag-3-line"></i></span>
                             <span>Offers &amp; Promotions</span>
                         </a>
+                        @endcan
+                        @can('branch-list')
                         <a href="{{ route('admin.branch.index') }}" class="dd-quick-link">
                             <span class="ql-icon"><i class="ri-store-2-line"></i></span>
                             <span>Branches</span>
                         </a>
+                        @endcan
                     </div>
                 </div>
 
+                @can('members-show')
                 <div class="card dd-panel">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title"><i class="ri-user-add-line me-1"></i> New Members</h5>
@@ -545,9 +622,11 @@
                         @endforelse
                     </div>
                 </div>
+                @endcan
             </div>
         </div>
 
+        @can('orders-show')
         @if($monthlyRevenue->isNotEmpty())
         <div class="row g-3 mt-1">
             <div class="col-12">
@@ -569,6 +648,8 @@
                 </div>
             </div>
         </div>
+        @endif
+        @endcan
         @endif
     @endsection
 </x-admin-master>

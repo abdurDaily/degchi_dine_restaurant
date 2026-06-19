@@ -12,6 +12,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class MenuController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:menu-list')->only(['index', 'edit']);
+        $this->middleware('permission:menu-create')->only('store');
+        $this->middleware('permission:menu-edit')->only('update');
+        $this->middleware('permission:menu-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

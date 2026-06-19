@@ -14,49 +14,101 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $orderStatusCounts = Order::query()
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
+        $user = auth()->user();
 
         $stats = [
-            'orders_total'      => Order::count(),
-            'orders_today'      => Order::whereDate('created_at', today())->count(),
-            'orders_pending'    => (int) ($orderStatusCounts['pending'] ?? 0),
-            'orders_new'        => Order::whereNull('viewed_at')->count(),
-            'orders_revenue'    => (float) Order::whereIn('status', ['confirmed', 'completed'])->sum('final_amount'),
-            'revenue_today'     => (float) Order::whereIn('status', ['confirmed', 'completed'])
-                ->whereDate('created_at', today())
-                ->sum('final_amount'),
-            'members_total'     => Member::count(),
-            'members_pending'   => Member::where('is_student', true)->where('approval_status', 'pending')->count(),
-            'members_golden'    => Member::where('type', 'golden')->count(),
-            'reviews_total'     => Review::count(),
-            'reviews_pending'   => Review::where('status', 'pending')->count(),
-            'menu_items'        => Menu::count(),
-            'categories'        => Category::count(),
-            'offers_active'     => Offer::where('is_active', true)->count(),
-            'branches'          => Branch::count(),
+            'orders_total'    => 0,
+            'orders_today'    => 0,
+            'orders_pending'  => 0,
+            'orders_new'      => 0,
+            'orders_revenue'  => 0,
+            'revenue_today'   => 0,
+            'members_total'   => 0,
+            'members_pending' => 0,
+            'members_golden'  => 0,
+            'reviews_total'   => 0,
+            'reviews_pending' => 0,
+            'menu_items'      => 0,
+            'categories'      => 0,
+            'offers_active'   => 0,
+            'branches'        => 0,
         ];
 
-        $recentOrders = Order::query()
-            ->latest()
-            ->take(10)
-            ->get(['id', 'customer_name', 'customer_phone', 'final_amount', 'status', 'payment_status', 'created_at', 'viewed_at']);
+        $orderStatusCounts = collect();
+        $recentOrders = collect();
+        $recentMembers = collect();
+        $monthlyRevenue = collect();
 
-        $recentMembers = Member::query()
-            ->latest()
-            ->take(6)
-            ->get(['id', 'name', 'phone', 'unique_card_number', 'type', 'approval_status', 'is_student', 'created_at']);
+        if ($user->can('orders-show')) {
+            $orderStatusCounts = Order::query()
+                ->selectRaw('status, COUNT(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
 
-        $monthlyRevenue = Order::query()
-            ->whereIn('status', ['confirmed', 'completed'])
-            ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(final_amount) as total")
-            ->groupBy('month_key')
-            ->orderBy('month_key')
-            ->pluck('total', 'month_key');
+            $stats['orders_total']   = Order::count();
+            $stats['orders_today']   = Order::whereDate('created_at', today())->count();
+            $stats['orders_pending'] = (int) ($orderStatusCounts['pending'] ?? 0);
+            $stats['orders_new']     = Order::whereNull('viewed_at')->count();
+            $stats['orders_revenue'] = (float) Order::whereIn('status', ['confirmed', 'completed'])->sum('final_amount');
+            $stats['revenue_today']  = (float) Order::whereIn('status', ['confirmed', 'completed'])
+                ->whereDate('created_at', today())
+                ->sum('final_amount');
 
-        return view('dashboard', compact('stats', 'recentOrders', 'recentMembers', 'orderStatusCounts', 'monthlyRevenue'));
+            $recentOrders = Order::query()
+                ->latest()
+                ->take(10)
+                ->get(['id', 'customer_name', 'customer_phone', 'final_amount', 'status', 'payment_status', 'created_at', 'viewed_at']);
+
+            $monthlyRevenue = Order::query()
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
+                ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(final_amount) as total")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->pluck('total', 'month_key');
+        }
+
+        if ($user->can('members-show')) {
+            $stats['members_total']   = Member::count();
+            $stats['members_pending'] = Member::where('is_student', true)->where('approval_status', 'pending')->count();
+            $stats['members_golden']  = Member::where('type', 'golden')->count();
+
+            $recentMembers = Member::query()
+                ->latest()
+                ->take(6)
+                ->get(['id', 'name', 'phone', 'unique_card_number', 'type', 'approval_status', 'is_student', 'created_at']);
+        }
+
+        if ($user->can('reviews-show')) {
+            $stats['reviews_total']   = Review::count();
+            $stats['reviews_pending'] = Review::where('status', 'pending')->count();
+        }
+
+        if ($user->can('menu-list')) {
+            $stats['menu_items'] = Menu::count();
+        }
+
+        if ($user->can('category-list')) {
+            $stats['categories'] = Category::count();
+        }
+
+        if ($user->can('offers-show')) {
+            $stats['offers_active'] = Offer::where('is_active', true)->count();
+        }
+
+        if ($user->can('branch-list')) {
+            $stats['branches'] = Branch::count();
+        }
+
+        $hasDashboardWidgets = $user->hasDashboardWidgets();
+
+        return view('dashboard', compact(
+            'stats',
+            'recentOrders',
+            'recentMembers',
+            'orderStatusCounts',
+            'monthlyRevenue',
+            'hasDashboardWidgets'
+        ));
     }
 }

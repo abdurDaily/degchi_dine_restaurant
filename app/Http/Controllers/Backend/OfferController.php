@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Storage;
 
 class OfferController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:offers-show')->only(['index', 'create', 'edit']);
+        $this->middleware('permission:offers-create')->only('store');
+        $this->middleware('permission:offers-edit')->only(['update', 'toggleStatus']);
+        $this->middleware('permission:offers-delete')->only('destroy');
+    }
+
     public function index()
     {
         $offers = Offer::with('menuVariations')->latest()->get();

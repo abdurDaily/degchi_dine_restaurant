@@ -73,7 +73,7 @@
 
             <p class="auth-secure-note">
                 <i class="bi bi-shield-lock-fill"></i>
-                Only authorized staff should register
+                New accounts require admin approval before panel access
             </p>
         </form>
 

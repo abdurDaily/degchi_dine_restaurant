@@ -10,6 +10,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SignaturePlatterController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:signature-platters-list')->only(['index', 'edit']);
+        $this->middleware('permission:signature-platters-create')->only('store');
+        $this->middleware('permission:signature-platters-edit')->only('update');
+        $this->middleware('permission:signature-platters-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
