@@ -59,6 +59,35 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query->where('status', true);
     }
 
+    public static function generateUserNumber(): int
+    {
+        do {
+            $number = random_int(10000000, 99999999);
+        } while (static::where('user_number', $number)->exists());
+
+        return $number;
+    }
+
+    public function defaultAdminRoute(): string
+    {
+        return route('dashboard');
+    }
+
+    public function hasDashboardWidgets(): bool
+    {
+        return $this->canAny([
+            'orders-show',
+            'members-show',
+            'members-edit',
+            'menu-list',
+            'category-list',
+            'offers-show',
+            'reviews-show',
+            'reviews-moderate',
+            'branch-list',
+        ]);
+    }
+
     protected $appends = ['profile_image'];
 
     public function getProfileImageAttribute()

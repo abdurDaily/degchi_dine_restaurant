@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:members-show')->only(['index', 'show']);
+        $this->middleware('permission:members-edit')->only(['toggleStatus', 'syncPurchase', 'approve', 'reject']);
+    }
+
     public function index(Request $request)
     {
         $search = $request->query('search');

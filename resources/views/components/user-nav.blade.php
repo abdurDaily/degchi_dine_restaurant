@@ -7,7 +7,7 @@
     <div class="collapse menu-dropdown"
         id="userNav">
         <ul class="nav nav-sm flex-column">
-            @can('users.create')
+            @can('users-show')
             <li class="nav-item">
                 <a href="{{ route('users.index') }}" class="nav-link"><span data-key="t-remix">Users</span></a>
             </li>

@@ -26,8 +26,7 @@ class DatabaseSeeder extends Seeder
             [
                 UserSeeder::class,
                 RoleSeeder::class,
-                UsersPermissionSeeder::class,
-                SettingPermissionSeeder::class,
+                RestaurantPermissionSeeder::class,
                 CurrencySeeder::class,
                 CurrencyPermissionSeeder::class,
                 CurrencySettingSeeder::class,

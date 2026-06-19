@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class ContactController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:contact-show')->only('index');
+        $this->middleware('permission:contact-edit')->only('store');
+    }
+
     public function index()
     {
         $settings = Setting::where('setting_group', 'contact_section')

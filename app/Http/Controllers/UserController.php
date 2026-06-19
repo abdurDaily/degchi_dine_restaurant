@@ -55,7 +55,7 @@ class UserController extends Controller
                     }
                     else
                     {
-                        return '<span class="badge bg-danger">Inactive</span>';
+                        return '<span class="badge bg-danger">Pending approval</span>';
                     }
                 })
                 ->addColumn('actions', function ($item)
@@ -118,6 +118,7 @@ class UserController extends Controller
             # make unique user number
             $user->user_number = mt_rand(10000000, 99999999);
             $user->password = Hash::make($validatedData['password']);
+            $user->status = true;
 
             # make profile image
             if (isset($validatedData['image']))
@@ -200,6 +201,11 @@ class UserController extends Controller
             if (isset($validatedData['password']))
             {
                 $user->password = Hash::make($validatedData['password']);
+            }
+
+            if (auth()->user()->can('users-edit'))
+            {
+                $user->status = $request->boolean('status');
             }
 
             # make profile image

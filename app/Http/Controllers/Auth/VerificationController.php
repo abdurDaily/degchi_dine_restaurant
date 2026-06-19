@@ -27,6 +27,17 @@ class VerificationController extends Controller
      */
     protected $redirectTo = '/dashboard';
 
+    public function redirectPath()
+    {
+        $user = auth()->user();
+
+        if ($user && !$user->status) {
+            return route('pending-approval');
+        }
+
+        return $user?->defaultAdminRoute() ?? $this->redirectTo;
+    }
+
     /**
      * Create a new controller instance.
      *

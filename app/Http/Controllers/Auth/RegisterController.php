@@ -28,7 +28,18 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/dashboard';
+    protected $redirectTo = '/pending-approval';
+
+    protected function redirectPath()
+    {
+        $user = auth()->user();
+
+        if ($user && !$user->status) {
+            return route('pending-approval');
+        }
+
+        return $user?->defaultAdminRoute() ?? $this->redirectTo;
+    }
 
     /**
      * Create a new controller instance.
@@ -66,7 +77,9 @@ class RegisterController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'user_number' => User::generateUserNumber(),
             'password' => Hash::make($data['password']),
+            'status' => false,
         ]);
     }
 }

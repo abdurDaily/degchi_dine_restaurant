@@ -24,7 +24,7 @@ use App\Http\Controllers\NotificationController;
 //     return to_route('login');
 // });
 
-Auth::routes(['register' => true, 'verify' => false]);
+Auth::routes(['register' => true, 'verify' => true]);
 
 Route::get('/run-migrations', function (Request $request) {
     if ($request->input('key') !== MIGRATION_KEY) {
@@ -54,7 +54,17 @@ Route::get('cache-clear', function () {
 
 
 
-Route::middleware(['auth', 'setLocale'])->group(function () {
+Route::middleware(['auth'])->group(function () {
+    Route::get('pending-approval', function () {
+        if (auth()->user()->status) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('auth.pending-approval');
+    })->name('pending-approval');
+});
+
+Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
 
     // System Settings Routes
     Route::get('settings', [SettingController::class, 'settings'])->name('system-setting');

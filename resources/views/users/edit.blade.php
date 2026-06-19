@@ -65,6 +65,18 @@
                                         </div>
                                     @endif
 
+                                    @if (auth()->user()->can('users-edit'))
+                                        <div class="mt-4 col-md-4">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="status" value="1"
+                                                    id="userStatus" {{ $user->status ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="userStatus">
+                                                    Active account (admin approved)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     {{-- checkbox --}}
                                     <div class="mt-4 col-md-4">
                                         <div class="form-check">

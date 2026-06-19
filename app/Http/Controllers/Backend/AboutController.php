@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class AboutController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:about-show')->only('index');
+        $this->middleware('permission:about-edit')->only('store');
+    }
+
     public function index()
     {
         $settings = Setting::whereIn('setting_group', ['about_section', 'about_page'])

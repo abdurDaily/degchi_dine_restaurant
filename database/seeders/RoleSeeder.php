@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use id;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;

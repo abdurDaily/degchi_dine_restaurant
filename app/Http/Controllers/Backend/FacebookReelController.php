@@ -9,6 +9,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class FacebookReelController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:facebook-reels-list')->only(['index', 'edit']);
+        $this->middleware('permission:facebook-reels-create')->only('store');
+        $this->middleware('permission:facebook-reels-edit')->only('update');
+        $this->middleware('permission:facebook-reels-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

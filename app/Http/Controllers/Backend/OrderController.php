@@ -9,6 +9,12 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:orders-show')->only(['index', 'show', 'latestOrderId']);
+        $this->middleware('permission:orders-edit')->only('updateStatus');
+    }
+
     public function index(Request $request)
     {
         // AJAX counts-only refresh (called by JS polling & after status update)

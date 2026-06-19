@@ -10,7 +10,8 @@ class ReviewController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('permission:reviews-show')->only('index');
+        $this->middleware('permission:reviews-moderate')->only(['approve', 'reject', 'delete']);
     }
 
     public function index(Request $request)

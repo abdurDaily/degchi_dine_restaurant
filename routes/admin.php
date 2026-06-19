@@ -10,7 +10,7 @@ use App\Http\Controllers\Backend\ContactController;
 use Illuminate\Support\Facades\Route;
 
 // --- BRANCH MANAGEMENT ---
-Route::middleware(['auth', 'setLocale'])->prefix("branch")->name("branch.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("branch")->name("branch.")->group(function () {
     Route::get("/index", [BranchController::class, "index"])->name("index");
     Route::post("/store", [BranchController::class, "store"])->name("store");
     Route::get("/{branch}/edit", [BranchController::class, "edit"])->name("edit");
@@ -19,7 +19,7 @@ Route::middleware(['auth', 'setLocale'])->prefix("branch")->name("branch.")->gro
 });
 
 // --- CATEGORY MANAGEMENT ---
-Route::middleware(['auth', 'setLocale'])->prefix("category")->name("category.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("category")->name("category.")->group(function () {
     Route::get("/index", [CategoryController::class, "index"])->name("index");
     Route::post("/store", [CategoryController::class, "store"])->name("store");
     Route::get("/{category}/edit", [CategoryController::class, "edit"])->name("edit");
@@ -28,7 +28,7 @@ Route::middleware(['auth', 'setLocale'])->prefix("category")->name("category.")-
 });
 
 // --- MENU MANAGEMENT (NEW) ---
-Route::middleware(['auth', 'setLocale'])->prefix("menu")->name("menu.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("menu")->name("menu.")->group(function () {
     Route::get("/index", [MenuController::class, "index"])->name("index");
     Route::post("/store", [MenuController::class, "store"])->name("store");
     Route::get("/{menu}/edit", [MenuController::class, "edit"])->name("edit");
@@ -38,7 +38,7 @@ Route::middleware(['auth', 'setLocale'])->prefix("menu")->name("menu.")->group(f
 });
 
 // --- SIGNATURE PLATTERS MANAGEMENT ---
-Route::middleware(['auth', 'setLocale'])->prefix("signature-platters")->name("signature-platters.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("signature-platters")->name("signature-platters.")->group(function () {
     Route::get("/index", [SignaturePlatterController::class, "index"])->name("index");
     Route::post("/store", [SignaturePlatterController::class, "store"])->name("store");
     Route::get("/{signaturePlatter}/edit", [SignaturePlatterController::class, "edit"])->name("edit");
@@ -47,7 +47,7 @@ Route::middleware(['auth', 'setLocale'])->prefix("signature-platters")->name("si
 });
 
 // --- FACEBOOK REELS MANAGEMENT ---
-Route::middleware(['auth', 'setLocale'])->prefix("facebook-reels")->name("facebook-reels.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("facebook-reels")->name("facebook-reels.")->group(function () {
     Route::get("/index", [FacebookReelController::class, "index"])->name("index");
     Route::post("/store", [FacebookReelController::class, "store"])->name("store");
     Route::get("/{facebookReel}/edit", [FacebookReelController::class, "edit"])->name("edit");
@@ -56,13 +56,13 @@ Route::middleware(['auth', 'setLocale'])->prefix("facebook-reels")->name("facebo
 });
 
 // --- ABOUT SECTION MANAGEMENT ---
-Route::middleware(['auth', 'setLocale'])->prefix("about")->name("about.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("about")->name("about.")->group(function () {
     Route::get("/index", [AboutController::class, "index"])->name("index");
     Route::post("/store", [AboutController::class, "store"])->name("store");
 });
 
 // --- CONTACT SECTION MANAGEMENT ---
-Route::middleware(['auth', 'setLocale'])->prefix("contact")->name("contact.")->group(function () {
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("contact")->name("contact.")->group(function () {
     Route::get("/index", [ContactController::class, "index"])->name("index");
     Route::post("/store", [ContactController::class, "store"])->name("store");
 });
