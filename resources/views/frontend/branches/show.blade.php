@@ -150,20 +150,16 @@
                                 </div>
                                 <div class="menu-offer-body">
                                     <h5 class="menu-offer-title">{{ $menu->name }}</h5>
-                                    <p class="menu-offer-meta mb-0">{{ Str::limit($menu->description ?? 'Fresh and delicious item', 95) }}</p>
-                                    <div class="menu-offer-divider"></div>
+                                    <p class="menu-offer-meta mb-0">{{ Str::limit($menu->description ?? 'Fresh item', 33) }}</p>
                                     <div class="menu-offer-footer">
                                         <div class="menu-offer-price-wrap">
-                                            <span class="menu-offer-price-label">Starts from</span>
                                             <span class="menu-offer-price">৳ {{ number_format((float) $minPrice, 2) }}</span>
                                         </div>
-                                    </div>
-                                    <div class="menu-offer-actions">
                                         <button class="menu-offer-cart-btn" type="button"
                                             data-variation-id="{{ $firstVariation?->id }}"
-                                            data-original-price="{{ $minPrice }}">
-                                            <i class="bi bi-bag-plus" aria-hidden="true"></i>
-                                            Order Now
+                                            data-original-price="{{ $minPrice }}"
+                                            aria-label="Add {{ $menu->name }} to cart">
+                                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
                                         </button>
                                     </div>
                                 </div>
