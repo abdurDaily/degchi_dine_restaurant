@@ -223,26 +223,28 @@
 
     <!-- MENU CARD -->
 
-    <section class="platter-section">
-      <div class="mb-5 text-center reveal py-lg-2">
-        <h2 class="section-title mt-2">Our Signature Platters</h2>
-        <div class="elegant-divider mx-auto">
-          <span></span>
-          <i class="fa-solid fa-concierge-bell"></i>
-          <span></span>
+    <section class="section-block platter-section" id="platters">
+      <div class="container px-4 px-lg-5">
+        <div class="platter-section-header text-center reveal mb-4 mb-lg-5">
+          <span class="menu-kicker platter-kicker"><i class="bi bi-star-fill me-1"></i> Signature Selection</span>
+          <h2 class="section-title mt-3 mb-2">Our Signature Platters</h2>
+          <div class="elegant-divider mx-auto">
+            <span></span>
+            <i class="fa-solid fa-concierge-bell"></i>
+            <span></span>
+          </div>
+          <p class="section-subtitle mx-auto">
+            Carefully crafted selections perfect for sharing
+          </p>
         </div>
-        <p class="section-subtitle">
-          Carefully crafted selections perfect for sharing
-        </p>
-      </div>
 
-      <div class="platter-card-wrapper">
+      <div class="platter-card-wrapper reveal">
         <div class="platter-card p-0">
           <div class="bg-blob blob-1"></div>
           <div class="bg-blob blob-2"></div>
 
           <div class="platter-nav-column">
-            <div class="slider-nav">
+            <div class="slider-nav ">
               @forelse($signaturePlatters as $platter)
                 @php
                   $thumbnailImage = $platter->thumbnail_image
@@ -288,8 +290,8 @@
                         )
                       : 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80';
                 @endphp
-                <div class="content-item">
-                  <div class="subtitle-wrapper">
+                <div class="content-item  pe-lg-5">
+                  <div class="subtitle-wrapper ">
                     <h4 class="platter-subtitle">{{ $platter->subtitle ?: 'Signature Collection' }}</h4>
                     <span class="subtitle-line"></span>
                   </div>
@@ -315,9 +317,9 @@
                       @endforeach
                     </ul>
                   @endif
-                  <div class="text-center text-lg-start">
+                  <div class="text-center text-lg-start platter-cta-wrap">
                     <button class="btn-order trigger-menu-popup" data-menu-image="{{ $menuCardImage }}" data-platter-title="{{ $platter->title }}">
-                      view menu card
+                      <i class="bi bi-eye me-2"></i>View Menu Card
                     </button>
                   </div>
                 </div>
@@ -336,15 +338,16 @@
             </div>
 
             <div class="custom-slider-arrows">
-              <button class="custom-prev">
+              <button class="custom-prev" aria-label="Previous platter">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
-              <button class="custom-next">
+              <button class="custom-next" aria-label="Next platter">
                 <i class="fa-solid fa-chevron-right"></i>
               </button>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
 

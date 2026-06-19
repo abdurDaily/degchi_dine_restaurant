@@ -9660,63 +9660,114 @@ body {
 }
 
 /* ==========================================================================
-   PLATTER SECTION - ULTRA PREMIUM UI
+   PLATTER SECTION — BRAND TEAL & GOLD
    ========================================================================== */
 .platter-section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 15px;
-}
-.platter-section .section-title {
-  color: #116b83;
-  font-weight: 500;
-  font-size: 3.2rem;
-  letter-spacing: 1px;
-  font-family: Poppins, sans-serif;
   position: relative;
-  padding-left: 18px; /* Breathing space for the new left bar pseudo-accent */
-  display: inline-block;
-  line-height: 1.2;
-  /* margin-bottom: 15px; */
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(231, 174, 7, 0.08), transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(17, 107, 131, 0.1), transparent 55%),
+    linear-gradient(180deg, #f4f9fb 0%, #ffffff 50%, #f8fcfd 100%);
+  padding: 3.5rem 0 4rem;
 }
+
+.platter-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(17, 107, 131, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 107, 131, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.platter-section > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.platter-section-header .section-title {
+  color: #083844;
+}
+
+.platter-kicker {
+  color: #116b83 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(17, 107, 131, 0.15) !important;
+}
+
+.platter-section-header .elegant-divider span {
+  background: linear-gradient(90deg, transparent, rgba(17, 107, 131, 0.35));
+}
+
+.platter-section-header .elegant-divider span:last-child {
+  background: linear-gradient(90deg, rgba(17, 107, 131, 0.35), transparent);
+}
+
+.platter-section-header .elegant-divider i {
+  color: #e7ae07;
+}
+
+.platter-section-header .section-subtitle {
+  max-width: 520px;
+  color: #5a7a85;
+}
+
 .platter-card-wrapper {
   overflow: hidden;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .platter-card {
-  background-color: #f7bb79;
-  border-radius: 20px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fcfd 100%);
+  border: 1px solid rgba(17, 107, 131, 0.12);
+  border-radius: 24px;
   display: flex;
   align-items: stretch;
-  padding: 60px 40px;
+  padding: 2.5rem 2rem;
   position: relative;
-  box-shadow: 0 20px 40px rgba(247, 187, 121, 0.2);
+  box-shadow: 0 20px 50px rgba(8, 56, 68, 0.1);
+}
+
+.platter-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .bg-blob {
   position: absolute;
-  background-color: rgba(255, 230, 180, 0.4);
   border-radius: 50%;
-  filter: blur(4px);
+  filter: blur(40px);
   z-index: 0;
+  pointer-events: none;
 }
+
 .blob-1 {
-  width: 300px;
+  width: 280px;
   height: 200px;
-  top: -50px;
-  left: 30%;
-  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  top: -40px;
+  right: 8%;
+  background: rgba(231, 174, 7, 0.12);
 }
+
 .blob-2 {
-  width: 400px;
-  height: 250px;
-  bottom: -80px;
-  left: 10%;
-  border-radius: 50% 50% 30% 70% / 60% 40% 70% 40%;
+  width: 320px;
+  height: 220px;
+  bottom: -60px;
+  left: 5%;
+  background: rgba(17, 107, 131, 0.1);
 }
 
 .platter-nav-column {
-  width: 45%;
+  width: 42%;
   position: relative;
   z-index: 2;
   display: flex;
@@ -9725,38 +9776,34 @@ body {
 }
 
 .platter-content-column {
-  width: 55%;
+  width: 58%;
   position: relative;
   z-index: 2;
-  padding-left: 60px;
+  padding-left: 2.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-/* --- Navigation Slider (Desktop Layout Match) --- */
 .slider-nav {
-  height: 650px;
+  height: 520px;
   width: 100%;
   position: relative;
 }
 
-/* Allow scaled active image to break out of the sides, but padding prevents cutting */
 .slider-nav .slick-list {
-  padding: 40px 0 !important;
+  padding: 2rem 0 !important;
   overflow: visible !important;
 }
 
-/* STRICT HIDING LOGIC: Completely hides any slide that isn't the active 3 */
 .slider-nav .slick-slide {
-  margin: 25px 0;
-  opacity: 0 !important; /* Hide by default */
+  margin: 1.25rem 0;
+  opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none;
-  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Make only the 3 active slides visible */
 .slider-nav .slick-slide.slick-active {
   opacity: 1 !important;
   visibility: visible !important;
@@ -9771,16 +9818,15 @@ body {
   cursor: pointer;
 }
 
-/* INACTIVE IMAGES (Top & Bottom): Base size, pushed left */
 .nav-img-wrapper {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   margin: 0 auto;
-  transform: scale(0.95) translateX(-50px); /* Creates the left side of the Triangle */
-  opacity: 0.8;
-  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  transform: scale(0.9) translateX(-40px);
+  opacity: 0.75;
+  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .nav-img-wrapper img {
@@ -9788,39 +9834,39 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-  border: 3px solid transparent;
-  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 8px 22px rgba(8, 56, 68, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ACTIVE IMAGE (Middle): Scale exactly 1.8, pushed right */
 .slick-current .nav-img-wrapper {
-  transform: scale(1.8) translateX(25px); /* Matches the large right-aligned box */
+  transform: scale(1.55) translateX(20px);
   opacity: 1;
   z-index: 10;
 }
+
 .slick-current .nav-img-wrapper img {
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
-  border-color: #ffffff;
+  box-shadow: 0 16px 36px rgba(17, 107, 131, 0.28);
+  border-color: #e7ae07;
 }
 
-/* Sticker Badge Styling */
 .sticker-badge {
   position: absolute;
-  top: 0px;
-  right: -5px;
-  background: #ffffff;
+  top: 0;
+  right: -6px;
+  background: linear-gradient(135deg, #116b83, #083844);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   padding: 2px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(8, 56, 68, 0.25);
   opacity: 0;
   transform: scale(0) rotate(-20deg);
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s;
 }
+
 .sticker-inner {
-  border: 1px dashed #b5a396;
+  border: 1px dashed rgba(231, 174, 7, 0.55);
   border-radius: 50%;
   width: 100%;
   height: 100%;
@@ -9828,123 +9874,152 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #2c1e16;
+  color: #fff;
   font-family: "Poppins", sans-serif;
   font-size: 6px;
   font-weight: 700;
   line-height: 1.1;
+  padding: 2px;
 }
+
 .slick-current .sticker-badge {
   opacity: 1;
   transform: scale(1) rotate(0deg);
 }
 
-/* --- Content Typography --- */
 .content-item {
   outline: none;
+  padding: 0.5rem 0;
 }
+
 .subtitle-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
+
 .platter-subtitle {
   font-family: "Poppins", sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: #3b2a20;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #116b83;
   text-transform: uppercase;
   margin: 0;
 }
+
 .subtitle-line {
-  width: 45px;
+  width: 40px;
   height: 2px;
-  background-color: #3b2a20;
-  opacity: 0.6;
+  background: linear-gradient(90deg, #e7ae07, rgba(231, 174, 7, 0.2));
+  border-radius: 2px;
 }
+
 .platter-title {
-  font-family: "Playfair Display", serif;
-  font-size: 3.2rem;
+  font-family: var(--section-title-font, "Poppins", sans-serif);
+  font-size: clamp(1.85rem, 3.5vw, 2.75rem);
   font-weight: 700;
   line-height: 1.15;
-  color: #1a1a1a;
-  margin-bottom: 15px;
+  color: #083844;
+  margin-bottom: 0.85rem;
 }
+
 .platter-desc {
   font-family: "Lato", sans-serif;
-  font-size: 1.05rem;
-  color: #4a3f35;
-  margin-bottom: 25px;
-  line-height: 1.6;
+  font-size: 1rem;
+  color: #5a7a85;
+  margin-bottom: 1.25rem;
+  line-height: 1.65;
   max-width: 95%;
 }
+
 .platter-features {
   list-style: none;
   padding: 0;
-  margin-bottom: 35px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
+
 .platter-features li {
   font-family: "Lato", sans-serif;
-  font-size: 0.95rem;
-  color: #2c1e16;
-  margin-bottom: 14px;
+  font-size: 0.92rem;
+  color: #0d5566;
   line-height: 1.5;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-}
-.platter-features li i {
-  margin-top: 4px;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(17, 107, 131, 0.06);
+  border-radius: 12px;
+  border-left: 3px solid #e7ae07;
 }
 
-/* Interactive Order Button */
+.platter-features li i {
+  margin-top: 2px;
+  color: #e7ae07;
+}
+
+.platter-cta-wrap {
+  margin-top: 0.5rem;
+}
+
 .btn-order {
-  display: inline-block;
-  background-color: #725b48;
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #116b83, #0d5566);
+  color: #ffffff !important;
   font-family: "Poppins", sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 14px 40px;
-  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(114, 91, 72, 0.3);
-  transition: all 0.3s ease;
-}
-.btn-order:hover {
-  background-color: #4e3e31;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(114, 91, 72, 0.4);
+  box-shadow: 0 10px 26px rgba(17, 107, 131, 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Navigation Arrows */
+.btn-order:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(17, 107, 131, 0.3);
+  color: #ffffff !important;
+}
+
 .custom-slider-arrows {
   position: absolute;
-  bottom: 10%;
-  right: 10%;
+  bottom: 8%;
+  right: 8%;
   display: flex;
-  gap: 12px;
+  gap: 0.65rem;
 }
+
 .custom-slider-arrows button {
-  background: transparent;
-  border: 1.5px solid #2c1e16;
-  border-radius: 8px;
-  width: 48px;
-  height: 48px;
+  background: #fff;
+  border: 1px solid rgba(17, 107, 131, 0.18);
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #2c1e16;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
+  color: #116b83;
+  font-size: 1rem;
+  box-shadow: 0 6px 18px rgba(8, 56, 68, 0.08);
+  transition: all 0.25s ease;
 }
+
 .custom-slider-arrows button:hover {
-  background: #2c1e16;
+  background: linear-gradient(135deg, #116b83, #0d5566);
+  border-color: transparent;
   color: #ffffff;
+  transform: translateY(-2px);
 }
 
 /* --- Menu Popup Modal --- */
@@ -10015,59 +10090,73 @@ body {
    RESPONSIVE DESIGN (Mobile / Tablet)
    ========================================================================== */
 @media (max-width: 991px) {
+  .platter-section {
+    padding: 2.5rem 0 3rem;
+  }
+
   .platter-card {
     flex-direction: column;
-    padding: 50px 20px;
+    padding: 1.5rem 1.15rem 1.75rem;
+    border-radius: 20px;
     overflow: hidden;
   }
 
   .platter-nav-column {
     width: 100%;
-    margin-bottom: 25px;
-    padding-top: 50px;
+    margin-bottom: 0.5rem;
+    padding-top: 0.5rem;
   }
 
   .platter-content-column {
     width: 100%;
     padding-left: 0;
+    padding-top: 0.5rem;
   }
 
   .slider-nav {
     height: auto;
-    padding: 0px 0 !important;
-    overflow: visible !important;
+    min-height: 200px;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
 
-  /* Horizontal gaps between the 3 images */
+  .slider-nav .slick-list {
+    overflow: hidden !important;
+    padding: 1.25rem 0 !important;
+  }
+
   .slider-nav .slick-slide {
-    margin: 0 15px !important;
+    margin: 0 0.5rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto;
   }
 
-  /* Make inactive side images smaller so center image stands out more */
   .nav-img-wrapper {
-    width: 95px;
-    height: 95px;
-    transform: scale(0.75) translateX(0); /* Smaller, but perfectly centered horizontally */
+    width: 100px;
+    height: 100px;
+    transform: scale(0.85);
+    opacity: 0.65;
   }
 
-  /* Make mobile active image MASSIVE */
   .slick-current .nav-img-wrapper {
-    transform: scale(1.65) translateX(0);
+    transform: scale(1.15);
+    opacity: 1;
   }
 
   .sticker-badge {
-    width: 38px;
-    height: 38px;
-    right: -10px;
-    top: -5px;
+    width: 34px;
+    height: 34px;
+    right: -4px;
+    top: -2px;
   }
 
   .sticker-inner {
-    font-size: 6.5px;
+    font-size: 5.5px;
   }
 
   .platter-title {
-    font-size: 2.5rem;
+    font-size: clamp(1.55rem, 6vw, 2rem);
     text-align: center;
   }
 
@@ -10078,31 +10167,96 @@ body {
   .platter-desc {
     text-align: center;
     max-width: 100%;
+    font-size: 0.94rem;
   }
 
-  /* Fix Arrow Placement for Mobile */
+  .platter-features {
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .platter-features li {
+    font-size: 0.88rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .platter-cta-wrap {
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-order {
+    width: 100%;
+    max-width: 320px;
+  }
+
   .custom-slider-arrows {
     position: relative;
-    margin-top: 30px;
-    bottom: auto; /* Reset desktop positioning */
-    right: auto; /* Reset desktop positioning */
+    margin-top: 1.25rem;
+    bottom: auto;
+    right: auto;
     justify-content: center;
-    padding-bottom: 30px;
+    padding-bottom: 0.5rem;
   }
 }
 
 @media (max-width: 575px) {
+  .platter-section {
+    padding: 2rem 0 2.5rem;
+  }
+
+  .platter-card {
+    padding: 1.25rem 0.85rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .slider-nav {
+    min-height: 170px;
+  }
+
   .slider-nav .slick-slide {
-    margin: 0 8px !important;
+    margin: 0 0.35rem !important;
   }
 
   .nav-img-wrapper {
-    width: 80px;
-    height: 80px;
+    width: 88px;
+    height: 88px;
+    transform: scale(0.8);
+  }
+
+  .slick-current .nav-img-wrapper {
+    transform: scale(1.08);
   }
 
   .platter-title {
-    font-size: 2rem;
+    font-size: clamp(1.4rem, 7vw, 1.75rem);
+    margin-bottom: 0.65rem;
+  }
+
+  .platter-subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+  }
+
+  .platter-desc {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .platter-features {
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .custom-slider-arrows button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .btn-order {
+    font-size: 0.82rem;
+    padding: 0.78rem 1.25rem;
   }
 }
 
@@ -10211,7 +10365,7 @@ body {
   background-color: #faf8f5;
   padding: 50px 40px;
   border-right: 1px solid var(--dd-border);
-  /* display: flex; */
+                           /* display: flex; */
   flex-direction: column;
   justify-content: center;
 }

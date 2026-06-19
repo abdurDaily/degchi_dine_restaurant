@@ -1370,13 +1370,13 @@ $(document).ready(function () {
                 },
             },
             {
-                breakpoint: 575,
+                breakpoint: 576,
                 settings: {
                     vertical: false,
                     verticalSwiping: false,
                     centerMode: true,
-                    centerPadding: "0px",
-                    slidesToShow: 3,
+                    centerPadding: "24px",
+                    slidesToShow: 1,
                 },
             },
         ],
