@@ -392,6 +392,16 @@ $(function () {
     /* ══════════════════════════════════════════════════
        5. STATUS UPDATE FORM
     ══════════════════════════════════════════════════ */
+    function toggleOrderStatusRemarks() {
+        const isCanceled = $('#order_status').val() === 'canceled';
+        $('#orderStatusRemarksWrap').toggle(isCanceled);
+        if (!isCanceled) {
+            $('#order_status_remarks').val('');
+        }
+    }
+
+    $(document).on('change', '#order_status', toggleOrderStatusRemarks);
+
     $(document).on('submit', '#updateOrderStatusForm', function (e) {
         e.preventDefault();
         const form      = $(this);

@@ -112,6 +112,11 @@
                             <option value="canceled" {{ $order->status === 'canceled' ? 'selected' : '' }}>Canceled</option>
                         </select>
                     </div>
+                    <div class="mb-3" id="orderStatusRemarksWrap" style="{{ $order->status === 'canceled' ? '' : 'display:none;' }}">
+                        <label for="order_status_remarks" class="form-label fw-semibold">Cancellation Remarks</label>
+                        <textarea name="status_remarks" id="order_status_remarks" class="form-control" rows="3" placeholder="Reason shown to the customer (e.g. item unavailable, wrong address…)">{{ old('status_remarks', $order->status_remarks) }}</textarea>
+                        <small class="text-muted">Visible on the customer order tracking page when the order is canceled.</small>
+                    </div>
                     <div class="mb-3">
                         <label for="order_payment_status" class="form-label fw-semibold">Payment Status</label>
                         <select name="payment_status" id="order_payment_status" class="form-select">

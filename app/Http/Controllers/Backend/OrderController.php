@@ -94,11 +94,15 @@ class OrderController extends Controller
         $request->validate([
             'status' => 'required|in:pending,confirmed,completed,canceled',
             'payment_status' => 'required|in:unpaid,paid,failed,cancelled',
+            'status_remarks' => 'nullable|string|max:1000',
         ]);
 
         $order->update([
             'status' => $request->status,
             'payment_status' => $request->payment_status,
+            'status_remarks' => $request->status === 'canceled'
+                ? $request->status_remarks
+                : null,
         ]);
 
         if ($order->status === 'completed' || $order->payment_status === 'paid') {

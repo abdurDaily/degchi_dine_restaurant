@@ -107,7 +107,7 @@
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--glass-border);
-            border-radius: 1.25rem;
+            border-radius: 1rem;
             box-shadow: var(--glass-shadow);
             padding: 2.5rem;
         }
@@ -203,11 +203,39 @@
             color: var(--brand-dark);
         }
 
+        /* --- Form sections --- */
+        .checkout-form-panel {
+            background: rgba(255, 255, 255, 0.72);
+            border-radius: 1rem;
+            padding: 10px;
+        }
+
+        .checkout-form-panel + .checkout-form-panel {
+            margin-top: 1rem;
+        }
+
+        .checkout-form-heading {
+            margin-bottom: 1.15rem;
+        }
+
+        .checkout-form-heading-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(17, 107, 131, 0.1);
+            color: var(--brand-accent);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
         /* --- Payment Radio Cards --- */
         .checkout-payment-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: 1fr;
+            gap: 0.85rem;
         }
 
         .checkout-payment-card {
@@ -216,44 +244,125 @@
         }
 
         .checkout-payment-card input[type="radio"] {
-            display: none;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .checkout-payment-body {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1.1rem 1.25rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #4b5563;
-            background: transparent;
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            gap: 0.9rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1rem 1.1rem;
+            background: #fff;
+            transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+            min-height: 76px;
         }
 
         .checkout-payment-card:hover .checkout-payment-body {
-            border-color: rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border-color: rgba(17, 107, 131, 0.35);
+            box-shadow: 0 8px 22px rgba(17, 107, 131, 0.08);
         }
 
-        .checkout-payment-card input:checked+.checkout-payment-body {
-            border-color: var(--brand-dark);
+        .checkout-payment-card input:checked + .checkout-payment-body {
+            border-color: var(--brand-accent);
+            background: linear-gradient(135deg, rgba(17, 107, 131, 0.06), rgba(231, 174, 7, 0.05));
+            box-shadow: 0 10px 24px rgba(17, 107, 131, 0.12);
+        }
+
+        .checkout-payment-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.35rem;
+            transition: transform 0.25s ease;
+        }
+
+        .checkout-payment-icon-wrap--cod {
+            background: linear-gradient(135deg, rgba(17, 107, 131, 0.14), rgba(17, 107, 131, 0.06));
+            color: #116b83;
+        }
+
+        .checkout-payment-icon-wrap--online {
+            background: linear-gradient(135deg, rgba(231, 174, 7, 0.2), rgba(231, 174, 7, 0.08));
+            color: #b8860b;
+        }
+
+        .checkout-payment-card input:checked + .checkout-payment-body .checkout-payment-icon-wrap {
+            transform: scale(1.04);
+        }
+
+        .checkout-payment-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .checkout-payment-text strong {
+            font-size: 0.92rem;
+            font-weight: 700;
             color: var(--brand-dark);
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            line-height: 1.3;
         }
 
-        .checkout-payment-icon {
-            font-size: 1.4rem;
-            color: #9ca3af;
-            transition: color 0.3s ease;
+        .checkout-payment-text small {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            line-height: 1.4;
         }
 
-        .checkout-payment-card input:checked+.checkout-payment-body .checkout-payment-icon {
-            color: var(--brand-dark);
+        .checkout-payment-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin-top: 0.35rem;
+        }
+
+        .checkout-payment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            padding: 0.18rem 0.45rem;
+            border-radius: 999px;
+            background: rgba(17, 107, 131, 0.08);
+            color: #116b83;
+        }
+
+        .checkout-payment-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: transparent;
+            font-size: 1.15rem;
+            transition: all 0.25s ease;
+        }
+
+        .checkout-payment-card input:checked + .checkout-payment-body .checkout-payment-check {
+            border-color: var(--brand-accent);
+            background: var(--brand-accent);
+            color: #fff;
+        }
+
+        .checkout-payment-check i {
+            line-height: 1;
+            font-size: 0.95rem;
         }
 
         /* =======================================================
@@ -444,6 +553,142 @@
             background-color: rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
+
+        @media (min-width: 768px) {
+            .checkout-payment-options {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            
+        }
+
+        @media (max-width: 767.98px) {
+            .cart-page-hero {
+                padding: 1.35rem 0 1.15rem;
+            }
+
+            .cart-hero-title {
+                font-size: clamp(1.35rem, 5vw, 1.65rem);
+            }
+
+            .cart-stepper {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 0.15rem;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .cart-stepper::-webkit-scrollbar {
+                display: none;
+            }
+
+            .cart-step {
+                flex-shrink: 0;
+                padding: 0.42rem 0.85rem;
+                font-size: 0.78rem;
+            }
+
+            .cart-step i {
+                font-size: 0.9rem;
+            }
+
+            .cart-step-arrow {
+                flex-shrink: 0;
+            }
+
+            .cart-page-section {
+                padding-top: 1.35rem;
+                padding-bottom: 2.5rem;
+            }
+
+            .checkout-form-card {
+                padding: 1rem !important;
+                border-radius: 1rem;
+            }
+
+            .checkout-form-panel {
+                background: transparent;
+                border: none;
+                border-radius: 0.85rem;
+            }
+
+            .checkout-form-heading {
+                font-size: 1rem;
+                gap: 0.65rem;
+            }
+
+            .checkout-input {
+                padding: 0.78rem 0.95rem 0.78rem 2.85rem !important;
+                font-size: 0.9rem;
+            }
+
+            .checkout-input-icon {
+                left: 0.95rem;
+                font-size: 1rem;
+            }
+
+            .checkout-payment-body {
+                padding: 0.9rem;
+                min-height: auto;
+            }
+
+            .checkout-payment-icon-wrap {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+
+            .checkout-payment-text strong {
+                font-size: 0.86rem;
+            }
+
+            .checkout-payment-text small {
+                font-size: 0.72rem;
+            }
+
+            .checkout-summary-sticky {
+                position: static !important;
+                top: auto !important;
+            }
+
+            .cart-summary-header,
+            .checkout-summary-items-wrap,
+            .cart-summary-body,
+            .cart-summary-footer {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .cart-summary-header {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .cart-summary-footer {
+                padding-bottom: 1.15rem;
+            }
+
+            .cart-summary-total-val {
+                font-size: 1.35rem;
+            }
+
+            .cart-checkout-btn {
+                padding: 0.9rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .cart-page-hero .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            .checkout-payment-badges {
+                display: none;
+            }
+        }
     </style>
 
     <div class="cart-page-hero">
@@ -463,9 +708,7 @@
                         <i class="bi bi-credit-card"></i> Checkout
                     </span>
                     <i class="bi bi-chevron-right cart-step-arrow mx-1"></i>
-                    <span class="cart-step">
-                        <i class="bi bi-check-circle"></i> Confirmed
-                    </span>
+                    
                 </div>
 
             </div>
@@ -476,7 +719,7 @@
         <div class="container px-4 px-lg-5">
             <div class="row g-4 align-items-start">
                 <div class="col-lg-7">
-                    <form id="checkoutForm" class="checkout-form-card" action="{{ route('frontend.order.store') }}"
+                    <form id="checkoutForm" class="checkout-form-card p-3" action="{{ route('frontend.order.store') }}"
                         method="POST">
                         @csrf
 
@@ -502,12 +745,14 @@
                             </div>
                         @endif
 
-                        <div class="checkout-form-section px-0 pt-0">
+                        <div class="checkout-form-panel">
                             <h6 class="checkout-form-heading">
-                                <span class="checkout-step-num">1</span>
+                                <span class="checkout-form-heading-icon" aria-hidden="true">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </span>
                                 Shipping Address
                             </h6>
-                            <div class="row g-4">
+                            <div class="row g-3 g-md-4">
                                 <div class="col-md-6">
                                     <label class="form-label">Full Name*</label>
                                     <div class="checkout-input-wrap">
@@ -569,27 +814,40 @@
                             </div>
                         </div>
 
-                        <div class="checkout-form-divider my-4" style="height: 1px; background: var(--border-light);"></div>
-
-                        <div class="checkout-form-section px-0 pb-0">
+                        <div class="checkout-form-panel">
                             <h6 class="checkout-form-heading">
-                                <span class="checkout-step-num">2</span>
+                                <span class="checkout-form-heading-icon" aria-hidden="true">
+                                    <i class="bi bi-wallet2"></i>
+                                </span>
                                 Payment Method
                             </h6>
-                            <div class="checkout-payment-options mt-3">
+                            <div class="checkout-payment-options">
                                 <label class="checkout-payment-card">
                                     <input type="radio" name="payment_method" value="cod" checked />
                                     <span class="checkout-payment-body">
-                                        <i class="bi bi-cash-coin checkout-payment-icon"></i>
-                                        <span>Cash on Delivery</span>
+                                        <span class="checkout-payment-icon-wrap checkout-payment-icon-wrap--cod" aria-hidden="true">
+                                            <i class="bi bi-cash-coin"></i>
+                                        </span>
+                                        <span class="checkout-payment-text">
+                                            <strong>Cash on Delivery</strong>
+                                        </span>
+                                        <span class="checkout-payment-check" aria-hidden="true">
+                                            <i class="bi bi-check-lg"></i>
+                                        </span>
                                     </span>
                                 </label>
                                 <label class="checkout-payment-card">
                                     <input type="radio" name="payment_method" value="sslcommerz" />
                                     <span class="checkout-payment-body">
-                                        <i class="bi bi-credit-card-fill checkout-payment-icon"
-                                            style="color: var(--brand-accent);"></i>
-                                        <span>Online Payment</span>
+                                        <span class="checkout-payment-icon-wrap checkout-payment-icon-wrap--online" aria-hidden="true">
+                                            <i class="bi bi-credit-card-2-front"></i>
+                                        </span>
+                                        <span class="checkout-payment-text">
+                                            <strong>Online Payment</strong>
+                                        </span>
+                                        <span class="checkout-payment-check" aria-hidden="true">
+                                            <i class="bi bi-check-lg"></i>
+                                        </span>
                                     </span>
                                 </label>
                             </div>
