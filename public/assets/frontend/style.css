@@ -11610,85 +11610,110 @@ body {
   align-items: flex-start;
 }
 
-.menu-page .filter-sticky-boundary {
-  width: 100%;
-  position: relative;
+/* Food Panda style sticky filter bar */
+.menu-page .menu-sticky-filter-wrap {
+  position: sticky;
+  top: var(--menu-filter-top, 86px);
+  z-index: 1025;
+  margin-bottom: 1.25rem;
+  padding-top: 0.25rem;
+  background: transparent;
 }
 
-.menu-page .filter-col {
+.menu-page .menu-filter-bar.filter-sidebar {
   display: flex;
   flex-direction: column;
-}
-
-.menu-page .filter-sidebar {
-  position: relative;
-  z-index: 30;
+  gap: 0.75rem;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow 0.25s ease;
   background: #ffffff;
-}
-
-.menu-page .filter-sidebar.is-sticky {
-  box-shadow: 0 16px 40px rgba(17, 107, 131, 0.18);
-}
-
-.menu-page .filter-sidebar.is-sticky-bottom {
+  border: 1px solid rgba(17, 107, 131, 0.12);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
   box-shadow: 0 8px 24px rgba(17, 107, 131, 0.1);
+  overflow: visible;
 }
 
-@media (min-width: 992px) {
-  .menu-page .filter-sidebar {
-    max-height: calc(100vh - 86px - 2.5rem);
-  }
-
-  .menu-page .filter-sidebar-body {
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 1.25rem 1.35rem 1.5rem;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(17, 107, 131, 0.35) transparent;
-  }
-
-  .menu-page .filter-sidebar-body::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .menu-page .filter-sidebar-body::-webkit-scrollbar-thumb {
-    background: rgba(17, 107, 131, 0.35);
-    border-radius: 4px;
-  }
+.menu-page .menu-filter-bar .filter-group {
+  margin: 0;
 }
 
-.menu-page .filter-sidebar-head {
-  padding: 1rem 1.35rem;
-  background: linear-gradient(135deg, rgba(17, 107, 131, 0.08), rgba(231, 174, 7, 0.06));
-  border-bottom: 1px solid rgba(17, 107, 131, 0.1);
-}
-
-.menu-page .filter-sidebar-head .filter-title {
-  border-bottom: none;
-  padding-bottom: 0;
+.menu-page .menu-filter-bar .filter-group-label {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: #083844;
 }
 
-.menu-page .filter-sidebar-body {
-  padding: 1.25rem 1.35rem 1.5rem;
+.menu-page .menu-filter-bar .filter-group-label i {
+  color: #116b83;
 }
 
-.menu-page .category-pills-column {
-  max-height: 280px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 4px;
-  scrollbar-width: thin;
+/* Horizontal category checkbox chips */
+.menu-page .category-checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.menu-page .category-pill-btn.active {
-  background: linear-gradient(135deg, #116b83, #0a4554) !important;
-  border-color: #116b83 !important;
-  box-shadow: 0 4px 12px rgba(17, 107, 131, 0.2);
+.menu-page .category-checkbox-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-main);
+  background: #ffffff;
+  border: 1px solid rgba(17, 107, 131, 0.18);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.menu-page .category-checkbox-chip:hover {
+  border-color: #116b83;
+  background: rgba(17, 107, 131, 0.05);
+}
+
+.menu-page .category-checkbox-chip input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  display: none;
+  accent-color: #116b83;
+  cursor: pointer;
+}
+
+.menu-page .category-checkbox-chip.is-checked {
+  color: #ffffff;
+  background: linear-gradient(135deg, #116b83, #0a4554);
+  border-color: #116b83;
+  box-shadow: 0 4px 12px rgba(17, 107, 131, 0.22);
+}
+
+.menu-page .category-checkbox-chip.is-checked input {
+  accent-color: #ffffff;
+}
+
+/* Price group below categories */
+.menu-page .filter-group-price {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(17, 107, 131, 0.1);
+}
+
+.menu-page .filter-group-price .price-slider-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-page .filter-group-price .dual-range-slider {
+  max-width: 420px;
+  width: 100%;
 }
 
 .menu-page .price-badge {
@@ -11759,87 +11784,43 @@ body {
     padding-top: 0.5rem;
   }
 
-  /* Mobile: JS sticky filter panel — header on top, filter data below */
-  .menu-page .menu-mobile-sticky-filter {
-    position: relative;
-    z-index: 1025;
+  .menu-page .menu-sticky-filter-wrap {
+    top: var(--menu-filter-top, 72px);
     margin-bottom: 1rem;
+    position: sticky;
+    align-self: flex-start;
   }
 
-  .menu-page .menu-mobile-sticky-filter.is-js-sticky-active {
-    margin-bottom: 1rem;
+  .menu-page .menu-filter-bar.filter-sidebar {
+    padding: 0.75rem 0.85rem;
+    gap: 0.6rem;
+    border-radius: 12px;
   }
 
-  .menu-page .menu-mobile-sticky-filter .filter-sidebar.is-mobile-fixed {
-    box-shadow: 0 10px 28px rgba(17, 107, 131, 0.18);
-    border-radius: 0 0 16px 16px;
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-sidebar {
-    border: 1px solid rgba(17, 107, 131, 0.1);
-    box-shadow: 0 8px 24px rgba(17, 107, 131, 0.12);
-    border-radius: 0 0 16px 16px;
-    overflow: hidden;
-    background: #ffffff;
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-sidebar-head {
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, #116b83, #0a4554);
-    border-bottom: none;
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-sidebar-head .filter-title {
-    color: #ffffff;
-    font-size: 0.95rem;
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-sidebar-head .filter-title i {
-    color: #e7ae07;
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-sidebar-body {
-    padding: 0.85rem 1rem 1rem;
-    background: #ffffff;
-    border-top: 1px solid rgba(17, 107, 131, 0.08);
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-group {
-    margin-bottom: 0.75rem !important;
-  }
-
-  .menu-page .menu-mobile-sticky-filter .filter-group:last-child {
-    margin-bottom: 0 !important;
-  }
-
-  .menu-page .filter-sidebar-body {
-    overflow: visible;
-  }
-
-  .menu-page .category-pills-column {
-    flex-direction: row !important;
+  /* Categories scroll horizontally on small screens */
+  .menu-page .category-checkbox-row {
     flex-wrap: nowrap;
     overflow-x: auto;
-    max-height: none;
-    padding-bottom: 0.35rem;
+    padding-bottom: 0.3rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
 
-  .menu-page .category-pills-column::-webkit-scrollbar {
+  .menu-page .category-checkbox-row::-webkit-scrollbar {
     display: none;
   }
 
-  .menu-page .category-pill-btn {
-    width: auto;
+  .menu-page .category-checkbox-chip {
     flex-shrink: 0;
     white-space: nowrap;
-    padding: 0.55rem 1rem;
-    border-radius: 50px;
   }
 
   .menu-page .filter-group-label {
-    font-size: 0.78rem;
+    font-size: 0.74rem;
+  }
+
+  .menu-page .filter-group-price .dual-range-slider {
+    max-width: 100%;
   }
 }
 

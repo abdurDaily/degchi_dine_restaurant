@@ -681,7 +681,21 @@ class HomeController extends Controller
         $maxPriceLimit = (float) (\App\Models\MenuVariation::max('price') ?? 1000);
 
         // 3. Get search/filter params
-        $selectedCategorySlug = $request->query('category');
+        // Support both the new multi-select (?categories[]=slug) and the legacy single (?category=slug)
+        $selectedCategories = collect($request->query('categories', []))
+            ->filter()
+            ->map(fn($slug) => (string) $slug)
+            ->values()
+            ->all();
+
+        $legacyCategory = $request->query('category');
+        if (empty($selectedCategories) && $legacyCategory) {
+            $selectedCategories = [(string) $legacyCategory];
+        }
+
+        // Kept for the view's backward compatibility (first selected slug)
+        $selectedCategorySlug = $selectedCategories[0] ?? null;
+
         $offerFilter = $request->query('offer'); // NEW: Filter by offer ID
         $minPrice = $request->query('min_price', $minPriceLimit);
         $maxPrice = $request->query('max_price', $maxPriceLimit);
@@ -704,10 +718,10 @@ class HomeController extends Controller
                 'category'
             ]);
 
-        // Filter by category slug
-        if ($selectedCategorySlug) {
-            $query->whereHas('category', function ($q) use ($selectedCategorySlug) {
-                $q->where('slug', $selectedCategorySlug);
+        // Filter by category slug(s)
+        if (!empty($selectedCategories)) {
+            $query->whereHas('category', function ($q) use ($selectedCategories) {
+                $q->whereIn('slug', $selectedCategories);
             });
         }
 
@@ -746,6 +760,7 @@ class HomeController extends Controller
             'minPriceLimit',
             'maxPriceLimit',
             'selectedCategorySlug',
+            'selectedCategories',
             'minPrice',
             'maxPrice',
             'offerFilter',
