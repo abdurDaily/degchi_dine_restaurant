@@ -94,7 +94,7 @@
     <section class="menu-section section-block py-5 mt-lg-5" id="menu">
       <div class="container px-4 px-lg-5">
         <div class="mb-5 text-center reveal menu-section-header">
-          <span class="menu-kicker"><i class="bi bi-heart-fill me-1"></i> Guest Favorites</span>
+          {{-- <span class="menu-kicker"><i class="bi bi-heart-fill me-1"></i> Guest Favorites</span> --}}
           <h2 class="section-title loved-by-title mt-3 mb-2 ">Loved by Our Guests</h2>
           <div class="elegant-divider mx-auto">
             <span></span>
@@ -107,6 +107,9 @@
         </div>
 
         <div id="menuSlider" class="menu-slider reveal">
+          <p class="menu-slider-mobile-hint d-md-none" aria-hidden="true">
+            <i class="bi bi-arrow-left-right me-1"></i> Swipe or use arrows to browse
+          </p>
           <div class="menu-slider-viewport">
             <div class="menu-slider-track">
               @php
@@ -226,7 +229,7 @@
     <section class="section-block platter-section" id="platters">
       <div class="container px-4 px-lg-5">
         <div class="platter-section-header text-center reveal mb-4 mb-lg-5">
-          <span class="menu-kicker platter-kicker"><i class="bi bi-star-fill me-1"></i> Signature Selection</span>
+          {{-- <span class="menu-kicker platter-kicker"><i class="bi bi-star-fill me-1"></i> Signature Selection</span> --}}
           <h2 class="section-title mt-3 mb-2">Our Signature Platters</h2>
           <div class="elegant-divider mx-auto">
             <span></span>
@@ -666,7 +669,7 @@
         @endphp
 
         <div class="visit-us-header text-center reveal">
-          <span class="menu-kicker"><i class="bi bi-geo-alt-fill me-1"></i> Find Us</span>
+          {{-- <span class="menu-kicker"><i class="bi bi-geo-alt-fill me-1"></i> Find Us</span> --}}
           <h2 class="section-title mt-3 mb-2">{{ $contactTitle }}</h2>
           <p class="section-subtitle mx-auto">{{ $contactSubtitle }}</p>
         </div>

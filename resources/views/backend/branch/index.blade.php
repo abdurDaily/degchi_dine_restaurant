@@ -1,199 +1,52 @@
 @extends('layouts.dashboard')
 
+@section('title', 'Branch Management')
+
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        .datatable-wrapper {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-
-        .branch-datatable {
-            margin-bottom: 0;
-        }
-
-        .branch-datatable thead th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 1rem;
-        }
-
-        .branch-datatable tbody td {
-            padding: 0.9rem 1rem;
-            vertical-align: middle;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .branch-datatable tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .branch-datatable tbody tr {
-            transition: background-color 0.2s;
-        }
-
-        .badge {
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8rem;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.7rem;
-            font-size: 0.8rem;
-        }
-
-        .add-new-btn {
-            padding: 0.6rem 1.2rem;
-            font-weight: 500;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-        }
-
-        .modal-header .modal-title {
-            color: white;
-            font-weight: 600;
-        }
-
-        .modal-header .btn-close {
-            filter: invert(1);
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 0.5rem;
-        }
-
-        .detail-section {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-        }
-
-        .detail-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.3rem;
-        }
-
-        .detail-value {
-            font-size: 1rem;
-            color: #212529;
-            font-weight: 500;
-        }
-
-        .page-header {
-            margin-bottom: 2rem;
-        }
-
-        .page-header h3 {
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 0.25rem;
-        }
-
-        .page-header .text-muted {
-            font-size: 0.95rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        table.dataTable {
-            width: 100% !important;
-        }
-
-        .delivery-service {
-            background: #f0f3ff;
-            border-left: 3px solid #667eea;
-            padding: 0.8rem;
-            margin-bottom: 0.8rem;
-            border-radius: 4px;
-        }
-
-        .delivery-service-label {
-            font-weight: 600;
-            color: #667eea;
-            font-size: 0.9rem;
-        }
-
-        .delivery-service-value {
-            color: #212529;
-            word-break: break-all;
-            margin-top: 0.3rem;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
 @endpush
 
 @section('content')
-    <div class="container-fluid py-4">
-        <!-- Page Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="header-actions">
-                    <div class="page-header">
-                        <h3 class="mb-0">Branch Management</h3>
-                        <p class="text-muted mb-0">Add, edit, and manage your restaurant branches with delivery service details</p>
-                    </div>
-                    <button type="button" class="btn btn-primary add-new-btn" data-bs-toggle="modal" data-bs-target="#addBranchModal">
-                        <i class="ri-add-line me-2"></i>Add New Branch
-                    </button>
-                </div>
+    <div class="container-fluid py-4 admin-crud-page">
+        <div class="admin-crud-header">
+            <div>
+                <h3 class="admin-crud-header__title">Branch Management</h3>
+                <p class="admin-crud-header__lead">Add, edit, and manage restaurant branches with delivery partner links</p>
+            </div>
+            <div class="admin-crud-header__actions">
+                <button type="button" class="admin-crud-btn-primary" data-bs-toggle="modal" data-bs-target="#addBranchModal">
+                    <i class="ri-add-line"></i>Add New Branch
+                </button>
             </div>
         </div>
 
-        <!-- DataTable Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-0">
-                        <div class="table-responsive datatable-wrapper">
-                            <table class="table branch-datatable table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th width="60">No</th>
-                                        <th>Branch Name</th>
-                                        <th>Phone</th>
-                                        <th>Location</th>
-                                        <th width="100">Delivery Services</th>
-                                        <th width="120">Actions</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
+        <div class="admin-crud-card">
+            <div class="admin-crud-card__head">
+                <h5><i class="ri-store-2-line me-1"></i> All Branches</h5>
+            </div>
+            <div class="admin-crud-card__body admin-crud-card__body--flush">
+                <div class="admin-crud-table-wrap">
+                    <table class="table admin-datatable branch-datatable table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="60">No</th>
+                                <th>Branch Name</th>
+                                <th>Phone</th>
+                                <th>Location</th>
+                                <th width="100">Delivery</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Add/Edit Branch Modal -->
     <div class="modal fade" id="addBranchModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0">
-                <div class="modal-header">
+                <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
                         <i class="ri-store-2-fill me-2"></i><span id="modalTitle">Add Branch Details</span>
                     </h5>
@@ -230,11 +83,9 @@
 
                             <!-- Delivery Services Section -->
                             <div class="col-12">
-                                <hr class="my-2">
-                                <label class="form-label mb-3">
-                                    <strong>Delivery Services (Optional)</strong>
-                                    <small class="text-muted d-block">Add delivery partner links and logos</small>
-                                </label>
+                                <hr class="admin-form-divider">
+                                <p class="admin-form-section-title">Delivery Services <span class="text-muted fw-normal">(optional)</span></p>
+                                <small class="text-muted d-block mb-3">Add delivery partner links and logos</small>
 
                                 <!-- FoodPanda -->
                                 <div class="row g-2 mb-3">
@@ -298,7 +149,7 @@
     <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0">
-                <div class="modal-header">
+                <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
                         <i class="ri-file-info-fill me-2"></i>Branch Details
                     </h5>
@@ -307,23 +158,23 @@
                 <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
                     <div class="row g-4">
                         <div class="col-12">
-                            <div class="detail-section">
-                                <div class="detail-label">Branch Name</div>
-                                <h4 id="detail_name" class="detail-value mb-0"></h4>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Branch Name</div>
+                                <h4 id="detail_name" class="admin-detail-value mb-0"></h4>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Phone</div>
-                                <p id="detail_phone" class="detail-value mb-0"></p>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Phone</div>
+                                <p id="detail_phone" class="admin-detail-value mb-0"></p>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Location</div>
-                                <p id="detail_location" class="detail-value mb-0"></p>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Location</div>
+                                <p id="detail_location" class="admin-detail-value mb-0"></p>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Delivery Services</div>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Delivery Services</div>
                                 <div id="detail_services" class="mb-0">
                                     <p class="text-muted">No delivery services configured</p>
                                 </div>
@@ -343,13 +194,6 @@
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let table;
         let currentEditId = null;
@@ -380,7 +224,7 @@
                             icon: 'warning',
                             title: 'File Too Large',
                             text: errorMsg,
-                            confirmButtonColor: '#667eea'
+                            confirmButtonColor: '#116b83'
                         });
                         
                         // Clear the input
@@ -396,7 +240,7 @@
                                 icon: 'error',
                                 title: 'Invalid File Type',
                                 text: errorMsg,
-                                confirmButtonColor: '#667eea'
+                                confirmButtonColor: '#116b83'
                             });
                             
                             $(this).val('');
@@ -562,21 +406,21 @@
                     let servicesHtml = '';
                     if (data.foodpanda_url || data.pathao_url || data.foodi_url) {
                         if (data.foodpanda_url) {
-                            servicesHtml += `<div class="delivery-service">
-                                <div class="delivery-service-label">🍔 FoodPanda</div>
-                                <div class="delivery-service-value"><a href="${data.foodpanda_url}" target="_blank">${data.foodpanda_url}</a></div>
+                            servicesHtml += `<div class="admin-delivery-service">
+                                <div class="admin-delivery-service-label">🍔 FoodPanda</div>
+                                <div class="admin-delivery-service-value"><a href="${data.foodpanda_url}" target="_blank">${data.foodpanda_url}</a></div>
                             </div>`;
                         }
                         if (data.pathao_url) {
-                            servicesHtml += `<div class="delivery-service">
-                                <div class="delivery-service-label">🚚 Pathao</div>
-                                <div class="delivery-service-value"><a href="${data.pathao_url}" target="_blank">${data.pathao_url}</a></div>
+                            servicesHtml += `<div class="admin-delivery-service">
+                                <div class="admin-delivery-service-label">🚚 Pathao</div>
+                                <div class="admin-delivery-service-value"><a href="${data.pathao_url}" target="_blank">${data.pathao_url}</a></div>
                             </div>`;
                         }
                         if (data.foodi_url) {
-                            servicesHtml += `<div class="delivery-service">
-                                <div class="delivery-service-label">🛵 Foodi</div>
-                                <div class="delivery-service-value"><a href="${data.foodi_url}" target="_blank">${data.foodi_url}</a></div>
+                            servicesHtml += `<div class="admin-delivery-service">
+                                <div class="admin-delivery-service-label">🛵 Foodi</div>
+                                <div class="admin-delivery-service-value"><a href="${data.foodi_url}" target="_blank">${data.foodi_url}</a></div>
                             </div>`;
                         }
                         $('#detail_services').html(servicesHtml);
