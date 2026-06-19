@@ -14,7 +14,7 @@
 
       <div class="hero-mobile-stack d-flex d-lg-none align-items-end justify-content-center text-center">
         <div class="container hero-mobile-inner px-3 px-sm-4 pb-4 pb-md-5">
-          <p class="hero-mobile-kicker mb-2">Degchi Dine · হালিশহার</p>
+          {{-- <p class="hero-mobile-kicker mb-2">Degchi Dine · হালিশহার</p> --}}
           <h2 class="hero-mobile-title">Home of Authentic Kacchi & Biriyani</h2>
           <p class="hero-mobile-copy mx-auto mb-0">
             Formal hospitality meets bold local flavor — dine in or order for
