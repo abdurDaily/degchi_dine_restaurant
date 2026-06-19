@@ -1,68 +1,74 @@
 @extends('layouts.dashboard')
 
+@section('title', 'Category Management')
+
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
 @endpush
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <!-- CREATE CATEGORY FORM -->
-            <div class="col-xl-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header">
-                        <h5 class="mb-0">Add Category</h5>
+    <div class="container-fluid py-4 admin-crud-page">
+        <div class="admin-crud-header">
+            <div>
+                <h3 class="admin-crud-header__title">Category Management</h3>
+                <p class="admin-crud-header__lead">Organize menu items by branch and category</p>
+            </div>
+        </div>
+
+        <div class="row admin-crud-grid g-4">
+            <div class="col-xl-4 col-lg-5">
+                <div class="admin-crud-card admin-crud-form-panel">
+                    <div class="admin-crud-card__head">
+                        <h5><i class="ri-folder-add-line me-1"></i> Add Category</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="admin-crud-card__body">
                         <form id="categoryForm" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Select Branch</label>
+                                <label class="form-label">Select Branch</label>
                                 <select name="branch_id" class="form-select">
                                     <option value="">-- Choose Branch --</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
                                 </select>
-                                <span class="text-danger error-text branch_id_error"></span>
+                                <span class="text-danger error-text branch_id_error d-block mt-1" style="font-size:0.82rem;"></span>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Category Name</label>
-                                <input type="text" name="name" id="cat_name" class="form-control"
-                                    placeholder="e.g. Fast Food">
-                                <span class="text-danger error-text name_error"></span>
+                                <label class="form-label">Category Name</label>
+                                <input type="text" name="name" id="cat_name" class="form-control" placeholder="e.g. Fast Food">
+                                <span class="text-danger error-text name_error d-block mt-1" style="font-size:0.82rem;"></span>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Category Image</label>
+                                <label class="form-label">Category Image</label>
                                 <input type="file" name="image" class="form-control" accept="image/*">
-                                <span class="text-danger error-text image_error"></span>
+                                <span class="text-danger error-text image_error d-block mt-1" style="font-size:0.82rem;"></span>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Status</label>
+                                <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
                                 </select>
                             </div>
 
-                            <button type="submit" id="submitBtn" class="btn btn-primary w-100 fw-bold">Save
-                                Category</button>
+                            <button type="submit" id="submitBtn" class="admin-crud-btn-primary">Save Category</button>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <!-- CATEGORY DATA TABLE -->
-            <div class="col-xl-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table category-datatable table-bordered nowrap align-middle w-100">
+            <div class="col-xl-8 col-lg-7">
+                <div class="admin-crud-card">
+                    <div class="admin-crud-card__head">
+                        <h5><i class="ri-list-check-2 me-1"></i> All Categories</h5>
+                    </div>
+                    <div class="admin-crud-card__body admin-crud-card__body--flush">
+                        <div class="admin-crud-table-wrap">
+                            <table class="table admin-datatable category-datatable table-hover align-middle mb-0">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -70,7 +76,7 @@
                                         <th>Category</th>
                                         <th>Branch</th>
                                         <th>Status</th>
-                                        <th width="80px">Action</th>
+                                        <th width="80">Action</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -79,22 +85,20 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- EDIT CATEGORY MODAL -->
     <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0">
                 <form id="editCategoryForm" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="edit_id">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Category</h5>
+                    <div class="modal-header admin-modal-header">
+                        <h5 class="modal-title"><i class="ri-pencil-line me-1"></i> Edit Category</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label>Branch</label>
+                            <label class="form-label">Branch</label>
                             <select name="branch_id" id="edit_branch_id" class="form-select">
                                 @foreach ($branches as $branch)
                                     <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -102,16 +106,15 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label>Name</label>
+                            <label class="form-label">Name</label>
                             <input type="text" id="edit_name" name="name" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label>Image (Leave blank to keep current)</label>
-                            <input type="file" name="image" class="form-control">
+                            <label class="form-label">Image <span class="text-muted fw-normal">(leave blank to keep current)</span></label>
+                            <input type="file" name="image" class="form-control" accept="image/*">
                         </div>
-                        <!-- Inside your Edit Modal -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Status</label>
+                        <div class="mb-0">
+                            <label class="form-label">Status</label>
                             <select name="status" id="edit_status" class="form-select">
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
@@ -119,22 +122,17 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Update Category</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="admin-crud-btn-primary">Update Category</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    </div>
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
         $(document).ready(function() {
             $.ajaxSetup({
@@ -146,16 +144,20 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                autoWidth: false,
+                pageLength: 25,
                 ajax: "{{ route('admin.category.index') }}",
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
+                        name: 'DT_RowIndex',
+                        width: '50px'
                     },
                     {
                         data: 'image',
                         name: 'image',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: '70px'
                     },
                     {
                         data: 'name',
@@ -164,48 +166,44 @@
                     {
                         data: 'branch_name',
                         name: 'branch.name'
-                    }, // Links to branch relationship
+                    },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'status',
+                        width: '90px'
                     },
                     {
                         data: 'action',
                         name: 'action',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: '80px'
                     },
                 ]
             });
 
-            // CREATE
             $('#categoryForm').on('submit', function(e) {
                 e.preventDefault();
-
-                // Clear previous errors
                 $('.error-text').text('');
                 let submitBtn = $('#submitBtn');
                 submitBtn.prop('disabled', true).text('Saving...');
-
-                // Use FormData for files/images
                 let formData = new FormData(this);
 
                 $.ajax({
                     url: "{{ route('admin.category.store') }}",
                     method: "POST",
                     data: formData,
-                    processData: false, // Required for FormData
-                    contentType: false, // Required for FormData
+                    processData: false,
+                    contentType: false,
                     success: function(res) {
                         toastr.success(res.message);
                         $('#categoryForm')[0].reset();
-                        $('.category-datatable').DataTable().ajax.reload(); // Reload Table
+                        table.ajax.reload();
                         submitBtn.prop('disabled', false).text('Save Category');
                     },
                     error: function(xhr) {
                         submitBtn.prop('disabled', false).text('Save Category');
                         if (xhr.status === 422) {
-                            // Validation Errors
                             let errors = xhr.responseJSON.errors;
                             $.each(errors, function(key, val) {
                                 $('.' + key + '_error').text(val[0]);
@@ -217,7 +215,6 @@
                 });
             });
 
-            // EDIT (Fetch)
             $(document).on('click', '.edit-btn', function() {
                 let id = $(this).data('id');
                 let url = "{{ route('admin.category.edit', ':id') }}".replace(':id', id);
@@ -226,15 +223,11 @@
                     $('#edit_id').val(data.id);
                     $('#edit_name').val(data.name);
                     $('#edit_branch_id').val(data.branch_id);
-
-                    // ADD THIS LINE TO SHOW THE STATUS
                     $('#edit_status').val(data.status);
-
                     $('#editCategoryModal').modal('show');
                 });
             });
 
-            // UPDATE (Use FormData for potential Image Upload)
             $('#editCategoryForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#edit_id').val();
@@ -243,7 +236,7 @@
 
                 $.ajax({
                     url: url,
-                    method: 'POST', // Using POST with _method or direct route
+                    method: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
@@ -255,7 +248,6 @@
                 });
             });
 
-            // DELETE (SweetAlert2)
             $(document).on('click', '.delete-btn', function() {
                 let id = $(this).data('id');
                 let url = "{{ route('admin.category.delete', ':id') }}".replace(':id', id);
@@ -265,8 +257,8 @@
                     text: "This will affect menus under this category!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: '#116b83',
+                    cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                     if (result.isConfirmed) {

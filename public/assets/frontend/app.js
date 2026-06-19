@@ -1054,7 +1054,7 @@ $(function () {
                 settings: {
                     slidesToShow: 1,
                     slidesToScroll: 1,
-                    arrows: false,
+                    arrows: true,
                     dots: false,
                     centerMode: false,
                     centerPadding: "0px",
@@ -1065,7 +1065,7 @@ $(function () {
                 settings: {
                     slidesToShow: 1,
                     slidesToScroll: 1,
-                    arrows: false,
+                    arrows: true,
                     dots: false,
                     centerMode: false,
                     centerPadding: "0px",

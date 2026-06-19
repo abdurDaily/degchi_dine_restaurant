@@ -1,248 +1,54 @@
 @extends('layouts.dashboard')
 
+@section('title', 'Menu Management')
+
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        .datatable-wrapper {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-
-        .menu-datatable {
-            margin-bottom: 0;
-        }
-
-        .menu-datatable thead th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 1rem;
-        }
-
-        .menu-datatable tbody td {
-            padding: 0.9rem 1rem;
-            vertical-align: middle;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .menu-datatable tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .menu-datatable tbody tr {
-            transition: background-color 0.2s;
-        }
-
-        .badge {
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8rem;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.7rem;
-            font-size: 0.8rem;
-        }
-
-        .add-new-btn {
-            padding: 0.6rem 1.2rem;
-            font-weight: 500;
-        }
-
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-        }
-
-        .modal-header .modal-title {
-            color: white;
-            font-weight: 600;
-        }
-
-        .modal-header .btn-close {
-            filter: invert(1);
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 0.5rem;
-        }
-
-        .variation-row {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .variation-row:hover {
-            border-color: #667eea;
-            background: #f0f3ff;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
-        }
-
-        .variation-row.first {
-            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
-            border: 1px solid #667eea;
-        }
-
-        .remove-variation {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            z-index: 10;
-        }
-
-        .variation-index {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            width: 28px;
-            height: 28px;
-            line-height: 28px;
-            text-align: center;
-            border-radius: 50%;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-right: 0.5rem;
-        }
-
-        .add-variation-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 0.6rem 1rem;
-            font-weight: 500;
-        }
-
-        .add-variation-btn:hover {
-            background: linear-gradient(135deg, #5568d3 0%, #68428b 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .detail-section {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-        }
-
-        .detail-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.3rem;
-        }
-
-        .detail-value {
-            font-size: 1rem;
-            color: #212529;
-            font-weight: 500;
-        }
-
-        .image-placeholder {
-            background: #e9ecef;
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 280px;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .page-header {
-            margin-bottom: 2rem;
-        }
-
-        .page-header h3 {
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 0.25rem;
-        }
-
-        .page-header .text-muted {
-            font-size: 0.95rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        table.dataTable {
-            width: 100% !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
 @endpush
 
 @section('content')
-    <div class="container-fluid py-4">
-        <!-- Page Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="header-actions">
-                    <div class="page-header">
-                        <h3 class="mb-0">Menu Items Management</h3>
-                        <p class="text-muted mb-0">Add, edit, and manage your restaurant menu items and pricing variations</p>
-                    </div>
-                    <button type="button" class="btn btn-primary add-new-btn" data-bs-toggle="modal" data-bs-target="#addMenuModal">
-                        <i class="ri-add-line me-2"></i>Add New Menu Item
-                    </button>
-                </div>
+    <div class="container-fluid py-4 admin-crud-page">
+        <div class="admin-crud-header">
+            <div>
+                <h3 class="admin-crud-header__title">Menu Items Management</h3>
+                <p class="admin-crud-header__lead">Add, edit, and manage menu items with pricing variations</p>
+            </div>
+            <div class="admin-crud-header__actions">
+                <button type="button" class="admin-crud-btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuModal">
+                    <i class="ri-add-line"></i>Add New Menu Item
+                </button>
             </div>
         </div>
 
-        <!-- DataTable Card -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-0">
-                        <div class="table-responsive datatable-wrapper">
-                            <table class="table menu-datatable table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th width="60">No</th>
-                                        <th width="70">Image</th>
-                                        <th>Item Name</th>
-                                        <th>Category</th>
-                                        <th width="140">Price Range</th>
-                                        <th width="100">Variations</th>
-                                        <th width="100">Status</th>
-                                        <th width="120">Actions</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
+        <div class="admin-crud-card">
+            <div class="admin-crud-card__head">
+                <h5><i class="ri-restaurant-2-line me-1"></i> All Menu Items</h5>
+            </div>
+            <div class="admin-crud-card__body admin-crud-card__body--flush">
+                <div class="admin-crud-table-wrap">
+                    <table class="table admin-datatable menu-datatable table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th width="60">No</th>
+                                <th width="70">Image</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th width="140">Price Range</th>
+                                <th width="100">Variations</th>
+                                <th width="100">Status</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Add/Edit Menu Item Modal -->
     <div class="modal fade" id="addMenuModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0">
-                <div class="modal-header">
+                <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
                         <i class="ri-restaurant-2-fill me-2"></i>Add Menu Item & Variations
                     </h5>
@@ -289,7 +95,7 @@
                                         <label class="form-label mb-0">Price Variations <span class="text-danger">*</span></label>
                                         <small class="text-muted d-block">Add different sizes/types with their prices</small>
                                     </div>
-                                    <button type="button" class="btn btn-sm add-variation-btn" id="add_variation">
+                                    <button type="button" class="btn btn-sm admin-add-variation-btn" id="add_variation">
                                         <i class="ri-add-line me-1"></i>Add Variation
                                     </button>
                                 </div>
@@ -313,7 +119,7 @@
     <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0">
-                <div class="modal-header">
+                <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
                         <i class="ri-file-info-fill me-2"></i>Menu Item Details
                     </h5>
@@ -323,7 +129,7 @@
                     <div class="row g-4">
                         <!-- Image Section -->
                         <div class="col-md-5">
-                            <div class="image-placeholder">
+                            <div class="admin-image-placeholder">
                                 <img id="detail_image" src="" alt="Item Image" class="img-fluid rounded" style="max-height: 280px; display: none;">
                                 <span id="no_image">No Image Available</span>
                             </div>
@@ -331,33 +137,33 @@
 
                         <!-- Details Section -->
                         <div class="col-md-7">
-                            <div class="detail-section">
-                                <div class="detail-label">Item Name</div>
-                                <h4 id="detail_name" class="detail-value mb-0"></h4>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Item Name</div>
+                                <h4 id="detail_name" class="admin-detail-value mb-0"></h4>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Category</div>
-                                <p id="detail_category" class="detail-value mb-0"></p>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Category</div>
+                                <p id="detail_category" class="admin-detail-value mb-0"></p>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Item Slug</div>
-                                <p id="detail_slug" class="detail-value font-monospace mb-0" style="font-size: 0.9rem; background: white; padding: 0.5rem; border-radius: 4px; border-left: 3px solid #667eea;"></p>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Item Slug</div>
+                                <p id="detail_slug" class="admin-detail-value font-monospace mb-0" style="font-size: 0.88rem;"></p>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Description</div>
-                                <p id="detail_description" class="detail-value mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.5;"></p>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Description</div>
+                                <p id="detail_description" class="admin-detail-value mb-0 text-muted" style="font-size: 0.9rem; line-height: 1.5;"></p>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Status</div>
-                                <div id="detail_status" class="detail-value mb-0"></div>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Status</div>
+                                <div id="detail_status" class="admin-detail-value mb-0"></div>
                             </div>
 
-                            <div class="detail-section">
-                                <div class="detail-label">Price Variations</div>
+                            <div class="admin-detail-section">
+                                <div class="admin-detail-label">Price Variations</div>
                                 <div id="detail_variations" class="mb-0">
                                     <p class="text-muted">No variations</p>
                                 </div>
@@ -374,16 +180,10 @@
             </div>
         </div>
     </div>
+    </div>
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let vIndex = 0;
         let table;
@@ -423,7 +223,7 @@
 
             // Remove Variation Row
             $(document).on('click', '.remove-variation', function() {
-                $(this).closest('.variation-row').fadeOut(300, function() {
+                $(this).closest('.admin-variation-row').fadeOut(300, function() {
                     $(this).remove();
                 });
             });
@@ -507,7 +307,7 @@
                             const image = v.image ? (v.image.includes('http') ? v.image : '{{ asset("") }}' + v.image) : null;
                             variationsHtml += `
                                 <div class="badge bg-soft-primary text-primary me-2 mb-2" style="padding: 0.6rem 0.9rem; font-size: 0.85rem;">
-                                    <strong>${v.name}</strong> - <strong style="color: #667eea;">৳${parseFloat(v.price).toFixed(2)}</strong>
+                                    <strong>${v.name}</strong> - <strong class="admin-price-accent">৳${parseFloat(v.price).toFixed(2)}</strong>
                                 </div>`;
                         });
                         $('#detail_variations').html(variationsHtml);
@@ -582,6 +382,12 @@
                 });
             });
 
+            $('#addMenuModal').on('show.bs.modal', function() {
+                if (!$('#variation_wrapper').children().length) {
+                    addVariationRow();
+                }
+            });
+
             // Reset form when modal is hidden
             $('#addMenuModal').on('hidden.bs.modal', function() {
                 resetForm();
@@ -596,13 +402,13 @@
             let isFirst = i === 0;
 
             let html = `
-                <div class="variation-row ${isFirst ? 'first' : ''}" style="position: relative;">
+                <div class="admin-variation-row ${isFirst ? 'first' : ''}" style="position: relative;">
                     ${i > 0 ? '<button type="button" class="btn btn-sm btn-danger remove-variation"><i class="ri-close-line"></i></button>' : ''}
                     ${oldImage}
                     <div class="row g-3">
                         <div class="col-12 mb-2">
                             <small class="text-muted fw-600">
-                                <span class="variation-index">${i + 1}</span>
+                                <span class="admin-variation-index">${i + 1}</span>
                                 <strong>Variation ${i + 1}</strong>
                             </small>
                         </div>
