@@ -55,14 +55,12 @@
                 <div class="menu-offer-body">
                     <h5 class="menu-offer-title">{{ $menu->name }}</h5>
                     <p class="menu-offer-meta mb-0">
-                        {{ \Illuminate\Support\Str::limit($menu->description ?? 'Freshly prepared signature dish from Degchi Dine.', 95) }}
+                        {{ \Illuminate\Support\Str::limit($menu->description ?? 'Signature dish', 33) }}
                     </p>
-                    <div class="menu-offer-divider"></div>
                     <div class="menu-offer-footer">
                         <div class="menu-offer-price-wrap">
-                            <span class="menu-offer-price-label">Starts from</span>
                             @if($bestOffer)
-                                <span class="menu-offer-price" style="text-decoration: line-through; opacity: 0.6; font-size: 0.9em;">
+                                <span class="menu-offer-price menu-offer-price-old">
                                   ৳ {{ number_format((float) ($firstVariation?->price ?? 0), 2) }}
                                 </span>
                                 <span class="menu-offer-price text-danger fw-bold">
@@ -72,13 +70,11 @@
                                 <span class="menu-offer-price">৳ {{ number_format((float) ($firstVariation?->price ?? 0), 2) }}</span>
                             @endif
                         </div>
-                    </div>
-                    <div class="menu-offer-actions" onclick="event.preventDefault()">
-                        <button class="menu-offer-cart-btn" type="button" 
+                        <button class="menu-offer-cart-btn" type="button"
                                 data-variation-id="{{ $firstVariation?->id }}"
-                                data-original-price="{{ $firstVariation?->price ?? 0 }}">
-                            <i class="bi bi-bag-plus" aria-hidden="true"></i>
-                            Order Now
+                                data-original-price="{{ $firstVariation?->price ?? 0 }}"
+                                aria-label="Add {{ $menu->name }} to cart">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
