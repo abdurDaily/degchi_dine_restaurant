@@ -1,48 +1,44 @@
 <x-auth-master>
-    @section('content')
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6 col-xl-5">
-                <div class="mt-4 card card-bg-fill">
-                    <div class="p-4 card-body">
-                        <div class="mt-2 text-center">
-                            <h5 class="text-primary">{{ app_name() }}</h5>
-                            <p class="text-muted">Reset Password</p>
-                        </div>
-                        <div class="p-2 mt-4">
-                            <div>
-                                @if (session('status'))
-                                    <div class="alert alert-success" role="alert">
-                                        {{ session('status') }}
-                                    </div>
-                                @endif
-                            </div>
-                            <form method="POST" action="{{ route('password.email') }}">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="text" class="form-control @error('email') is-invalid @enderror "
-                                        id="email" name="email" value="{{ old('email') }}" required
-                                        autocomplete="email" autofocus placeholder="Enter email">
-                                    @error('email')
-                                        <p class="mt-1 text-danger">{{ $message }}</p>
-                                    @enderror
-                                </div>
+    @section('title', 'Reset Password')
 
-                                <div class="mt-4">
-                                    <button class="btn btn-success w-100" type="submit">Submit</button>
-                                </div>
-                                <div class="mt-2">
-                                    <div class="float-end">
-                                        <a href="{{ route('login') }}" class="text-muted">Back to login</a>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <!-- end card body -->
-                </div>
-                <!-- end card -->
+    @section('content')
+        <div class="auth-card-heading">
+            <h5>Reset password</h5>
+            <p>Enter your email and we'll send you a reset link.</p>
+        </div>
+
+        @if (session('status'))
+            <div class="auth-alert auth-alert--success" role="alert">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ session('status') }}</span>
             </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.email') }}">
+            @csrf
+
+            <div class="auth-field">
+                <label for="email" class="form-label">Email address</label>
+                <div class="auth-input-wrap">
+                    <i class="bi bi-envelope auth-input-icon" aria-hidden="true"></i>
+                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                        id="email" name="email" value="{{ old('email') }}" required
+                        autocomplete="email" autofocus placeholder="you@example.com">
+                </div>
+                @error('email')
+                    <p class="auth-field-error">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <button class="btn btn-auth-primary" type="submit">
+                <i class="bi bi-send"></i>
+                Send Reset Link
+            </button>
+        </form>
+
+        <div class="auth-card-footer">
+            Remember your password?
+            <a href="{{ route('login') }}" class="auth-link">Back to sign in</a>
         </div>
     @endsection
 </x-auth-master>
