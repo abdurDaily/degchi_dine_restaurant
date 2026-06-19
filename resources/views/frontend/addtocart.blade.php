@@ -40,14 +40,15 @@ body {
 }
 
 .cart-hero-title {
-    font-size: clamp(1.8rem, 4vw, 2.2rem);
+    font-size: clamp(1.25rem, 3vw, 1.55rem);
     color: var(--brand-dark);
-    font-weight: 800;
+    font-weight: 700;
     margin: 0;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.2px;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.65rem;
+    flex-wrap: wrap;
 }
 
 .menu-kicker {
@@ -64,10 +65,10 @@ body {
     display: inline-block;
     background: rgba(231, 174, 7, 0.1);
     color: var(--brand-accent);
-    font-size: 0.9rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.3px;
-    padding: 0.35rem 0.85rem;
+    letter-spacing: 0.2px;
+    padding: 0.28rem 0.7rem;
     border-radius: 999px;
     vertical-align: middle;
     border: 1px solid rgba(231, 174, 7, 0.2);
@@ -135,14 +136,14 @@ body {
 .cart-summary-header {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    font-size: 1.15rem;
+    gap: 0.65rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: var(--brand-dark);
-    padding: 1.5rem 2rem;
+    padding: 1.1rem 1.35rem;
     border-bottom: 1px solid var(--border-light);
     background: rgba(255, 255, 255, 0.6);
-    letter-spacing: -0.2px;
+    letter-spacing: 0;
 }
 
 /* --- Product Cards (Glassmorphism) --- */
@@ -201,11 +202,11 @@ body {
 }
 
 .cart-product-name {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 0.82rem;
+    font-weight: 700;
     color: var(--brand-dark);
-    margin: 0 0 0.35rem;
-    line-height: 1.2;
+    margin: 0 0 0.25rem;
+    line-height: 1.35;
 }
 
 .cart-product-tag {
@@ -284,14 +285,14 @@ body {
 }
 
 .cart-product-total {
-    font-size: 1.25rem;
+    font-size: 0.92rem;
     color: var(--brand-dark);
     font-weight: 800;
 }
 
 /* --- Buttons & Links --- */
 .cart-section-label {
-    font-size: 1.05rem;
+    font-size: 0.82rem;
     font-weight: 700;
     color: var(--brand-dark);
 }
@@ -642,7 +643,7 @@ body {
 
                     <div class="cart-summary-footer">
                         <a href="{{ route('frontend.checkout') }}" class="btn cart-checkout-btn w-100 d-flex justify-content-center align-items-center">
-                            Proceed to Checkout <i class="bi bi-arrow-right ms-2"></i>
+                            Checkout <i class="bi bi-arrow-right ms-2"></i>
                         </a>
                         <p class="cart-secure-note">
                             <i class="bi bi-shield-check me-1"></i> 100% Secure &amp; Safe Checkout

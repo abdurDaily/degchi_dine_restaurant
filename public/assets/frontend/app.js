@@ -429,14 +429,26 @@ const renderCartDrawer = () => {
     const cart = getCartData();
     const cartDrawerItems = document.getElementById("cartDrawerItems");
     const subtotalNode = document.getElementById("cartDrawerSubtotal");
+    const cartDrawerCount = document.getElementById("cartDrawerCount");
 
     if (!cartDrawerItems || !subtotalNode) return;
 
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (cartDrawerCount) {
+        cartDrawerCount.textContent =
+            itemCount === 0
+                ? "No items yet"
+                : `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+    }
+
     if (!cart.length) {
         cartDrawerItems.innerHTML = `
-      <div class="text-center py-5">
-        <i class="bi bi-bag-x cart-empty-icon"></i>
-        <p class="mt-3 mb-0">Your cart is empty.</p>
+      <div class="cart-drawer-empty">
+        <div class="cart-drawer-empty-icon" aria-hidden="true">
+          <i class="bi bi-bag"></i>
+        </div>
+        <p class="cart-drawer-empty-title">Your cart is empty</p>
+        <p class="cart-drawer-empty-text">Add dishes from the menu to get started.</p>
       </div>
     `;
     } else {
@@ -449,16 +461,23 @@ const renderCartDrawer = () => {
           </div>
           <div class="cart-item-body">
             <div class="cart-item-header-row">
-              <h6 class="cart-item-title">${item.title}</h6>
-              <button class="cart-item-remove-btn btn btn-link p-0" type="button" aria-label="Remove item">
-                <i class="bi bi-trash"></i>
+              <div class="cart-item-info">
+                <h6 class="cart-item-title">${item.title}</h6>
+                <span class="cart-item-unit">${formatCurrency(item.price)} each</span>
+              </div>
+              <button class="cart-item-remove-btn" type="button" aria-label="Remove ${item.title}">
+                <i class="bi bi-trash3"></i>
               </button>
             </div>
             <div class="cart-item-footer-row">
               <div class="cart-qty-row">
-                <button class="qty-adjust-btn btn btn-sm" type="button" data-change="-1" aria-label="Decrease quantity">—</button>
+                <button class="qty-adjust-btn" type="button" data-change="-1" aria-label="Decrease quantity">
+                  <i class="bi bi-dash"></i>
+                </button>
                 <span class="cart-qty">${item.quantity}</span>
-                <button class="qty-adjust-btn btn btn-sm" type="button" data-change="1" aria-label="Increase quantity">+</button>
+                <button class="qty-adjust-btn" type="button" data-change="1" aria-label="Increase quantity">
+                  <i class="bi bi-plus"></i>
+                </button>
               </div>
               <div class="cart-item-meta">${formatCurrency(item.price * item.quantity)}</div>
             </div>
