@@ -102,6 +102,11 @@
                                             <button type="button" class="btn btn-sm btn-outline-primary view-member-btn" data-id="{{ $member->id }}" data-url="{{ route('members.show', $member->id) }}" title="View Details" data-bs-toggle="tooltip">
                                                 <i class="ri-eye-line"></i>
                                             </button>
+                                            @if($member->type !== 'golden')
+                                                <button type="button" class="btn btn-sm btn-outline-warning upgrade-golden-btn" data-id="{{ $member->id }}" data-url="{{ route('members.upgradeGolden', $member->id) }}" title="Upgrade to Golden (10% every order)" data-bs-toggle="tooltip">
+                                                    <i class="ri-vip-crown-line"></i>
+                                                </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -135,7 +140,10 @@
                 </div>
                 <div class="modal-footer d-none" id="memberApprovalFooter">
                     <span id="modalApprovalStatusBadge"></span>
-                    <div class="ms-auto d-flex gap-2">
+                    <div class="ms-auto d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-warning btn-sm d-none" id="modalUpgradeGoldenBtn">
+                            <i class="ri-vip-crown-fill me-1"></i> Upgrade to Golden
+                        </button>
                         <button type="button" class="btn btn-success btn-sm d-none" id="modalApproveBtn">
                             <i class="ri-check-line me-1"></i> Approve
                         </button>
@@ -154,6 +162,7 @@
 <script>
 $(function () {
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    var currentModalMember = null;
 
     // ---- View Member Detail ----
     $(document).on('click', '.view-member-btn', function () {
@@ -166,6 +175,7 @@ $(function () {
         $.getJSON(url, function (res) {
             if (res.success) {
                 var m = res.member;
+                currentModalMember = m;
                 var typeBadge = m.type === 'golden'
                     ? '<span class="badge bg-warning text-dark"><i class="ri-vip-crown-fill me-1"></i>Golden</span>'
                     : '<span class="badge bg-info">Membership</span>';
@@ -186,6 +196,7 @@ $(function () {
                 }
 
                 updateModalApprovalActions(m);
+                updateModalGoldenUpgrade(m);
 
                 var profileImageHtml = '';
                 if (m.profile_image_url) {
@@ -313,6 +324,29 @@ $(function () {
         });
     });
 
+    function updateModalGoldenUpgrade(member) {
+        var footer = $('#memberApprovalFooter');
+        var upgradeBtn = $('#modalUpgradeGoldenBtn');
+
+        footer.removeClass('d-none');
+        upgradeBtn.data('id', member.id).data('url', '{{ url("/members") }}/' + member.id + '/upgrade-golden');
+
+        if (member.type === 'golden') {
+            upgradeBtn.addClass('d-none');
+            return;
+        }
+
+        upgradeBtn.removeClass('d-none');
+    }
+
+    function updateMemberTypeBadge(memberId) {
+        var row = $('#member-row-' + memberId);
+        if (!row.length) return;
+
+        row.find('td').eq(5).html('<span class="badge bg-warning text-dark"><i class="ri-vip-crown-fill me-1"></i>Golden</span>');
+        row.find('.upgrade-golden-btn').remove();
+    }
+
     function updateModalApprovalActions(member) {
         var footer = $('#memberApprovalFooter');
         var approveBtn = $('#modalApproveBtn');
@@ -320,7 +354,8 @@ $(function () {
         var statusBadge = $('#modalApprovalStatusBadge');
 
         if (!member.is_student) {
-            footer.addClass('d-none');
+            $('#modalApproveBtn, #modalRejectBtn').addClass('d-none');
+            $('#modalApprovalStatusBadge').empty();
             return;
         }
 
@@ -361,6 +396,62 @@ $(function () {
         $('#count-approved').text(counts.approved ?? 0);
         $('#count-rejected').text(counts.rejected ?? 0);
     }
+
+    // ---- Upgrade to Golden ----
+    function handleGoldenUpgrade(url, memberId, onSuccess) {
+        if (!confirm('Upgrade this member to Golden Card? They will receive 10% off every order for 5 years.')) {
+            return;
+        }
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken },
+            success: function (res) {
+                if (res.success) {
+                    updateMemberTypeBadge(memberId);
+                    if (typeof onSuccess === 'function') {
+                        onSuccess(res);
+                    }
+                    toastr ? toastr.success(res.message) : alert(res.message);
+                }
+            },
+            error: function (xhr) {
+                var errorMsg = xhr.responseJSON && xhr.responseJSON.message
+                    ? xhr.responseJSON.message
+                    : 'Failed to upgrade member.';
+                toastr ? toastr.error(errorMsg) : alert(errorMsg);
+            }
+        });
+    }
+
+    $(document).on('click', '.upgrade-golden-btn', function () {
+        var btn = $(this);
+        handleGoldenUpgrade(btn.data('url'), btn.data('id'));
+    });
+
+    $('#modalUpgradeGoldenBtn').on('click', function () {
+        var btn = $(this);
+        handleGoldenUpgrade(btn.data('url'), btn.data('id'), function (res) {
+            if (currentModalMember) {
+                currentModalMember.type = 'golden';
+                currentModalMember.expires_at = res.expires_at || currentModalMember.expires_at;
+                updateModalGoldenUpgrade(currentModalMember);
+            }
+
+            var typeCell = $('#memberDetailBody').find('tr').filter(function () {
+                return $(this).find('th').text() === 'Type';
+            }).find('td');
+            typeCell.html('<span class="badge bg-warning text-dark"><i class="ri-vip-crown-fill me-1"></i>Golden</span>');
+
+            if (res.expires_at) {
+                var expiresRow = $('#memberDetailBody').find('tr').filter(function () {
+                    return $(this).find('th').text() === 'Expires At';
+                }).find('td');
+                expiresRow.text(res.expires_at);
+            }
+        });
+    });
 
     // ---- Approve Student Member ----
     $('#modalApproveBtn').on('click', function () {
