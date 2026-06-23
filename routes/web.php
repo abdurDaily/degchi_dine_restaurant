@@ -108,6 +108,7 @@ Route::middleware(['auth', 'setLocale'])->group(function () {
     Route::post('members/{member}/sync-purchase', [MemberController::class, 'syncPurchase'])->name('members.syncPurchase');
     Route::post('members/{member}/approve', [MemberController::class, 'approve'])->name('members.approve');
     Route::post('members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
+    Route::post('members/{member}/upgrade-golden', [MemberController::class, 'upgradeToGolden'])->name('members.upgradeGolden');
     // Admin menu management
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('menu', App\Http\Controllers\Backend\MenuController::class)->except(['show']);

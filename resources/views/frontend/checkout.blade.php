@@ -793,7 +793,7 @@
                                             value="{{ $loggedInMember->unique_card_number ?? '' }}" />
                                     </div>
                                     <div id="membershipFeedback" class="form-text text-muted mt-2"
-                                        style="font-size: 0.75rem;">Enter membership card number to check eligibility for first-order or golden card discounts. Student first-order offers require admin approval.</div>
+                                        style="font-size: 0.75rem;">30% or 35% off applies on your first order only. After ৳2,000 total spend, you unlock 10% off every order as a Golden member.</div>
                                 </div>
                                 {{-- <div class="col-md-5 d-flex align-items-center">
                                 <div class="form-check mt-3 w-100 p-3 rounded" style="background: rgba(0,0,0,0.02); border: 1px dashed rgba(0,0,0,0.1);">
@@ -949,33 +949,76 @@
                 const offerNameEl = document.getElementById('offerName');
                 const offerBadgeEl = document.getElementById('offerBadge');
 
-                // Track current membership discount amount (set when card is verified)
-                let currentMemberDiscount = 0;
+                // Track membership discount rate (recalculated when cart subtotal changes)
+                let memberDiscountRate = 0;
                 let verifiedMember = {
                     verified: false,
                     eligible: false,
                     is_student: false,
                     approval_status: 'approved',
                     member_type: 'standard',
+                    first_order_discount_used: false,
                 };
+
+                @if($loggedInMemberDiscount ?? null)
+                memberDiscountRate = {{ (int) ($loggedInMemberDiscount['rate'] ?? 0) }};
+                verifiedMember = {
+                    verified: true,
+                    eligible: {{ ($loggedInMemberDiscount['eligible'] ?? false) ? 'true' : 'false' }},
+                    is_student: {{ ($loggedInMember->is_student ?? false) ? 'true' : 'false' }},
+                    approval_status: @json($loggedInMember->approval_status ?? 'approved'),
+                    member_type: @json($loggedInMemberDiscount['member_type'] ?? $loggedInMember->type ?? 'membership'),
+                    first_order_discount_used: {{ ($loggedInMemberDiscount['first_order_discount_used'] ?? false) ? 'true' : 'false' }},
+                };
+                @endif
+
+                function calculateMemberDiscount(subtotal) {
+                    if (!verifiedMember.eligible || memberDiscountRate <= 0) {
+                        return 0;
+                    }
+
+                    return parseFloat((subtotal * (memberDiscountRate / 100)).toFixed(2));
+                }
+
+                function refreshCheckoutDiscounts(subtotal) {
+                    if (typeof subtotal !== 'number' || Number.isNaN(subtotal)) {
+                        subtotal = parseFloat(orderTotalInput?.value) || 0;
+                    }
+
+                    const memberDiscount = calculateMemberDiscount(subtotal);
+                    const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
+                    const offerInfo = calculateOfferDiscount(cart);
+                    const bestDiscount = Math.max(memberDiscount, offerInfo.discount);
+
+                    updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount);
+                }
 
                 function offerEligibleForVerifiedMember(offer) {
                     if (offer.applicable_to === 'golden') {
                         return verifiedMember.verified && verifiedMember.eligible && verifiedMember.member_type === 'golden';
                     }
                     if (offer.applicable_to === 'student') {
+                        if (offer.is_first_order && verifiedMember.first_order_discount_used) {
+                            return false;
+                        }
                         return verifiedMember.verified
                             && verifiedMember.eligible
                             && verifiedMember.is_student
                             && verifiedMember.approval_status === 'approved';
                     }
                     if (offer.applicable_to === 'membership') {
+                        if (offer.is_first_order && verifiedMember.first_order_discount_used) {
+                            return false;
+                        }
                         return verifiedMember.verified
                             && verifiedMember.eligible
                             && !verifiedMember.is_student;
                     }
                     if (offer.is_first_order === true || offer.is_first_order === 1) {
                         if (!verifiedMember.verified || !verifiedMember.eligible) {
+                            return false;
+                        }
+                        if (verifiedMember.first_order_discount_used) {
                             return false;
                         }
                         if (verifiedMember.is_student && verifiedMember.approval_status !== 'approved') {
@@ -1061,9 +1104,11 @@
                     };
                 }
 
-                function updateTotals(subtotal, bestDiscount, offerInfo) {
+                function updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount) {
                     offerInfo = offerInfo || { discount: 0, offerName: '', offerPercent: 0 };
-                    const memberDiscount = currentMemberDiscount || 0;
+                    memberDiscount = typeof memberDiscount === 'number'
+                        ? memberDiscount
+                        : calculateMemberDiscount(subtotal);
                     const offerDiscount = offerInfo.discount;
 
                     console.log('updateTotals called:', { subtotal, bestDiscount, memberDiscount, offerDiscount });
@@ -1100,16 +1145,37 @@
                     console.log('Final total displayed:', finalTotal);
                 }
 
-                function updateDiscountDisplay(memberDiscountAmount) {
-                    currentMemberDiscount = memberDiscountAmount;
-                    const subtotal = parseFloat(orderTotalInput.value) || 0;
-                    
-                    // Get cart items from localStorage
-                    const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
-                    const offerInfo = calculateOfferDiscount(cart);
-                    
-                    const bestDiscount = Math.max(memberDiscountAmount, offerInfo.discount);
-                    updateTotals(subtotal, bestDiscount, offerInfo);
+                function updateDiscountDisplay() {
+                    refreshCheckoutDiscounts();
+                }
+
+                function applyMemberCheckResult(result, responseOk) {
+                    memberDiscountRate = responseOk && result.eligible ? (result.discount_rate || 0) : 0;
+                    verifiedMember = {
+                        verified: true,
+                        eligible: !!result.eligible,
+                        is_student: !!result.is_student,
+                        approval_status: result.approval_status || 'approved',
+                        member_type: result.member_type || 'standard',
+                        first_order_discount_used: !!result.first_order_discount_used,
+                    };
+
+                    membershipFeedback.textContent = result.message || 'Unable to verify membership card.';
+                    membershipFeedback.classList.remove('text-success', 'text-danger', 'text-warning');
+
+                    if (result.is_student && result.approval_status === 'pending') {
+                        membershipFeedback.classList.add('text-warning');
+                    } else if (result.is_student && result.approval_status === 'rejected') {
+                        membershipFeedback.classList.add('text-danger');
+                    } else if (result.eligible) {
+                        membershipFeedback.classList.add('text-success');
+                    } else if (!responseOk) {
+                        membershipFeedback.classList.add('text-danger');
+                    } else {
+                        membershipFeedback.classList.add('text-danger');
+                    }
+
+                    refreshCheckoutDiscounts();
                 }
 
                 function handleQueryMessage() {
@@ -1132,60 +1198,29 @@
 
                 async function checkMemberCardEligibility(cardNumber) {
                     if (!cardNumber) {
-                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard' };
+                        memberDiscountRate = 0;
+                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard', first_order_discount_used: false };
                         membershipFeedback.textContent =
                             'Enter your membership card number to check eligibility for first-order or golden card discounts.';
                         membershipFeedback.classList.remove('text-success', 'text-danger', 'text-warning');
-                        updateDiscountDisplay(0);
+                        refreshCheckoutDiscounts(0);
                         return;
                     }
 
                     try {
+                        const subtotal = parseFloat(orderTotalInput.value) || 0;
                         const response = await fetch(
-                            `{{ route('frontend.member.check') }}?member_card_number=${encodeURIComponent(cardNumber)}`
+                            `{{ route('frontend.member.check') }}?member_card_number=${encodeURIComponent(cardNumber)}&order_total=${encodeURIComponent(subtotal)}`
                             );
                         const result = await response.json();
-
-                        verifiedMember = {
-                            verified: true,
-                            eligible: !!result.eligible,
-                            is_student: !!result.is_student,
-                            approval_status: result.approval_status || 'approved',
-                            member_type: result.member_type || 'standard',
-                        };
-
-                        if (!response.ok) {
-                            membershipFeedback.textContent = result.message || 'Unable to verify membership card.';
-                            membershipFeedback.classList.remove('text-success', 'text-warning');
-                            membershipFeedback.classList.add('text-danger');
-                            updateDiscountDisplay(0);
-                            return;
-                        }
-
-                        membershipFeedback.textContent = result.message;
-                        membershipFeedback.classList.remove('text-success', 'text-danger', 'text-warning');
-
-                        if (result.is_student && result.approval_status === 'pending') {
-                            membershipFeedback.classList.add('text-warning');
-                        } else if (result.is_student && result.approval_status === 'rejected') {
-                            membershipFeedback.classList.add('text-danger');
-                        } else if (result.eligible) {
-                            membershipFeedback.classList.add('text-success');
-                        } else {
-                            membershipFeedback.classList.add('text-danger');
-                        }
-
-                        const subtotal = parseFloat(orderTotalInput.value) || 0;
-                        currentMemberDiscount = result.eligible
-                            ? parseFloat((subtotal * (result.discount_rate / 100)).toFixed(2))
-                            : 0;
-                        updateDiscountDisplay(currentMemberDiscount);
+                        applyMemberCheckResult(result, response.ok);
                     } catch (error) {
-                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard' };
+                        memberDiscountRate = 0;
+                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard', first_order_discount_used: false };
                         membershipFeedback.textContent = 'Unable to verify membership card at the moment.';
                         membershipFeedback.classList.remove('text-success', 'text-warning');
                         membershipFeedback.classList.add('text-danger');
-                        updateDiscountDisplay(0);
+                        refreshCheckoutDiscounts();
                     }
                 }
 
@@ -1198,14 +1233,10 @@
                 if (memberCardInput) {
                     memberCardInput.addEventListener('input', function() {
                         if (!this.value.trim()) {
-                            verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard' };
-                            currentMemberDiscount = 0;
+                            memberDiscountRate = 0;
+                            verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard', first_order_discount_used: false };
                         }
-                        const subtotal = parseFloat(orderTotalInput.value) || 0;
-                        const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
-                        const offerInfo = calculateOfferDiscount(cart);
-                        const bestDiscount = Math.max(currentMemberDiscount, offerInfo.discount);
-                        updateTotals(subtotal, bestDiscount, offerInfo);
+                        refreshCheckoutDiscounts();
                     });
 
                     memberCardInput.addEventListener('change', function() {
@@ -1216,10 +1247,13 @@
                 // Re-apply discounts whenever app.js finishes rendering the cart summary
                 document.addEventListener('cartSummaryRendered', function(e) {
                     const subtotal = e.detail.total || 0;
-                    const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
-                    const offerInfo = calculateOfferDiscount(cart);
-                    const bestDiscount = Math.max(currentMemberDiscount, offerInfo.discount);
-                    updateTotals(subtotal, bestDiscount, offerInfo);
+
+                    if (memberCardInput && memberCardInput.value.trim() && !verifiedMember.verified) {
+                        checkMemberCardEligibility(memberCardInput.value.trim());
+                        return;
+                    }
+
+                    refreshCheckoutDiscounts(subtotal);
                 });
 
                 if (checkoutForm) {
@@ -1291,6 +1325,18 @@
 
                 handleQueryMessage();
 
+                @if($loggedInMemberDiscount ?? null)
+                if (membershipFeedback && verifiedMember.verified) {
+                    membershipFeedback.textContent = @json($loggedInMemberDiscount['message'] ?? '');
+                    membershipFeedback.classList.remove('text-success', 'text-danger', 'text-warning');
+                    @if($loggedInMemberDiscount['eligible'] ?? false)
+                    membershipFeedback.classList.add('text-success');
+                    @else
+                    membershipFeedback.classList.add('text-danger');
+                    @endif
+                }
+                @endif
+
                 @if($loggedInMember ?? null)
                 if (memberCardInput && memberCardInput.value.trim()) {
                     checkMemberCardEligibility(memberCardInput.value.trim());
@@ -1308,15 +1354,7 @@
                 if (initialCart.length > 0) {
                     // Wait a bit for cart to render, then calculate
                     setTimeout(function() {
-                        const subtotal = parseFloat(document.getElementById('order_total')?.value || 0);
-                        console.log('Initial subtotal:', subtotal);
-                        
-                        if (subtotal > 0) {
-                            const offerInfo = calculateOfferDiscount(initialCart);
-                            const bestDiscount = Math.max(currentMemberDiscount, offerInfo.discount);
-                            updateTotals(subtotal, bestDiscount, offerInfo);
-                            console.log('Initial discount calculated and applied');
-                        }
+                        refreshCheckoutDiscounts(parseFloat(document.getElementById('order_total')?.value || 0));
                     }, 500);
                 }
 
