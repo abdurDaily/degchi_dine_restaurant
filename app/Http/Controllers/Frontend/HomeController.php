@@ -138,8 +138,11 @@ class HomeController extends Controller
             ->get();
 
         $loggedInMember = Auth::guard('member')->user();
+        $loggedInMemberDiscount = $loggedInMember
+            ? $loggedInMember->resolveMemberDiscount(1)
+            : null;
 
-        return view('frontend.checkout', compact('activeOffers', 'loggedInMember'));
+        return view('frontend.checkout', compact('activeOffers', 'loggedInMember', 'loggedInMemberDiscount'));
     }
 
     public function cards()
@@ -316,8 +319,8 @@ class HomeController extends Controller
         $totalPurchase = $member->orders()
             ->whereIn('status', ['completed', 'confirmed'])
             ->sum('final_amount');
-        if ($totalPurchase < 2000) {
-            $msg = 'You are not eligible for a Golden Card yet. Your total purchase is ৳' . number_format($totalPurchase, 2) . ', but the eligibility requirement is ৳2,000.00.';
+        if ($totalPurchase < Member::GOLDEN_UPGRADE_THRESHOLD) {
+            $msg = 'You are not eligible for a Golden Card yet. Your total purchase is ৳' . number_format($totalPurchase, 2) . ', but the eligibility requirement is ৳' . number_format(Member::GOLDEN_UPGRADE_THRESHOLD, 2) . '.';
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $msg], 422);
             }
@@ -332,10 +335,7 @@ class HomeController extends Controller
             return back()->with('success', $msg);
         }
 
-        $member->update([
-            'type' => 'golden',
-            'expires_at' => now()->addYears(5),
-        ]);
+        $member->upgradeToGolden();
 
         $msg = 'Congratulations! Your membership has been upgraded to Golden Card. Your card is now valid for 5 years with a 10% flat discount.';
         if ($request->ajax()) {
@@ -381,38 +381,11 @@ class HomeController extends Controller
         }
 
         $discountAmount = 0;
+        $consumesFirstOrderSlot = false;
         if ($member) {
-            $isExpired = $member->expires_at && $member->expires_at < now();
-            if (!$isExpired) {
-                if ($member->type === 'golden') {
-                    // Golden Card: 10% on every order
-                    $discountAmount = round($request->order_total * 0.10, 2);
-                } elseif (!$member->first_order_discount_used) {
-                    $canUseFirstOrder = !($member->is_student && $member->approval_status !== 'approved');
-                    if ($canUseFirstOrder) {
-                        $rate = $member->is_student ? 0.35 : 0.30;
-                        $discountAmount = round($request->order_total * $rate, 2);
-                    }
-                } else {
-                    // First-order discount already used.
-                    // Calculate live total: credited total_purchase + any orders not yet credited
-                    $uncreditedTotal = $member->orders()
-                        ->where('member_credited', false)
-                        ->whereNotIn('status', ['canceled'])
-                        ->sum('final_amount');
-
-                    $liveTotalPurchase = (float) $member->total_purchase + (float) $uncreditedTotal;
-
-                    if ($liveTotalPurchase >= 2000) {
-                        // Auto-upgrade to Golden Card immediately
-                        $member->update([
-                            'type'       => 'golden',
-                            'expires_at' => now()->addYears(5),
-                        ]);
-                        $discountAmount = round($request->order_total * 0.10, 2);
-                    }
-                }
-            }
+            $consumesFirstOrderSlot = $member->canUseFirstOrderDiscount();
+            $memberDiscount = $member->resolveMemberDiscount((float) $request->order_total);
+            $discountAmount = $memberDiscount['amount'];
         }
 
         // Apply promotional offers discount
@@ -491,6 +464,10 @@ class HomeController extends Controller
         }
 
         $order = Order::create($orderData);
+
+        if ($member && $consumesFirstOrderSlot) {
+            $member->update(['first_order_discount_used' => true]);
+        }
 
         // ============================================
         // 4. Handle Payment Logic
@@ -579,96 +556,32 @@ class HomeController extends Controller
             ], 404);
         }
 
-        // Check card expiration
-        $isExpired = $member->expires_at && $member->expires_at < now();
-        if ($isExpired) {
-            return response()->json([
-                'eligible' => false,
-                'member_name' => $member->name,
-                'total_purchase' => (float) $member->total_purchase,
-                'discount_rate' => 0,
-                'message' => 'This membership card has expired. Validity is 1 year for standard and 5 years for golden.',
-            ]);
-        }
+        $orderTotal = (float) $request->query('order_total', 0);
+        $discount = $member->resolveMemberDiscount($orderTotal > 0 ? $orderTotal : 1);
 
-        if ($member->type === 'golden') {
-            return response()->json([
-                'eligible' => true,
-                'member_name' => $member->name,
-                'member_type' => $member->type,
-                'total_purchase' => (float) $member->total_purchase,
-                'discount_rate' => 10,
-                'message' => 'Golden Card Holder: 10% discount applied to all food items.',
-            ]);
-        }
-
-        if ($member->first_order_discount_used) {
-            // Calculate live total: credited total_purchase + any orders not yet credited
-            $uncreditedTotal = $member->orders()
-                ->where('member_credited', false)
-                ->whereNotIn('status', ['canceled'])
-                ->sum('final_amount');
-
-            $liveTotalPurchase = (float) $member->total_purchase + (float) $uncreditedTotal;
-
-            if ($liveTotalPurchase >= 2000) {
-                // Auto-upgrade to Golden Card immediately
-                if ($member->type !== 'golden') {
-                    $member->update([
-                        'type'       => 'golden',
-                        'expires_at' => now()->addYears(5),
-                    ]);
-                }
-
-                return response()->json([
-                    'eligible'       => true,
-                    'member_name'    => $member->name,
-                    'member_type'    => 'golden',
-                    'total_purchase' => $liveTotalPurchase,
-                    'discount_rate'  => 10,
-                    'message'        => 'Golden Card Holder: 10% discount applied to all food items.',
-                ]);
-            }
-
-            return response()->json([
-                'eligible'       => false,
-                'member_name'    => $member->name,
-                'total_purchase' => $liveTotalPurchase,
-                'discount_rate'  => 0,
-                'message'        => 'No discount available. Spend ৳' . number_format(2000 - $liveTotalPurchase, 2) . ' more to unlock Golden Card with 10% discount on every order.',
-            ]);
-        }
-
-        $rate = $member->is_student ? 35 : 30;
-        
-        // For student members, check if they are approved by admin
-        if ($member->is_student && $member->approval_status !== 'approved') {
-            $statusMessage = $member->approval_status === 'rejected' 
-                ? 'Your student membership has been rejected by admin. Please contact support for assistance.'
-                : 'Your student membership is pending admin approval. First-order discount will be available once approved.';
-            
-            return response()->json([
-                'eligible' => false,
-                'member_name' => $member->name,
-                'member_type' => $member->type,
-                'total_purchase' => (float) $member->total_purchase,
-                'discount_rate' => 0,
-                'is_student' => true,
-                'approval_status' => $member->approval_status,
-                'message' => $statusMessage,
-            ]);
-        }
-        
-        return response()->json([
-            'eligible' => true,
+        $response = [
+            'eligible' => $discount['eligible'],
             'member_name' => $member->name,
-            'member_type' => $member->type,
-            'total_purchase' => (float) $member->total_purchase,
-            'discount_rate' => $rate,
-            'is_student' => $member->is_student,
-            'approval_status' => $member->approval_status,
-            'message' => sprintf('Welcome back! %d%% first-order discount applied to all food items.', $rate),
-        ]);
+            'member_type' => $discount['member_type'] ?? $member->type,
+            'total_purchase' => $member->liveTotalPurchase(),
+            'discount_rate' => $discount['rate'],
+            'first_order_discount_used' => $discount['first_order_discount_used'],
+            'message' => $discount['message'],
+        ];
+
+        if (isset($discount['is_student'])) {
+            $response['is_student'] = $discount['is_student'];
+        } else {
+            $response['is_student'] = $member->is_student;
+        }
+
+        if (isset($discount['approval_status'])) {
+            $response['approval_status'] = $discount['approval_status'];
+        } elseif ($member->is_student) {
+            $response['approval_status'] = $member->approval_status;
+        }
+
+        return response()->json($response);
     }
 
     public function completeMenu(Request $request)
