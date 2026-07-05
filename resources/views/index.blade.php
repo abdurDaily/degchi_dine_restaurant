@@ -8,14 +8,14 @@
     <section id="home" class="hero">
       <video class="hero-video" autoplay muted loop playsinline preload="auto"
         poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
-        <source src="{{ asset('assets/frontend/video/video.mp4') }}" type="video/mp4" />
+        <source src="{{ asset('assets/frontend/video/degchi_banner_video.mp4') }}" type="video/mp4" />
       </video>
       <div class="hero-overlay"></div>
 
       <div class="hero-mobile-stack d-flex d-lg-none align-items-end justify-content-center text-center">
         <div class="container hero-mobile-inner px-3 px-sm-4 pb-4 pb-md-5">
           {{-- <p class="hero-mobile-kicker mb-2">Degchi Dine · হালিশহার</p> --}}
-          <h2 class="hero-mobile-title">Home of Authentic Kacchi & Biriyani</h2>
+          <h2 class="hero-mobile-title">Home Of Traditional Mezban, Kacchi & Bangla Food</h2>
           <p class="hero-mobile-copy mx-auto mb-0">
             Formal hospitality meets bold local flavor — dine in or order for
             takeaway in Chittagong.
@@ -38,7 +38,7 @@
       <div class="container hero-content px-4 px-lg-5 d-none d-lg-flex align-items-center justify-content-center">
         <div class="text-center w-100">
           <h2 class="hero-title">
-            Home of Authentic Kacchi & Biriyani
+            Home Of Traditional Mezban, Kacchi & Bangla Food
           </h2>
           <p class="hero-copy mt-3 mb-4 mx-auto">
              From slow-cooked Kacchi to flavorful Biriyani, we bring generations of tradition, rich spices, and unforgettable aromas together to create a dining experience that feels like a celebration in every bite.

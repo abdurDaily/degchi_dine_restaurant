@@ -716,7 +716,7 @@ h6,
 }
 
 .hero-title {
-  font-size: clamp(2.8rem, 6.2vw, 5.1rem);
+  font-size: 54px;
   line-height: 1;
   margin-top: 1.2rem;
 }
@@ -904,7 +904,7 @@ h6,
 
 .hero-mobile-title {
   font-family: music, "Fraunces", serif;
-  font-size: clamp(2rem, 8.5vw, 3.15rem);
+  font-size:40px;
   line-height: 1.05;
   color: #fffdf8;
   margin: 0 0 0.65rem;
@@ -1008,7 +1008,7 @@ h6,
   }
 
   .hero-mobile-title {
-    font-size: clamp(1.75rem, 9vw, 2.5rem);
+    font-size: 28px;
   }
 
   .hero-mobile-copy {
@@ -7651,7 +7651,7 @@ footer[id],
       font-size: clamp(1.75rem, 8.5vw, 2.4rem);
     }
     .hero-mobile-title {
-      font-size: clamp(1.75rem, 9vw, 2.65rem);
+      font-size: 25px;
     }
     .hero-mobile-copy {
       font-size: 0.88rem;
@@ -11329,7 +11329,7 @@ body {
   }
 
   .hero-mobile-title {
-    font-size: 1.65rem !important;
+    font-size: 25px !important;
   }
 }
 
