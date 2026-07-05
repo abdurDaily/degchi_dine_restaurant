@@ -20,25 +20,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function ()
-// {
-//     return to_route('login');
-// });
 
 Auth::routes(['register' => true, 'verify' => true]);
 
-Route::get('/run-migrations', function (Request $request) {
-    if ($request->input('key') !== MIGRATION_KEY) {
-        abort(403, 'Unauthorized');
-    }
-    Artisan::call('migrate', ["--force" => true]);
-    Artisan::call('db:seed', ["--force" => true]);
-    return 'Migrations ran successfully';
-});
+// Route::get('/run-migrations', function (Request $request) {
+//     if ($request->input('key') !== MIGRATION_KEY) {
+//         abort(403, 'Unauthorized');
+//     }
+//     Artisan::call('migrate', ["--force" => true]);
+//     Artisan::call('db:seed', ["--force" => true]);
+//     return 'Migrations ran successfully';
+// });
 
-Route::get('/linkstorage', function () {
-    Artisan::call('storage:link');
-});
+// Route::get('/linkstorage', function () {
+//     Artisan::call('storage:link');
+// });
 
 Route::get('cache-clear', function () {
     try {
@@ -179,6 +175,8 @@ Route::name('frontend.')->group(function () {
     Route::post('/order', [HomeController::class, 'storeOrder'])->name('order.store');
     Route::get('/member/check', [HomeController::class, 'checkMemberCard'])->name('member.check');
     Route::get('/menu', [HomeController::class, 'completeMenu'])->name('completeMenu');
+    Route::get('/party-booking', [HomeController::class, 'partyBooking'])->name('partyBooking');
+    Route::post('/party-booking', [HomeController::class, 'storePartyBooking'])->name('partyBooking.store');
 
     // Member login & dashboard (limited access)
     Route::get('/member/login', [MemberAuthController::class, 'showLoginForm'])->name('member.login');

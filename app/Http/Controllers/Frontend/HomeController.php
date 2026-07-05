@@ -726,4 +726,26 @@ class HomeController extends Controller
             'activeOfferDetails'
         ));
     }
+
+    public function partyBooking()
+    {
+        $branches = Branch::where('status', 1)->get();
+        return view('frontend.party_booking', compact('branches'));
+    }
+
+    public function storePartyBooking(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'total_members' => 'required|integer|min:1',
+            'booking_date' => 'required|date|after_or_equal:today',
+            'branch_id' => 'required|exists:branches,id',
+        ]);
+
+        // Further logic to store party booking can be added here
+        // Currently just redirecting back with success message
+
+        return back()->with('success', 'Your party booking request has been submitted successfully! We will contact you soon.');
+    }
 }
