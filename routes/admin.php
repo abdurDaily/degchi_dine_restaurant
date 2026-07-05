@@ -66,3 +66,10 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("contact")->name
     Route::get("/index", [ContactController::class, "index"])->name("index");
     Route::post("/store", [ContactController::class, "store"])->name("store");
 });
+
+// --- PARTY BOOKINGS MANAGEMENT ---
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("party-bookings")->name("party-bookings.")->group(function () {
+    Route::get("/index", [\App\Http\Controllers\Backend\BookingController::class, "index"])->name("index");
+    Route::post("/{booking}/update", [\App\Http\Controllers\Backend\BookingController::class, "update"])->name("update");
+    Route::delete("/{booking}/delete", [\App\Http\Controllers\Backend\BookingController::class, "destroy"])->name("delete");
+});

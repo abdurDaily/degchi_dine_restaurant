@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\FacebookReel;
 use App\Models\Member;
@@ -735,7 +736,7 @@ class HomeController extends Controller
 
     public function storePartyBooking(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'total_members' => 'required|integer|min:1',
@@ -743,8 +744,15 @@ class HomeController extends Controller
             'branch_id' => 'required|exists:branches,id',
         ]);
 
-        // Further logic to store party booking can be added here
-        // Currently just redirecting back with success message
+        $existingPendingBooking = Booking::where('phone', $request->phone)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingPendingBooking) {
+            return back()->withInput()->withErrors(['phone' => 'You already have a pending booking request. Please wait for our confirmation before booking again.']);
+        }
+
+        Booking::create($validated);
 
         return back()->with('success', 'Your party booking request has been submitted successfully! We will contact you soon.');
     }
