@@ -547,3 +547,45 @@
     font-size: 1.25rem;
   }
 }
+
+
+/* ==========================================================================
+   Overight Css Ui by Hamim
+   ========================================================================== */
+
+   .btn-star-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    color: #9ca3af;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-star-toggle:hover {
+    background: #fef9e7;
+    border-color: #f5c518;
+    color: #f5c518;
+    transform: scale(1.05);
+}
+
+.btn-star-toggle.is-active {
+    background: #fff8e1;
+    border-color: #f5c518;
+    color: #f5c518;
+}
+
+.btn-star-toggle.is-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.btn-star-toggle i {
+    line-height: 1;
+}

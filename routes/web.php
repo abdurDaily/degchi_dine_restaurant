@@ -1,23 +1,24 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SettingController;
+use App\Http\Controllers\Backend\MemberController;
+use App\Http\Controllers\Backend\MenuController;
+use App\Http\Controllers\Backend\OfferController;
+use App\Http\Controllers\Backend\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\MemberAuthController;
 use App\Http\Controllers\Frontend\PaymentController;
-use App\Http\Controllers\Backend\MemberController;
-use App\Http\Controllers\Backend\OfferController;
-use App\Http\Controllers\Backend\OrderController;
-use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function ()
 // {
@@ -121,6 +122,7 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     Route::post('members/{member}/upgrade-golden', [MemberController::class, 'upgradeToGolden'])->name('members.upgradeGolden');
     // Admin menu management
     Route::prefix('admin')->name('admin.')->group(function () {
+        Route::post('admin/menu/{id}/toggle-popular', [MenuController::class, 'togglePopular'])->name('menu.togglePopular');
         Route::resource('menu', App\Http\Controllers\Backend\MenuController::class)->except(['show']);
         Route::post('menu/{menu}/delete', [App\Http\Controllers\Backend\MenuController::class, 'destroy'])->name('menu.delete');
         

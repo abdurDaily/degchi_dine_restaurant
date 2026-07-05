@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class MenuController extends Controller
@@ -16,7 +16,7 @@ class MenuController extends Controller
     {
         $this->middleware('permission:menu-list')->only(['index', 'edit']);
         $this->middleware('permission:menu-create')->only('store');
-        $this->middleware('permission:menu-edit')->only('update');
+        $this->middleware('permission:menu-edit')->only(['update', 'togglePopular']); // ✅ যোগ করুন
         $this->middleware('permission:menu-delete')->only('destroy');
     }
 
@@ -28,14 +28,15 @@ class MenuController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('image_preview', function ($row) {
-                    $image = $row->variations->first()?->image 
+                    $image = $row->variations->first()?->image
                         ? (strpos($row->variations->first()->image, 'http') === 0
                             ? $row->variations->first()->image
                             : asset($row->variations->first()->image))
                         : asset('assets/placeholder/placeholder.png');
-                    return '<img src="' . $image . '" width="50" height="50" class="rounded shadow-sm object-fit-cover" />';
+
+                    return '<img src="'.$image.'" width="50" height="50" class="rounded shadow-sm object-fit-cover" />';
                 })
-                ->addColumn('category_name', fn($row) => $row->category->name ?? 'N/A')
+                ->addColumn('category_name', fn ($row) => $row->category->name ?? 'N/A')
                 ->addColumn('price_range', function ($row) {
                     if ($row->variations->isEmpty()) {
                         return '<span class="text-muted">No variations</span>';
@@ -43,44 +44,78 @@ class MenuController extends Controller
                     $prices = $row->variations->pluck('price');
                     $min = $prices->min();
                     $max = $prices->max();
-                    return $min == $max 
-                        ? '৳' . number_format($min, 2)
-                        : '৳' . number_format($min, 2) . ' - ৳' . number_format($max, 2);
+
+                    return $min == $max
+                        ? '৳'.number_format($min, 2)
+                        : '৳'.number_format($min, 2).' - ৳'.number_format($max, 2);
                 })
-                ->addColumn('variations_count', fn($row) => '<span class="badge bg-soft-info text-info">' . $row->variations->count() . ' variations</span>')
+                ->addColumn('variations_count', fn ($row) => '<span class="badge bg-soft-info text-info">'.$row->variations->count().' variations</span>')
                 ->addColumn('status', function ($row) {
                     return $row->is_available
                         ? '<span class="badge bg-success"><i class="ri-check-line me-1"></i>Available</span>'
                         : '<span class="badge bg-danger"><i class="ri-close-line me-1"></i>Out of Stock</span>';
                 })
+                // Popular star toggle column
+                ->addColumn('popular_status', function ($row) {
+                    $isPopular = (bool) $row->is_popular;
+                    $activeClass = $isPopular ? 'is-active' : '';
+                    $icon = $isPopular ? 'ri-star-fill' : 'ri-star-line';
+                    $title = $isPopular ? 'Marked as Popular (click to remove)' : 'Mark as Popular';
+
+                    return '
+                        <button type="button"
+                            class="btn-star-toggle '.$activeClass.'"
+                            data-id="'.$row->id.'"
+                            data-popular="'.($isPopular ? 1 : 0).'"
+                            title="'.$title.'"
+                            data-bs-toggle="tooltip">
+                            <i class="'.$icon.'"></i>
+                        </button>';
+                })
                 ->addColumn('action', function ($row) {
                     return '
                     <div class="d-flex gap-1 flex-wrap">
-                        <button class="btn btn-sm btn-soft-info view-details-btn" data-id="' . $row->id . '" title="View Details" data-bs-toggle="tooltip">
+                        <button class="btn btn-sm btn-soft-info view-details-btn" data-id="'.$row->id.'" title="View Details" data-bs-toggle="tooltip">
                             <i class="ri-eye-fill"></i>
                         </button>
-                        <button class="btn btn-sm btn-soft-warning edit-btn" data-id="' . $row->id . '" title="Edit" data-bs-toggle="tooltip">
+                        <button class="btn btn-sm btn-soft-warning edit-btn" data-id="'.$row->id.'" title="Edit" data-bs-toggle="tooltip">
                             <i class="ri-pencil-fill"></i>
                         </button>
-                        <button class="btn btn-sm btn-soft-danger delete-btn" data-id="' . $row->id . '" title="Delete" data-bs-toggle="tooltip">
+                        <button class="btn btn-sm btn-soft-danger delete-btn" data-id="'.$row->id.'" title="Delete" data-bs-toggle="tooltip">
                             <i class="ri-delete-bin-fill"></i>
                         </button>
                     </div>';
                 })
-                ->rawColumns(['action', 'image_preview', 'variations_count', 'status', 'price_range'])
+                ->rawColumns(['action', 'image_preview', 'variations_count', 'status', 'price_range', 'popular_status']) // ✅ যোগ করুন
                 ->make(true);
         }
         $categories = Category::all();
+
         return view('backend.menu.index', compact('categories'));
+    }
+
+    public function togglePopular($id)
+    {
+        $menu = Menu::findOrFail($id);
+        $menu->is_popular = ! $menu->is_popular;
+        $menu->save();
+
+        return response()->json([
+            'success' => true,
+            'is_popular' => $menu->is_popular,
+            'message' => $menu->is_popular
+                ? $menu->name.' marked as Popular'
+                : $menu->name.' removed from Popular',
+        ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|string|max:255',
-            'variations'  => 'required|array|min:1',
-            'variations.*.name'  => 'required|string',
+            'name' => 'required|string|max:255',
+            'variations' => 'required|array|min:1',
+            'variations.*.name' => 'required|string',
             'variations.*.price' => 'required|numeric',
         ]);
 
@@ -88,10 +123,10 @@ class MenuController extends Controller
             return DB::transaction(function () use ($request) {
                 // Create Parent
                 $menu = Menu::create([
-                    'category_id'  => $request->category_id,
-                    'name'         => $request->name,
-                    'slug'         => Str::slug($request->name) . '-' . rand(1000, 9999),
-                    'description'  => $request->description,
+                    'category_id' => $request->category_id,
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name).'-'.rand(1000, 9999),
+                    'description' => $request->description,
                     'is_available' => $request->is_available ?? 1,
                 ]);
 
@@ -100,13 +135,13 @@ class MenuController extends Controller
                     $imagePath = null;
                     if ($request->hasFile("variations.$index.image")) {
                         $file = $request->file("variations.$index.image");
-                        $imageName = time() . '_' . $index . '.' . $file->extension();
+                        $imageName = time().'_'.$index.'.'.$file->extension();
                         $file->move(public_path('uploads/menus/variations'), $imageName);
-                        $imagePath = 'uploads/menus/variations/' . $imageName;
+                        $imagePath = 'uploads/menus/variations/'.$imageName;
                     }
 
                     $menu->variations()->create([
-                        'name'  => $vData['name'],
+                        'name' => $vData['name'],
                         'price' => $vData['price'],
                         'image' => $imagePath,
                     ]);
@@ -119,14 +154,13 @@ class MenuController extends Controller
         }
     }
 
-
     public function edit($id)
     {
         // Load variations and category so the edit form can see them
         $menu = Menu::with(['variations', 'category'])->findOrFail($id);
+
         return response()->json($menu);
     }
-
 
     // app/Http/Controllers/Backend/MenuController.php
 
@@ -136,8 +170,8 @@ class MenuController extends Controller
 
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|string|max:255',
-            'variations'  => 'required|array|min:1',
+            'name' => 'required|string|max:255',
+            'variations' => 'required|array|min:1',
         ]);
 
         try {
@@ -145,10 +179,10 @@ class MenuController extends Controller
                 // Update Parent
                 $menu->update([
                     'category_id' => $request->category_id,
-                    'name'        => $request->name,
+                    'name' => $request->name,
                     'description' => $request->description,
                     'is_available' => $request->is_available,
-                    'slug'        => Str::slug($request->name) . '-' . $menu->id,
+                    'slug' => Str::slug($request->name).'-'.$menu->id,
                 ]);
 
                 // Handle Variations
@@ -160,11 +194,13 @@ class MenuController extends Controller
                         // Check if this image is still being used by checking old_image inputs
                         $stillUsed = false;
                         foreach ($request->variations as $index => $v) {
-                            if (($v['old_image'] ?? '') == $oldVar->image && !$request->hasFile("variations." . $index . ".image")) {
+                            if (($v['old_image'] ?? '') == $oldVar->image && ! $request->hasFile('variations.'.$index.'.image')) {
                                 $stillUsed = true;
                             }
                         }
-                        if (!$stillUsed) unlink(public_path($oldVar->image));
+                        if (! $stillUsed) {
+                            unlink(public_path($oldVar->image));
+                        }
                     }
                 }
 
@@ -175,24 +211,24 @@ class MenuController extends Controller
 
                     if ($request->hasFile("variations.$index.image")) {
                         $file = $request->file("variations.$index.image");
-                        $imageName = time() . '_' . $index . '.' . $file->extension();
+                        $imageName = time().'_'.$index.'.'.$file->extension();
                         $file->move(public_path('uploads/menus/variations'), $imageName);
-                        $imagePath = 'uploads/menus/variations/' . $imageName;
+                        $imagePath = 'uploads/menus/variations/'.$imageName;
                     }
 
                     $menu->variations()->create([
-                        'name'  => $vData['name'],
+                        'name' => $vData['name'],
                         'price' => $vData['price'],
                         'image' => $imagePath,
                     ]);
                 }
             });
+
             return response()->json(['status' => 'success', 'message' => 'Updated successfully!']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
-
 
     public function destroy($id)
     {
@@ -203,6 +239,7 @@ class MenuController extends Controller
             }
         }
         $menu->delete();
+
         return response()->json(['status' => 'success', 'message' => 'Deleted successfully!']);
     }
 }

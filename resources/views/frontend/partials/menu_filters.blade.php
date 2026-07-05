@@ -6,38 +6,48 @@
             ->filter()
             ->map(fn($slug) => (string) $slug)
             ->all();
-    $isOfferSelected = request()->has('offerFilter');
-
+    $isOfferSelected   = filter_var(request()->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
+    $isPopularSelected = filter_var(request()->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN); 
 @endphp
 
 <div class="menu-filter-bar filter-sidebar shadow-sm" id="filterSidebar{{ $suffix }}">
 
-    {{-- ================= CATEGORY FILTER ================= --}}
+    {{-- ================= CATEGORY + OFFER + POPULAR FILTER ================= --}}
     <div class="filter-group filter-group-categories">
         <label class="filter-group-label">
             <i class="bi bi-grid-3x3-gap me-1"></i>Categories
         </label>
 
         <ul class="category-list-group list-unstyled" id="categoryListGroup{{ $suffix }}">
-            <li class="category-list-item {{ empty($selectedCategories) ? 'is-checked' : '' }}">
+
+            {{--  Popular  --}}
+            <li class="category-list-item {{ $isPopularSelected ? 'is-checked' : '' }}">
                 <label class="category-list-label">
-                    <input type="checkbox" class="menu-category-checkbox" value="" data-all-categories
-                        {{ empty($selectedCategories) ? 'checked' : '' }}>
-                    <span>Special Items</span>
+                    <input type="checkbox" class="menu-category-checkbox" value="popular" data-popular-filter
+                        {{ $isPopularSelected ? 'checked' : '' }}>
+                    <span>Customer Favorites</span>
                 </label>
             </li>
-           
-            <li class="category-list-item  {{ $isOfferSelected ? 'is-checked' : '' }}">
-                <a href="#"
-                    class="text-decoration-none">
-                    <label class="category-list-label">
-                        <input type="checkbox" class="menu-category-checkbox" value="offer"
-                            {{ $isOfferSelected ? 'checked' : '' }}>
-                        <span><i class="bi bi-tag-fill me-1"></i>Offer</span>
-                    </label>
-                </a>
+
+            {{-- All Items --}}
+            {{-- <li class="category-list-item {{ empty($selectedCategories) && !$isOfferSelected && !$isPopularSelected ? 'is-checked' : '' }}">
+                <label class="category-list-label">
+                    <input type="checkbox" class="menu-category-checkbox" value="" data-all-categories
+                        {{ empty($selectedCategories) && !$isOfferSelected && !$isPopularSelected ? 'checked' : '' }}>
+                    <span>Special Items</span>
+                </label>
+            </li> --}}
+
+            {{-- Offer --}}
+            <li class="category-list-item {{ $isOfferSelected ? 'is-checked' : '' }}">
+                <label class="category-list-label">
+                    <input type="checkbox" class="menu-category-checkbox" value="offer" data-offer-filter
+                        {{ $isOfferSelected ? 'checked' : '' }}>
+                    <span>Offer</span>
+                </label>
             </li>
 
+            {{-- Dynamic categories --}}
             @foreach ($categories as $category)
                 <li class="category-list-item {{ in_array($category->slug, $selectedCategories) ? 'is-checked' : '' }}">
                     <label class="category-list-label">
@@ -49,7 +59,6 @@
             @endforeach
         </ul>
     </div>
-
 
     {{-- ================= PRICE FILTER ================= --}}
     <div class="filter-group filter-group-price">
@@ -74,9 +83,7 @@
                 <span class="price-badge px-2 py-1 rounded bg-light border">
                     ৳ <span id="minPriceDisplay{{ $suffix }}">{{ number_format($minPrice) }}</span>
                 </span>
-
                 <span class="small text-uppercase fw-bold">to</span>
-
                 <span class="price-badge px-2 py-1 rounded bg-light border">
                     ৳ <span id="maxPriceDisplay{{ $suffix }}">{{ number_format($maxPrice) }}</span>
                 </span>
@@ -86,54 +93,19 @@
 
 </div>
 
-
-{{-- ================= SCRIPT ================= --}}
+{{-- ================= SCRIPT (শুধু UI scroll/visual effect) ================= --}}
 <script>
     (function() {
-
         var list = document.getElementById('categoryListGroup{{ $suffix }}');
         if (!list) return;
 
         var hideTimer;
-
-        // Scroll effect
         list.addEventListener('scroll', function() {
             list.classList.add('is-scrolling');
-
             clearTimeout(hideTimer);
             hideTimer = setTimeout(function() {
                 list.classList.remove('is-scrolling');
             }, 800);
         });
-
-
-        // ================= CATEGORY CLICK UI FIX =================
-        document.querySelectorAll('#categoryListGroup{{ $suffix }} .menu-category-checkbox')
-            .forEach(function(checkbox) {
-
-                checkbox.addEventListener('change', function() {
-
-                    let allCheckbox = list.querySelector('[data-all-categories]');
-
-                    if (this.hasAttribute('data-all-categories')) {
-                        // If ALL selected → uncheck others
-                        list.querySelectorAll('.menu-category-checkbox').forEach(cb => {
-                            if (cb !== this) cb.checked = false;
-                        });
-                    } else {
-                        // If any other selected → uncheck ALL
-                        allCheckbox.checked = false;
-                    }
-
-                    // Toggle active class
-                    list.querySelectorAll('.category-list-item').forEach(item => {
-                        let input = item.querySelector('input');
-                        item.classList.toggle('is-checked', input.checked);
-                    });
-
-                });
-
-            });
-
     })();
 </script>

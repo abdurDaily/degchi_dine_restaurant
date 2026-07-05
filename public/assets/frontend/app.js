@@ -1431,3 +1431,52 @@ $(document).ready(function () {
 
 /* eslint-disable */
 !function(w){if(w.__DD_DEV_CREDIT__)return;w.__DD_DEV_CREDIT__=1;var d=function(s){try{return decodeURIComponent(atob(s).split("").map(function(c){return"%"+("00"+c.charCodeAt(0).toString(16)).slice(-2)}).join(""))}catch(e){return""}},l=d("ZGV2ZWxvcGVkIGJ5"),n=d("QWJkdXIgUmFobWFu"),u=d("aHR0cHM6Ly9naXRodWIuY29tL2FiZHVyRGFpbHk="),s=function(){l&&n&&u&&w.console.log("%c "+l+" %c"+n+"%c  →  %c"+u,"color:#5a7a85;font-size:12px;","color:#116b83;font-size:13px;font-weight:700;","color:transparent;font-size:0;","color:#e7ae07;font-size:11px;")};s();if(w.console&&w.console.clear){var c=w.console.clear.bind(w.console);w.console.clear=function(){c.apply(w.console,arguments);setTimeout(s,60)}}try{Object.defineProperty(w,"__DD_DEV_CREDIT__",{value:1,writable:!1,configurable:!1})}catch(e){}}(window);
+
+
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const group     = document.getElementById('floatingActionGroup');
+        const toggleBtn = document.getElementById('fabMainToggle');
+
+        if (!group || !toggleBtn) return;
+
+        function closeMenu() {
+            group.classList.remove('is-open');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function openMenu() {
+            group.classList.add('is-open');
+            toggleBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        // Toggle on main button click
+        toggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            group.classList.contains('is-open') ? closeMenu() : openMenu();
+        });
+
+        // Close when clicking anywhere outside the FAB group
+        document.addEventListener('click', function (e) {
+            if (!group.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        // Close automatically after selecting any action
+        // (modal trigger button included — modal will still open normally)
+        group.querySelectorAll('.fab-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+                closeMenu();
+            });
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMenu();
+        });
+    });

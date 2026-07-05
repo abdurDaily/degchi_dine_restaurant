@@ -292,33 +292,60 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <!-- Floating action buttons (right) -->
-  <div class="floating-right">
-    @guest('member')
-      {{-- @unless(request()->routeIs('frontend.order.track'))
-      <button type="button" id="trackOrderFab" class="fab fab-track is-visible" data-bs-toggle="modal"
-        data-bs-target="#trackOrderModal" aria-label="Track your order" title="Track Order">
-        <span class="fab-track-label">Track Order</span>
-        <iconify-icon icon="solar:delivery-linear" aria-hidden="true"></iconify-icon>
-      </button>
-      @endunless --}}
-    @else
-      @unless(request()->routeIs('frontend.order.track'))
-      <a href="{{ route('frontend.order.track') }}" class="fab fab-track is-visible" aria-label="Track an order" title="Track Order">
-        <span class="fab-track-label">Track Order</span>
-        <iconify-icon icon="solar:delivery-linear" aria-hidden="true"></iconify-icon>
-      </a>
-      @endunless
-      <a href="{{ route('frontend.member.dashboard') }}" class="fab fab-track is-visible" aria-label="My Dashboard" title="My Dashboard" style="background: linear-gradient(135deg, #e7ae07, #c99606) !important;">
-        <span class="fab-track-label">Dashboard</span>
-        <iconify-icon icon="solar:widget-5-bold" aria-hidden="true"></iconify-icon>
-      </a>
-    @endguest
-    <a id="whatsappBtn" class="fab fab-whatsapp is-visible"
-      href="https://wa.me/8801898795400?text=Hello%20Degchi%20Dine%20I%20have%20a%20question%20about%20ordering"
-      target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp" title="WhatsApp">
-      <i class="bi bi-whatsapp" aria-hidden="true"></i>
-    </a>
-  </div>
+<!-- Floating action buttons (right) -->
+<div class="floating-right" id="floatingActionGroup">
+
+    <!-- Sub action buttons (hidden until main FAB is clicked) -->
+    <div class="fab-menu" id="fabMenu">
+
+        @guest('member')
+            @unless(request()->routeIs('frontend.order.track'))
+            <button type="button" class="fab-item fab-track" data-bs-toggle="modal"
+                data-bs-target="#trackOrderModal" aria-label="Track your order" title="Track Order">
+                <span class="fab-item-icon"><iconify-icon icon="solar:delivery-linear" aria-hidden="true"></iconify-icon></span>
+                <span class="fab-item-label">Track Order</span>
+            </button>
+            @endunless
+        @else
+            @unless(request()->routeIs('frontend.order.track'))
+            <a href="{{ route('frontend.order.track') }}" class="fab-item fab-track"
+                aria-label="Track an order" title="Track Order">
+                <span class="fab-item-icon"><iconify-icon icon="solar:delivery-linear" aria-hidden="true"></iconify-icon></span>
+                <span class="fab-item-label">Track Order</span>
+            </a>
+            @endunless
+            <a href="{{ route('frontend.member.dashboard') }}" class="fab-item fab-dashboard"
+                aria-label="My Dashboard" title="My Dashboard">
+                <span class="fab-item-icon"><iconify-icon icon="solar:widget-5-bold" aria-hidden="true"></iconify-icon></span>
+                <span class="fab-item-label">Dashboard</span>
+            </a>
+        @endguest
+
+        <a class="fab-item fab-messenger"
+            href="https://m.me/YOUR_PAGE_USERNAME"
+            target="_blank" rel="noopener noreferrer"
+            aria-label="Chat with us on Messenger" title="Messenger">
+            <span class="fab-item-icon"><iconify-icon icon="ri:messenger-fill" aria-hidden="true"></iconify-icon></span>
+            <span class="fab-item-label">Messenger</span>
+        </a>
+
+        <a class="fab-item fab-whatsapp"
+            href="https://wa.me/8801898795400?text=Hello%20Degchi%20Dine%20I%20have%20a%20question%20about%20ordering"
+            target="_blank" rel="noopener noreferrer"
+            aria-label="Chat with us on WhatsApp" title="WhatsApp">
+            <span class="fab-item-icon"><i class="bi bi-whatsapp" aria-hidden="true"></i></span>
+            <span class="fab-item-label">WhatsApp</span>
+        </a>
+
+    </div>
+
+    <!-- Main toggle button -->
+    <button type="button" id="fabMainToggle" class="fab-main" aria-label="Open contact options" aria-expanded="false">
+        <iconify-icon icon="solar:chat-round-dots-bold" class="fab-icon-open" aria-hidden="true"></iconify-icon>
+        <iconify-icon icon="solar:close-circle-bold" class="fab-icon-close" aria-hidden="true"></iconify-icon>
+    </button>
+
+</div>
 
   {{-- Quick Track Order Modal (site-wide) --}}
   @guest('member')

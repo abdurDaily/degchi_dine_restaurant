@@ -3,20 +3,25 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
+use App\Models\Category;
+use App\Models\FacebookReel;
 use App\Models\Member;
+use App\Models\Menu;
+use App\Models\MenuVariation;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Review;
 use App\Models\Setting;
 use App\Models\SignaturePlatter;
-use App\Models\FacebookReel;
 use App\Services\SSLCommerzService;
 use App\Support\OrderRedirect;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -24,24 +29,30 @@ class HomeController extends Controller
     {
         // Cache categories for 5 minutes to improve performance
         $categories = cache()->remember('home_categories', 300, function () {
-            return \App\Models\Category::where('status', 1)
-                ->with(['menus' => function ($query) {
-                    $query->where('is_available', 1)
-                        ->select(['id', 'category_id', 'name', 'slug', 'description', 'is_available'])
-                        ->with(['variations' => function ($query) {
-                            $query->select(['id', 'menu_id', 'name', 'price', 'image'])
-                                ->with(['offers' => function ($q) {
-                                    $q->where('is_active', true)
-                                        ->where(function ($subQ) {
-                                            $subQ->whereNull('valid_from')->orWhere('valid_from', '<=', now());
-                                        })
-                                        ->where(function ($subQ) {
-                                            $subQ->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                                        })
-                                        ->select(['offers.id', 'offers.name', 'offers.discount_percent', 'offers.popup_badge']);
-                                }]);
-                        }]);
-                }])
+            return Category::where('status', 1)
+                ->with([
+                    'menus' => function ($query) {
+                        $query->where('is_available', 1)
+                            ->select(['id', 'category_id', 'name', 'slug', 'description', 'is_available'])
+                            ->with([
+                                'variations' => function ($query) {
+                                    $query->select(['id', 'menu_id', 'name', 'price', 'image'])
+                                        ->with([
+                                            'offers' => function ($q) {
+                                                $q->where('is_active', true)
+                                                    ->where(function ($subQ) {
+                                                        $subQ->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                                                    })
+                                                    ->where(function ($subQ) {
+                                                        $subQ->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                                                    })
+                                                    ->select(['offers.id', 'offers.name', 'offers.discount_percent', 'offers.popup_badge']);
+                                            },
+                                        ]);
+                                },
+                            ]);
+                    },
+                ])
                 ->select(['id', 'name', 'status', 'branch_id', 'image'])
                 ->orderBy('name')
                 ->get();
@@ -50,7 +61,7 @@ class HomeController extends Controller
         // Simple pagination wrapper
         $perPage = 10;
         $page = request()->get('page', 1);
-        $paginatedCategories = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginatedCategories = new LengthAwarePaginator(
             $categories->forPage($page, $perPage),
             $categories->count(),
             $perPage,
@@ -59,7 +70,7 @@ class HomeController extends Controller
         );
 
         $branches = cache()->remember('home_branches', 600, function () {
-            return \App\Models\Branch::orderBy('name')->select(['id', 'name', 'location', 'phone', 'slug', 'foodpanda_url', 'pathao_url', 'foodi_url', 'foodpanda_logo', 'pathao_logo', 'foodi_logo'])->get();
+            return Branch::orderBy('name')->select(['id', 'name', 'location', 'phone', 'slug', 'foodpanda_url', 'pathao_url', 'foodi_url', 'foodpanda_logo', 'pathao_logo', 'foodi_logo'])->get();
         });
 
         $signaturePlatters = SignaturePlatter::where('status', 1)
@@ -86,7 +97,7 @@ class HomeController extends Controller
 
         // Cache popup offer for 5 minutes
         $popupOffer = cache()->remember('home_popup_offer', 300, function () {
-            return \App\Models\Offer::where('is_active', true)
+            return Offer::where('is_active', true)
                 ->where('show_as_popup', true)
                 ->where(function ($q) {
                     $q->whereNull('popup_expires_at')
@@ -120,10 +131,9 @@ class HomeController extends Controller
         return view('frontend.apply');
     }
 
-
     public function checkout()
     {
-        $activeOffers = \App\Models\Offer::where('is_active', true)
+        $activeOffers = Offer::where('is_active', true)
             ->where('discount_percent', '>', 0)
             ->where(function ($q) {
                 $q->whereNull('valid_from')->orWhere('valid_from', '<=', now());
@@ -131,9 +141,11 @@ class HomeController extends Controller
             ->where(function ($q) {
                 $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
             })
-            ->with(['menuVariations' => function ($q) {
-                $q->select(['menu_variations.id', 'menu_id', 'name', 'price']);
-            }])
+            ->with([
+                'menuVariations' => function ($q) {
+                    $q->select(['menu_variations.id', 'menu_id', 'name', 'price']);
+                },
+            ])
             ->orderBy('discount_percent', 'desc')
             ->get();
 
@@ -148,6 +160,7 @@ class HomeController extends Controller
     public function cards()
     {
         $offers = Offer::active()->orderBy('created_at', 'desc')->get();
+
         return view('frontend.cards', compact('offers'));
     }
 
@@ -217,8 +230,8 @@ class HomeController extends Controller
         // Send welcome SMS with card details
         $this->sendWelcomeSms($member);
 
-        $message = 'Membership registered successfully. Your card number is ' . $member->unique_card_number;
-        
+        $message = 'Membership registered successfully. Your card number is '.$member->unique_card_number;
+
         if ($member->is_student) {
             $message .= '. Your student membership will be reviewed by admin. First-order discount will be available once approved.';
         } else {
@@ -229,8 +242,8 @@ class HomeController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'success' => true, 
-                'message' => $message, 
+                'success' => true,
+                'message' => $message,
                 'card' => $member->unique_card_number,
                 'is_student' => $member->is_student,
                 'approval_status' => $member->approval_status,
@@ -250,7 +263,7 @@ class HomeController extends Controller
         $exists = Member::phoneExists($request->phone);
 
         return response()->json([
-            'available' => !$exists,
+            'available' => ! $exists,
             'message' => $exists
                 ? 'This phone number is already registered. Please sign in or use a different number.'
                 : 'Phone number is available.',
@@ -259,7 +272,8 @@ class HomeController extends Controller
 
     /**
      * Send welcome SMS to newly registered member
-     * @param Member $member
+     *
+     * @param  Member  $member
      * @return array
      */
     private function sendWelcomeSms($member)
@@ -275,13 +289,13 @@ class HomeController extends Controller
                 Log::info('Welcome SMS sent to member', [
                     'member_id' => $member->id,
                     'phone' => $phone,
-                    'name' => $member->name
+                    'name' => $member->name,
                 ]);
             } else {
                 Log::warning('Failed to send welcome SMS to member', [
                     'member_id' => $member->id,
                     'phone' => $phone,
-                    'error' => $response['error'] ?? 'Unknown error'
+                    'error' => $response['error'] ?? 'Unknown error',
                 ]);
             }
 
@@ -289,12 +303,12 @@ class HomeController extends Controller
         } catch (\Exception $e) {
             Log::error('Exception while sending welcome SMS', [
                 'member_id' => $member->id,
-                'exception' => $e->getMessage()
+                'exception' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -307,11 +321,12 @@ class HomeController extends Controller
 
         $member = Member::where('unique_card_number', $request->unique_card_number)->first();
 
-        if (!$member) {
+        if (! $member) {
             $msg = 'Membership card number not found.';
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $msg], 404);
             }
+
             return back()->withErrors(['unique_card_number' => $msg]);
         }
 
@@ -320,10 +335,11 @@ class HomeController extends Controller
             ->whereIn('status', ['completed', 'confirmed'])
             ->sum('final_amount');
         if ($totalPurchase < Member::GOLDEN_UPGRADE_THRESHOLD) {
-            $msg = 'You are not eligible for a Golden Card yet. Your total purchase is ৳' . number_format($totalPurchase, 2) . ', but the eligibility requirement is ৳' . number_format(Member::GOLDEN_UPGRADE_THRESHOLD, 2) . '.';
+            $msg = 'You are not eligible for a Golden Card yet. Your total purchase is ৳'.number_format($totalPurchase, 2).', but the eligibility requirement is ৳'.number_format(Member::GOLDEN_UPGRADE_THRESHOLD, 2).'.';
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $msg], 422);
             }
+
             return back()->withErrors(['unique_card_number' => $msg]);
         }
 
@@ -332,6 +348,7 @@ class HomeController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => $msg]);
             }
+
             return back()->with('success', $msg);
         }
 
@@ -341,6 +358,7 @@ class HomeController extends Controller
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $msg]);
         }
+
         return back()->with('success', $msg);
     }
 
@@ -371,7 +389,7 @@ class HomeController extends Controller
         $paymentMethod = $request->payment_method;
         if (Schema::hasColumn('orders', 'payment_method')) {
             $col = DB::select("SHOW COLUMNS FROM `orders` LIKE 'payment_method'");
-            if (!empty($col) && isset($col[0]->Type) && strpos($col[0]->Type, 'enum(') === 0) {
+            if (! empty($col) && isset($col[0]->Type) && strpos($col[0]->Type, 'enum(') === 0) {
                 $typeDef = $col[0]->Type; // e.g. enum('cod','bkash','sslcommerz','other')
                 if (strpos($typeDef, "'{$paymentMethod}'") === false) {
                     // fallback to 'other' when DB enum doesn't include the requested value
@@ -394,13 +412,17 @@ class HomeController extends Controller
         $offerDiscount = 0;
         $itemDiscountDetails = [];
 
-        if (is_array($items) && !empty($items)) {
+        if (is_array($items) && ! empty($items)) {
             foreach ($items as &$item) {
                 $menuVariationId = $item['variation_id'] ?? $item['id'] ?? null;
-                if (!$menuVariationId) continue;
+                if (! $menuVariationId) {
+                    continue;
+                }
 
-                $variation = \App\Models\MenuVariation::find($menuVariationId);
-                if (!$variation) continue;
+                $variation = MenuVariation::find($menuVariationId);
+                if (! $variation) {
+                    continue;
+                }
 
                 // Get active, valid offers for this variation
                 $applicableOffers = $variation->activeOffers()
@@ -488,7 +510,7 @@ class HomeController extends Controller
         // --- SSLCOMMERZ (EASYCHECKOUT POPUP) ---
         if ($request->payment_method === 'sslcommerz') {
             try {
-                $sslcommerz = new SSLCommerzService();
+                $sslcommerz = new SSLCommerzService;
 
                 $post_data = [
                     'total_amount' => $order->final_amount,
@@ -512,7 +534,7 @@ class HomeController extends Controller
 
                 $sslResponse = $sslcommerz->initiatePayment($post_data);
 
-                if (!empty($sslResponse['success']) && !empty($sslResponse['gateway_url'])) {
+                if (! empty($sslResponse['success']) && ! empty($sslResponse['gateway_url'])) {
                     if ($request->ajax()) {
                         return response()->json([
                             'success' => true,
@@ -533,10 +555,11 @@ class HomeController extends Controller
 
                 return back()->withErrors(['payment' => $sslResponse['message'] ?? 'Payment initialization failed.']);
             } catch (\Exception $e) {
-                Log::error('SSLCommerz Init Error: ' . $e->getMessage());
+                Log::error('SSLCommerz Init Error: '.$e->getMessage());
                 if ($request->ajax()) {
                     return response()->json(['success' => false, 'message' => 'System error during payment initiation.'], 500);
                 }
+
                 return back()->withErrors(['payment' => 'System error during payment initiation.']);
             }
         }
@@ -586,18 +609,17 @@ class HomeController extends Controller
 
     public function completeMenu(Request $request)
     {
-        // 1. Fetch active categories
-        $categories = \App\Models\Category::where('status', 1)->get();
+        // 1. Active categories
+        $categories = Category::where('status', 1)->get();
 
-        // 2. Fetch min and max price limits dynamically from menu variations
-        $minPriceLimit = (float) (\App\Models\MenuVariation::min('price') ?? 0);
-        $maxPriceLimit = (float) (\App\Models\MenuVariation::max('price') ?? 1000);
+        // 2. Dynamic min/max price range
+        $minPriceLimit = (float) (MenuVariation::min('price') ?? 0);
+        $maxPriceLimit = (float) (MenuVariation::max('price') ?? 1000);
 
-        // 3. Get search/filter params
-        // Support both the new multi-select (?categories[]=slug) and the legacy single (?category=slug)
+        // 3. Filter params
         $selectedCategories = collect($request->query('categories', []))
             ->filter()
-            ->map(fn($slug) => (string) $slug)
+            ->map(fn ($slug) => (string) $slug)
             ->values()
             ->all();
 
@@ -606,63 +628,85 @@ class HomeController extends Controller
             $selectedCategories = [(string) $legacyCategory];
         }
 
-        // Kept for the view's backward compatibility (first selected slug)
         $selectedCategorySlug = $selectedCategories[0] ?? null;
 
-        $offerFilter = $request->query('offer'); // NEW: Filter by offer ID
+        $offerFilter = $request->query('offer'); // নির্দিষ্ট offer ID দিয়ে filter
+        $offerOnly = filter_var($request->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);   // শুধু offer-item filter
+        $popularOnly = filter_var($request->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN); // ✅ নতুন: শুধু popular-item filter
+
         $minPrice = $request->query('min_price', $minPriceLimit);
         $maxPrice = $request->query('max_price', $maxPriceLimit);
 
-        // 4. Build query with eager loading for offers
-        $query = \App\Models\Menu::where('is_available', 1)
+        // 4. Base query
+        $query = Menu::where('is_available', 1)
             ->with([
                 'variations' => function ($q) {
-                    $q->with(['offers' => function ($offerQuery) {
-                        $offerQuery->where('is_active', true)
-                            ->where(function ($q) {
-                                $q->whereNull('valid_from')->orWhere('valid_from', '<=', now());
-                            })
-                            ->where(function ($q) {
-                                $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                            })
-                            ->select(['offers.id', 'offers.name', 'offers.discount_percent']);
-                    }]);
+                    $q->with([
+                        'offers' => function ($offerQuery) {
+                            $offerQuery->where('is_active', true)
+                                ->where(function ($q) {
+                                    $q->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                                })
+                                ->where(function ($q) {
+                                    $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                                })
+                                ->select(['offers.id', 'offers.name', 'offers.discount_percent']);
+                        },
+                    ]);
                 },
-                'category'
+                'category',
             ]);
 
-        // Filter by category slug(s)
-        if (!empty($selectedCategories)) {
+        // Category filter
+        if (! empty($selectedCategories)) {
             $query->whereHas('category', function ($q) use ($selectedCategories) {
                 $q->whereIn('slug', $selectedCategories);
             });
         }
 
-        // NEW: Filter by offer - show only items that have this specific offer
+        // Specific offer ID filter
         if ($offerFilter) {
             $query->whereHas('variations.offers', function ($q) use ($offerFilter) {
                 $q->where('offers.id', $offerFilter);
             });
         }
 
-        // Filter by price range
+        // Generic "has an active offer" filter
+        if ($offerOnly) {
+            $query->whereHas('variations.offers', function ($q) {
+                $q->where('is_active', true)
+                    ->where(function ($q) {
+                        $q->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                    });
+            });
+        }
+
+        //  Popular items filter
+        if ($popularOnly) {
+            $query->where('is_popular', 1);
+        }
+
+        // Price filter
         $query->whereHas('variations', function ($q) use ($minPrice, $maxPrice) {
             $q->whereBetween('price', [$minPrice, $maxPrice]);
         });
 
-        // 5. Paginate items (9 per page for perfect grid)
+        // 5. Paginate
         $menus = $query->orderBy('name')->paginate(9)->withQueryString();
 
-        // 6. Get active offer details if filtering by offer
+        // 6. Active offer details if filtering by offer
         $activeOfferDetails = null;
         if ($offerFilter) {
-            $activeOfferDetails = \App\Models\Offer::where('id', $offerFilter)
+            $activeOfferDetails = Offer::where('id', $offerFilter)
                 ->where('is_active', true)
                 ->select(['id', 'name', 'discount_percent', 'description'])
                 ->first();
         }
 
-        // 7. Handle AJAX request
+        // 7. AJAX response
         if ($request->ajax()) {
             return view('frontend.partials.menu_grid', compact('menus'))->render();
         }
@@ -677,6 +721,8 @@ class HomeController extends Controller
             'minPrice',
             'maxPrice',
             'offerFilter',
+            'offerOnly',
+            'popularOnly',   
             'activeOfferDetails'
         ));
     }
