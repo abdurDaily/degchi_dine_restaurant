@@ -162,6 +162,28 @@ class MemberController extends Controller
     }
 
     /**
+     * Upgrade a member to Golden Card (10% discount on every order, 5-year validity).
+     */
+    public function upgradeToGolden(Member $member)
+    {
+        if ($member->isGolden()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Member already has a Golden Card.',
+            ], 400);
+        }
+
+        $member->upgradeToGolden();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Member upgraded to Golden Card. They now receive 10% off every order for 5 years.',
+            'type' => 'golden',
+            'expires_at' => $member->expires_at?->format('Y-m-d'),
+        ]);
+    }
+
+    /**
      * Reject/Revoke approval for a student member.
      */
     public function reject(Member $member)

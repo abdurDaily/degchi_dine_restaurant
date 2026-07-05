@@ -113,7 +113,7 @@ class Offer extends Model
             if ($member->type === 'golden') {
                 return false;
             }
-            if ($member->first_order_discount_used) {
+            if ($member->first_order_discount_used || $member->hasCompletedOrders()) {
                 return false;
             }
         }
@@ -125,7 +125,10 @@ class Offer extends Model
             'membership' => $member && !$member->is_student,
             'golden' => $member && $member->type === 'golden',
             'all' => $this->is_first_order
-                ? ($member !== null && $member->type !== 'golden' && !$member->first_order_discount_used)
+                ? ($member !== null
+                    && $member->type !== 'golden'
+                    && !$member->first_order_discount_used
+                    && !$member->hasCompletedOrders())
                 : true,
             default => true,
         };
