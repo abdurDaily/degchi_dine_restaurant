@@ -78,7 +78,7 @@
           <a class="nav-link" href="{{ route('frontend.reviews.index') }}">Reviews</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.contact') }}">Contact</a>
+          <a class="nav-link" href="{{ route('frontend.contact') }}">Contacts</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ route('frontend.order.track') }}">Track Order</a>
@@ -148,9 +148,11 @@
         <li class="nav-item">
           <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.home') }}#home">Home</a>
         </li>
+
         <!-- <li class="nav-item">
           <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.home') }}#about">About</a>
         </li> -->
+
         <li class="nav-item">
           <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.completeMenu') }}">Full Menu</a>
         </li>
@@ -292,13 +294,13 @@
   <!-- Floating action buttons (right) -->
   <div class="floating-right">
     @guest('member')
-      @unless(request()->routeIs('frontend.order.track'))
+      {{-- @unless(request()->routeIs('frontend.order.track'))
       <button type="button" id="trackOrderFab" class="fab fab-track is-visible" data-bs-toggle="modal"
         data-bs-target="#trackOrderModal" aria-label="Track your order" title="Track Order">
         <span class="fab-track-label">Track Order</span>
         <iconify-icon icon="solar:delivery-linear" aria-hidden="true"></iconify-icon>
       </button>
-      @endunless
+      @endunless --}}
     @else
       @unless(request()->routeIs('frontend.order.track'))
       <a href="{{ route('frontend.order.track') }}" class="fab fab-track is-visible" aria-label="Track an order" title="Track Order">

@@ -12,7 +12,8 @@ class Category extends Model
         'name',
         'slug',
         'image',
-        'status'
+        'status',
+        'sort_order',
     ];
     public function branch()
     {

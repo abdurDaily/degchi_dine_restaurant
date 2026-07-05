@@ -13006,3 +13006,77 @@ body {
     text-align: center;
   }
 }
+
+
+
+
+/* ===== Sticky sidebar (Foodpanda style) ===== */
+.menu-sticky-filter-wrap {
+    position: sticky;
+    top: 90px; /* adjust to match your fixed navbar height, or 20px if no fixed navbar */
+    align-self: flex-start;
+    z-index: 10;
+}
+
+/* ===== Scrollable category list with auto-hiding scrollbar ===== */
+.category-list-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    max-height: 320px;      /* shows scroll once list is taller than this */
+    overflow-y: auto;
+    padding-right: 6px;
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+}
+.category-list-group.is-scrolling {
+    scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+}
+
+/* Chrome / Edge / Safari */
+.category-list-group::-webkit-scrollbar {
+    width: 5px;
+}
+.category-list-group::-webkit-scrollbar-track {
+    background: transparent;
+}
+.category-list-group::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.category-list-group.is-scrolling::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
+.category-list-item {
+    border-radius: 8px;
+    transition: background-color 0.15s ease;
+}
+.category-list-item.is-checked {
+    background-color: #fff3e0;
+}
+.category-list-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    margin: 0;
+}
+.category-list-item-offer .category-list-label span {
+    color: #d9534f;
+    font-weight: 700;
+}
+.category-list-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #d9534f;
+}

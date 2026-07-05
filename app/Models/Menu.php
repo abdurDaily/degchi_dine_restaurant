@@ -10,7 +10,12 @@ class Menu extends Model
 {
     // price and image are removed from here because they are now moved to the MenuVariation model
 
-    protected $fillable = ['category_id', 'name', 'slug', 'description', 'is_available'];
+    protected $fillable = ['category_id', 'name', 'slug', 'description', 'is_available', 'is_popular'];
+
+    protected $casts = [
+        'is_popular'   => 'boolean',
+        'is_available' => 'boolean',
+    ];
     /**
      * Get the category that owns the menu item.
      */
