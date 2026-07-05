@@ -740,7 +740,7 @@
         </div>
       </div>
     </section>
-
+ 
     {{-- ══ Offer Popup Ad ══ --}}
     @if(isset($popupOffer) && $popupOffer)
     <div id="offerPopupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9990; align-items:center; justify-content:center;">

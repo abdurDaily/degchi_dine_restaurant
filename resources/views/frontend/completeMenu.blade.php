@@ -1,5 +1,5 @@
 @extends('frontend.layout')
-
+ 
 @section('meta_title', 'Complete Menu')
 @section('meta_description', 'Browse the full Degchi Dine menu — kacchi, biriyani, platters and signature dishes. Order online for delivery or pickup.')
 
