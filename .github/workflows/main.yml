@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Update this to match the PHP version selected in your cPanel
+          php-version: '8.4' # Update this to match the PHP version selected in your cPanel
 
       - name: Install Composer Dependencies
         run: composer install --optimize-autoloader --no-dev
