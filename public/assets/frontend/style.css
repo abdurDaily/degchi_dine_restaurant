@@ -429,6 +429,38 @@ h6,
   text-shadow: none;
 }
 
+/* --- desktop-nav2 styling --- */
+.desktop-nav2 {
+  justify-content: center;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.desktop-nav2 .nav-item {
+  margin: 0 0.25rem;
+}
+
+.desktop-nav2 .nav-link {
+  color: var(--text-main);
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.desktop-navbar .desktop-nav2 .nav-link:hover,
+.desktop-navbar .desktop-nav2 .nav-link.active,
+.desktop-navbar.is-scrolled .desktop-nav2 .nav-link:hover,
+.desktop-navbar.is-scrolled .desktop-nav2 .nav-link.active {
+  color: #fff;
+  background: var(--brand); /* Accent background color */
+}
+
+.desktop-navbar.is-scrolled .desktop-nav2 .nav-link {
+  color: var(--text-main);
+}
+
 .navbar-hamburger {
   color: rgba(255, 247, 235, 0.98);
   font-size: 1.9rem;
@@ -524,6 +556,29 @@ h6,
   background: rgba(17, 107, 131, 0.1);
   color: var(--brand);
   border-left: 3px solid var(--brand-gold);
+}
+
+/* --- side-nav-mbl styling --- */
+.side-nav-mbl .nav-link {
+  display: block;
+  width: 100%;
+  color: var(--text-main);
+  border-radius: 0;
+  margin-bottom: 0.35rem;
+  padding: 0.65rem 1rem;
+  font-weight: 500;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.side-nav-mbl .nav-link:hover {
+  color: var(--brand);
+}
+
+.side-nav-mbl .nav-link.active {
+  background: var(--brand-teal-light); /* Light blueish background */
+  color: var(--brand);
+  border-left: 4px solid var(--brand); /* Blueish left border */
 }
 
 .side-footer {
