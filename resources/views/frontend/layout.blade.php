@@ -53,6 +53,7 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ app(\App\Support\SeoSettings::class)->googleTagManagerId() }}"
   height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
   @endif
+  {{-- Desktop Menu --}}
   <nav id="desktopNavbar" class="navbar py-0 desktop-navbar d-none d-lg-block sticky-top">
     <div class="container px-4 px-xxl-5">
       <a class="navbar-brand" href="{{ route('frontend.home') }}">
@@ -61,27 +62,30 @@
         </div>
       </a>
 
-      <ul class="navbar-nav flex-row desktop-nav">
+      <ul class="navbar-nav flex-row desktop-nav2">
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.home') }}#home">Home</a>
+          <a class="nav-link {{ request()->routeIs('frontend.home') ? 'active' : '' }}" href="{{ route('frontend.home') }}#home">Home</a>
         </li>
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.home') }}#about">About</a>
-        </li> -->
-        <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.completeMenu') }}">Full Menu</a>
+         <li class="nav-item">
+          <a class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}" href="{{ route('frontend.about') }}">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.cards') }}">Card</a>
+          <a class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}" href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.reviews.index') }}">Reviews</a>
+          <a class="nav-link {{ request()->routeIs('frontend.completeMenu') && !request()->has('offerFilter') ? 'active' : '' }}" href="{{ route('frontend.completeMenu') }}">Full Menu</a>
+        </li>
+        {{-- <li class="nav-item">
+          <a class="nav-link {{ request()->routeIs('frontend.cards') ? 'active' : '' }}" href="{{ route('frontend.cards') }}">Card</a>
+        </li> --}}
+        <li class="nav-item">
+          <a class="nav-link {{ request()->routeIs('frontend.reviews.index') ? 'active' : '' }}" href="{{ route('frontend.reviews.index') }}">Reviews</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.contact') }}">Contacts</a>
+          <a class="nav-link {{ request()->routeIs('frontend.contact') ? 'active' : '' }}" href="{{ route('frontend.contact') }}">Contacts</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('frontend.order.track') }}">Track Order</a>
+          <a class="nav-link {{ request()->routeIs('frontend.order.track') ? 'active' : '' }}" href="{{ route('frontend.order.track') }}">Track Order</a>
         </li>
       </ul>
 
@@ -105,6 +109,7 @@
     </div>
   </nav>
 
+  {{-- Mobile menu --}}
   <nav class="navbar py-0 navbar-light mobile-topbar d-lg-none sticky-top">
     <div class="container-fluid px-3 px-sm-4">
       <button id="mobileMenuToggle" class="navbar-toggler mobile-menu-toggle" type="button" aria-controls="mobileMenu"
@@ -144,37 +149,40 @@
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-      <ul class="nav flex-column side-nav">
+      <ul class="nav flex-column side-nav-mbl">
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.home') }}#home">Home</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.home') ? 'active' : '' }}" href="{{ route('frontend.home') }}#home">Home</a>
         </li>
 
-        <!-- <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.home') }}#about">About</a>
-        </li> -->
+         <li class="nav-item">
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}" href="{{ route('frontend.about') }}">About</a>
+        </li>
 
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.completeMenu') }}">Full Menu</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}" href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>
         </li>
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.cards') }}">Card</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.completeMenu') && !request()->has('offerFilter') ? 'active' : '' }}" href="{{ route('frontend.completeMenu') }}">Full Menu</a>
         </li>
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.reviews.index') }}">Reviews</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.cards') ? 'active' : '' }}" href="{{ route('frontend.cards') }}">Card</a>
         </li>
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.contact') }}">Contact</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.reviews.index') ? 'active' : '' }}" href="{{ route('frontend.reviews.index') }}">Reviews</a>
         </li>
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.order.track') }}">Track Order</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.contact') ? 'active' : '' }}" href="{{ route('frontend.contact') }}">Contact</a>
+        </li>
+        <li class="nav-item">
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.order.track') ? 'active' : '' }}" href="{{ route('frontend.order.track') }}">Track Order</a>
         </li>
         @auth('member')
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.member.dashboard') }}">My Dashboard</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.member.dashboard') ? 'active' : '' }}" href="{{ route('frontend.member.dashboard') }}">My Dashboard</a>
         </li>
         @else
         <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.member.login') }}">Member Login</a>
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.member.login') ? 'active' : '' }}" href="{{ route('frontend.member.login') }}">Member Login</a>
         </li>
         @endauth
       </ul>
@@ -191,7 +199,7 @@
       </div>
     </div>
   </div>
-
+  {{-- Mobile menu end --}}
   <main class="main-content">
 
     @yield('frontend_content');
