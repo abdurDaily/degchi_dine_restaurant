@@ -23,7 +23,7 @@
           <div
             class="hero-cta-group d-flex flex-column flex-sm-row gap-2 gap-sm-3 justify-content-center align-items-stretch align-items-sm-center pt-3 pt-sm-4">
             <a href="{{ route('frontend.home') }}#menu" class="btn btn-brand btn-lg px-4 flex-grow-1 flex-sm-grow-0">Order Now</a>
-            <a href="{{ route('frontend.completeMenu') }}" class="btn btn-brand-outline btn-lg px-4 flex-grow-1 flex-sm-grow-0">Explore Menu</a>
+            <a href="{{ route('frontend.partyBooking') }}" class="btn btn-brand-outline btn-lg px-4 flex-grow-1 flex-sm-grow-0">Party Booking</a>
           </div>
         </div>
       </div>
@@ -45,7 +45,7 @@
             </p> 
           <div class="hero-cta-group d-flex flex-wrap gap-3 justify-content-center">
             <a href="{{ route('frontend.home') }}#menu" class="btn btn-brand btn-lg px-4">Order Now</a>
-            <a href="{{ route('frontend.completeMenu') }}" class="btn btn-brand-outline btn-lg px-4">Explore Menu</a>
+            <a href="{{ route('frontend.partyBooking') }}" class="btn btn-brand-outline btn-lg px-4">Party Booking</a>
           </div>
         </div>
       </div>
