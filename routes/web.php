@@ -175,6 +175,7 @@ Route::name('frontend.')->group(function () {
     Route::post('/order', [HomeController::class, 'storeOrder'])->name('order.store');
     Route::get('/member/check', [HomeController::class, 'checkMemberCard'])->name('member.check');
     Route::get('/menu', [HomeController::class, 'completeMenu'])->name('completeMenu');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/party-booking', [HomeController::class, 'partyBooking'])->name('partyBooking');
     Route::post('/party-booking', [HomeController::class, 'storePartyBooking'])->name('partyBooking.store');
 

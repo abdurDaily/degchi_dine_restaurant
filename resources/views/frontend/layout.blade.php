@@ -66,6 +66,9 @@
         <li class="nav-item">
           <a class="nav-link {{ request()->routeIs('frontend.home') ? 'active' : '' }}" href="{{ route('frontend.home') }}#home">Home</a>
         </li>
+         <li class="nav-item">
+          <a class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}" href="{{ route('frontend.about') }}">About</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}" href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>
         </li>
@@ -151,9 +154,9 @@
           <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.home') ? 'active' : '' }}" href="{{ route('frontend.home') }}#home">Home</a>
         </li>
 
-        <!-- <li class="nav-item">
-          <a data-bs-dismiss="offcanvas" class="nav-link" href="{{ route('frontend.home') }}#about">About</a>
-        </li> -->
+         <li class="nav-item">
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}" href="{{ route('frontend.about') }}">About</a>
+        </li>
 
         <li class="nav-item">
           <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}" href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>

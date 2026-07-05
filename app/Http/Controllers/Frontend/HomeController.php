@@ -127,6 +127,19 @@ class HomeController extends Controller
         return view('frontend.addtocart');
     }
 
+    public function about()
+    {
+        $aboutSettings = Setting::where('setting_group', 'about_section')
+            ->get()
+            ->keyBy('key');
+
+        $videos = FacebookReel::where('status', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('frontend.about', compact('aboutSettings', 'videos'));
+    }
+
     public function cardApply()
     {
         return view('frontend.apply');
