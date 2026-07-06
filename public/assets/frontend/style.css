@@ -2358,7 +2358,7 @@ h6,
 /* --- Absolute Floating Experience Ribbon Label Block --- */
 .about-experience-badge {
   position: absolute;
-  bottom: 1.25rem;
+  /* bottom: 1.25rem; */
   right: 0.5rem;
   left: auto;
   background: linear-gradient(135deg, #116b83, #083844);
@@ -2439,7 +2439,7 @@ h6,
   }
 
   .about-experience-badge {
-    bottom: 0.75rem;
+    /* bottom: 0.75rem; */
     right: 0.25rem;
     min-width: 120px;
     padding: 0.95rem 0.85rem;
@@ -7206,7 +7206,7 @@ footer[id],
       border-radius: 16px;
     }
     .about-experience-badge {
-      bottom: 0.5rem;
+      /* bottom: 0.5rem; */
       right: 0;
       min-width: 110px;
       padding: 0.85rem 0.75rem;

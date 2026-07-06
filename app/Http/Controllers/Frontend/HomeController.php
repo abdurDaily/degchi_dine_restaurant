@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Branch;
 use App\Models\Booking;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\FacebookReel;
 use App\Models\Member;
@@ -645,8 +645,20 @@ class HomeController extends Controller
         $selectedCategorySlug = $selectedCategories[0] ?? null;
 
         $offerFilter = $request->query('offer'); // নির্দিষ্ট offer ID দিয়ে filter
-        $offerOnly = filter_var($request->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);   // শুধু offer-item filter
-        $popularOnly = filter_var($request->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN); // ✅ নতুন: শুধু popular-item filter
+        $offerOnly = filter_var($request->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
+
+        // Fresh visit কিনা চেক করা হচ্ছে (কোনো filter param URL-এ আছে কিনা)
+        $hasAnyFilterParam = $request->has('categories')
+            || $request->has('category')
+            || $request->has('offerFilter')
+            || $request->has('popularFilter')
+            || $request->has('min_price')
+            || $request->has('max_price');
+
+        // Fresh visit হলে Popular ডিফল্ট ফিল্টার হবে, নাহলে query থেকে নেওয়া হবে
+        $popularOnly = $hasAnyFilterParam
+            ? filter_var($request->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN)
+            : true;
 
         $minPrice = $request->query('min_price', $minPriceLimit);
         $maxPrice = $request->query('max_price', $maxPriceLimit);
@@ -698,7 +710,7 @@ class HomeController extends Controller
             });
         }
 
-        //  Popular items filter
+        // Popular items filter (ডিফল্ট বা ইউজার-সিলেক্টেড)
         if ($popularOnly) {
             $query->where('is_popular', 1);
         }
@@ -736,7 +748,7 @@ class HomeController extends Controller
             'maxPrice',
             'offerFilter',
             'offerOnly',
-            'popularOnly',   
+            'popularOnly',
             'activeOfferDetails'
         ));
     }
@@ -744,6 +756,7 @@ class HomeController extends Controller
     public function partyBooking()
     {
         $branches = Branch::where('status', 1)->get();
+
         return view('frontend.party_booking', compact('branches'));
     }
 

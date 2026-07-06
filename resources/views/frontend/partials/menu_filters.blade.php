@@ -1,13 +1,21 @@
 @php
     $suffix = $suffix ?? '';
-    $selectedCategories =
-        $selectedCategories ??
-        collect(request()->query('categories', []))
-            ->filter()
-            ->map(fn($slug) => (string) $slug)
-            ->all();
-    $isOfferSelected   = filter_var(request()->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
-    $isPopularSelected = filter_var(request()->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN); 
+
+    // Fresh visit কিনা চেক করা হচ্ছে — মানে ইউজার এখনো কোনো filter apply করেনি
+    $hasAnyFilterParam =
+        request()->has('categories') ||
+        request()->has('category') ||
+        request()->has('offerFilter') ||
+        request()->has('popularFilter') ||
+        request()->has('min_price') ||
+        request()->has('max_price');
+
+    $isOfferSelected = filter_var(request()->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
+
+    // Fresh visit হলে Popular ডিফল্ট checked, নাহলে normal query value নেওয়া হবে
+    $isPopularSelected = $hasAnyFilterParam
+        ? filter_var(request()->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN)
+        : true;
 @endphp
 
 <div class="menu-filter-bar filter-sidebar shadow-sm" id="filterSidebar{{ $suffix }}">
@@ -20,7 +28,7 @@
 
         <ul class="category-list-group list-unstyled" id="categoryListGroup{{ $suffix }}">
 
-            {{--  Popular  --}}
+            {{-- Popular --}}
             <li class="category-list-item {{ $isPopularSelected ? 'is-checked' : '' }}">
                 <label class="category-list-label">
                     <input type="checkbox" class="menu-category-checkbox" value="popular" data-popular-filter
@@ -28,15 +36,6 @@
                     <span>Customer Favorites</span>
                 </label>
             </li>
-
-            {{-- All Items --}}
-            {{-- <li class="category-list-item {{ empty($selectedCategories) && !$isOfferSelected && !$isPopularSelected ? 'is-checked' : '' }}">
-                <label class="category-list-label">
-                    <input type="checkbox" class="menu-category-checkbox" value="" data-all-categories
-                        {{ empty($selectedCategories) && !$isOfferSelected && !$isPopularSelected ? 'checked' : '' }}>
-                    <span>Special Items</span>
-                </label>
-            </li> --}}
 
             {{-- Offer --}}
             <li class="category-list-item {{ $isOfferSelected ? 'is-checked' : '' }}">
@@ -93,7 +92,7 @@
 
 </div>
 
-{{-- ================= SCRIPT (শুধু UI scroll/visual effect) ================= --}}
+{{-- ================= SCRIPT (শুধু UI scroll visual effect) ================= --}}
 <script>
     (function() {
         var list = document.getElementById('categoryListGroup{{ $suffix }}');
