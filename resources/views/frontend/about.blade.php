@@ -96,9 +96,9 @@
       <span class="about-kicker text-uppercase d-block mb-2">
         <i class="bi bi-play-circle-fill me-1"></i> Watch & Experience
       </span>
-      <h2 class="section-title">Behind the Scenes</h2>
+      <h2 class="section-title">Watch Us on facebook</h2>
       <p class="about-lead mx-auto" style="max-width: 600px;">
-        Get a glimpse of our kitchen, our craft, and our community straight from our social reels.
+        Kitchen energy, chef moments, and guest vibes from Degchi Dine. Fresh reels every week.
       </p>
     </div>
 
@@ -209,17 +209,26 @@
   transform: translateY(-6px);
   box-shadow: 0 24px 48px rgba(17, 107, 131, 0.18);
 }
+
+/* FIX: thumbnail wrapper — explicit width so the box always fills the card,
+   regardless of the image's own intrinsic size */
 .about-video-thumb-wrap {
   display: block;
   position: relative;
+  width: 100%;
   overflow: hidden;
   aspect-ratio: 9/16;
   max-height: 340px;
 }
+
+/* FIX: image itself — force it to stretch to the wrapper's full box
+   (display:block removes inline-image whitespace/gap issues) */
 .about-video-thumb {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.4s ease;
 }
 .about-video-card:hover .about-video-thumb {
