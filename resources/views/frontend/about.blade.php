@@ -210,19 +210,17 @@
   box-shadow: 0 24px 48px rgba(17, 107, 131, 0.18);
 }
 
-/* FIX: thumbnail wrapper — explicit width so the box always fills the card,
-   regardless of the image's own intrinsic size */
+/* FIX: <a> tag (thumb wrap) — force block + full width explicitly,
+   overriding any inline/inline-block default anchor behavior */
 .about-video-thumb-wrap {
   display: block;
   position: relative;
-  width: 100%;
+  width: 100% !important;
   overflow: hidden;
   aspect-ratio: 9/16;
   max-height: 340px;
 }
 
-/* FIX: image itself — force it to stretch to the wrapper's full box
-   (display:block removes inline-image whitespace/gap issues) */
 .about-video-thumb {
   display: block;
   width: 100%;
@@ -241,26 +239,36 @@
   font-size: 3rem;
   color: var(--brand);
 }
+
+/* Play overlay — always visible (no hover-only opacity) */
 .about-video-play-overlay {
-  position: absolute; inset: 0;
-  background: rgba(8, 56, 68, 0.35);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 56, 68, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
 }
-.about-video-card:hover .about-video-play-overlay { opacity: 1; }
+
+/* Play button — always visible, centered, new bg color */
 .about-video-play-btn {
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: var(--brand-gold);
-  display: flex; align-items: center; justify-content: center;
+  background: #116b83;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #fff;
   font-size: 1.4rem;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-  transform: scale(0.85);
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transform: scale(1);
 }
-.about-video-card:hover .about-video-play-btn { transform: scale(1); }
+.about-video-card:hover .about-video-play-btn {
+  transform: scale(1.08);
+}
+
 .about-video-info {
   padding: 1rem 1.2rem;
 }
