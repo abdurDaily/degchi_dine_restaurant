@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Builder;
 class Coupon extends Model
 {
     protected $fillable = [
+        'name',
         'code',
+        'description',
         'discount_type',
-        'discount_value',
+        'discount_amount',
         'min_order_amount',
         'usage_limit',
         'used_count',
@@ -21,7 +23,7 @@ class Coupon extends Model
     protected $casts = [
         'is_active'        => 'boolean',
         'expires_at'       => 'date',
-        'discount_value'   => 'decimal:2',
+        'discount_amount'  => 'decimal:2',
         'min_order_amount' => 'decimal:2',
     ];
 
@@ -57,9 +59,9 @@ class Coupon extends Model
      */
     public function calculateDiscount(float $orderTotal): float
     {
-        if ($this->discount_type === 'percent') {
-            return round($orderTotal * ($this->discount_value / 100), 2);
+        if ($this->discount_type === 'percentage' || $this->discount_type === 'percent') {
+            return round($orderTotal * ($this->discount_amount / 100), 2);
         }
-        return min((float) $this->discount_value, $orderTotal);
+        return min((float) $this->discount_amount, $orderTotal);
     }
 }
