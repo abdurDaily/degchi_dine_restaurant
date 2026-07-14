@@ -34,6 +34,7 @@
             <x-setting-nav></x-setting-nav>
             <x-branch></x-branch>
             <x-category></x-category>
+            <x-coupon></x-coupon>
             <x-frontend-content-nav></x-frontend-content-nav>
             <x-party-booking-nav></x-party-booking-nav>
         </ul>

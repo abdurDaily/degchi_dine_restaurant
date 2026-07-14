@@ -7,6 +7,7 @@ use App\Http\Controllers\Backend\SignaturePlatterController;
 use App\Http\Controllers\Backend\FacebookReelController;
 use App\Http\Controllers\Backend\AboutController;
 use App\Http\Controllers\Backend\ContactController;
+use App\Http\Controllers\Backend\CouponController;
 use Illuminate\Support\Facades\Route;
 
 // --- BRANCH MANAGEMENT ---
@@ -72,4 +73,13 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("party-bookings"
     Route::get("/index", [\App\Http\Controllers\Backend\BookingController::class, "index"])->name("index");
     Route::post("/{booking}/update", [\App\Http\Controllers\Backend\BookingController::class, "update"])->name("update");
     Route::delete("/{booking}/delete", [\App\Http\Controllers\Backend\BookingController::class, "destroy"])->name("delete");
+});
+
+// --- COUPON MANAGEMENT ---
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("coupon")->name("coupon.")->group(function () {
+    Route::get("/index", [CouponController::class, "index"])->name("index");
+    Route::post("/store", [CouponController::class, "store"])->name("store");
+    Route::get("/{coupon}/edit", [CouponController::class, "edit"])->name("edit");
+    Route::post("/{coupon}/update", [CouponController::class, "update"])->name("update");
+    Route::delete("/{coupon}/delete", [CouponController::class, "destroy"])->name("delete");
 });

@@ -76,6 +76,12 @@ class RestaurantPermissionSeeder extends Seeder
             ['name' => 'users-edit', 'group' => 'users', 'details' => 'Edit users and approve accounts'],
             ['name' => 'users-delete', 'group' => 'users', 'details' => 'Delete admin users'],
 
+            // Coupons
+            ['name' => 'coupon-list', 'group' => 'coupons', 'details' => 'View coupons list'],
+            ['name' => 'coupon-create', 'group' => 'coupons', 'details' => 'Create new coupons'],
+            ['name' => 'coupon-edit', 'group' => 'coupons', 'details' => 'Edit coupons'],
+            ['name' => 'coupon-delete', 'group' => 'coupons', 'details' => 'Delete coupons'],
+
             // System settings
             ['name' => 'theme-customization', 'group' => 'settings', 'details' => 'Customize admin theme'],
             ['name' => 'general-setting', 'group' => 'settings', 'details' => 'Logo, app name, SEO, SSLCommerz'],
