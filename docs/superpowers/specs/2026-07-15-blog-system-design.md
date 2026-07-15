@@ -201,13 +201,15 @@ Add **Blog** to desktop and mobile nav in `resources/views/frontend/layout.blade
 
 ### Frontend routes
 
+Post-scoped routes use **`{slug}` consistently** (no mixing with post ID). Comment-scoped routes use comment `{id}` (comments have no slug).
+
 - `GET /blog` → index
 - `GET /blog/{slug}` → show
-- `POST /blog/{post}/comments` → store comment (member auth)
+- `POST /blog/{slug}/comments` → store comment / reply (member auth; resolve post by slug)
 - `POST /blog/comments/{comment}/react` → like/dislike (member auth)
-- Optional: `GET` counts endpoint if AJAX UI needs refresh
+- Optional: reaction counts returned in the react JSON response (no separate counts route required)
 
-Route ordering: static paths before `{slug}` to avoid collisions.
+Route ordering: register `/blog/comments/...` (and any other static `/blog/...` paths) **before** `/blog/{slug}` so they are not captured as slugs.
 
 ## Error handling
 
@@ -221,7 +223,8 @@ Route ordering: static paths before `{slug}` to avoid collisions.
 
 ## Cleanup checklist
 
-- Fix migrations (author_id, blog_category_id, member reactions unique, body column)
+- Fix migrations (author_id, blog_category_id, member reactions unique)
+- Use slug consistently for all post-scoped frontend blog routes
 - Rename BlogCategorie → BlogCategory everywhere
 - Deduplicate `web.php` blog routes
 - Fix models fillable/casts/relationships
@@ -261,3 +264,4 @@ Route ordering: static paths before `{slug}` to avoid collisions.
 | Schema update method | Edit create migrations + `migrate:fresh` |
 | Implementation approach | Fix & harden existing scaffold |
 | Member system | Keep fully intact |
+| Post-scoped frontend routes | Always `{slug}` (never mix with post ID) |
