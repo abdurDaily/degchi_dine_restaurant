@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/admin.php'));
         },
     )
+    ->withBroadcasting(
+        __DIR__ . '/../routes/channels.php',
+        ['middleware' => ['web', 'auth']],
+    )
     // ->withMiddleware(function (Middleware $middleware) {
     //     //
     // })

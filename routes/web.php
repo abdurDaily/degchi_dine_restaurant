@@ -101,9 +101,15 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     # Notifications
-    Route::controller(NotificationController::class)->prefix('notifications/')->name('notify.')->group(function () {
-        Route::get('/', 'index')->name('index');
-    });
+    Route::controller(NotificationController::class)
+        ->prefix('notifications')
+        ->name('notify.')
+        ->middleware('can:orders-show')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('read-all', 'markAllAsRead')->name('readAll');
+            Route::post('{id}/read', 'markAsRead')->name('read');
+        });
 
     Route::resource('users', UserController::class)->except(['show']);
 

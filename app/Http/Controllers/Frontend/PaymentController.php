@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\SSLCommerzService;
+use App\Support\NotifyAdminsOfNewOrder;
 use App\Support\OrderRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -204,6 +205,8 @@ class PaymentController extends Controller
         ]);
 
         $order->creditMemberPurchase();
+
+        NotifyAdminsOfNewOrder::send($order);
 
         $this->sendPaymentConfirmationSms($order);
     }

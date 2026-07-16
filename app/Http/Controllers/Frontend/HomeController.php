@@ -17,6 +17,7 @@ use App\Models\Review;
 use App\Models\Setting;
 use App\Models\SignaturePlatter;
 use App\Services\SSLCommerzService;
+use App\Support\NotifyAdminsOfNewOrder;
 use App\Support\OrderRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -536,6 +537,8 @@ class HomeController extends Controller
         // --- CASH ON DELIVERY ---
         if ($request->payment_method === 'cod') {
             $order->creditMemberPurchase();
+
+            NotifyAdminsOfNewOrder::send($order);
 
             return OrderRedirect::respond(
                 $request,
