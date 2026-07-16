@@ -1,0 +1,450 @@
+# Task 5 review package
+diff --git a/resources/views/components/admin-master.blade.php b/resources/views/components/admin-master.blade.php
+index 6ae49e5..e6990dc 100644
+--- a/resources/views/components/admin-master.blade.php
++++ b/resources/views/components/admin-master.blade.php
+@@ -52,6 +52,12 @@
+     @auth
+         @can('orders-show')
+         <link rel="stylesheet" href="{{ asset('assets/css/admin-order-alert.css') }}">
++        <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
++        <meta name="admin-user-id" content="{{ auth()->id() }}">
++        <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
++        <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
++        <meta name="notify-read-all-url" content="{{ route('notify.readAll') }}">
++        <meta name="notify-read-url-template" content="{{ url('/notifications/__ID__/read') }}">
+         @endcan
+     @endauth
+ 
+@@ -236,6 +242,8 @@
+                 </div>
+             </div>
+         </div>
++        <audio id="adminNotifSound" preload="auto" src="{{ asset('sounds/notification.wav') }}"></audio>
++        <div class="admin-notif-toast-wrap" id="adminNotifToastWrap" aria-live="polite"></div>
+         @endcan
+     @endauth
+     {{-- pri loader --}}
+@@ -482,6 +490,9 @@
+     @auth
+         @can('orders-show')
+         <script src="{{ asset('assets/js/admin-order-alert.js') }}" defer></script>
++        <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
++        <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
++        <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
+         @endcan
+     @endauth
+     @yield('scripts')
+diff --git a/resources/views/components/header.blade.php b/resources/views/components/header.blade.php
+index 315a11e..b133376 100644
+--- a/resources/views/components/header.blade.php
++++ b/resources/views/components/header.blade.php
+@@ -158,7 +158,48 @@ class="mdi mdi-magnify"></i></button>
+                         Cache</button>
+                 </div>
+ 
+-          
++                @can('orders-show')
++                    @php
++                        $adminNotifications = auth()->user()->notifications()->latest()->take(10)->get();
++                        $adminUnreadCount = auth()->user()->unreadNotifications()->count();
++                    @endphp
++                    <div class="dropdown topbar-head-dropdown ms-1 header-item" id="adminNotificationDropdown">
++                        <button type="button"
++                            class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
++                            id="page-header-notifications-dropdown"
++                            data-bs-toggle="dropdown"
++                            data-bs-auto-close="outside"
++                            aria-haspopup="true"
++                            aria-expanded="false">
++                            <i class="bx bx-bell fs-22"></i>
++                            <span class="admin-notif-badge {{ $adminUnreadCount > 0 ? '' : 'is-hidden' }}"
++                                id="adminNotifBadge"
++                                data-count="{{ $adminUnreadCount }}">{{ $adminUnreadCount > 99 ? '99+' : $adminUnreadCount }}</span>
++                        </button>
++                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 admin-notif-dropdown"
++                            aria-labelledby="page-header-notifications-dropdown">
++                            <div class="admin-notif-header">
++                                <span class="fw-semibold">Notifications</span>
++                                <button type="button" class="btn btn-sm btn-link p-0" id="adminNotifMarkAll">Mark all as read</button>
++                            </div>
++                            <div class="admin-notif-list" id="adminNotifList">
++                                @forelse ($adminNotifications as $notification)
++                                    @php $data = $notification->data; @endphp
++                                    <div class="admin-notif-item {{ $notification->read_at ? '' : 'unread' }}"
++                                        data-id="{{ $notification->id }}"
++                                        role="button"
++                                        tabindex="0">
++                                        <div class="fw-medium">Order #{{ $data['order_id'] ?? 'G��' }}</div>
++                                        <div class="text-muted fs-12">{{ $data['message'] ?? '' }}</div>
++                                        <div class="text-muted fs-11">{{ $notification->created_at->diffForHumans() }}</div>
++                                    </div>
++                                @empty
++                                    <div class="admin-notif-empty" id="adminNotifEmpty">No notifications yet</div>
++                                @endforelse
++                            </div>
++                        </div>
++                    </div>
++                @endcan
+ 
+                 <div class="ms-1 header-item d-none d-sm-flex">
+                     <button type="button"
+
+===== public/js/admin-notifications.js =====
+
+(function () {
+    'use strict';
+
+    const userIdMeta = document.querySelector('meta[name="admin-user-id"]');
+    const keyMeta = document.querySelector('meta[name="pusher-key"]');
+    const clusterMeta = document.querySelector('meta[name="pusher-cluster"]');
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+
+    if (!userIdMeta || !keyMeta || !keyMeta.content || !csrfMeta) {
+        return;
+    }
+
+    const userId = userIdMeta.content;
+    const readAllUrl = document.querySelector('meta[name="notify-read-all-url"]')?.content;
+    const readUrlTemplate = document.querySelector('meta[name="notify-read-url-template"]')?.content;
+
+    const listEl = document.getElementById('adminNotifList');
+    const badgeEl = document.getElementById('adminNotifBadge');
+    const markAllBtn = document.getElementById('adminNotifMarkAll');
+    const toastWrap = document.getElementById('adminNotifToastWrap');
+    const audioEl = document.getElementById('adminNotifSound');
+
+    let soundEnabled = false;
+
+    document.addEventListener('click', function () {
+        soundEnabled = true;
+    }, { once: true });
+
+    function playSound() {
+        if (!soundEnabled || !audioEl) {
+            return;
+        }
+
+        try {
+            audioEl.currentTime = 0;
+            const promise = audioEl.play();
+            if (promise && typeof promise.catch === 'function') {
+                promise.catch(function () {});
+            }
+        } catch (error) {}
+    }
+
+    function setBadge(count) {
+        if (!badgeEl) {
+            return;
+        }
+
+        const normalizedCount = Math.max(0, count);
+        badgeEl.dataset.count = String(normalizedCount);
+        badgeEl.textContent = normalizedCount > 99 ? '99+' : String(normalizedCount);
+        badgeEl.classList.toggle('is-hidden', normalizedCount === 0);
+    }
+
+    function getBadgeCount() {
+        return parseInt(badgeEl?.dataset.count || '0', 10) || 0;
+    }
+
+    function showToast(message) {
+        if (!toastWrap) {
+            return;
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'admin-notif-toast';
+        toast.textContent = message;
+        toastWrap.appendChild(toast);
+        setTimeout(function () {
+            toast.remove();
+        }, 4500);
+    }
+
+    function removeEmptyState() {
+        const empty = document.getElementById('adminNotifEmpty');
+        if (empty) {
+            empty.remove();
+        }
+    }
+
+    function trimListToTen() {
+        if (!listEl) {
+            return;
+        }
+
+        const items = listEl.querySelectorAll('.admin-notif-item');
+        for (let index = 10; index < items.length; index++) {
+            items[index].remove();
+        }
+    }
+
+    function escapeHtml(value) {
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function timeAgo(iso) {
+        const timestamp = new Date(iso).getTime();
+        if (Number.isNaN(timestamp)) {
+            return 'just now';
+        }
+
+        const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+        if (seconds < 60) return 'just now';
+        if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';
+        if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+
+        return Math.floor(seconds / 86400) + ' days ago';
+    }
+
+    function prependNotification(payload) {
+        if (!listEl) {
+            return;
+        }
+
+        removeEmptyState();
+
+        const item = document.createElement('div');
+        item.className = 'admin-notif-item unread';
+        item.dataset.id = payload.id || '';
+        item.setAttribute('role', 'button');
+        item.tabIndex = 0;
+
+        const orderId = payload.order_id ?? '—';
+        const message = payload.message || 'নতুন অর্ডার এসেছে';
+        const when = payload.created_at ? timeAgo(payload.created_at) : 'just now';
+
+        item.innerHTML =
+            '<div class="fw-medium">Order #' + escapeHtml(String(orderId)) + '</div>' +
+            '<div class="text-muted fs-12">' + escapeHtml(message) + '</div>' +
+            '<div class="text-muted fs-11">' + escapeHtml(when) + '</div>';
+
+        item.addEventListener('click', function () {
+            markOneRead(item);
+        });
+
+        listEl.insertBefore(item, listEl.firstChild);
+        trimListToTen();
+    }
+
+    function postJson(url) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfMeta.content,
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        }).then(function (response) {
+            if (!response.ok) {
+                throw new Error('Request failed');
+            }
+
+            return response.json();
+        });
+    }
+
+    function markOneRead(item) {
+        const id = item.dataset.id;
+        if (!id || !readUrlTemplate || item.classList.contains('is-reading')) {
+            return;
+        }
+
+        if (!item.classList.contains('unread')) {
+            return;
+        }
+
+        item.classList.add('is-reading');
+        const url = readUrlTemplate.replace('__ID__', encodeURIComponent(id));
+        postJson(url)
+            .then(function () {
+                item.classList.remove('unread', 'is-reading');
+                setBadge(getBadgeCount() - 1);
+            })
+            .catch(function () {
+                item.classList.remove('is-reading');
+            });
+    }
+
+    if (listEl) {
+        listEl.querySelectorAll('.admin-notif-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+                markOneRead(item);
+            });
+        });
+    }
+
+    if (markAllBtn && readAllUrl) {
+        markAllBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            postJson(readAllUrl)
+                .then(function () {
+                    listEl?.querySelectorAll('.admin-notif-item.unread').forEach(function (item) {
+                        item.classList.remove('unread');
+                    });
+                    setBadge(0);
+                })
+                .catch(function () {});
+        });
+    }
+
+    const EchoConstructor = typeof window.Echo === 'function'
+        ? window.Echo
+        : window.Echo?.default;
+
+    if (!window.Pusher || typeof EchoConstructor !== 'function') {
+        return;
+    }
+
+    window.Echo = new EchoConstructor({
+        broadcaster: 'pusher',
+        key: keyMeta.content,
+        cluster: clusterMeta?.content || 'mt1',
+        forceTLS: true,
+        authEndpoint: '/broadcasting/auth',
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': csrfMeta.content,
+            },
+        },
+    });
+
+    window.Echo.private('App.Models.User.' + userId)
+        .notification(function (notification) {
+            const type = notification.type || '';
+            if (type !== 'new-order-notification' && !type.includes('NewOrderNotification')) {
+                return;
+            }
+
+            prependNotification({
+                id: notification.id,
+                order_id: notification.order_id,
+                message: notification.message,
+                created_at: notification.created_at,
+            });
+            setBadge(getBadgeCount() + 1);
+            showToast(notification.message || 'নতুন অর্ডার এসেছে');
+            playSound();
+        });
+})();
+
+===== public/assets/css/admin-notifications.css =====
+
+.admin-notif-dropdown {
+  width: 320px;
+  max-height: 420px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+}
+
+.admin-notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vz-border-color, #e9ebec);
+}
+
+.admin-notif-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.admin-notif-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.admin-notif-item.unread {
+  background: rgba(64, 81, 137, 0.06);
+}
+
+.admin-notif-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.admin-notif-empty {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: #878a99;
+  font-size: 0.875rem;
+}
+
+.admin-notif-badge {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 50rem;
+  background: #f06548;
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.admin-notif-badge.is-hidden {
+  display: none !important;
+}
+
+.admin-notif-toast-wrap {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1090;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.admin-notif-toast {
+  min-width: 260px;
+  max-width: 360px;
+  padding: 0.85rem 1rem;
+  border-radius: 0.4rem;
+  background: #212529;
+  color: #fff;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+  animation: adminNotifSlideIn 0.25s ease-out;
+  pointer-events: auto;
+}
+
+@keyframes adminNotifSlideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+===== sounds =====
+
+
+Name             Length
+----             ------
+.gitkeep              1
+notification.wav   6444
+
+
+
+        <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
+        <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
+        <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+        <audio id="adminNotifSound" preload="auto" src="{{ asset('sounds/notification.wav') }}"></audio>
+        <div class="admin-notif-toast-wrap" id="adminNotifToastWrap" aria-live="polite"></div>
+        <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+        <script src="{{ asset('js/admin-notifications.js') }}" defer></script>

@@ -1,0 +1,56 @@
+diff --git a/app/Http/Controllers/NotificationController.php b/app/Http/Controllers/NotificationController.php
+index 7bd130a..c7f3fbe 100644
+--- a/app/Http/Controllers/NotificationController.php
++++ b/app/Http/Controllers/NotificationController.php
+@@ -6,5 +6,27 @@
+ 
+ class NotificationController extends Controller
+ {
+-    //
++    public function index()
++    {
++        abort(404);
++    }
++
++    public function markAsRead(string $id)
++    {
++        abort_unless(auth()->user()->can('orders-show'), 403);
++
++        $notification = auth()->user()->notifications()->where('id', $id)->firstOrFail();
++        $notification->markAsRead();
++
++        return response()->json(['success' => true]);
++    }
++
++    public function markAllAsRead()
++    {
++        abort_unless(auth()->user()->can('orders-show'), 403);
++
++        auth()->user()->unreadNotifications->markAsRead();
++
++        return response()->json(['success' => true]);
++    }
+ }
+diff --git a/routes/web.php b/routes/web.php
+index 2c06f99..991a7e2 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -101,9 +101,15 @@
+     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+ 
+     # Notifications
+-    Route::controller(NotificationController::class)->prefix('notifications/')->name('notify.')->group(function () {
+-        Route::get('/', 'index')->name('index');
+-    });
++    Route::controller(NotificationController::class)
++        ->prefix('notifications')
++        ->name('notify.')
++        ->middleware('can:orders-show')
++        ->group(function () {
++            Route::get('/', 'index')->name('index');
++            Route::post('read-all', 'markAllAsRead')->name('readAll');
++            Route::post('{id}/read', 'markAsRead')->name('read');
++        });
+ 
+     Route::resource('users', UserController::class)->except(['show']);
+ 
