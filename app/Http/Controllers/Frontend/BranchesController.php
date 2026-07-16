@@ -7,12 +7,16 @@ use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BranchesController extends Controller
 {
     public function index()
     {
-        $branches = Branch::where('status', 1)->orderBy('name')->get();
+        $branches = Branch::query()
+            ->where('status', 1)
+            ->orderBy('name', 'asc')
+            ->get();
         return view('frontend.branches.index', compact('branches'));
     }
 
@@ -20,17 +24,18 @@ class BranchesController extends Controller
     {
         // Get categories that belong to this branch OR are global (branch_id is null)
         // Also need to filter menus by branch
-        $categories = Category::where('status', 1)
-            ->where(function($query) use ($branch) {
+        $categories = Category::query()
+            ->where('status', 1)
+            ->where(function ($query) use ($branch) {
                 $query->where('branch_id', $branch->id)
                       ->orWhereNull('branch_id');
             })
-            ->with(['menus' => function ($query) use ($branch) {
+            ->with(['menus' => function ($query) {
                 // Only get menus that are available and have variations
                 $query->where('is_available', 1)
                       ->with('variations');
             }])
-            ->orderBy('name')
+            ->orderBy('name', 'asc')
             ->get()
             // Filter to only categories that have menus
             ->filter(function ($category) {
@@ -67,20 +72,21 @@ class BranchesController extends Controller
     public function searchMenu(Request $request, Branch $branch)
     {
         $query = $request->get('q');
-        \Log::info('Search Menu - Branch: ' . $branch->slug . ', Query: ' . $query);
-        
+        Log::info('Search Menu - Branch: ' . $branch->slug . ', Query: ' . $query);
+
         if (!$query || strlen($query) < 2) {
             return response()->json(['data' => []]);
         }
 
         // Search in available menus for this branch only
-        $menus = Menu::where('is_available', 1)
+        $menus = Menu::query()
+            ->where('is_available', 1)
             ->where('name', 'LIKE', "%{$query}%")
             ->with(['category', 'variations'])
             ->whereHas('variations') // Only menus with variations
-            ->whereHas('category', function($q) use ($branch) {
+            ->whereHas('category', function ($q) use ($branch) {
                 // Filter by branch categories
-                $q->where(function($subQ) use ($branch) {
+                $q->where(function ($subQ) use ($branch) {
                     $subQ->where('branch_id', $branch->id)
                          ->orWhereNull('branch_id');
                 });
@@ -88,7 +94,7 @@ class BranchesController extends Controller
             ->limit(15)
             ->get();
 
-        \Log::info('Found ' . $menus->count() . ' menus');
+        Log::info('Found ' . $menus->count() . ' menus');
 
         $results = $menus->map(function ($menu) {
             return [
@@ -101,7 +107,7 @@ class BranchesController extends Controller
             ];
         });
 
-        \Log::info('Search results:', $results->toArray());
+        Log::info('Search results:', $results->toArray());
         return response()->json(['data' => $results]);
     }
 }
