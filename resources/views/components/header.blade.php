@@ -158,7 +158,48 @@
                         Cache</button>
                 </div>
 
-          
+                @can('orders-show')
+                    @php
+                        $adminNotifications = auth()->user()->notifications()->latest()->take(10)->get();
+                        $adminUnreadCount = auth()->user()->unreadNotifications()->count();
+                    @endphp
+                    <div class="dropdown topbar-head-dropdown ms-1 header-item" id="adminNotificationDropdown">
+                        <button type="button"
+                            class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
+                            id="page-header-notifications-dropdown"
+                            data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="bx bx-bell fs-22"></i>
+                            <span class="admin-notif-badge {{ $adminUnreadCount > 0 ? '' : 'is-hidden' }}"
+                                id="adminNotifBadge"
+                                data-count="{{ $adminUnreadCount }}">{{ $adminUnreadCount > 99 ? '99+' : $adminUnreadCount }}</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 admin-notif-dropdown"
+                            aria-labelledby="page-header-notifications-dropdown">
+                            <div class="admin-notif-header">
+                                <span class="fw-semibold">Notifications</span>
+                                <button type="button" class="btn btn-sm btn-link p-0" id="adminNotifMarkAll">Mark all as read</button>
+                            </div>
+                            <div class="admin-notif-list" id="adminNotifList">
+                                @forelse ($adminNotifications as $notification)
+                                    @php $data = $notification->data; @endphp
+                                    <div class="admin-notif-item {{ $notification->read_at ? '' : 'unread' }}"
+                                        data-id="{{ $notification->id }}"
+                                        role="button"
+                                        tabindex="0">
+                                        <div class="fw-medium">Order #{{ $data['order_id'] ?? '—' }}</div>
+                                        <div class="text-muted fs-12">{{ $data['message'] ?? '' }}</div>
+                                        <div class="text-muted fs-11">{{ $notification->created_at->diffForHumans() }}</div>
+                                    </div>
+                                @empty
+                                    <div class="admin-notif-empty" id="adminNotifEmpty">No notifications yet</div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                @endcan
 
                 <div class="ms-1 header-item d-none d-sm-flex">
                     <button type="button"

@@ -52,6 +52,12 @@
     @auth
         @can('orders-show')
         <link rel="stylesheet" href="{{ asset('assets/css/admin-order-alert.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
+        <meta name="admin-user-id" content="{{ auth()->id() }}">
+        <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
+        <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
+        <meta name="notify-read-all-url" content="{{ route('notify.readAll') }}">
+        <meta name="notify-read-url-template" content="{{ url('/notifications/__ID__/read') }}">
         @endcan
     @endauth
 
@@ -236,6 +242,8 @@
                 </div>
             </div>
         </div>
+        <audio id="adminNotifSound" preload="auto" src="{{ asset('sounds/notification.wav') }}"></audio>
+        <div class="admin-notif-toast-wrap" id="adminNotifToastWrap" aria-live="polite"></div>
         @endcan
     @endauth
     {{-- pri loader --}}
@@ -482,6 +490,9 @@
     @auth
         @can('orders-show')
         <script src="{{ asset('assets/js/admin-order-alert.js') }}" defer></script>
+        <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+        <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
         @endcan
     @endauth
     @yield('scripts')

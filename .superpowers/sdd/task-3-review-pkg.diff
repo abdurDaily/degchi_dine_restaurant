@@ -1,0 +1,42 @@
+diff --git a/app/Http/Controllers/Frontend/HomeController.php b/app/Http/Controllers/Frontend/HomeController.php
+index dd1c4f9..ff2f272 100644
+--- a/app/Http/Controllers/Frontend/HomeController.php
++++ b/app/Http/Controllers/Frontend/HomeController.php
+@@ -17,6 +17,7 @@
+ use App\Models\Setting;
+ use App\Models\SignaturePlatter;
+ use App\Services\SSLCommerzService;
++use App\Support\NotifyAdminsOfNewOrder;
+ use App\Support\OrderRedirect;
+ use Illuminate\Http\Request;
+ use Illuminate\Pagination\LengthAwarePaginator;
+@@ -537,6 +538,8 @@ public function storeOrder(Request $request)
+         if ($request->payment_method === 'cod') {
+             $order->creditMemberPurchase();
+ 
++            NotifyAdminsOfNewOrder::send($order);
++
+             return OrderRedirect::respond(
+                 $request,
+                 $order,
+diff --git a/app/Http/Controllers/Frontend/PaymentController.php b/app/Http/Controllers/Frontend/PaymentController.php
+index 9b54588..57f5361 100644
+--- a/app/Http/Controllers/Frontend/PaymentController.php
++++ b/app/Http/Controllers/Frontend/PaymentController.php
+@@ -5,6 +5,7 @@
+ use App\Http\Controllers\Controller;
+ use App\Models\Order;
+ use App\Services\SSLCommerzService;
++use App\Support\NotifyAdminsOfNewOrder;
+ use App\Support\OrderRedirect;
+ use Illuminate\Http\Request;
+ use Illuminate\Support\Facades\Log;
+@@ -205,6 +206,8 @@ private function markOrderAsPaid(Order $order, array $details): void
+ 
+         $order->creditMemberPurchase();
+ 
++        NotifyAdminsOfNewOrder::send($order);
++
+         $this->sendPaymentConfirmationSms($order);
+     }
+ 

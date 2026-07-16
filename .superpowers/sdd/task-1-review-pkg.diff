@@ -1,0 +1,195 @@
+﻿# Review package Task 1 (post-fix)
+Base: d85178f7a8e74eddb8f9f6b7369c4798f1aa88d9
+Head: WORKING_TREE
+
+## bootstrap/app.php + BroadcastServiceProvider + channels + config + env + composer
+diff --git a/.env.example b/.env.example
+index 100a1cc..1d1703d 100644
+--- a/.env.example
++++ b/.env.example
+@@ -34,9 +34,17 @@ SESSION_ENCRYPT=false
+ SESSION_PATH=/
+ SESSION_DOMAIN=null
+ 
+-BROADCAST_CONNECTION=log
++BROADCAST_CONNECTION=pusher
++# Local/dev: use sync so ShouldQueue notifications broadcast immediately.
++# Production: database or redis + run `php artisan queue:work`
++QUEUE_CONNECTION=sync
++
++PUSHER_APP_ID=
++PUSHER_APP_KEY=
++PUSHER_APP_SECRET=
++PUSHER_APP_CLUSTER=ap2
++
+ FILESYSTEM_DISK=local
+-QUEUE_CONNECTION=database
+ 
+ CACHE_STORE=database
+ CACHE_PREFIX=
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 280e889..096f5ac 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -18,6 +18,10 @@
+                 ->group(base_path('routes/admin.php'));
+         },
+     )
++    ->withBroadcasting(
++        __DIR__ . '/../routes/channels.php',
++        ['middleware' => ['web', 'auth']],
++    )
+     // ->withMiddleware(function (Middleware $middleware) {
+     //     //
+     // })
+diff --git a/bootstrap/providers.php b/bootstrap/providers.php
+index 38b258d..71eb0e8 100644
+--- a/bootstrap/providers.php
++++ b/bootstrap/providers.php
+@@ -2,4 +2,5 @@
+ 
+ return [
+     App\Providers\AppServiceProvider::class,
++    App\Providers\BroadcastServiceProvider::class,
+ ];
+diff --git a/composer.json b/composer.json
+index 101cf88..02a6173 100644
+--- a/composer.json
++++ b/composer.json
+@@ -15,6 +15,7 @@
+         "laravel/framework": "^11.39.1",
+         "laravel/tinker": "^2.9",
+         "laravel/ui": "^4.6",
++        "pusher/pusher-php-server": "^7.2",
+         "spatie/laravel-permission": "^6.12",
+         "yajra/laravel-datatables-oracle": "^11.0"
+     },
+
+===== BroadcastServiceProvider =====
+
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class BroadcastServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        //
+    }
+}
+
+===== channels.php =====
+
+<?php
+
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id && $user->can('orders-show');
+});
+
+===== broadcasting.php =====
+
+<?php
+
+return [
+
+    'default' => env('BROADCAST_CONNECTION', 'null'),
+
+    'connections' => [
+
+        'pusher' => [
+            // Pusher free plan approx limits: 200k messages/day, 100 concurrent connections.
+            'driver' => 'pusher',
+            'key' => env('PUSHER_APP_KEY'),
+            'secret' => env('PUSHER_APP_SECRET'),
+            'app_id' => env('PUSHER_APP_ID'),
+            'options' => [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ],
+            'client_options' => [],
+        ],
+
+        'ably' => [
+            'driver' => 'ably',
+            'key' => env('ABLY_KEY'),
+        ],
+
+        'log' => [
+            'driver' => 'log',
+        ],
+
+        'null' => [
+            'driver' => 'null',
+        ],
+
+    ],
+
+];
+
+===== bootstrap/app.php =====
+
+<?php
+
+use App\Http\Middleware\setLocale;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
+        health: '/up',
+        then: function () {
+            Route::middleware('web')
+                ->prefix('admin') // All routes will start with /admin/
+                ->name('admin.')  // Route names will be admin.branches.index
+                ->group(base_path('routes/admin.php'));
+        },
+    )
+    ->withBroadcasting(
+        __DIR__ . '/../routes/channels.php',
+        ['middleware' => ['web', 'auth']],
+    )
+    // ->withMiddleware(function (Middleware $middleware) {
+    //     //
+    // })
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+            if ($request->is('member/dashboard') || $request->is('member/dashboard/*')) {
+                return route('frontend.member.login');
+            }
+
+            return route('login');
+        });
+        $middleware->web(append: [
+            setLocale::class,
+        ]);
+        $middleware->validateCsrfTokens(except: [
+            'payment/*',
+        ]);
+        $middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'setLocale' => \App\Http\Middleware\setLocale::class,
+            'user.active' => \App\Http\Middleware\EnsureUserIsActive::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();
+
+  GET|POST|HEAD       broadcasting/auth ................... Illuminate\Broadcasting ΓÇ║ BroadcastController@authenticate
+                      Γçé web
+                      Γçé auth
+
+                                                                                                    Showing [1] routes
+
+

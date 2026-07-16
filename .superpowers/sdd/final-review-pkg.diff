@@ -1,0 +1,888 @@
+# Final branch review package
+Base: d85178f7a8e74eddb8f9f6b7369c4798f1aa88d9
+Head: WORKING_TREE feature/admin-order-notifications
+
+## Stat (feature files)
+
+ M .env.example
+ M app/Http/Controllers/Frontend/HomeController.php
+ M app/Http/Controllers/Frontend/PaymentController.php
+ M app/Http/Controllers/NotificationController.php
+ M app/Models/User.php
+ M bootstrap/app.php
+ M bootstrap/providers.php
+ M composer.json
+ M resources/views/components/admin-master.blade.php
+ M resources/views/components/header.blade.php
+ M routes/web.php
+?? app/Notifications/
+?? app/Providers/BroadcastServiceProvider.php
+?? app/Support/NotifyAdminsOfNewOrder.php
+?? config/broadcasting.php
+?? public/assets/css/admin-notifications.css
+?? public/js/admin-notifications.js
+?? public/sounds/
+?? routes/channels.php
+?? tests/Feature/NewOrderNotificationTest.php
+
+## Diff tracked
+
+diff --git a/.env.example b/.env.example
+index 100a1cc..1d1703d 100644
+--- a/.env.example
++++ b/.env.example
+@@ -34,9 +34,17 @@ SESSION_ENCRYPT=false
+ SESSION_PATH=/
+ SESSION_DOMAIN=null
+ 
+-BROADCAST_CONNECTION=log
++BROADCAST_CONNECTION=pusher
++# Local/dev: use sync so ShouldQueue notifications broadcast immediately.
++# Production: database or redis + run `php artisan queue:work`
++QUEUE_CONNECTION=sync
++
++PUSHER_APP_ID=
++PUSHER_APP_KEY=
++PUSHER_APP_SECRET=
++PUSHER_APP_CLUSTER=ap2
++
+ FILESYSTEM_DISK=local
+-QUEUE_CONNECTION=database
+ 
+ CACHE_STORE=database
+ CACHE_PREFIX=
+diff --git a/app/Http/Controllers/Frontend/HomeController.php b/app/Http/Controllers/Frontend/HomeController.php
+index dd1c4f9..ff2f272 100644
+--- a/app/Http/Controllers/Frontend/HomeController.php
++++ b/app/Http/Controllers/Frontend/HomeController.php
+@@ -17,6 +17,7 @@
+ use App\Models\Setting;
+ use App\Models\SignaturePlatter;
+ use App\Services\SSLCommerzService;
++use App\Support\NotifyAdminsOfNewOrder;
+ use App\Support\OrderRedirect;
+ use Illuminate\Http\Request;
+ use Illuminate\Pagination\LengthAwarePaginator;
+@@ -537,6 +538,8 @@ public function storeOrder(Request $request)
+         if ($request->payment_method === 'cod') {
+             $order->creditMemberPurchase();
+ 
++            NotifyAdminsOfNewOrder::send($order);
++
+             return OrderRedirect::respond(
+                 $request,
+                 $order,
+diff --git a/app/Http/Controllers/Frontend/PaymentController.php b/app/Http/Controllers/Frontend/PaymentController.php
+index 9b54588..57f5361 100644
+--- a/app/Http/Controllers/Frontend/PaymentController.php
++++ b/app/Http/Controllers/Frontend/PaymentController.php
+@@ -5,6 +5,7 @@
+ use App\Http\Controllers\Controller;
+ use App\Models\Order;
+ use App\Services\SSLCommerzService;
++use App\Support\NotifyAdminsOfNewOrder;
+ use App\Support\OrderRedirect;
+ use Illuminate\Http\Request;
+ use Illuminate\Support\Facades\Log;
+@@ -205,6 +206,8 @@ private function markOrderAsPaid(Order $order, array $details): void
+ 
+         $order->creditMemberPurchase();
+ 
++        NotifyAdminsOfNewOrder::send($order);
++
+         $this->sendPaymentConfirmationSms($order);
+     }
+ 
+diff --git a/app/Http/Controllers/NotificationController.php b/app/Http/Controllers/NotificationController.php
+index 7bd130a..c7f3fbe 100644
+--- a/app/Http/Controllers/NotificationController.php
++++ b/app/Http/Controllers/NotificationController.php
+@@ -6,5 +6,27 @@
+ 
+ class NotificationController extends Controller
+ {
+-    //
++    public function index()
++    {
++        abort(404);
++    }
++
++    public function markAsRead(string $id)
++    {
++        abort_unless(auth()->user()->can('orders-show'), 403);
++
++        $notification = auth()->user()->notifications()->where('id', $id)->firstOrFail();
++        $notification->markAsRead();
++
++        return response()->json(['success' => true]);
++    }
++
++    public function markAllAsRead()
++    {
++        abort_unless(auth()->user()->can('orders-show'), 403);
++
++        auth()->user()->unreadNotifications->markAsRead();
++
++        return response()->json(['success' => true]);
++    }
+ }
+diff --git a/app/Models/User.php b/app/Models/User.php
+index ccb1edc..0c58b60 100644
+--- a/app/Models/User.php
++++ b/app/Models/User.php
+@@ -99,4 +99,9 @@ public function posts()
+     {
+         return $this->hasMany(Post::class, 'author_id');
+     }
++
++    public function receivesBroadcastNotificationsOn(): string
++    {
++        return 'App.Models.User.'.$this->id;
++    }
+ }
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 280e889..096f5ac 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -18,6 +18,10 @@
+                 ->group(base_path('routes/admin.php'));
+         },
+     )
++    ->withBroadcasting(
++        __DIR__ . '/../routes/channels.php',
++        ['middleware' => ['web', 'auth']],
++    )
+     // ->withMiddleware(function (Middleware $middleware) {
+     //     //
+     // })
+diff --git a/bootstrap/providers.php b/bootstrap/providers.php
+index 38b258d..71eb0e8 100644
+--- a/bootstrap/providers.php
++++ b/bootstrap/providers.php
+@@ -2,4 +2,5 @@
+ 
+ return [
+     App\Providers\AppServiceProvider::class,
++    App\Providers\BroadcastServiceProvider::class,
+ ];
+diff --git a/composer.json b/composer.json
+index 101cf88..02a6173 100644
+--- a/composer.json
++++ b/composer.json
+@@ -15,6 +15,7 @@
+         "laravel/framework": "^11.39.1",
+         "laravel/tinker": "^2.9",
+         "laravel/ui": "^4.6",
++        "pusher/pusher-php-server": "^7.2",
+         "spatie/laravel-permission": "^6.12",
+         "yajra/laravel-datatables-oracle": "^11.0"
+     },
+diff --git a/resources/views/components/admin-master.blade.php b/resources/views/components/admin-master.blade.php
+index 6ae49e5..e6990dc 100644
+--- a/resources/views/components/admin-master.blade.php
++++ b/resources/views/components/admin-master.blade.php
+@@ -52,6 +52,12 @@
+     @auth
+         @can('orders-show')
+         <link rel="stylesheet" href="{{ asset('assets/css/admin-order-alert.css') }}">
++        <link rel="stylesheet" href="{{ asset('assets/css/admin-notifications.css') }}">
++        <meta name="admin-user-id" content="{{ auth()->id() }}">
++        <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
++        <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
++        <meta name="notify-read-all-url" content="{{ route('notify.readAll') }}">
++        <meta name="notify-read-url-template" content="{{ url('/notifications/__ID__/read') }}">
+         @endcan
+     @endauth
+ 
+@@ -236,6 +242,8 @@
+                 </div>
+             </div>
+         </div>
++        <audio id="adminNotifSound" preload="auto" src="{{ asset('sounds/notification.wav') }}"></audio>
++        <div class="admin-notif-toast-wrap" id="adminNotifToastWrap" aria-live="polite"></div>
+         @endcan
+     @endauth
+     {{-- pri loader --}}
+@@ -482,6 +490,9 @@
+     @auth
+         @can('orders-show')
+         <script src="{{ asset('assets/js/admin-order-alert.js') }}" defer></script>
++        <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
++        <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
++        <script src="{{ asset('js/admin-notifications.js') }}" defer></script>
+         @endcan
+     @endauth
+     @yield('scripts')
+diff --git a/resources/views/components/header.blade.php b/resources/views/components/header.blade.php
+index 315a11e..b133376 100644
+--- a/resources/views/components/header.blade.php
++++ b/resources/views/components/header.blade.php
+@@ -158,7 +158,48 @@ class="mdi mdi-magnify"></i></button>
+                         Cache</button>
+                 </div>
+ 
+-          
++                @can('orders-show')
++                    @php
++                        $adminNotifications = auth()->user()->notifications()->latest()->take(10)->get();
++                        $adminUnreadCount = auth()->user()->unreadNotifications()->count();
++                    @endphp
++                    <div class="dropdown topbar-head-dropdown ms-1 header-item" id="adminNotificationDropdown">
++                        <button type="button"
++                            class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
++                            id="page-header-notifications-dropdown"
++                            data-bs-toggle="dropdown"
++                            data-bs-auto-close="outside"
++                            aria-haspopup="true"
++                            aria-expanded="false">
++                            <i class="bx bx-bell fs-22"></i>
++                            <span class="admin-notif-badge {{ $adminUnreadCount > 0 ? '' : 'is-hidden' }}"
++                                id="adminNotifBadge"
++                                data-count="{{ $adminUnreadCount }}">{{ $adminUnreadCount > 99 ? '99+' : $adminUnreadCount }}</span>
++                        </button>
++                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 admin-notif-dropdown"
++                            aria-labelledby="page-header-notifications-dropdown">
++                            <div class="admin-notif-header">
++                                <span class="fw-semibold">Notifications</span>
++                                <button type="button" class="btn btn-sm btn-link p-0" id="adminNotifMarkAll">Mark all as read</button>
++                            </div>
++                            <div class="admin-notif-list" id="adminNotifList">
++                                @forelse ($adminNotifications as $notification)
++                                    @php $data = $notification->data; @endphp
++                                    <div class="admin-notif-item {{ $notification->read_at ? '' : 'unread' }}"
++                                        data-id="{{ $notification->id }}"
++                                        role="button"
++                                        tabindex="0">
++                                        <div class="fw-medium">Order #{{ $data['order_id'] ?? 'G��' }}</div>
++                                        <div class="text-muted fs-12">{{ $data['message'] ?? '' }}</div>
++                                        <div class="text-muted fs-11">{{ $notification->created_at->diffForHumans() }}</div>
++                                    </div>
++                                @empty
++                                    <div class="admin-notif-empty" id="adminNotifEmpty">No notifications yet</div>
++                                @endforelse
++                            </div>
++                        </div>
++                    </div>
++                @endcan
+ 
+                 <div class="ms-1 header-item d-none d-sm-flex">
+                     <button type="button"
+diff --git a/routes/web.php b/routes/web.php
+index 2c06f99..991a7e2 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -101,9 +101,15 @@
+     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+ 
+     # Notifications
+-    Route::controller(NotificationController::class)->prefix('notifications/')->name('notify.')->group(function () {
+-        Route::get('/', 'index')->name('index');
+-    });
++    Route::controller(NotificationController::class)
++        ->prefix('notifications')
++        ->name('notify.')
++        ->middleware('can:orders-show')
++        ->group(function () {
++            Route::get('/', 'index')->name('index');
++            Route::post('read-all', 'markAllAsRead')->name('readAll');
++            Route::post('{id}/read', 'markAsRead')->name('read');
++        });
+ 
+     Route::resource('users', UserController::class)->except(['show']);
+ 
+
+===== FILE config/broadcasting.php =====
+
+<?php
+
+return [
+
+    'default' => env('BROADCAST_CONNECTION', 'null'),
+
+    'connections' => [
+
+        'pusher' => [
+            // Pusher free plan approx limits: 200k messages/day, 100 concurrent connections.
+            'driver' => 'pusher',
+            'key' => env('PUSHER_APP_KEY'),
+            'secret' => env('PUSHER_APP_SECRET'),
+            'app_id' => env('PUSHER_APP_ID'),
+            'options' => [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ],
+            'client_options' => [],
+        ],
+
+        'ably' => [
+            'driver' => 'ably',
+            'key' => env('ABLY_KEY'),
+        ],
+
+        'log' => [
+            'driver' => 'log',
+        ],
+
+        'null' => [
+            'driver' => 'null',
+        ],
+
+    ],
+
+];
+
+===== FILE routes/channels.php =====
+
+<?php
+
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id && $user->can('orders-show');
+});
+
+===== FILE app/Providers/BroadcastServiceProvider.php =====
+
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class BroadcastServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        //
+    }
+}
+
+===== FILE app/Notifications/NewOrderNotification.php =====
+
+<?php
+
+namespace App\Notifications;
+
+use App\Models\Order;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
+
+class NewOrderNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(public Order $order)
+    {
+    }
+
+    public function via(object $notifiable): array
+    {
+        return ['database', 'broadcast'];
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        return $this->payload();
+    }
+
+    public function toDatabase(object $notifiable): array
+    {
+        return $this->payload();
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->payload());
+    }
+
+    public function broadcastType(): string
+    {
+        return 'new-order-notification';
+    }
+
+    private function payload(): array
+    {
+        return [
+            'order_id' => $this->order->id,
+            'message' => 'নতুন অর্ডার এসেছে',
+            'created_at' => now()->toIso8601String(),
+        ];
+    }
+}
+
+===== FILE app/Support/NotifyAdminsOfNewOrder.php =====
+
+<?php
+
+namespace App\Support;
+
+use App\Models\Order;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+use Illuminate\Support\Facades\Notification;
+
+class NotifyAdminsOfNewOrder
+{
+    public static function send(Order $order): void
+    {
+        $admins = User::permission('orders-show')->get();
+
+        if ($admins->isEmpty()) {
+            return;
+        }
+
+        Notification::send($admins, new NewOrderNotification($order));
+    }
+}
+
+===== FILE public/js/admin-notifications.js =====
+
+(function () {
+    'use strict';
+
+    const userIdMeta = document.querySelector('meta[name="admin-user-id"]');
+    const keyMeta = document.querySelector('meta[name="pusher-key"]');
+    const clusterMeta = document.querySelector('meta[name="pusher-cluster"]');
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+
+    const listEl = document.getElementById('adminNotifList');
+    const badgeEl = document.getElementById('adminNotifBadge');
+    const markAllBtn = document.getElementById('adminNotifMarkAll');
+    const toastWrap = document.getElementById('adminNotifToastWrap');
+    const audioEl = document.getElementById('adminNotifSound');
+
+    if (!listEl && !badgeEl && !markAllBtn) {
+        return;
+    }
+
+    const readAllUrl = document.querySelector('meta[name="notify-read-all-url"]')?.content;
+    const readUrlTemplate = document.querySelector('meta[name="notify-read-url-template"]')?.content;
+
+    let soundEnabled = false;
+
+    document.addEventListener('click', function () {
+        soundEnabled = true;
+    }, { once: true });
+
+    function playSound() {
+        if (!soundEnabled || !audioEl) {
+            return;
+        }
+
+        try {
+            audioEl.currentTime = 0;
+            const promise = audioEl.play();
+            if (promise && typeof promise.catch === 'function') {
+                promise.catch(function () {});
+            }
+        } catch (error) {}
+    }
+
+    function setBadge(count) {
+        if (!badgeEl) {
+            return;
+        }
+
+        const normalizedCount = Math.max(0, count);
+        badgeEl.dataset.count = String(normalizedCount);
+        badgeEl.textContent = normalizedCount > 99 ? '99+' : String(normalizedCount);
+        badgeEl.classList.toggle('is-hidden', normalizedCount === 0);
+    }
+
+    function getBadgeCount() {
+        return parseInt(badgeEl?.dataset.count || '0', 10) || 0;
+    }
+
+    function showToast(message) {
+        if (!toastWrap) {
+            return;
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'admin-notif-toast';
+        toast.textContent = message;
+        toastWrap.appendChild(toast);
+        setTimeout(function () {
+            toast.remove();
+        }, 4500);
+    }
+
+    function removeEmptyState() {
+        const empty = document.getElementById('adminNotifEmpty');
+        if (empty) {
+            empty.remove();
+        }
+    }
+
+    function trimListToTen() {
+        if (!listEl) {
+            return;
+        }
+
+        const items = listEl.querySelectorAll('.admin-notif-item');
+        for (let index = 10; index < items.length; index++) {
+            items[index].remove();
+        }
+    }
+
+    function escapeHtml(value) {
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function timeAgo(iso) {
+        const timestamp = new Date(iso).getTime();
+        if (Number.isNaN(timestamp)) {
+            return 'just now';
+        }
+
+        const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+        if (seconds < 60) return 'just now';
+        if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';
+        if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+
+        return Math.floor(seconds / 86400) + ' days ago';
+    }
+
+    function prependNotification(payload) {
+        if (!listEl) {
+            return;
+        }
+
+        removeEmptyState();
+
+        const item = document.createElement('div');
+        item.className = 'admin-notif-item unread';
+        item.dataset.id = payload.id || '';
+        item.setAttribute('role', 'button');
+        item.tabIndex = 0;
+
+        const orderId = payload.order_id ?? '—';
+        const message = payload.message || 'নতুন অর্ডার এসেছে';
+        const when = payload.created_at ? timeAgo(payload.created_at) : 'just now';
+
+        item.innerHTML =
+            '<div class="fw-medium">Order #' + escapeHtml(String(orderId)) + '</div>' +
+            '<div class="text-muted fs-12">' + escapeHtml(message) + '</div>' +
+            '<div class="text-muted fs-11">' + escapeHtml(when) + '</div>';
+
+        item.addEventListener('click', function () {
+            markOneRead(item);
+        });
+
+        listEl.insertBefore(item, listEl.firstChild);
+        trimListToTen();
+    }
+
+    function postJson(url) {
+        if (!csrfMeta) {
+            return Promise.reject(new Error('Missing CSRF token'));
+        }
+
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfMeta.content,
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        }).then(function (response) {
+            if (!response.ok) {
+                throw new Error('Request failed');
+            }
+
+            return response.json();
+        });
+    }
+
+    function markOneRead(item) {
+        const id = item.dataset.id;
+        if (!id || !readUrlTemplate || item.classList.contains('is-reading')) {
+            return;
+        }
+
+        if (!item.classList.contains('unread')) {
+            return;
+        }
+
+        item.classList.add('is-reading');
+        const url = readUrlTemplate.replace('__ID__', encodeURIComponent(id));
+        postJson(url)
+            .then(function () {
+                item.classList.remove('unread', 'is-reading');
+                setBadge(getBadgeCount() - 1);
+            })
+            .catch(function () {
+                item.classList.remove('is-reading');
+            });
+    }
+
+    if (listEl) {
+        listEl.querySelectorAll('.admin-notif-item').forEach(function (item) {
+            item.addEventListener('click', function () {
+                markOneRead(item);
+            });
+        });
+    }
+
+    if (markAllBtn && readAllUrl) {
+        markAllBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            postJson(readAllUrl)
+                .then(function () {
+                    listEl?.querySelectorAll('.admin-notif-item.unread').forEach(function (item) {
+                        item.classList.remove('unread');
+                    });
+                    setBadge(0);
+                })
+                .catch(function () {});
+        });
+    }
+
+    const userId = userIdMeta?.content;
+    const pusherKey = keyMeta?.content;
+    if (!userId || !pusherKey || !csrfMeta) {
+        return;
+    }
+
+    const EchoConstructor = typeof window.Echo === 'function'
+        ? window.Echo
+        : window.Echo?.default;
+
+    if (!window.Pusher || typeof EchoConstructor !== 'function') {
+        return;
+    }
+
+    window.Echo = new EchoConstructor({
+        broadcaster: 'pusher',
+        key: pusherKey,
+        cluster: clusterMeta?.content || 'mt1',
+        forceTLS: true,
+        authEndpoint: '/broadcasting/auth',
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': csrfMeta.content,
+            },
+        },
+    });
+
+    window.Echo.private('App.Models.User.' + userId)
+        .notification(function (notification) {
+            const type = notification.type || '';
+            if (type !== 'new-order-notification' && !type.includes('NewOrderNotification')) {
+                return;
+            }
+
+            prependNotification({
+                id: notification.id,
+                order_id: notification.order_id,
+                message: notification.message,
+                created_at: notification.created_at,
+            });
+            setBadge(getBadgeCount() + 1);
+            showToast(notification.message || 'নতুন অর্ডার এসেছে');
+            playSound();
+        });
+})();
+
+===== FILE public/assets/css/admin-notifications.css =====
+
+#adminNotificationDropdown > .btn {
+  position: relative;
+}
+
+.admin-notif-dropdown {
+  width: 320px;
+  max-height: 420px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+}
+
+.admin-notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vz-border-color, #e9ebec);
+}
+
+.admin-notif-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.admin-notif-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.admin-notif-item.unread {
+  background: rgba(64, 81, 137, 0.06);
+}
+
+.admin-notif-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.admin-notif-empty {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: #878a99;
+  font-size: 0.875rem;
+}
+
+.admin-notif-badge {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 50rem;
+  background: #f06548;
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.admin-notif-badge.is-hidden {
+  display: none !important;
+}
+
+.admin-notif-toast-wrap {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1090;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.admin-notif-toast {
+  min-width: 260px;
+  max-width: 360px;
+  padding: 0.85rem 1rem;
+  border-radius: 0.4rem;
+  background: #212529;
+  color: #fff;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+  animation: adminNotifSlideIn 0.25s ease-out;
+  pointer-events: auto;
+}
+
+@keyframes adminNotifSlideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+===== FILE tests/Feature/NewOrderNotificationTest.php =====
+
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Order;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+use App\Support\NotifyAdminsOfNewOrder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Spatie\Permission\Models\Permission;
+use Tests\TestCase;
+
+class NewOrderNotificationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_notify_admins_sends_to_users_with_orders_show_only(): void
+    {
+        Permission::findOrCreate('orders-show', 'web');
+
+        $admin = User::factory()->create(['status' => true]);
+        $admin->givePermissionTo('orders-show');
+
+        $other = User::factory()->create(['status' => true]);
+
+        $order = Order::create([
+            'customer_name' => 'Test Customer',
+            'customer_phone' => '01700000000',
+            'customer_address' => 'Test Address',
+            'payment_method' => 'cod',
+            'status' => 'pending',
+            'total_amount' => 100.00,
+            'final_amount' => 100.00,
+        ]);
+
+        Notification::fake();
+
+        NotifyAdminsOfNewOrder::send($order);
+
+        Notification::assertSentTo($admin, NewOrderNotification::class);
+        Notification::assertNotSentTo($other, NewOrderNotification::class);
+    }
+
+    public function test_admin_can_mark_notification_read(): void
+    {
+        Permission::findOrCreate('orders-show', 'web');
+        $admin = User::factory()->create(['status' => true]);
+        $admin->givePermissionTo('orders-show');
+
+        $admin->notify(new NewOrderNotification(
+            Order::query()->first() ?? $this->makeOrder()
+        ));
+
+        $notification = $admin->notifications()->first();
+
+        $this->actingAs($admin)
+            ->postJson(route('notify.read', $notification->id))
+            ->assertOk()
+            ->assertJson(['success' => true]);
+
+        $this->assertNotNull($notification->fresh()->read_at);
+    }
+
+    public function test_admin_can_mark_all_notifications_read(): void
+    {
+        Permission::findOrCreate('orders-show', 'web');
+        $admin = User::factory()->create(['status' => true]);
+        $admin->givePermissionTo('orders-show');
+        $order = Order::query()->first() ?? $this->makeOrder();
+
+        $admin->notify(new NewOrderNotification($order));
+        $admin->notify(new NewOrderNotification($order));
+
+        $this->actingAs($admin)
+            ->postJson(route('notify.readAll'))
+            ->assertOk();
+
+        $this->assertSame(0, $admin->unreadNotifications()->count());
+    }
+
+    private function makeOrder(): Order
+    {
+        return Order::create([
+            'customer_name' => 'Test Customer',
+            'customer_phone' => '01700000000',
+            'customer_address' => 'Test Address',
+            'payment_method' => 'cod',
+            'status' => 'pending',
+            'total_amount' => 100.00,
+            'final_amount' => 100.00,
+        ]);
+    }
+}
