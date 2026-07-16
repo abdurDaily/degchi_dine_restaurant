@@ -3,17 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\UserSeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CurrencySettingSeeder;
-use Database\Seeders\UsersPermissionSeeder;
-use Database\Seeders\SettingPermissionSeeder;
 use Database\Seeders\MenuSeeder;
-use Database\Seeders\SignaturePlatterSeeder;
+use Database\Seeders\OrderSeeder;
 use Database\Seeders\ReviewSeeder;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\SettingPermissionSeeder;
+use Database\Seeders\SignaturePlatterSeeder;
+use Database\Seeders\UserSeeder;
+use Database\Seeders\UsersPermissionSeeder;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
                 CurrencySeeder::class,
                 CurrencyPermissionSeeder::class,
                 CurrencySettingSeeder::class,
+                OrderSeeder::class,
                 MenuSeeder::class,
                 SignaturePlatterSeeder::class,
                 ReviewSeeder::class,

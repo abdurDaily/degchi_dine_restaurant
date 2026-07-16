@@ -18,25 +18,73 @@
         --brand-red: #0d5566;
     }
 
+    /* Hero — centered heritage style */
     .blog-detail-header {
-        background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+        background:
+            radial-gradient(ellipse 70% 60% at 50% 45%, rgba(17, 107, 131, 0.45) 0%, transparent 70%),
+            linear-gradient(180deg, #0d5a6e 0%, #083844 55%, #062a33 100%);
         color: #fff;
-        padding: 3rem 0;
-        margin-bottom: 2rem;
+        padding: 4.5rem 1.5rem 4rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+    }
+
+    .blog-detail-header-inner {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .blog-detail-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.92);
+        margin-bottom: 1.15rem;
+    }
+
+    .blog-detail-eyebrow svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+        flex-shrink: 0;
     }
 
     .blog-detail-title {
-        font-size: 2.5rem;
+        font-size: clamp(1.85rem, 4.5vw, 2.75rem);
         font-weight: 700;
-        margin-bottom: 1rem;
+        line-height: 1.2;
+        margin: 0 0 1rem;
+        color: #fff;
+        letter-spacing: -0.02em;
+    }
+
+    .blog-detail-lead {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 560px;
+        margin: 0 auto 1.5rem;
+        font-weight: 400;
     }
 
     .blog-detail-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.5rem;
-        font-size: 0.95rem;
-        opacity: 0.9;
+        justify-content: center;
+        gap: 0.75rem 1.5rem;
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.72);
+    }
+
+    .blog-detail-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
     }
 
     .blog-detail-content {
@@ -52,90 +100,342 @@
         margin: 1.5rem 0;
     }
 
-    /* Comments */
-    .comment-wrapper {
-        background: #fff;
-        border-radius: 12px;
+    /* Featured image / placeholder */
+    .blog-featured-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 16px;
+        display: block;
+    }
+
+    .blog-image-placeholder {
+        width: 100%;
+        min-height: 320px;
+        max-height: 500px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        background:
+            linear-gradient(135deg, rgba(17, 107, 131, 0.08) 0%, rgba(231, 174, 7, 0.12) 100%),
+            linear-gradient(135deg, #e8f4f7 0%, #cfe4eb 100%);
+        border: 1px dashed rgba(17, 107, 131, 0.25);
+        color: var(--brand);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .blog-image-placeholder::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 20% 30%, rgba(231, 174, 7, 0.18) 0%, transparent 45%),
+            radial-gradient(circle at 80% 70%, rgba(17, 107, 131, 0.15) 0%, transparent 40%);
+        pointer-events: none;
+    }
+
+    .blog-image-placeholder-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 16px rgba(17, 107, 131, 0.12);
+        position: relative;
+        z-index: 1;
+    }
+
+    .blog-image-placeholder-icon svg {
+        width: 36px;
+        height: 36px;
+        stroke: var(--brand);
+        fill: none;
+        stroke-width: 1.5;
+    }
+
+    .blog-image-placeholder-label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        opacity: 0.85;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Comments panel — reference card UI */
+    .comments-panel {
+        margin-top: 2.5rem;
         padding: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid rgba(17, 107, 131, 0.08);
+        box-shadow: 0 12px 40px rgba(17, 107, 131, 0.08);
+    }
+
+    .comments-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .comments-section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 1.25rem;
+        margin: 0;
+    }
+
+    .comments-section-title .count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.85rem;
+        height: 1.6rem;
+        padding: 0 0.55rem;
+        border-radius: 999px;
+        background: var(--brand);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .comment-composer {
+        background: #f8fafb;
+        border: 1px solid #e6ecef;
+        border-radius: 16px;
+        padding: 1rem 1.1rem 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .comment-composer textarea {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0.35rem 0.15rem 0.75rem;
+        min-height: 72px;
+        resize: vertical;
+        width: 100%;
+        font-size: 0.95rem;
+        color: #2d2d2d;
+    }
+
+    .comment-composer textarea:focus {
+        outline: none;
+        box-shadow: none;
+        border: none;
+    }
+
+    .comment-composer-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding-top: 0.35rem;
+        border-top: 1px solid #e8eef1;
+    }
+
+    .comment-composer .btn-post {
+        background: var(--brand);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 1.35rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .comment-composer .btn-post:hover {
+        background: var(--brand-dark);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .login-to-comment {
+        background: linear-gradient(135deg, rgba(17, 107, 131, 0.08), rgba(231, 174, 7, 0.1));
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--brand);
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(17, 107, 131, 0.12);
+    }
+
+    .comment-wrapper {
+        background: transparent;
+        border-radius: 0;
+        padding: 1.15rem 0;
+        border: none;
+        border-bottom: 1px solid #eef2f4;
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+
+    .comment-wrapper:last-child {
+        border-bottom: none;
     }
 
     .comment-wrapper:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        box-shadow: none;
+        border-color: #eef2f4;
     }
 
     .comment-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: var(--brand-teal-light);
+        background: linear-gradient(135deg, #d4e8ee, #c5dde5);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--brand);
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
         flex-shrink: 0;
+        text-transform: uppercase;
     }
 
     .comment-content {
         flex: 1;
+        min-width: 0;
+    }
+
+    .comment-meta-row {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.65rem;
+        margin-bottom: 0.35rem;
     }
 
     .comment-author {
-        font-weight: 600;
+        font-weight: 700;
         color: #1a1a1a;
-        margin-bottom: 0.25rem;
-    }
-
-    .comment-text {
-        color: #4a4a4a;
-        line-height: 1.6;
-        margin-bottom: 0.5rem;
+        margin: 0;
+        font-size: 0.92rem;
     }
 
     .comment-time {
-        font-size: 0.8rem;
-        color: #6c757d;
+        font-size: 0.78rem;
+        color: #9aa3ab;
+        margin: 0;
+    }
+
+    .comment-text {
+        color: #3a4148;
+        line-height: 1.6;
+        margin: 0 0 0.65rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.94rem;
     }
 
     .comment-actions {
         display: flex;
-        gap: 1rem;
-        margin-top: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.15rem 0.85rem;
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
     }
 
     .comment-action-btn {
         background: none;
         border: none;
-        color: #6c757d;
-        font-size: 0.85rem;
+        color: #7a848e;
+        font-size: 0.82rem;
         cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 0.25rem 0.5rem;
+        transition: color 0.2s ease;
+        padding: 0.2rem 0.15rem;
         border-radius: 4px;
         display: inline-flex;
         align-items: center;
-        gap: 0.25rem;
+        gap: 0.35rem;
+        line-height: 1;
+    }
+
+    .comment-action-btn svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .comment-action-btn .reaction-count {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        min-width: 0.75rem;
+        color: inherit;
     }
 
     .comment-action-btn:hover {
-        background: var(--brand-teal-light);
+        background: none;
         color: var(--brand);
     }
 
     .comment-action-btn.liked {
         color: var(--brand);
+        background: none;
+        border: none;
+    }
+
+    .comment-action-btn.liked svg {
+        fill: currentColor;
+        stroke: currentColor;
     }
 
     .comment-action-btn.disliked {
-        color: var(--brand-red);
+        color: #b42318;
+        background: none;
+        border: none;
+    }
+
+    .comment-action-btn.disliked svg {
+        fill: currentColor;
+        stroke: currentColor;
+    }
+
+    .reply-btn {
+        color: var(--brand);
+        cursor: pointer;
+        font-size: 0.82rem;
+        font-weight: 600;
+        background: none;
+        border: none;
+        padding: 0.2rem 0.15rem;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        white-space: nowrap;
+    }
+
+    .reply-btn:hover {
+        background: none;
+        text-decoration: underline;
+        color: var(--brand-dark);
     }
 
     .reply-form {
-        margin-top: 1rem;
-        padding-left: 2rem;
+        margin-top: 0.85rem;
         display: none;
     }
 
@@ -143,41 +443,41 @@
         display: block;
     }
 
-    .reply-btn {
-        color: var(--brand);
-        cursor: pointer;
-        font-size: 0.85rem;
-        font-weight: 500;
-        background: none;
-        border: none;
-        padding: 0;
+    .reply-form .comment-form,
+    .reply-form .comment-composer {
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
-    .reply-btn:hover {
-            text-decoration: underline;
-        }
-
     .nested-comment {
-        margin-left: 2.5rem;
-        padding-left: 1.5rem;
-        border-left: 2px solid var(--brand-teal-light);
+        margin-left: 1.15rem;
+        margin-top: 0.25rem;
+        padding-left: 1.15rem;
+        border-left: 2px solid #e6ecef;
+        position: relative;
+    }
+
+    .nested-comment > .comment-wrapper {
+        background: transparent;
     }
 
     .comment-form {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-top: 2rem;
+        background: #f8fafb;
+        border-radius: 16px;
+        padding: 1rem 1.1rem;
+        margin-top: 0;
+        border: 1px solid #e6ecef;
     }
 
     .comment-form textarea {
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        padding: 0.75rem;
+        border-radius: 10px;
+        border: 1px solid #dce4e8;
+        padding: 0.75rem 0.9rem;
         resize: vertical;
-        min-height: 100px;
-        transition: all 0.3s ease;
+        min-height: 80px;
+        transition: all 0.25s ease;
         width: 100%;
+        background: #fff;
     }
 
     .comment-form textarea:focus {
@@ -189,15 +489,15 @@
     .btn-primary {
         background: var(--brand);
         border: none;
-        padding: 0.625rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-weight: 600;
+        transition: all 0.25s ease;
     }
 
     .btn-primary:hover {
         background: var(--brand-dark);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(17, 107, 131, 0.3);
     }
 
@@ -209,69 +509,71 @@
         background: #e9ecef;
         border: none;
         color: #495057;
-        padding: 0.625rem 1.5rem;
-        border-radius: 8px;
+        padding: 0.5rem 1.15rem;
+        border-radius: 999px;
         font-weight: 500;
-        transition: all 0.3s ease;
+        transition: all 0.25s ease;
     }
 
     .btn-secondary:hover {
         background: #dee2e6;
     }
 
-    .login-to-comment {
-        background: var(--brand-teal-light);
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        color: var(--brand);
-        font-weight: 500;
-    }
-
     @media (max-width: 768px) {
-        .blog-detail-title {
-            font-size: 1.8rem;
+        .blog-detail-header {
+            padding: 3.25rem 1rem 2.75rem;
         }
-        
+
+        .blog-detail-lead {
+            font-size: 0.95rem;
+        }
+
+        .blog-image-placeholder {
+            min-height: 220px;
+        }
+
+        .comments-panel {
+            padding: 1.1rem;
+            border-radius: 16px;
+        }
+
         .nested-comment {
-            margin-left: 1rem;
+            margin-left: 0.35rem;
             padding-left: 0.75rem;
-        }
-        
-        .reply-form {
-            padding-left: 1rem;
         }
     }
 </style>
 @endpush
 
-@section('content')
+@section('frontend_content')
+@php
+    $heroLead = \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($post->content))), 140);
+@endphp
 <!-- Header -->
 <div class="blog-detail-header">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <h1 class="blog-detail-title">{{ $post->title }}</h1>
-                <div class="blog-detail-meta">
-                    <span>
-                        <i class="ri-user-line"></i> 
-                        {{ $post->author?->name ?? 'Unknown' }}
-                    </span>
-                    <span>
-                        <i class="ri-calendar-line"></i> 
-                        {{ $post->created_at->format('M d, Y') }}
-                    </span>
-                    <span>
-                        <i class="ri-eye-line"></i> 
-                        {{ number_format($post->view_count) }} views
-                    </span>
-                    @if($post->blogCategory)
-                        <span>
-                            <i class="ri-price-tag-3-line"></i> 
-                            {{ $post->blogCategory->name }}
-                        </span>
-                    @endif
-                </div>
+        <div class="blog-detail-header-inner py-5">
+            <div class="blog-detail-eyebrow">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                {{ $post->blogCategory?->name ?? 'Our Stories' }}
+            </div>
+            <h1 class="blog-detail-title">{{ $post->title }}</h1>
+           
+            <div class="blog-detail-meta">
+                <span>
+                    <i class="ri-user-line"></i>
+                    {{ $post->author?->name ?? 'Unknown' }}
+                </span>
+                <span>
+                    <i class="ri-calendar-line"></i>
+                    {{ $post->created_at->format('M d, Y') }}
+                </span>
+                <span>
+                    <i class="ri-eye-line"></i>
+                    {{ number_format($post->view_count) }} views
+                </span>
             </div>
         </div>
     </div>
@@ -281,14 +583,24 @@
     <div class="row">
         <div class="col-lg-10 mx-auto">
             <!-- Featured Image -->
-            @if($post->image_url)
-                <div class="mb-4">
-                    <img src="{{ $post->image_url }}" 
-                         alt="{{ $post->title }}" 
-                         class="img-fluid rounded" 
-                         style="width: 100%; max-height: 500px; object-fit: cover;">
-                </div>
-            @endif
+            <div class="mb-4">
+                @if($post->image_url)
+                    <img src="{{ $post->image_url }}"
+                         alt="{{ $post->title }}"
+                         class="blog-featured-image">
+                @else
+                    <div class="blog-image-placeholder" aria-hidden="true">
+                        <div class="blog-image-placeholder-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                                <circle cx="8.5" cy="10" r="1.5"/>
+                                <path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.12 0L6 18"/>
+                            </svg>
+                        </div>
+                        <span class="blog-image-placeholder-label">No featured image</span>
+                    </div>
+                @endif
+            </div>
 
             <!-- Content -->
             <div class="blog-detail-content">
@@ -305,15 +617,15 @@
                                 <div class="blog-card">
                                     <div class="blog-card-image-wrapper">
                                         @if($related->image_url)
-                                            <img src="{{ $related->image_url }}" 
-                                                 alt="{{ $related->title }}" 
-                                                 class="blog-card-image" 
+                                            <img src="{{ $related->image_url }}"
+                                                 alt="{{ $related->title }}"
+                                                 class="blog-card-image"
                                                  style="height: 150px;">
                                         @endif
                                     </div>
                                     <div class="blog-card-body" style="padding: 1rem;">
-                                        <a href="{{ route('frontend.blog.show', $related->slug) }}" 
-                                           class="blog-card-title" 
+                                        <a href="{{ route('frontend.blog.show', $related->slug) }}"
+                                           class="blog-card-title"
                                            style="font-size: 0.95rem;">
                                             {{ $related->title }}
                                         </a>
@@ -326,45 +638,45 @@
             @endif
 
             <!-- Comments Section -->
-            <div class="mt-5 pt-4 border-top">
-                <h4 class="mb-4">
-                    Comments ({{ $post->allComments->where('is_active', true)->count() }})
-                </h4>
+            <div class="comments-panel">
+                <div class="comments-header">
+                    <h4 class="comments-section-title">
+                        Comments
+                        <span class="count-badge">{{ $post->allComments->where('is_active', true)->count() }}</span>
+                    </h4>
+                </div>
 
                 @if(!$post->comments_enabled)
-                    <div class="alert alert-warning">
+                    <div class="alert alert-warning mb-0">
                         <i class="ri-chat-off-line me-2"></i>
                         Comments are disabled for this post.
                     </div>
                 @else
-                    <!-- Comment Form -->
                     @auth('member')
-                        <div class="comment-form">
-                            <h5 class="mb-3">Leave a Comment</h5>
+                        <div class="comment-composer">
                             <form id="commentForm" data-post-slug="{{ $post->slug }}">
                                 @csrf
-                                <div class="mb-3">
-                                    <textarea name="comment" class="form-control" rows="4" 
-                                              placeholder="Write your comment..." required></textarea>
+                                <textarea name="comment" class="form-control" rows="3"
+                                          placeholder="Share your mind..." required></textarea>
+                                <div class="comment-composer-footer">
+                                    <button type="submit" class="btn btn-post">Post</button>
                                 </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="ri-send-plane-line me-2"></i>Post Comment
-                                </button>
                             </form>
                         </div>
                     @else
                         <div class="login-to-comment">
                             <i class="ri-login-box-line fs-4 d-block mb-2"></i>
-                            Please <a href="{{ route('frontend.member.login') }}" class="text-decoration-none fw-bold" 
+                            Please <a href="{{ route('frontend.member.login') }}" class="text-decoration-none fw-bold"
                                        style="color: var(--brand);">login as member</a> to comment
                         </div>
                     @endauth
 
-                    <!-- Comments List -->
-                    <div id="commentsContainer" class="mt-4">
-                        @foreach($post->comments as $comment)
+                    <div id="commentsContainer">
+                        @forelse($post->comments as $comment)
                             @include('frontend.blog.partials.comment', ['comment' => $comment, 'postSlug' => $post->slug])
-                        @endforeach
+                        @empty
+                            <p class="comments-empty text-muted text-center py-3 mb-0" style="font-size: 0.95rem;">No comments yet. Be the first to share your thoughts.</p>
+                        @endforelse
                     </div>
                 @endif
             </div>
@@ -416,6 +728,7 @@
             e.preventDefault();
             const form = $(this);
             postComment(form.data('post-slug'), form.find('textarea[name="comment"]').val(), null, function(response) {
+                $('#commentsContainer .comments-empty').remove();
                 $('#commentsContainer').prepend(response.comment);
                 form.find('textarea[name="comment"]').val('');
             });

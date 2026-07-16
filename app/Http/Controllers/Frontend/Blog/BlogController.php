@@ -15,16 +15,16 @@ class BlogController extends Controller
     public function index()
     {
         $posts = Post::query()
-        ->with(['blogCategory', 'author'])
-        ->published()
-        ->latest()
-        ->paginate(12);
-        
+            ->with(['blogCategory', 'author'])
+            ->published()
+            ->latest()
+            ->paginate(12);
+
         $categories = BlogCategory::query()
-        ->where('is_active', true)
-        ->orderBy('name', 'asc')
-        ->get();
-        
+            ->where('is_active', true)
+            ->orderBy('name', 'asc')
+            ->get();
+
         return view('frontend.blog.blogIndex', compact('posts', 'categories'));
     }
 
@@ -34,12 +34,17 @@ class BlogController extends Controller
             ->with([
                 'blogCategory',
                 'author',
-                'comments.member',
-                'comments.reactions',
-                'comments.replies.member',
-                'comments.replies.reactions',
-                'comments.replies.replies.member',
-                'comments.replies.replies.reactions',
+                'comments' => function ($q) {
+                    $q->where('is_active', true)
+                        ->with([
+                            'member',
+                            'reactions',
+                            'replies' => function ($q) {
+                                $q->where('is_active', true)
+                                    ->with(['member', 'reactions']);
+                            },
+                        ]);
+                },
             ])
             ->where('slug', $slug)
             ->published()

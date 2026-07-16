@@ -121,6 +121,7 @@ class MenuController extends Controller
 
         try {
             return DB::transaction(function () use ($request) {
+                // dd($request->all());
                 // Create Parent
                 $menu = Menu::create([
                     'category_id' => $request->category_id,
@@ -133,13 +134,18 @@ class MenuController extends Controller
                 // Create Children (Variations)
                 foreach ($request->variations as $index => $vData) {
                     $imagePath = null;
-                    if ($request->hasFile("variations.$index.image")) {
+                    
+                    if (isset($request->variations[$index]['image'])) {
                         $file = $request->file("variations.$index.image");
                         $imageName = time().'_'.$index.'.'.$file->extension();
-                        $file->move(public_path('uploads/menus/variations'), $imageName);
-                        $imagePath = 'uploads/menus/variations/'.$imageName;
+                        // $file->move(public_path('uploads/menus/variations'), $imageName);
+                        // $imagePath = 'uploads/menus/variations/'.$imageName;
+                        $file->store('menus/variations', 'public');
+                        dd($file);
+                        $imagePath = 'storage/menus/variations/'.$imageName;
                     }
 
+                    // dd($imagePath);
                     $menu->variations()->create([
                         'name' => $vData['name'],
                         'price' => $vData['price'],

@@ -23,7 +23,8 @@
     :type="$pageMetaType ?: null"
     :canonical="$pageMetaCanonical ?: null"
   />
-
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('assets/frontend/images/logo.webp') }}">
   <link
     href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
     rel="stylesheet" />

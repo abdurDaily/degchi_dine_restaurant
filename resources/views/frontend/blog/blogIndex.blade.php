@@ -2,26 +2,60 @@
 
 @section('meta_title', 'Blog')
 @section('meta_robots', 'index, follow')
-
+ 
 @push('front_css')
 <style>
     .blog-page-hero {
-        background: linear-gradient(135deg, #116b83 0%, #0a4554 100%);
+        background:
+            radial-gradient(ellipse 70% 60% at 50% 45%, rgba(17, 107, 131, 0.45) 0%, transparent 70%),
+            linear-gradient(180deg, #0d5a6e 0%, #083844 55%, #062a33 100%);
         color: #fff;
-        padding: 3.5rem 0 2.5rem;
-        margin-bottom: 2rem;
+        padding: 4.5rem 1.5rem 4rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+    }
+
+    .blog-page-hero-inner {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .blog-page-hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.92);
+        margin-bottom: 1.15rem;
+    }
+
+    .blog-page-hero-eyebrow svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+        flex-shrink: 0;
     }
 
     .blog-page-hero h1 {
-        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-size: clamp(1.85rem, 4.5vw, 2.75rem);
         font-weight: 700;
-        margin-bottom: 0.5rem;
+        line-height: 1.2;
+        margin: 0 0 1rem;
+        color: #fff;
+        letter-spacing: -0.02em;
     }
 
     .blog-page-hero p {
-        opacity: 0.9;
-        margin-bottom: 0;
-        max-width: 640px;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 560px;
+        margin: 0 auto;
+        font-weight: 400;
     }
 
     .blog-card {
@@ -178,6 +212,14 @@
     }
 
     @media (max-width: 768px) {
+        .blog-page-hero {
+            padding: 3.25rem 1rem 2.75rem;
+        }
+
+        .blog-page-hero p {
+            font-size: 0.95rem;
+        }
+
         .blog-card-image,
         .blog-card-placeholder {
             height: 190px;
@@ -187,11 +229,19 @@
 </style>
 @endpush
 
-@section('content')
+@section('frontend_content')
 <section class="blog-page-hero">
     <div class="container">
-        <h1>Our Blog</h1>
-        <p>Stories, updates, and insights from Degchi Dine. Browse all published posts below.</p>
+        <div class="blog-page-hero-inner">
+            <div class="blog-page-hero-eyebrow">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                Our Stories
+            </div>
+            <h1>Our Blog</h1>
+            <p>Stories, updates, and insights from Degchi Dine. Browse all published posts below.</p>
+        </div>
     </div>
 </section>
 
@@ -235,7 +285,7 @@
                                     {{ $post->title }}
                                 </a>
 
-                                <p class="blog-card-excerpt">{{ $post->excerpt }}</p>
+                                <!-- <p class="blog-card-excerpt">{{ $post->excerpt }}</p> -->
 
                                 <div class="blog-card-meta">
                                     <span><i class="ri-user-line"></i> {{ $post->author?->name ?? 'Admin' }}</span>
