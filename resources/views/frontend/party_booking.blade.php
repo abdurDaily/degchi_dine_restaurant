@@ -317,11 +317,16 @@
                     <h1 class="booking-info-title">Celebrate Moments With Us</h1>
                     <p class="booking-info-subtitle">Experience the perfect blend of traditional flavors and premium hospitality for your next big event.</p>
                     
-                    <!-- Media Highlight -->
+                    <!-- Media Highlight --> 
                     <div class="media-gallery">
-                        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
+                        {{-- <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
                             <source src="{{ asset('assets/frontend/video/PartyHallDegciDine.mp4') }}" type="video/mp4" />
-                        </video>
+                        </video> --}}
+                        <video class="hero-video" autoplay muted loop playsinline preload="auto"
+                                poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
+                                <source src="{{ asset('assets/frontend/video/PartyHallDegciDine.mp4') }}"
+                                    type="video/mp4" />
+                            </video>
                         <div class="media-overlay">
                             <h4 class="mb-1 text-white" style="font-family: 'Poppins', sans-serif; font-weight: 600;">Authentic Dining Experience</h4>
                             <p class="mb-0 text-white-50" style="font-size: 0.9rem;">Make your parties memorable with our signature platters.</p>
