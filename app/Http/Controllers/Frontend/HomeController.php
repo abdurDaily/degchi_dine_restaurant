@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\FacebookReel;
 use App\Models\Member;
 use App\Models\Menu;
@@ -388,6 +389,7 @@ class HomeController extends Controller
             'payment_method' => 'required|in:cod,sslcommerz',
             'member_card_number' => 'nullable|string|exists:members,unique_card_number',
             'student_card' => 'sometimes|boolean',
+            'coupon_code' => 'nullable|string',
         ]);
 
         // 2. Generate unique Transaction ID
@@ -396,6 +398,24 @@ class HomeController extends Controller
         $member = Auth::guard('member')->user();
         if ($request->filled('member_card_number')) {
             $member = Member::where('unique_card_number', $request->member_card_number)->first();
+        }
+
+        // Validate coupon code if provided
+        $couponDiscount = 0;
+        $coupon = null;
+        if ($request->filled('coupon_code')) {
+            $coupon = \App\Models\Coupon::where('code', $request->coupon_code)->active()->first();
+            if ($coupon && $coupon->isValid((float) $request->order_total)) {
+                $couponDiscount = $coupon->calculateDiscount((float) $request->order_total);
+            } else {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The applied coupon is invalid, expired, or doesn\'t meet the minimum order amount.',
+                    ], 422);
+                }
+                return back()->withErrors(['coupon_code' => 'The applied coupon is invalid, expired, or doesn\'t meet the minimum order amount.']);
+            }
         }
 
         // 3. Prepare Order payload and save to Database
@@ -472,13 +492,17 @@ class HomeController extends Controller
             $discountAmount = $offerDiscount;
         }
 
+        $totalDiscount = min((float) $request->order_total, $discountAmount + $couponDiscount);
+
         $orderData = [
             'customer_name' => $request->customer_name,
             'customer_phone' => $request->customer_phone,
             'customer_address' => $request->customer_address,
             'total_amount' => $request->order_total,
-            'discount_amount' => $discountAmount,
-            'final_amount' => max(0, $request->order_total - $discountAmount),
+            'discount_amount' => $totalDiscount,
+            'coupon_code' => $coupon ? $coupon->code : null,
+            'coupon_discount' => $couponDiscount,
+            'final_amount' => max(0, $request->order_total - $totalDiscount),
             'items' => json_encode($items ?? json_decode($request->items, true)),
             'payment_method' => $paymentMethod,
             'status' => 'pending',
@@ -782,4 +806,63 @@ class HomeController extends Controller
 
         return back()->with('success', 'Your party booking request has been submitted successfully! We will contact you soon.');
     }
+
+
+
+public function applyCoupon(Request $request)
+{
+    $request->validate([
+        'code' => 'required|string|max:50',
+        'order_total' => 'required|numeric|min:0',
+    ]);
+
+    $code = strtoupper(trim($request->code));
+    $subtotal = (float) $request->order_total;
+
+    $coupon = Coupon::whereRaw('UPPER(code) = ?', [$code])->first();
+
+    if (!$coupon) {
+        return response()->json(['valid' => false, 'message' => 'Invalid coupon code.'], 404);
+    }
+
+    if (!$coupon->is_active) {
+        return response()->json(['valid' => false, 'message' => 'This coupon is no longer active.'], 422);
+    }
+
+    if ($coupon->expires_at && now()->startOfDay()->gt($coupon->expires_at)) {
+        return response()->json(['valid' => false, 'message' => 'This coupon has expired.'], 422);
+    }
+
+    if ($coupon->usage_limit !== null && $coupon->used_count >= $coupon->usage_limit) {
+        return response()->json(['valid' => false, 'message' => 'This coupon has reached its usage limit.'], 422);
+    }
+
+    if ($subtotal < $coupon->min_order_amount) {
+        return response()->json([
+            'valid' => false,
+            'message' => 'Minimum order of ৳' . number_format($coupon->min_order_amount, 2) . ' required for this coupon.',
+        ], 422);
+    }
+
+    $discount = $coupon->discount_type === 'percentage'
+        ? round($subtotal * ($coupon->discount_amount / 100), 2)
+        : (float) $coupon->discount_amount;
+
+    $discount = min($discount, $subtotal);
+
+    return response()->json([
+        'valid' => true,
+        'code' => $coupon->code,
+        'name' => $coupon->name,
+        'discount_type' => $coupon->discount_type,
+        'discount_amount' => (float) $coupon->discount_amount,
+        'min_order_amount' => (float) $coupon->min_order_amount,
+        'discount' => $discount,
+        'message' => 'Coupon "' . $coupon->code . '" applied successfully!',
+    ]);
+}
+
+
+
+
 }

@@ -94,4 +94,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->image ? asset('storage/images/profile/' . $this->image) : null;
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'author_id');
+    }
 }

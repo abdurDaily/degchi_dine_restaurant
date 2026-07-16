@@ -111,22 +111,22 @@
                 <!-- Dark Logo-->
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'assets/null.jpg' }}" alt=""
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
                             style="max-width: 130px">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'assets/null.jpg' }}" alt=""
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
                             style="max-width: 130px">
                     </span>
                 </a>
                 <!-- Light Logo-->
                 <a href="{{ route('dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'assets/null.jpg' }}" alt=""
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
                             style="max-width: 130px">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'assets/null.jpg' }}" alt=""
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
                             style="max-width: 130px">
                     </span>
                 </a>
@@ -140,16 +140,16 @@
                 <!-- Dark Logo-->
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'assets/null.jpg' }}" alt=""
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
                             style="max-width: 130px">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'assets/null.jpg' }}" alt=""
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
                             style="max-width: 130px">
                     </span>
                 </a>
                 <button type="button" class="p-0 btn btn-sm fs-20 header-item float-end btn-vertical-sm-hover"
-                    id="vertical-hover">
+                    id="vertical-hover-2">
                     <i class="ri-record-circle-line"></i>
                 </button>
             </div>
@@ -414,24 +414,28 @@
     </script>
 
     <!-- API Response Success/Error Message Script Start -->
-    <script>
-        @if (Session::has('success'))
+    @if (Session::has('success'))
+        <script>
             Toast.fire({
                 icon: 'success',
-                title: "{{ Session::get('success') }}"
+                title: "{{ addslashes(Session::get('success')) }}"
             });
-        @elseif (Session::has('error'))
+        </script>
+    @elseif (Session::has('error'))
+        <script>
             Toast.fire({
                 icon: 'error',
-                title: "{{ Session::get('error') }}"
+                title: "{{ addslashes(Session::get('error')) }}"
             });
-        @elseif (Session::has('info'))
+        </script>
+    @elseif (Session::has('info'))
+        <script>
             Toast.fire({
                 icon: 'info',
-                title: "{{ Session::get('info') }}"
+                title: "{{ addslashes(Session::get('info')) }}"
             });
-        @endif
-    </script>
+        </script>
+    @endif
     <!-- API Response Success/Error Message Script End -->
 
 
@@ -480,6 +484,7 @@
         <script src="{{ asset('assets/js/admin-order-alert.js') }}" defer></script>
         @endcan
     @endauth
+    @yield('scripts')
     @stack('scripts')
 </body>
 

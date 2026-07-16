@@ -218,7 +218,8 @@
     }
 
     function E() {
-        document.getElementById("vertical-hover").addEventListener("click", function() {
+        var e = document.getElementById("vertical-hover");
+        e && e.addEventListener("click", function() {
             "sm-hover" === document.documentElement.getAttribute("data-sidebar-size") ? document.documentElement.setAttribute("data-sidebar-size", "sm-hover-active") : (document.documentElement.getAttribute("data-sidebar-size"), document.documentElement.setAttribute("data-sidebar-size", "sm-hover"))
         })
     }

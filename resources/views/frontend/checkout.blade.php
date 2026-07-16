@@ -450,6 +450,17 @@
             font-weight: 500;
         }
 
+        .cart-shipping-note {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-top: -0.35rem;
+            background: rgba(17, 107, 131, 0.05);
+            border: 1px dashed var(--border-light);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+        }
+
         .cart-summary-divider {
             height: 1px;
             background: var(--border-light);
@@ -817,6 +828,32 @@
                         <div class="checkout-form-panel">
                             <h6 class="checkout-form-heading">
                                 <span class="checkout-form-heading-icon" aria-hidden="true">
+                                    <i class="bi bi-ticket-perforated"></i>
+                                </span>
+                                Coupon Code
+                            </h6>
+                            <div class="row g-3 g-md-4">
+                                <div class="col-md-8">
+                                    <div class="checkout-input-wrap">
+                                        <i class="bi bi-tag checkout-input-icon"></i>
+                                        <input class="form-control checkout-input" type="text" id="couponCodeInput"
+                                            placeholder="Enter coupon code" style="text-transform:uppercase;" autocomplete="off" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" id="applyCouponBtn" class="btn cart-checkout-btn w-100" style="padding: 0.85rem; font-size: 0.9rem;">
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="couponFeedback" class="form-text mt-2" style="font-size: 0.75rem;"></div>
+                            <input type="hidden" name="coupon_code" id="couponCodeHidden" value="" />
+                            <input type="hidden" name="coupon_discount" id="couponDiscountHidden" value="0" />
+                        </div>
+
+                        <div class="checkout-form-panel">
+                            <h6 class="checkout-form-heading">
+                                <span class="checkout-form-heading-icon" aria-hidden="true">
                                     <i class="bi bi-wallet2"></i>
                                 </span>
                                 Payment Method
@@ -883,10 +920,22 @@
                                 </span>
                                 <span id="checkoutOfferDiscount" class="text-danger fw-bold">- ৳ 0.00</span>
                             </div>
-                            <div class="cart-summary-row">
-                                <span>Shipping</span>
-                                <span class="cart-free-tag">Free</span>
+                            <div class="cart-summary-row" id="couponDiscountRow" style="display: none;">
+                                <span>
+                                    🏷️ Coupon
+                                    <span class="badge ms-1" id="couponCodeBadge" style="background:#116b83;color:#fff;font-size:.68rem;padding:2px 7px;border-radius:20px;"></span>
+                                    <a href="#" id="removeCouponLink" class="ms-1 text-danger" style="font-size:.7rem;text-decoration:underline;">remove</a>
+                                </span>
+                                <span id="checkoutCouponDiscount" class="text-success fw-bold">- ৳ 0.00</span>
                             </div>
+                            <div class="cart-summary-row">
+                                <span>Delivery Charge</span>
+                                <span id="shippingChargeDisplay" class="cart-free-tag">৳ 60.00</span>
+                            </div>
+                            <div class="cart-shipping-note">
+                                <i class="bi bi-info-circle me-1"></i>ডেলিভারি লোকেশন ১ কিলোমিটারের বেশি হলে প্রতি কিলোমিটারে ২০ টাকা করে যুক্ত হবে।
+                            </div>
+                            <input type="hidden" name="shipping_charge" id="shippingChargeHidden" value="60" />
                             <div class="cart-summary-divider"></div>
                             <div class="cart-summary-total-row">
                                 <span>Total</span>
@@ -929,6 +978,14 @@
                 const subtotalDisplay = document.getElementById('checkoutSubtotal');
                 const orderTotalInput = document.getElementById('order_total');
 
+                // --- Delivery charge (default flat fee; +20tk per km beyond 1km is informational for now) ---
+                const SHIPPING_CHARGE = 60;
+                const shippingChargeDisplay = document.getElementById('shippingChargeDisplay');
+                const shippingChargeHidden = document.getElementById('shippingChargeHidden');
+                let shippingCharge = SHIPPING_CHARGE;
+                if (shippingChargeDisplay) shippingChargeDisplay.textContent = `৳ ${shippingCharge.toFixed(2)}`;
+                if (shippingChargeHidden) shippingChargeHidden.value = shippingCharge;
+
                 function showToast(type, text) {
                     if (typeof toastr !== 'undefined') {
                         toastr.options = {
@@ -948,6 +1005,19 @@
                 const offerDiscountRow = document.getElementById('offerDiscountRow');
                 const offerNameEl = document.getElementById('offerName');
                 const offerBadgeEl = document.getElementById('offerBadge');
+
+                // --- Coupon elements & state ---
+                const couponCodeInput = document.getElementById('couponCodeInput');
+                const applyCouponBtn = document.getElementById('applyCouponBtn');
+                const couponFeedback = document.getElementById('couponFeedback');
+                const couponDiscountRow = document.getElementById('couponDiscountRow');
+                const checkoutCouponDiscountEl = document.getElementById('checkoutCouponDiscount');
+                const couponCodeBadgeEl = document.getElementById('couponCodeBadge');
+                const couponCodeHidden = document.getElementById('couponCodeHidden');
+                const couponDiscountHidden = document.getElementById('couponDiscountHidden');
+                const removeCouponLink = document.getElementById('removeCouponLink');
+
+                let appliedCoupon = null; // { code, name, discount_type, discount_amount, discount, min_order_amount }
 
                 // Track membership discount rate (recalculated when cart subtotal changes)
                 let memberDiscountRate = 0;
@@ -980,17 +1050,55 @@
                     return parseFloat((subtotal * (memberDiscountRate / 100)).toFixed(2));
                 }
 
+                function parseCurrencyText(text) {
+                    const n = parseFloat((text || '').replace(/[^\d.]/g, ''));
+                    return Number.isNaN(n) ? 0 : n;
+                }
+
+                // Single source of truth for "what is the product subtotal right now".
+                // Priority: whatever is already rendered on screen (most trustworthy, since
+                // your cart renderer owns that text) -> the hidden order_total field ->
+                // recompute directly from localStorage as a last resort.
+                function getCurrentSubtotal() {
+                    const displayed = parseCurrencyText(subtotalDisplay?.textContent);
+                    if (displayed > 0) return displayed;
+
+                    const hidden = parseFloat(orderTotalInput?.value) || 0;
+                    if (hidden > 0) return hidden;
+
+                    try {
+                        const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
+                        return cart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+                    } catch (e) {
+                        return 0;
+                    }
+                }
+
+                // NOTE: Coupon discount is always calculated against the product subtotal only
+                // (never against the delivery charge), regardless of what is passed in.
+                function calculateCouponDiscount(subtotal) {
+                    if (!appliedCoupon) return 0;
+                    if (subtotal < (appliedCoupon.min_order_amount || 0)) return 0;
+
+                    const discount = appliedCoupon.discount_type === 'percentage'
+                        ? subtotal * (appliedCoupon.discount_amount / 100)
+                        : appliedCoupon.discount_amount;
+
+                    return Math.min(parseFloat(discount.toFixed(2)), subtotal);
+                }
+
                 function refreshCheckoutDiscounts(subtotal) {
-                    if (typeof subtotal !== 'number' || Number.isNaN(subtotal)) {
-                        subtotal = parseFloat(orderTotalInput?.value) || 0;
+                    if (typeof subtotal !== 'number' || Number.isNaN(subtotal) || subtotal <= 0) {
+                        subtotal = getCurrentSubtotal();
                     }
 
                     const memberDiscount = calculateMemberDiscount(subtotal);
                     const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
                     const offerInfo = calculateOfferDiscount(cart);
-                    const bestDiscount = Math.max(memberDiscount, offerInfo.discount);
+                    const bestPromoDiscount = Math.max(memberDiscount, offerInfo.discount);
+                    const couponDiscount = calculateCouponDiscount(subtotal);
 
-                    updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount);
+                    updateTotals(subtotal, bestPromoDiscount, offerInfo, memberDiscount, couponDiscount);
                 }
 
                 function offerEligibleForVerifiedMember(offer) {
@@ -1104,14 +1212,17 @@
                     };
                 }
 
-                function updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount) {
+                function updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount, couponDiscount) {
                     offerInfo = offerInfo || { discount: 0, offerName: '', offerPercent: 0 };
                     memberDiscount = typeof memberDiscount === 'number'
                         ? memberDiscount
                         : calculateMemberDiscount(subtotal);
+                    couponDiscount = typeof couponDiscount === 'number'
+                        ? couponDiscount
+                        : calculateCouponDiscount(subtotal);
                     const offerDiscount = offerInfo.discount;
 
-                    console.log('updateTotals called:', { subtotal, bestDiscount, memberDiscount, offerDiscount });
+                    console.log('updateTotals called:', { subtotal, bestDiscount, memberDiscount, offerDiscount, couponDiscount, shippingCharge });
 
                     // Update offer display
                     if (offerDiscount > 0) {
@@ -1134,12 +1245,38 @@
                         }
                     }
 
-                    const finalTotal = Math.max(0, subtotal - bestDiscount);
+                    // Update coupon display — coupon discount is calculated on product subtotal only,
+                    // it never reduces the delivery charge.
+                    if (appliedCoupon && couponDiscount > 0) {
+                        couponDiscountRow.style.display = '';
+                        checkoutCouponDiscountEl.textContent = `- ৳ ${couponDiscount.toFixed(2)}`;
+                        couponCodeBadgeEl.textContent = appliedCoupon.code;
+                    } else {
+                        couponDiscountRow.style.display = 'none';
+                    }
+
+                    couponCodeHidden.value = (appliedCoupon && couponDiscount > 0) ? appliedCoupon.code : '';
+                    couponDiscountHidden.value = couponDiscount.toFixed(2);
+
+                    // --- Final total formula ---
+                    // Subtotal shown = raw product price (before discount); the discount rows above
+                    // show exactly how much is being taken off that product price.
+                    // Coupon discount is ALWAYS calculated against the product subtotal only
+                    // (see calculateCouponDiscount) — the delivery charge is never discounted.
+                    //
+                    //   Total = (Subtotal - Membership/Offer Discount - Coupon Discount) + Delivery Charge
+                    //
+                    const discountedProductTotal = Math.max(0, subtotal - bestDiscount - couponDiscount);
+                    const deliveryChargeToAdd = typeof shippingCharge === 'number' ? shippingCharge : SHIPPING_CHARGE;
+                    const finalTotal = discountedProductTotal + deliveryChargeToAdd;
                     totalDisplay.textContent = `৳ ${finalTotal.toFixed(2)}`;
-                    
+
+                    if (shippingChargeDisplay) shippingChargeDisplay.textContent = `৳ ${shippingCharge.toFixed(2)}`;
+                    if (shippingChargeHidden) shippingChargeHidden.value = shippingCharge;
+
                     // Update hidden input for form submission
                     if (orderTotalInput) {
-                        orderTotalInput.value = subtotal.toFixed(2); // Send original subtotal, backend will recalculate discount
+                        orderTotalInput.value = subtotal.toFixed(2); // Send original product subtotal, backend will recalculate discount + add shipping
                     }
                     
                     console.log('Final total displayed:', finalTotal);
@@ -1208,7 +1345,7 @@
                     }
 
                     try {
-                        const subtotal = parseFloat(orderTotalInput.value) || 0;
+                        const subtotal = getCurrentSubtotal();
                         const response = await fetch(
                             `{{ route('frontend.member.check') }}?member_card_number=${encodeURIComponent(cardNumber)}&order_total=${encodeURIComponent(subtotal)}`
                             );
@@ -1222,6 +1359,92 @@
                         membershipFeedback.classList.add('text-danger');
                         refreshCheckoutDiscounts();
                     }
+                }
+
+                async function applyCouponInternal(code, silent = false) {
+                    const subtotal = getCurrentSubtotal();
+
+                    if (!code) {
+                        couponFeedback.textContent = 'Please enter a coupon code.';
+                        couponFeedback.className = 'form-text mt-2 text-danger';
+                        return;
+                    }
+
+                    applyCouponBtn.disabled = true;
+                    const originalBtnText = applyCouponBtn.innerHTML;
+                    applyCouponBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+                    try {
+                        const response = await fetch('{{ route('frontend.coupon.apply') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ code: code, order_total: subtotal }),
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.valid) {
+                            appliedCoupon = result;
+                            localStorage.setItem('degchi_coupon', JSON.stringify({ code: result.code }));
+                            couponFeedback.textContent = result.message;
+                            couponFeedback.className = 'form-text mt-2 text-success';
+                            if (!silent) showToast('success', result.message);
+                        } else {
+                            appliedCoupon = null;
+                            localStorage.removeItem('degchi_coupon');
+                            couponFeedback.textContent = result.message || 'Invalid coupon code.';
+                            couponFeedback.className = 'form-text mt-2 text-danger';
+                            if (!silent) showToast('error', result.message || 'Invalid coupon code.');
+                        }
+                    } catch (error) {
+                        appliedCoupon = null;
+                        couponFeedback.textContent = 'Unable to verify coupon right now.';
+                        couponFeedback.className = 'form-text mt-2 text-danger';
+                    } finally {
+                        applyCouponBtn.disabled = false;
+                        applyCouponBtn.innerHTML = originalBtnText;
+                        refreshCheckoutDiscounts(subtotal);
+                    }
+                }
+
+                function loadStoredCoupon() {
+                    try {
+                        const stored = JSON.parse(localStorage.getItem('degchi_coupon') || 'null');
+                        if (stored && stored.code) {
+                            couponCodeInput.value = stored.code;
+                            applyCouponInternal(stored.code, true);
+                        }
+                    } catch (e) {}
+                }
+
+                if (applyCouponBtn) {
+                    applyCouponBtn.addEventListener('click', function () {
+                        applyCouponInternal(couponCodeInput.value.trim().toUpperCase());
+                    });
+                }
+
+                if (couponCodeInput) {
+                    couponCodeInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            applyCouponInternal(this.value.trim().toUpperCase());
+                        }
+                    });
+                }
+
+                if (removeCouponLink) {
+                    removeCouponLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        appliedCoupon = null;
+                        couponCodeInput.value = '';
+                        localStorage.removeItem('degchi_coupon');
+                        couponFeedback.textContent = '';
+                        refreshCheckoutDiscounts(parseFloat(orderTotalInput?.value) || 0);
+                    });
                 }
 
                 function buildFormData(form) {
@@ -1292,6 +1515,7 @@
                             if (result.redirect_url) {
                                 if (result.clear_cart) {
                                     localStorage.removeItem('degchi_cart');
+                                    localStorage.removeItem('degchi_coupon');
                                 }
                                 window.location.href = result.redirect_url;
                                 return;
@@ -1300,6 +1524,7 @@
                             if (result.success) {
                                 if (result.clear_cart) {
                                     localStorage.removeItem('degchi_cart');
+                                    localStorage.removeItem('degchi_coupon');
                                 }
                                 showToast('success', result.message || 'Order placed successfully.');
                                 checkoutForm.reset();
@@ -1312,6 +1537,15 @@
                                 membershipFeedback.textContent =
                                     'Enter your membership card number to check eligibility for a 10% discount.';
                                 membershipFeedback.classList.remove('text-success', 'text-danger');
+
+                                appliedCoupon = null;
+                                couponCodeInput.value = '';
+                                couponFeedback.textContent = '';
+                                couponDiscountRow.style.display = 'none';
+
+                                shippingCharge = SHIPPING_CHARGE;
+                                if (shippingChargeDisplay) shippingChargeDisplay.textContent = `৳ ${shippingCharge.toFixed(2)}`;
+                                if (shippingChargeHidden) shippingChargeHidden.value = shippingCharge;
                             }
                         } catch (error) {
                             showToast('error', error.message || 'Server error while placing order.');
@@ -1324,6 +1558,7 @@
                 }
 
                 handleQueryMessage();
+                loadStoredCoupon();
 
                 @if($loggedInMemberDiscount ?? null)
                 if (membershipFeedback && verifiedMember.verified) {
@@ -1346,16 +1581,24 @@
                 // Initial offer discount calculation on page load
                 console.log('=== Checkout Page Loaded ===');
                 console.log('Active offers available:', activeOffers);
-                
-                // Trigger initial calculation
+
                 const initialCart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
                 console.log('Cart on page load:', initialCart);
-                
-                if (initialCart.length > 0) {
-                    // Wait a bit for cart to render, then calculate
-                    setTimeout(function() {
-                        refreshCheckoutDiscounts(parseFloat(document.getElementById('order_total')?.value || 0));
-                    }, 500);
+
+                // Paint the delivery charge + total immediately with whatever we can read right now
+                // (won't be wrong for long — the observer below corrects it the moment the real
+                // subtotal is rendered by the cart script).
+                refreshCheckoutDiscounts();
+
+                // The cart items/subtotal are rendered by a script we don't control, and its timing
+                // can vary. Rather than guessing with setTimeout, watch the subtotal element itself:
+                // any time its text changes (cart script finishes rendering, quantity changes, etc.),
+                // immediately recompute discounts and the final total.
+                if (subtotalDisplay && typeof MutationObserver !== 'undefined') {
+                    const subtotalObserver = new MutationObserver(function() {
+                        refreshCheckoutDiscounts();
+                    });
+                    subtotalObserver.observe(subtotalDisplay, { childList: true, characterData: true, subtree: true });
                 }
 
                 const flashMessage = @json(session('success') ?? session('error'));

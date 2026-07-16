@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\Backend\BlogCategory\BlogCategoryController;
+use App\Http\Controllers\Backend\Comment\CommentController;
 use App\Http\Controllers\Backend\MemberController;
 use App\Http\Controllers\Backend\MenuController;
 use App\Http\Controllers\Backend\OfferController;
 use App\Http\Controllers\Backend\OrderController;
+use App\Http\Controllers\Backend\Post\PostController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Frontend\Blog\BlogController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\MemberAuthController;
 use App\Http\Controllers\Frontend\PaymentController;
@@ -147,6 +151,28 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     // Offers CRUD
     Route::resource('offers', OfferController::class)->except(['show']);
     Route::post('offers/{offer}/toggle', [OfferController::class, 'toggleStatus'])->name('offers.toggle');
+
+    // Blog management (admin UI + DataTables AJAX)
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('blogCategories.index');
+        Route::post('/blog-categories', [BlogCategoryController::class, 'store'])->name('blogCategories.store');
+        Route::get('/blog-categories/{category}/edit', [BlogCategoryController::class, 'edit'])->name('blogCategories.edit');
+        Route::put('/blog-categories/{category}', [BlogCategoryController::class, 'update'])->name('blogCategories.update');
+        Route::delete('/blog-categories/{category}', [BlogCategoryController::class, 'destroy'])->name('blogCategories.delete');
+
+        Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+        Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+        Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+        Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+        Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.delete');
+        Route::post('/posts/{post}/toggle-comments', [PostController::class, 'toggleComments'])->name('posts.toggle-comments');
+
+        Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
+        Route::post('/comments/{comment}/toggle', [CommentController::class, 'toggleActive'])->name('comments.toggle');
+        Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.delete');
+
+        Route::get('/members', [App\Http\Controllers\Backend\MemberController::class, 'index'])->name('members.index');
+    });
 });
 
 Route::name('frontend.')->group(function () {
@@ -166,6 +192,7 @@ Route::name('frontend.')->group(function () {
     Route::get('/api/variation/{id}/offers', [App\Http\Controllers\Frontend\OfferCheckController::class, 'getOffersForVariation'])->name('api.offers.for-variation');
     Route::get('/api/variations/with-offers', [App\Http\Controllers\Frontend\OfferCheckController::class, 'getAllVariationsWithOffers'])->name('api.offers.all-variations');
     Route::get('/add-to-cart', [HomeController::class, 'addToCart'])->name('addtocart');
+    Route::post('/coupon/apply', [HomeController::class, 'applyCoupon'])->name('coupon.apply');
     Route::get('/checkout', [HomeController::class, 'checkout'])->name('checkout');
     Route::get('/cards', [HomeController::class, 'cards'])->name('cards');
     Route::get('/card-apply', [HomeController::class, 'cardApply'])->name('card.apply');
@@ -196,6 +223,12 @@ Route::name('frontend.')->group(function () {
     Route::post('/reviews', [App\Http\Controllers\Frontend\ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/reviews/verify-member', [App\Http\Controllers\Frontend\ReviewController::class, 'verifyMember'])->name('reviews.verify-member');
     Route::get('/contact', [App\Http\Controllers\Frontend\ReviewController::class, 'contact'])->name('contact');
+
+    // ========== Blog Routes ==========
+    Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+    Route::post('/blog/comments/{comment}/react', [BlogController::class, 'react'])->name('blog.react');
+    Route::post('/blog/{slug}/comments', [BlogController::class, 'comment'])->name('blog.comment');
+    Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 });
 
 Route::prefix('payment')->name('payment.')->group(function () {
@@ -204,3 +237,5 @@ Route::prefix('payment')->name('payment.')->group(function () {
     Route::match(['get', 'post'], '/cancel', [PaymentController::class, 'cancel'])->name('cancel');
     Route::match(['get', 'post'], '/ipn', [PaymentController::class, 'ipn'])->name('ipn');
 });
+
+

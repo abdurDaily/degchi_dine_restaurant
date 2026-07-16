@@ -27,12 +27,15 @@ class Order extends Model
         'student_card_used',
         'items',
         'member_credited',
+        'coupon_code',
+        'coupon_discount',
     ];
 
     protected $casts = [
         'total_amount'    => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'final_amount'    => 'decimal:2',
+        'coupon_discount' => 'decimal:2',
         'student_card_used' => 'boolean',
         'member_credited'   => 'boolean',
         'items'           => 'array',

@@ -11717,15 +11717,17 @@ body {
 .menu-page .menu-filter-bar .filter-group {
   margin: 0;
 }
-
+.menu-page .menu-filter-bar .filter-group-label {
+    font-size:18px;
+}
 .menu-page .menu-filter-bar .filter-group-label {
   display: block;
   margin-bottom: 0.55rem;
-  font-size: 0.78rem;
+  font-size: 18px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #083844;
+  color: var(--brand-red) ;
 }
 
 .menu-page .menu-filter-bar .filter-group-label i {
@@ -11897,7 +11899,7 @@ body {
   }
 
   .menu-page .filter-group-label {
-    font-size: 0.74rem;
+    font-size: 16px;
   }
 
   .menu-page .filter-group-price .dual-range-slider {

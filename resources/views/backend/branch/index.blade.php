@@ -82,7 +82,7 @@
                             </div>
 
                             <!-- Delivery Services Section -->
-                            <div class="col-12">
+                            {{-- <div class="col-12">
                                 <hr class="admin-form-divider">
                                 <p class="admin-form-section-title">Delivery Services <span class="text-muted fw-normal">(optional)</span></p>
                                 <small class="text-muted d-block mb-3">Add delivery partner links and logos</small>
@@ -131,7 +131,7 @@
                                         <span class="text-danger error-text foodi_logo_error d-block mt-1" style="font-size: 0.85rem;"></span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                     <div class="modal-footer">

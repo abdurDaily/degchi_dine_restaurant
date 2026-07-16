@@ -70,6 +70,9 @@
           <a class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}" href="{{ route('frontend.about') }}">About</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link {{ request()->routeIs('frontend.blog.*') ? 'active' : '' }}" href="{{ route('frontend.blog.index') }}">Blog</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}" href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>
         </li>
         <li class="nav-item">
@@ -156,6 +159,9 @@
 
          <li class="nav-item">
           <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}" href="{{ route('frontend.about') }}">About</a>
+        </li>
+        <li class="nav-item">
+          <a data-bs-dismiss="offcanvas" class="nav-link {{ request()->routeIs('frontend.blog.*') ? 'active' : '' }}" href="{{ route('frontend.blog.index') }}">Blog</a>
         </li>
 
         <li class="nav-item">
