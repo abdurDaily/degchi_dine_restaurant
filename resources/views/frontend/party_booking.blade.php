@@ -320,7 +320,7 @@
                     <!-- Media Highlight -->
                     <div class="media-gallery">
                         <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
-                            <source src="{{ asset('assets/frontend/video/Party Hall.Degci Dine (1).mp4') }}" type="video/mp4" />
+                            <source src="{{ asset('assets/frontend/video/PartyHallDegciDine.mp4') }}" type="video/mp4" />
                         </video>
                         <div class="media-overlay">
                             <h4 class="mb-1 text-white" style="font-family: 'Poppins', sans-serif; font-weight: 600;">Authentic Dining Experience</h4>
