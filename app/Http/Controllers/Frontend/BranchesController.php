@@ -33,7 +33,32 @@ class BranchesController extends Controller
             ->with(['menus' => function ($query) {
                 // Only get menus that are available and have variations
                 $query->where('is_available', 1)
-                      ->with('variations');
+                      ->with([
+                          'variations' => function ($q) {
+                              $q->with([
+                                  'offers' => function ($offerQuery) {
+                                      $offerQuery->where('is_active', true)
+                                          ->where(function ($subQ) {
+                                              $subQ->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                                          })
+                                          ->where(function ($subQ) {
+                                              $subQ->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                                          })
+                                          ->select([
+                                              'offers.id',
+                                              'offers.name',
+                                              'offers.discount_percent',
+                                              'offers.is_first_order',
+                                              'offers.applicable_to',
+                                              'offers.offer_type',
+                                              'offers.is_active',
+                                              'offers.valid_from',
+                                              'offers.valid_until',
+                                          ]);
+                                  },
+                              ]);
+                          },
+                      ]);
             }])
             ->orderBy('name', 'asc')
             ->get()

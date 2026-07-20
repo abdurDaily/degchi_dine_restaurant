@@ -70,6 +70,14 @@ class BlogController extends Controller
             return response()->json(['error' => 'Please login as member to comment'], 401);
         }
 
+        $member = Auth::guard('member')->user();
+        if (! $member->canOrderAndComment()) {
+            return response()->json([
+                'error' => $member->accountRestrictedMessage(),
+                'account_restricted' => true,
+            ], 403);
+        }
+
         $validated = $request->validate([
             'comment' => 'required|string|max:1000',
             'parent_id' => 'nullable|exists:comments,id',
@@ -116,6 +124,14 @@ class BlogController extends Controller
     {
         if (! Auth::guard('member')->check()) {
             return response()->json(['error' => 'Please login as member to react'], 401);
+        }
+
+        $member = Auth::guard('member')->user();
+        if (! $member->canOrderAndComment()) {
+            return response()->json([
+                'error' => $member->accountRestrictedMessage(),
+                'account_restricted' => true,
+            ], 403);
         }
 
         $validated = $request->validate([

@@ -32,9 +32,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($order->items as $item)
+                        @foreach($order->normalizedItems() as $item)
                         <tr>
-                            <td>{{ $item['title'] ?? 'Item' }}</td>
+                            <td>{{ $item['title'] ?? $item['name'] ?? 'Item' }}</td>
                             <td class="text-end">{{ $item['quantity'] ?? 1 }}</td>
                             <td class="text-end">৳{{ number_format($item['price'] ?? 0,2) }}</td>
                             <td class="text-end">৳{{ number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 1),2) }}</td>

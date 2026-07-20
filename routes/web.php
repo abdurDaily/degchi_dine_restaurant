@@ -122,6 +122,7 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     Route::get('members', [MemberController::class, 'index'])->name('members.index');
     Route::get('members/{member}', [MemberController::class, 'show'])->name('members.show');
     Route::post('members/{member}/toggle-status', [MemberController::class, 'toggleStatus'])->name('members.toggleStatus');
+    Route::post('members/{member}/update-status', [MemberController::class, 'updateStatus'])->name('members.updateStatus');
     Route::post('members/{member}/sync-purchase', [MemberController::class, 'syncPurchase'])->name('members.syncPurchase');
     Route::post('members/{member}/approve', [MemberController::class, 'approve'])->name('members.approve');
     Route::post('members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
@@ -222,6 +223,7 @@ Route::name('frontend.')->group(function () {
 
     Route::middleware('auth:member')->group(function () {
         Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->name('member.dashboard');
+        Route::put('/member/profile', [MemberAuthController::class, 'updateProfile'])->name('member.profile.update');
     });
 
     //* REVIEWS

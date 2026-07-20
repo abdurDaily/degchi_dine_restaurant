@@ -8,12 +8,16 @@ use App\Models\Offer;
 use App\Models\Category;
 use App\Models\MenuVariation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OfferPageController extends Controller
 {
     public function index(Request $request)
     {
-        // Fetch menu items that have at least one active offer on their variations
+        // Fetch menus; include all only when a visible all_items food offer exists for this viewer
+        $viewerMember = Auth::guard('member')->user();
+        $hasVisibleGlobalOffer = Offer::visibleAllItemOffersFor($viewerMember)->isNotEmpty();
+
         $query = Menu::where('is_available', 1)
             ->with([
                 'variations' => function ($q) {
@@ -25,20 +29,41 @@ class OfferPageController extends Controller
                             ->where(function ($q) {
                                 $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                             })
-                            ->select(['offers.id', 'offers.name', 'offers.discount_percent']);
+                            ->select([
+                                'offers.id',
+                                'offers.name',
+                                'offers.discount_percent',
+                                'offers.is_first_order',
+                                'offers.applicable_to',
+                                'offers.offer_type',
+                                'offers.is_active',
+                                'offers.valid_from',
+                                'offers.valid_until',
+                            ]);
                     }]);
                 },
                 'category',
-            ])
-            ->whereHas('variations.offers', function ($q) {
-                $q->where('is_active', true)
+            ]);
+
+        if (! $hasVisibleGlobalOffer) {
+            $memberCannotUseFirstOrder = $viewerMember && ! $viewerMember->canUseFirstOrderDiscount();
+
+            $query->whereHas('variations.offers', function ($q) use ($memberCannotUseFirstOrder) {
+                $q->where('applicable_to', 'all')
+                    ->where('discount_percent', '>', 0)
+                    ->where('is_active', true)
                     ->where(function ($subQ) {
                         $subQ->whereNull('valid_from')->orWhere('valid_from', '<=', now());
                     })
                     ->where(function ($subQ) {
                         $subQ->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                     });
+
+                if ($memberCannotUseFirstOrder) {
+                    $q->where('is_first_order', false);
+                }
             });
+        }
 
         // Price filter
         $minPriceLimit = (float) (MenuVariation::min('price') ?? 0);

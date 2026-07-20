@@ -49,7 +49,18 @@ class HomeController extends Controller
                                                     ->where(function ($subQ) {
                                                         $subQ->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                                                     })
-                                                    ->select(['offers.id', 'offers.name', 'offers.discount_percent', 'offers.popup_badge']);
+                                                    ->select([
+                                                        'offers.id',
+                                                        'offers.name',
+                                                        'offers.discount_percent',
+                                                        'offers.popup_badge',
+                                                        'offers.is_first_order',
+                                                        'offers.applicable_to',
+                                                        'offers.offer_type',
+                                                        'offers.is_active',
+                                                        'offers.valid_from',
+                                                        'offers.valid_until',
+                                                    ]);
                                             },
                                         ]);
                                 },
@@ -401,14 +412,25 @@ class HomeController extends Controller
             $member = Member::where('unique_card_number', $request->member_card_number)->first();
         }
 
-        // Validate coupon code if provided
+        if ($member && ! $member->canOrderAndComment()) {
+            $message = $member->accountRestrictedMessage();
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'account_restricted' => true,
+                ], 403);
+            }
+
+            return back()->withErrors(['member_card_number' => $message])->withInput();
+        }
+
+        // Validate coupon existence early; amount is recalculated against server subtotal below
         $couponDiscount = 0;
         $coupon = null;
         if ($request->filled('coupon_code')) {
             $coupon = \App\Models\Coupon::where('code', $request->coupon_code)->active()->first();
-            if ($coupon && $coupon->isValid((float) $request->order_total)) {
-                $couponDiscount = $coupon->calculateDiscount((float) $request->order_total);
-            } else {
+            if (! $coupon) {
                 if ($request->ajax()) {
                     return response()->json([
                         'success' => false,
@@ -433,23 +455,20 @@ class HomeController extends Controller
             }
         }
 
-        $discountAmount = 0;
-        $consumesFirstOrderSlot = false;
-        if ($member) {
-            $consumesFirstOrderSlot = $member->canUseFirstOrderDiscount();
-            $memberDiscount = $member->resolveMemberDiscount((float) $request->order_total);
-            $discountAmount = $memberDiscount['amount'];
-        }
+        $consumesFirstOrderSlot = $member ? $member->canUseFirstOrderDiscount() : false;
 
-        // Apply promotional offers discount
-        // Check for offers on specific items and calculate discount accordingly
+        // Apply promotional offers discount — always price from DB, never trust client unit prices
         $items = json_decode($request->items, true);
         $offerDiscount = 0;
         $itemDiscountDetails = [];
+        $serverSubtotal = 0;
 
         if (is_array($items) && ! empty($items)) {
             foreach ($items as &$item) {
-                $menuVariationId = $item['variation_id'] ?? $item['id'] ?? null;
+                $menuVariationId = $item['variation_id'] ?? null;
+                if (! $menuVariationId && isset($item['id']) && is_numeric($item['id'])) {
+                    $menuVariationId = $item['id'];
+                }
                 if (! $menuVariationId) {
                     continue;
                 }
@@ -459,17 +478,20 @@ class HomeController extends Controller
                     continue;
                 }
 
-                // Get active, valid offers for this variation
-                $applicableOffers = $variation->activeOffers()
-                    ->where('is_active', true)
-                    ->orderBy('discount_percent', 'desc')
-                    ->get();
+                $qty = max(1, (int) ($item['quantity'] ?? 1));
+                $unitPrice = (float) $variation->price;
+                $item['price'] = $unitPrice;
+                $item['original_price'] = $unitPrice;
+                $item['quantity'] = $qty;
+                $serverSubtotal += $unitPrice * $qty;
+
+                $applicableOffers = $variation->resolveApplicableOffers($member, false);
 
                 if ($applicableOffers->isNotEmpty()) {
                     $bestOffer = Offer::bestEligibleForMember($applicableOffers, $member);
 
                     if ($bestOffer) {
-                        $itemTotal = ($item['price'] ?? 0) * ($item['quantity'] ?? 1);
+                        $itemTotal = $unitPrice * $qty;
                         $itemDiscount = round($itemTotal * ($bestOffer->discount_percent / 100), 2);
 
                         $offerDiscount += $itemDiscount;
@@ -483,9 +505,20 @@ class HomeController extends Controller
 
                         $item['offer_id'] = $bestOffer->id;
                         $item['offer_discount'] = $itemDiscount;
+                        $item['offer_percent'] = $bestOffer->discount_percent;
                     }
                 }
             }
+            unset($item);
+        }
+
+        // Prefer server-calculated subtotal when items resolved cleanly
+        $orderSubtotal = $serverSubtotal > 0 ? $serverSubtotal : (float) $request->order_total;
+
+        $discountAmount = 0;
+        if ($member) {
+            $memberDiscount = $member->resolveMemberDiscount($orderSubtotal, true);
+            $discountAmount = $memberDiscount['amount'];
         }
 
         // Use the higher discount: member discount or accumulated item offers
@@ -493,18 +526,31 @@ class HomeController extends Controller
             $discountAmount = $offerDiscount;
         }
 
-        $totalDiscount = min((float) $request->order_total, $discountAmount + $couponDiscount);
+        if ($coupon) {
+            if (! $coupon->isValid($orderSubtotal)) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The applied coupon is invalid, expired, or doesn\'t meet the minimum order amount.',
+                    ], 422);
+                }
+                return back()->withErrors(['coupon_code' => 'The applied coupon is invalid, expired, or doesn\'t meet the minimum order amount.']);
+            }
+            $couponDiscount = $coupon->calculateDiscount($orderSubtotal);
+        }
+
+        $totalDiscount = min($orderSubtotal, $discountAmount + $couponDiscount);
 
         $orderData = [
             'customer_name' => $request->customer_name,
             'customer_phone' => $request->customer_phone,
             'customer_address' => $request->customer_address,
-            'total_amount' => $request->order_total,
+            'total_amount' => $orderSubtotal,
             'discount_amount' => $totalDiscount,
             'coupon_code' => $coupon ? $coupon->code : null,
             'coupon_discount' => $couponDiscount,
-            'final_amount' => max(0, $request->order_total - $totalDiscount),
-            'items' => json_encode($items ?? json_decode($request->items, true)),
+            'final_amount' => max(0, $orderSubtotal - $totalDiscount),
+            'items' => is_array($items) ? $items : [],
             'payment_method' => $paymentMethod,
             'status' => 'pending',
             'student_card_used' => $request->boolean('student_card'),
@@ -526,8 +572,13 @@ class HomeController extends Controller
 
         $order = Order::create($orderData);
 
+        // Membership / Student "First Order Only": after this order, never give that tier discount again
         if ($member && $consumesFirstOrderSlot) {
-            $member->update(['first_order_discount_used' => true]);
+            $tierOffer = $member->memberTierOffer();
+            if (! $tierOffer || $tierOffer->is_first_order) {
+                $member->update(['first_order_discount_used' => true]);
+                $member->first_order_discount_used = true;
+            }
         }
 
         // ============================================
@@ -620,6 +671,19 @@ class HomeController extends Controller
             ], 404);
         }
 
+        if (! $member->canOrderAndComment()) {
+            return response()->json([
+                'eligible' => false,
+                'account_restricted' => true,
+                'member_name' => $member->name,
+                'member_type' => $member->type,
+                'status' => $member->status,
+                'approval_status' => $member->approval_status,
+                'is_student' => $member->is_student,
+                'message' => $member->accountRestrictedMessage(),
+            ], 403);
+        }
+
         $orderTotal = (float) $request->query('order_total', 0);
         $discount = $member->resolveMemberDiscount($orderTotal > 0 ? $orderTotal : 1);
 
@@ -703,7 +767,17 @@ class HomeController extends Controller
                                 ->where(function ($q) {
                                     $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
                                 })
-                                ->select(['offers.id', 'offers.name', 'offers.discount_percent']);
+                                ->select([
+                                    'offers.id',
+                                    'offers.name',
+                                    'offers.discount_percent',
+                                    'offers.is_first_order',
+                                    'offers.applicable_to',
+                                    'offers.offer_type',
+                                    'offers.is_active',
+                                    'offers.valid_from',
+                                    'offers.valid_until',
+                                ]);
                         },
                     ]);
                 },
@@ -719,22 +793,40 @@ class HomeController extends Controller
 
         // Specific offer ID filter
         if ($offerFilter) {
-            $query->whereHas('variations.offers', function ($q) use ($offerFilter) {
-                $q->where('offers.id', $offerFilter);
-            });
+            $filteredOffer = Offer::find($offerFilter);
+            if ($filteredOffer && $filteredOffer->offer_type !== 'all_items') {
+                $query->whereHas('variations.offers', function ($q) use ($offerFilter) {
+                    $q->where('offers.id', $offerFilter);
+                });
+            }
+            // all_items offer applies to every menu — no pivot filter
         }
 
-        // Generic "has an active offer" filter
+        // Generic "has an active offer" filter — only offers this viewer can actually see/use
         if ($offerOnly) {
-            $query->whereHas('variations.offers', function ($q) {
-                $q->where('is_active', true)
-                    ->where(function ($q) {
-                        $q->whereNull('valid_from')->orWhere('valid_from', '<=', now());
-                    })
-                    ->where(function ($q) {
-                        $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
-                    });
-            });
+            $viewerMember = Auth::guard('member')->user();
+            $hasVisibleGlobalOffer = Offer::visibleAllItemOffersFor($viewerMember)->isNotEmpty();
+
+            if (! $hasVisibleGlobalOffer) {
+                $memberCannotUseFirstOrder = $viewerMember && ! $viewerMember->canUseFirstOrderDiscount();
+
+                $query->whereHas('variations.offers', function ($q) use ($memberCannotUseFirstOrder) {
+                    $q->where('applicable_to', 'all')
+                        ->where('discount_percent', '>', 0)
+                        ->where('is_active', true)
+                        ->where(function ($q) {
+                            $q->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                        })
+                        ->where(function ($q) {
+                            $q->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                        });
+
+                    // Hide first-order-only specific items from members who already ordered
+                    if ($memberCannotUseFirstOrder) {
+                        $q->where('is_first_order', false);
+                    }
+                });
+            }
         }
 
         // Popular items filter (ডিফল্ট বা ইউজার-সিলেক্টেড)

@@ -630,10 +630,10 @@ body {
                             <span>Subtotal <small class="text-muted ms-1">(2 items)</small></span>
                             <span id="cartPageSubtotal">৳ 1,140</span>
                         </div>
-                        <div class="cart-summary-row">
+                        <!-- <div class="cart-summary-row">
                             <span>Delivery</span>
                             <span class="cart-free-tag">Free</span>
-                        </div>
+                        </div> -->
                         <div class="cart-summary-divider"></div>
                         <div class="cart-summary-total-row">
                             <span>Total</span>

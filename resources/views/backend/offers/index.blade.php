@@ -16,11 +16,13 @@
 
             <div class="card-body p-0">
                 <div class="alert alert-info border-0 rounded-0 mb-0 py-3 px-4">
-                    <strong><i class="ri-information-line me-1"></i> First-order offers</strong>
+                    <strong><i class="ri-information-line me-1"></i> How discounts work</strong>
                     <ul class="mb-0 mt-2 small ps-3">
-                        <li><strong>Membership First Order (30%)</strong> — non-student members only, first order.</li>
-                        <li><strong>Student Membership First Order (35%)</strong> — approved students only. Pending or rejected students never receive this offer.</li>
-                        <li>At checkout, the system applies the <strong>highest discount among eligible offers only</strong> — not the global maximum.</li>
+                        <li><strong>Food item offers</strong> (Applies To: <em>All</em>) — All food items or Specific items. Largest % wins on the card.</li>
+                        <li><strong>Membership</strong> + <strong>First Order Only</strong> — 30% on the member’s <em>first order only</em>. After that order: no membership discount.</li>
+                        <li><strong>Student</strong> + <strong>First Order Only</strong> — 35% on an approved student’s <em>first order only</em>. After that order: no student discount.</li>
+                        <li><strong>Golden</strong> — 10% on every order after upgrade (not first-order limited).</li>
+                        <li>Checkout takes the <strong>higher of</strong> food-item offer vs member-card benefit (not stacked).</li>
                     </ul>
                 </div>
                 @if($offers->isEmpty())

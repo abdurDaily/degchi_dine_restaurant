@@ -93,14 +93,16 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Applicable To</label>
                             <select name="applicable_to" class="form-select @error('applicable_to') is-invalid @enderror">
-                                @foreach(['membership','student','golden','all'] as $opt)
-                                    <option value="{{ $opt }}" {{ old('applicable_to', $offer->applicable_to) === $opt ? 'selected' : '' }}>
-                                        {{ ucfirst($opt) }}
+                                @foreach(['all','membership','student','golden'] as $opt)
+                                    <option value="{{ $opt }}" {{ old('applicable_to', $offer->applicable_to ?? 'all') === $opt ? 'selected' : '' }}>
+                                        {{ $opt === 'all' ? 'All customers (public promo)' : ucfirst($opt) }}
                                     </option>
                                 @endforeach
                             </select>
                             <div class="form-text">
-                                Student = approved student members only. Membership = non-student members. First-order student offers require admin approval under Members.
+                                <strong>All</strong> = food menu promo (menu badges). 
+                                <strong>Membership / Student</strong> = checkout member-card discount (use the built-in First Order rows). 
+                                <strong>Golden</strong> = golden card benefit / threshold.
                             </div>
                             @error('applicable_to')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
@@ -192,7 +194,11 @@
                             <input type="checkbox" class="form-check-input" name="is_first_order" id="isFirstOrder"
                                    value="1" {{ old('is_first_order', $offer->is_first_order ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label fw-semibold" for="isFirstOrder">First Order Only</label>
-                            <div class="form-text">Pair with Applicable To: membership (30%) or student (35%, admin-approved only).</div>
+                            <div class="form-text">
+                                <strong>Membership / Student:</strong> discount applies on that member’s <em>first order only</em>.
+                                After they place one order, they get <strong>no more</strong> membership/student discount
+                                (until Golden). <strong>All (food promo):</strong> requires member login; badge hides after their first order.
+                            </div>
                         </div>
                     </div>
 

@@ -102,6 +102,32 @@ class Order extends Model
             default      => '<span class="badge bg-warning text-dark">Pending</span>',
         };
     }
+
+    /**
+     * Normalized line items (handles legacy double-encoded JSON strings).
+     */
+    public function normalizedItems(): array
+    {
+        $items = $this->items;
+
+        // Array cast can leave a JSON string when data was double-encoded on save
+        if (is_string($items)) {
+            $decoded = json_decode($items, true);
+            if (is_string($decoded)) {
+                $decoded = json_decode($decoded, true);
+            }
+            $items = $decoded;
+        }
+
+        if (! is_array($items)) {
+            return [];
+        }
+
+        // Re-index and ensure each row is an array (not stdClass)
+        return array_values(array_map(function ($item) {
+            return is_array($item) ? $item : (array) $item;
+        }, $items));
+    }
 }
 
 

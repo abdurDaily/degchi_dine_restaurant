@@ -326,6 +326,33 @@ const setupPrivilegeCardForm = () => {
 
 const CART_STORAGE_KEY = "degchi_cart";
 
+const getMemberState = () => {
+    return (
+        window.DEGCHI_MEMBER || {
+            loggedIn: false,
+            canUseFirstOrder: false,
+            loginUrl: "/member/login",
+            registerUrl: "/card-apply",
+        }
+    );
+};
+
+const offerRequiresMemberLogin = (isFirstOrder, applicableTo) => {
+    // Food promos: only First Order Only requires member login.
+    // Membership / Student / Golden benefits are applied at checkout via member card.
+    return !!isFirstOrder;
+};
+
+const showOfferMemberLoginModal = () => {
+    const modalEl = document.getElementById("offerMemberLoginModal");
+    if (modalEl && window.bootstrap?.Modal) {
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        return;
+    }
+    const member = getMemberState();
+    window.location.href = member.loginUrl || "/member/login";
+};
+
 const getCartData = () => {
     try {
         const raw = localStorage.getItem(CART_STORAGE_KEY);
@@ -343,11 +370,20 @@ const formatCurrency = (value) => {
     return `৳ ${Number(value || 0).toFixed(2)}`;
 };
 
+const getItemUnitPrice = (item) => Number(item.price || 0);
+
+const getItemOriginalPrice = (item) =>
+    Number(item.original_price ?? item.price ?? 0);
+
 const getCartTotal = (cart) => {
     return cart.reduce((total, item) => {
-        const price = Number(item.price || 0);
-        const quantity = Number(item.quantity || 0);
-        return total + price * quantity;
+        return total + getItemUnitPrice(item) * Number(item.quantity || 0);
+    }, 0);
+};
+
+const getCartOriginalTotal = (cart) => {
+    return cart.reduce((total, item) => {
+        return total + getItemOriginalPrice(item) * Number(item.quantity || 0);
     }, 0);
 };
 
@@ -381,37 +417,95 @@ const createMenuItemFromCard = (card) => {
     const originalPriceAttr =
         cartBtn.getAttribute("data-original-price") ||
         cartBtn.dataset.originalPrice;
-    let price = parseFloat(originalPriceAttr) || 0;
+    let originalPrice = parseFloat(originalPriceAttr) || 0;
 
-    if (price === 0) {
+    if (originalPrice === 0) {
         const allPrices = menuCard.querySelectorAll(".menu-offer-price");
         if (allPrices.length > 1) {
-            const priceText = allPrices[0].textContent
+            // Prefer struck-through original when both prices exist
+            const oldPrice = menuCard.querySelector(".menu-offer-price-old");
+            const priceText = (oldPrice || allPrices[0]).textContent
                 .replace(/,/g, "")
                 .replace(/[^\d.]/g, "")
                 .trim();
-            price = parseFloat(priceText) || 0;
+            originalPrice = parseFloat(priceText) || 0;
         } else if (allPrices.length === 1) {
             const priceText = allPrices[0].textContent
                 .replace(/,/g, "")
                 .replace(/[^\d.]/g, "")
                 .trim();
-            price = parseFloat(priceText) || 0;
+            originalPrice = parseFloat(priceText) || 0;
         }
+    }
+
+    const offerPercent =
+        parseFloat(
+            cartBtn.getAttribute("data-offer-percent") ||
+                cartBtn.dataset.offerPercent ||
+                "0",
+        ) || 0;
+    const offerId =
+        cartBtn.getAttribute("data-offer-id") || cartBtn.dataset.offerId || null;
+    const isFirstOrder =
+        (cartBtn.getAttribute("data-is-first-order") ||
+            cartBtn.dataset.isFirstOrder ||
+            "0") === "1";
+    const applicableTo = (
+        cartBtn.getAttribute("data-applicable-to") ||
+        cartBtn.dataset.applicableTo ||
+        "all"
+    ).toLowerCase();
+
+    const member = getMemberState();
+    const requiresMember = offerRequiresMemberLogin(isFirstOrder, applicableTo);
+
+    if (requiresMember && !member.loggedIn) {
+        showOfferMemberLoginModal();
+        return null;
+    }
+
+    let offerPriceAttr =
+        parseFloat(
+            cartBtn.getAttribute("data-offer-price") ||
+                cartBtn.dataset.offerPrice ||
+                "0",
+        ) || 0;
+
+    let price = originalPrice;
+    let offerApplied = false;
+    let appliedOfferPercent = 0;
+
+    const canApplyOffer =
+        offerPercent > 0 &&
+        (!requiresMember ||
+            (member.loggedIn &&
+                (!isFirstOrder || member.canUseFirstOrder !== false)));
+
+    if (canApplyOffer) {
+        price =
+            offerPriceAttr > 0
+                ? offerPriceAttr
+                : Math.round(originalPrice * (1 - offerPercent / 100) * 100) /
+                  100;
+        offerApplied = true;
+        appliedOfferPercent = offerPercent;
     }
 
     const item = {
         title: title || "Menu item",
         price: price,
+        original_price: originalPrice,
         quantity: 1,
         image,
         note: quantityText.trim() || "1 person",
-        variation_id: variationId ? parseInt(variationId) : null,
+        variation_id: variationId ? parseInt(variationId, 10) : null,
+        offer_id: offerId ? parseInt(offerId, 10) : null,
+        offer_percent: appliedOfferPercent,
+        offer_applied: offerApplied,
     };
 
     item.id = buildCartItemId(item);
 
-    console.log("Creating cart item:", item);
     return item;
 };
 
@@ -423,6 +517,15 @@ const updateCartBadges = (cart) => {
             node.textContent = totalCount;
             node.setAttribute("aria-label", `${totalCount} items`);
         });
+};
+
+const renderCartItemPriceLabel = (item) => {
+    const unit = getItemUnitPrice(item);
+    const original = getItemOriginalPrice(item);
+    if (item.offer_applied && original > unit) {
+        return `<span class="text-decoration-line-through text-muted me-1">${formatCurrency(original)}</span>${formatCurrency(unit)}`;
+    }
+    return formatCurrency(unit);
 };
 
 const renderCartDrawer = () => {
@@ -463,7 +566,7 @@ const renderCartDrawer = () => {
             <div class="cart-item-header-row">
               <div class="cart-item-info">
                 <h6 class="cart-item-title">${item.title}</h6>
-                <span class="cart-item-unit">${formatCurrency(item.price)} each</span>
+                <span class="cart-item-unit">${renderCartItemPriceLabel(item)} each${item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : ""}</span>
               </div>
               <button class="cart-item-remove-btn" type="button" aria-label="Remove ${item.title}">
                 <i class="bi bi-trash3"></i>
@@ -479,7 +582,7 @@ const renderCartDrawer = () => {
                   <i class="bi bi-plus"></i>
                 </button>
               </div>
-              <div class="cart-item-meta">${formatCurrency(item.price * item.quantity)}</div>
+              <div class="cart-item-meta">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</div>
             </div>
           </div>
         </article>
@@ -528,7 +631,7 @@ const renderCartPage = () => {
           <div class="cart-product-top">
             <div>
               <h6 class="cart-product-name">${item.title}</h6>
-              <span class="cart-product-tag">${item.note}</span>
+              <span class="cart-product-tag">${item.note}${item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : ""}</span>
             </div>
             <button class="btn cart-remove-btn" type="button" aria-label="Remove item">
               <i class="bi bi-x-lg"></i>
@@ -545,8 +648,8 @@ const renderCartPage = () => {
               </button>
             </div>
             <div class="cart-product-price-wrap">
-              <span class="cart-product-unit">${formatCurrency(item.price)} × ${item.quantity}</span>
-              <strong class="cart-product-total">${formatCurrency(item.price * item.quantity)}</strong>
+              <span class="cart-product-unit">${renderCartItemPriceLabel(item)} × ${item.quantity}</span>
+              <strong class="cart-product-total">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</strong>
             </div>
           </div>
         </div>
@@ -599,25 +702,31 @@ const renderCheckoutSummary = () => {
         <img src="${item.image}" alt="${item.title}" class="checkout-order-img" />
         <div class="checkout-order-info">
           <p class="checkout-order-name">${item.title}</p>
-          <span class="checkout-order-price">${formatCurrency(item.price)} × ${item.quantity}</span>
+          <span class="checkout-order-price">${renderCartItemPriceLabel(item)} × ${item.quantity}${item.offer_applied && item.offer_percent ? ` <span class="badge bg-danger-subtle text-danger">${item.offer_percent}% OFF</span>` : ""}</span>
         </div>
-        <strong class="checkout-order-subtotal">${formatCurrency(item.price * item.quantity)}</strong>
+        <strong class="checkout-order-subtotal">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</strong>
       </div>
     `,
         )
         .join("");
 
-    const total = getCartTotal(cart);
+    // Subtotal = offer/discounted unit prices (what the customer pays for items)
+    const discountedTotal = getCartTotal(cart);
+    const originalTotal = getCartOriginalTotal(cart);
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    checkoutSubtotal.textContent = formatCurrency(total);
-    checkoutTotal.textContent = formatCurrency(total);
-    if (orderTotalInput) orderTotalInput.value = total.toFixed(2);
+    checkoutSubtotal.textContent = formatCurrency(discountedTotal);
+    checkoutTotal.textContent = formatCurrency(discountedTotal);
+    // Backend recalculates from DB using original catalog prices
+    if (orderTotalInput) orderTotalInput.value = originalTotal.toFixed(2);
     if (itemsInput) itemsInput.value = JSON.stringify(cart);
     if (itemCountHint) {
         itemCountHint.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
     }
-    // Notify checkout page that the subtotal has been set so discounts can be re-applied
-    document.dispatchEvent(new CustomEvent('cartSummaryRendered', { detail: { total } }));
+    document.dispatchEvent(
+        new CustomEvent("cartSummaryRendered", {
+            detail: { total: discountedTotal, originalTotal },
+        }),
+    );
 };
 
 const addToCart = (item) => {

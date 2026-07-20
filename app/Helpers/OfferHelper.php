@@ -29,7 +29,7 @@ if (!function_exists('hasVariationOffer')) {
 }
 
 /**
- * Get all active offers for a menu variation
+ * Get all active offers for a menu variation (specific + all_items)
  */
 if (!function_exists('getVariationOffers')) {
     function getVariationOffers($variationId)
@@ -38,7 +38,7 @@ if (!function_exists('getVariationOffers')) {
         if (!$variation) {
             return collect();
         }
-        return $variation->activeOffers()->get();
+        return $variation->resolveApplicableOffers(null, false);
     }
 }
 

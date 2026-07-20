@@ -11,44 +11,81 @@ class MemberController extends Controller
     public function __construct()
     {
         $this->middleware('permission:members-show')->only(['index', 'show']);
-        $this->middleware('permission:members-edit')->only(['toggleStatus', 'syncPurchase', 'approve', 'reject']);
+        $this->middleware('permission:members-edit')->only(['toggleStatus', 'updateStatus', 'syncPurchase', 'approve', 'reject', 'upgradeToGolden']);
     }
 
     public function index(Request $request)
     {
-        $search = $request->query('search');
-        $approvalFilter = $request->query('approval'); // pending, approved, rejected
-        
-        // Get counts for filter buttons
-        $counts = $this->approvalCounts();
-        $pendingCount = $counts['pending'];
-        $approvedCount = $counts['approved'];
-        $rejectedCount = $counts['rejected'];
-        
+        $search = trim((string) $request->query('search', ''));
+
+        // Default: Active members. Use status=all to show every status.
+        $statusFilter = $request->query('status', 'active');
+        if (! in_array($statusFilter, ['pending', 'active', 'suspended', 'all'], true)) {
+            $statusFilter = 'active';
+        }
+
+        // Card/name/phone search must find members in any status (pending/rejected/suspended)
+        if ($search !== '') {
+            $statusFilter = 'all';
+        }
+
+        $typeFilter = $request->query('type', 'all');
+        if (! in_array($typeFilter, ['all', 'membership', 'golden'], true)) {
+            $typeFilter = 'all';
+        }
+
+        $studentFilter = $request->query('student', 'all');
+        if (! in_array($studentFilter, ['all', 'yes', 'no'], true)) {
+            $studentFilter = 'all';
+        }
+
+        $approvalFilter = $request->query('approval', 'all');
+        if (! in_array($approvalFilter, ['all', 'pending', 'approved', 'rejected'], true)) {
+            $approvalFilter = 'all';
+        }
+
         $members = Member::query()
             ->withSum(['orders as computed_total_purchase' => function ($q) {
                 $q->whereIn('status', ['confirmed', 'completed']);
             }], 'final_amount')
             ->withCount('orders')
-            ->when($search, function ($query, $search) {
-                return $query->where('unique_card_number', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhere('name', 'like', "%{$search}%");
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%'.$search.'%';
+                $query->where(function ($q) use ($search, $like) {
+                    $q->where('unique_card_number', 'like', $like)
+                        ->orWhere('unique_card_number', $search)
+                        ->orWhere('phone', 'like', $like)
+                        ->orWhere('name', 'like', $like)
+                        ->orWhere('email', 'like', $like);
+                });
             })
-            ->when($approvalFilter, function ($query, $approvalFilter) {
-                return $query->where('is_student', true)
+            ->when($statusFilter !== 'all', function ($query) use ($statusFilter) {
+                $query->where('status', $statusFilter);
+            })
+            ->when($typeFilter !== 'all', function ($query) use ($typeFilter) {
+                $query->where('type', $typeFilter);
+            })
+            ->when($studentFilter === 'yes', function ($query) {
+                $query->where('is_student', true);
+            })
+            ->when($studentFilter === 'no', function ($query) {
+                $query->where('is_student', false);
+            })
+            ->when($approvalFilter !== 'all', function ($query) use ($approvalFilter) {
+                $query->where('is_student', true)
                     ->where('approval_status', $approvalFilter);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('backend.members.index', compact(
-            'members', 
-            'search', 
-            'approvalFilter',
-            'pendingCount',
-            'approvedCount',
-            'rejectedCount'
+            'members',
+            'search',
+            'statusFilter',
+            'typeFilter',
+            'studentFilter',
+            'approvalFilter'
         ));
     }
 
@@ -109,6 +146,27 @@ class MemberController extends Controller
             'success' => true,
             'message' => 'Member status changed to ' . ucfirst($member->status) . '.',
             'new_status' => $member->status,
+            'counts' => $this->statusCounts(),
+        ]);
+    }
+
+    /**
+     * Set member account status: pending, active, or suspended.
+     */
+    public function updateStatus(Request $request, Member $member)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,active,suspended',
+        ]);
+
+        $member->status = $validated['status'];
+        $member->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Member status changed to ' . ucfirst($member->status) . '.',
+            'new_status' => $member->status,
+            'counts' => $this->statusCounts(),
         ]);
     }
 
@@ -212,6 +270,15 @@ class MemberController extends Controller
             'pending' => Member::where('is_student', true)->where('approval_status', 'pending')->count(),
             'approved' => Member::where('is_student', true)->where('approval_status', 'approved')->count(),
             'rejected' => Member::where('is_student', true)->where('approval_status', 'rejected')->count(),
+        ];
+    }
+
+    private function statusCounts(): array
+    {
+        return [
+            'pending' => Member::where('status', 'pending')->count(),
+            'active' => Member::where('status', 'active')->count(),
+            'suspended' => Member::where('status', 'suspended')->count(),
         ];
     }
 }

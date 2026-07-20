@@ -48,6 +48,10 @@ class OfferController extends Controller
             $offer->menuVariations()->sync($request->menu_variations);
         }
 
+        cache()->forget('home_categories');
+        cache()->forget('home_popup_offer');
+        cache()->forget('active_all_item_offers');
+
         return redirect()->route('offers.index')->with('success', 'Offer created successfully.');
     }
 
@@ -85,6 +89,10 @@ class OfferController extends Controller
             $offer->menuVariations()->detach();
         }
 
+        cache()->forget('home_categories');
+        cache()->forget('home_popup_offer');
+        cache()->forget('active_all_item_offers');
+
         return redirect()->route('offers.index')->with('success', 'Offer updated successfully.');
     }
 
@@ -96,22 +104,29 @@ class OfferController extends Controller
         $offer->menuVariations()->detach();
         $offer->delete();
 
+        cache()->forget('home_categories');
+        cache()->forget('home_popup_offer');
+        cache()->forget('active_all_item_offers');
+
         return response()->json(['success' => true, 'message' => 'Offer deleted.']);
     }
 
     public function toggleStatus(Offer $offer)
     {
         $offer->update(['is_active' => !$offer->is_active]);
+        cache()->forget('home_categories');
+        cache()->forget('home_popup_offer');
+        cache()->forget('active_all_item_offers');
         return response()->json(['success' => true, 'is_active' => $offer->is_active]);
     }
 
     private function validated(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'name'              => 'required|string|max:255',
             'description'       => 'nullable|string|max:1000',
             'discount_percent'  => 'required|integer|min:0|max:100',
-            'applicable_to'     => 'required|string|max:100',
+            'applicable_to'     => 'required|in:all,membership,student,golden',
             'offer_type'        => 'required|in:all_items,specific_items',
             'menu_variations'   => 'nullable|array',
             'menu_variations.*' => 'integer|exists:menu_variations,id',
@@ -125,5 +140,11 @@ class OfferController extends Controller
             'valid_from'        => 'nullable|date',
             'valid_until'       => 'nullable|date',
         ]);
+
+        $data['is_first_order'] = $request->boolean('is_first_order');
+        $data['is_active'] = $request->boolean('is_active');
+        $data['show_as_popup'] = $request->boolean('show_as_popup');
+
+        return $data;
     }
 }

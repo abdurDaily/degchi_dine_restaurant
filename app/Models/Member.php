@@ -59,6 +59,30 @@ class Member extends Authenticatable
         return $this->type === 'golden';
     }
 
+    public const ACCOUNT_RESTRICTED_MESSAGE = 'Your account temporary suspand. contact our help line';
+
+    /**
+     * Active account only — pending/suspended cannot order or comment.
+     * Student pending/rejected approval is also blocked.
+     */
+    public function canOrderAndComment(): bool
+    {
+        if ($this->status !== 'active') {
+            return false;
+        }
+
+        if ($this->is_student && $this->approval_status !== 'approved') {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function accountRestrictedMessage(): string
+    {
+        return self::ACCOUNT_RESTRICTED_MESSAGE;
+    }
+
     public function isExpired(): bool
     {
         return $this->expires_at && $this->expires_at->isPast();
@@ -108,7 +132,35 @@ class Member extends Authenticatable
 
     public function hasCompletedOrders(): bool
     {
-        return $this->orders()->whereNotIn('status', ['canceled'])->exists();
+        // Orders linked to this member account
+        if ($this->orders()->whereNotIn('status', ['canceled'])->exists()) {
+            return true;
+        }
+
+        // Orders placed with this membership card (even if member_id was missing)
+        if ($this->unique_card_number) {
+            return Order::query()
+                ->whereNotIn('status', ['canceled'])
+                ->where('unique_card_number', $this->unique_card_number)
+                ->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Persist first-order-used when historical orders exist but the flag was never set.
+     */
+    public function syncFirstOrderDiscountFlag(): void
+    {
+        if ($this->first_order_discount_used) {
+            return;
+        }
+
+        if ($this->hasCompletedOrders()) {
+            static::where('id', $this->id)->update(['first_order_discount_used' => true]);
+            $this->first_order_discount_used = true;
+        }
     }
 
     /**
@@ -116,6 +168,8 @@ class Member extends Authenticatable
      */
     public function canUseFirstOrderDiscount(): bool
     {
+        $this->syncFirstOrderDiscountFlag();
+
         if ($this->isGolden() || $this->isExpired()) {
             return false;
         }
@@ -127,9 +181,28 @@ class Member extends Authenticatable
         return true;
     }
 
+    /**
+     * Active Membership / Student first-order offer from the offers table (system rows).
+     */
+    public function memberTierOffer(): ?Offer
+    {
+        $applicable = $this->is_student ? 'student' : 'membership';
+
+        return Offer::query()
+            ->active()
+            ->valid()
+            ->where('applicable_to', $applicable)
+            ->where('discount_percent', '>', 0)
+            ->orderByDesc('discount_percent')
+            ->first();
+    }
+
+    /**
+     * Membership/Student discount % for this order, respecting First Order Only on the offer.
+     */
     public function firstOrderDiscountPercent(): ?int
     {
-        if (!$this->canUseFirstOrderDiscount()) {
+        if ($this->isGolden() || $this->isExpired()) {
             return null;
         }
 
@@ -137,7 +210,30 @@ class Member extends Authenticatable
             return null;
         }
 
-        return $this->is_student ? 35 : 30;
+        $offer = $this->memberTierOffer();
+
+        // Fallback to built-in rates when system offer rows are missing (always first-order only)
+        if (! $offer) {
+            if (! $this->canUseFirstOrderDiscount()) {
+                return null;
+            }
+
+            return $this->is_student
+                ? (int) (self::FIRST_ORDER_RATE_STUDENT * 100)
+                : (int) (self::FIRST_ORDER_RATE_STANDARD * 100);
+        }
+
+        // First Order Only ON → only while member has never ordered
+        if ($offer->is_first_order) {
+            if (! $this->canUseFirstOrderDiscount()) {
+                return null;
+            }
+
+            return (int) $offer->discount_percent;
+        }
+
+        // First Order Only OFF → every order for this membership/student tier
+        return (int) $offer->discount_percent;
     }
 
     public function qualifiesForGoldenUpgrade(): bool
@@ -151,14 +247,18 @@ class Member extends Authenticatable
      *
      * @return array{eligible: bool, amount: float, rate: int, member_type: string, message: string, first_order_discount_used: bool}
      */
-    public function resolveMemberDiscount(float $orderTotal, bool $autoUpgrade = true): array
+    public function resolveMemberDiscount(float $orderTotal, bool $autoUpgrade = false): array
     {
+        $this->syncFirstOrderDiscountFlag();
+
+        $firstOrderAlreadyUsed = $this->first_order_discount_used || $this->hasCompletedOrders();
+
         $base = [
             'eligible' => false,
             'amount' => 0.0,
             'rate' => 0,
             'member_type' => $this->type,
-            'first_order_discount_used' => $this->first_order_discount_used || $this->hasCompletedOrders(),
+            'first_order_discount_used' => $firstOrderAlreadyUsed,
         ];
 
         if ($this->isExpired()) {
@@ -167,28 +267,39 @@ class Member extends Authenticatable
             return $base;
         }
 
+        // Golden = every order (not limited by First Order Only on Membership/Student offers)
         if ($this->isGolden()) {
+            $msg = 'Golden Card Holder: 10% discount on every order.';
+            if ($firstOrderAlreadyUsed) {
+                $msg .= ' (Your Membership/Student first-order discount was already used.)';
+            }
+
             return array_merge($base, [
                 'eligible' => true,
                 'amount' => $this->goldenDiscountAmount($orderTotal),
                 'rate' => 10,
                 'member_type' => 'golden',
-                'message' => 'Golden Card Holder: 10% discount applied to all food items.',
+                'message' => $msg,
             ]);
         }
 
-        $firstOrderPercent = $this->firstOrderDiscountPercent();
-        if ($firstOrderPercent !== null) {
+        $tierPercent = $this->firstOrderDiscountPercent();
+        if ($tierPercent !== null) {
+            $offer = $this->memberTierOffer();
+            $isFirstOrderOffer = $offer ? (bool) $offer->is_first_order : true;
+
             return array_merge($base, [
                 'eligible' => true,
-                'amount' => round($orderTotal * ($firstOrderPercent / 100), 2),
-                'rate' => $firstOrderPercent,
+                'amount' => round($orderTotal * ($tierPercent / 100), 2),
+                'rate' => $tierPercent,
                 'first_order_discount_used' => false,
-                'message' => sprintf('%d%% first-order discount applied to all food items.', $firstOrderPercent),
+                'message' => $isFirstOrderOffer
+                    ? sprintf('%d%% first-order %s discount applied (one time only).', $tierPercent, $this->is_student ? 'student' : 'membership')
+                    : sprintf('%d%% %s discount applied to all food items.', $tierPercent, $this->is_student ? 'student' : 'membership'),
             ]);
         }
 
-        if ($this->canUseFirstOrderDiscount() && $this->is_student && $this->approval_status !== 'approved') {
+        if ($this->is_student && $this->approval_status !== 'approved' && ! $firstOrderAlreadyUsed) {
             $statusMessage = $this->approval_status === 'rejected'
                 ? 'Your student membership has been rejected by admin. Please contact support for assistance.'
                 : 'Your student membership is pending admin approval. First-order discount will be available once approved.';
@@ -200,26 +311,40 @@ class Member extends Authenticatable
             ]);
         }
 
+        // Eligible for golden by spend — only upgrade when explicitly allowed (after order credit)
         if ($this->qualifiesForGoldenUpgrade()) {
             if ($autoUpgrade) {
                 $this->upgradeToGolden();
+
+                return array_merge($base, [
+                    'eligible' => true,
+                    'amount' => round($orderTotal * self::GOLDEN_DISCOUNT_RATE, 2),
+                    'rate' => 10,
+                    'member_type' => 'golden',
+                    'message' => 'Golden Card unlocked: 10% discount on every order.',
+                ]);
             }
 
-            return array_merge($base, [
-                'eligible' => true,
-                'amount' => round($orderTotal * self::GOLDEN_DISCOUNT_RATE, 2),
-                'rate' => 10,
-                'member_type' => 'golden',
-                'message' => 'Golden Card Holder: 10% discount applied to all food items.',
-            ]);
+            $base['message'] = 'You have reached the Golden Card threshold (৳'
+                .number_format(self::GOLDEN_UPGRADE_THRESHOLD, 0)
+                .'). Complete this order to unlock 10% on every future order. '
+                .'Your Membership/Student first-order discount is already used.';
+
+            return $base;
         }
 
         $remaining = max(0, self::GOLDEN_UPGRADE_THRESHOLD - $this->liveTotalPurchase());
 
         return array_merge($base, [
-            'message' => $remaining > 0
-                ? 'No discount available. Spend ৳' . number_format($remaining, 2) . ' more to unlock Golden Card with 10% discount on every order.'
-                : 'No discount available on this order.',
+            'message' => $firstOrderAlreadyUsed
+                ? ($remaining > 0
+                    ? 'First-order membership/student discount already used — no membership discount on this order. Spend ৳'
+                        .number_format($remaining, 2)
+                        .' more to unlock Golden Card (10% on every order).'
+                    : 'First-order membership/student discount already used — no membership discount on this order.')
+                : ($remaining > 0
+                    ? 'No membership discount on this order. Spend ৳'.number_format($remaining, 2).' more to unlock Golden Card (10% on every order).'
+                    : 'No membership discount on this order.'),
         ]);
     }
 

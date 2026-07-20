@@ -22,9 +22,11 @@ class OfferCheckController extends Controller
             return response()->json(['error' => 'Variation not found'], 404);
         }
 
-        $offers = $variation->activeOffers()
-            ->select(['id', 'name', 'description', 'discount_percent', 'popup_badge', 'offer_type'])
-            ->get();
+        $offers = $variation->resolveApplicableOffers(null, false)
+            ->map(fn ($offer) => $offer->only([
+                'id', 'name', 'description', 'discount_percent', 'popup_badge', 'offer_type', 'is_first_order', 'applicable_to',
+            ]))
+            ->values();
 
         return response()->json([
             'has_offers' => $offers->isNotEmpty(),
@@ -40,8 +42,24 @@ class OfferCheckController extends Controller
      */
     public function getAllVariationsWithOffers()
     {
-        $variations = MenuVariation::with(['activeOffers:id,name,discount_percent,popup_badge'])
-            ->get(['id', 'menu_id', 'name', 'price', 'image']);
+        $globalOffers = \App\Models\Offer::activeAllItemOffers();
+
+        $variations = MenuVariation::with(['offers' => function ($q) {
+            $q->where('is_active', true)
+                ->where(function ($sub) {
+                    $sub->whereNull('valid_from')->orWhere('valid_from', '<=', now());
+                })
+                ->where(function ($sub) {
+                    $sub->whereNull('valid_until')->orWhere('valid_until', '>=', now());
+                });
+        }])->get(['id', 'menu_id', 'name', 'price', 'image']);
+
+        $variations->each(function ($variation) use ($globalOffers) {
+            $variation->setRelation(
+                'activeOffers',
+                $variation->offers->concat($globalOffers)->unique('id')->sortByDesc('discount_percent')->values()
+            );
+        });
 
         return response()->json([
             'variations' => $variations,

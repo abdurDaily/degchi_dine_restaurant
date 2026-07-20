@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 
 class Offer extends Model
 {
@@ -91,6 +92,88 @@ class Offer extends Model
             return true;
         }
         return $this->menuVariations()->where('menu_variation_id', $variation->id)->exists();
+    }
+
+    /**
+     * Active, in-date "all food items" promos only (not membership/student/golden tier deals).
+     */
+    public static function activeAllItemOffers(): Collection
+    {
+        return cache()->remember('active_all_item_offers', 60, function () {
+            return static::query()
+                ->active()
+                ->valid()
+                ->where('offer_type', 'all_items')
+                ->where('applicable_to', 'all')
+                ->where('discount_percent', '>', 0)
+                ->orderByDesc('discount_percent')
+                ->get();
+        });
+    }
+
+    /**
+     * Food-menu promo (All / Specific items). Competes for largest badge on product cards.
+     * Member-tier rows (membership / student / golden) are checkout benefits, not menu badges.
+     */
+    public function isFoodMenuOffer(): bool
+    {
+        return $this->applicable_to === 'all' && (int) $this->discount_percent > 0;
+    }
+
+    /**
+     * Built-in membership benefit rows (30% / 35% / golden) — applied via member card at checkout.
+     */
+    public function isMemberTierOffer(): bool
+    {
+        return in_array($this->applicable_to, ['membership', 'student', 'golden'], true);
+    }
+
+    /**
+     * Guest cannot use first-order food promos without signing in as a member.
+     */
+    public function requiresMemberLogin(): bool
+    {
+        return (bool) $this->is_first_order;
+    }
+
+    /**
+     * Public food promo anyone can use without membership.
+     */
+    public function isPublicPromo(): bool
+    {
+        return $this->isFoodMenuOffer() && ! $this->is_first_order;
+    }
+
+    /**
+     * Whether this food offer should appear on menu cards for the current viewer.
+     * Guests still see first-order food offers (login required on add).
+     * Members who already ordered must not see any first-order food offer.
+     */
+    public function isVisibleOnMenuFor(?Member $member): bool
+    {
+        if (! $this->isFoodMenuOffer() || $this->is_active === false || ! $this->isValid()) {
+            return false;
+        }
+
+        if ($this->is_first_order) {
+            if (! $member) {
+                return true;
+            }
+
+            return $this->isEligibleForMember($member);
+        }
+
+        return true;
+    }
+
+    /**
+     * All-items food offers currently visible on the menu for this viewer.
+     */
+    public static function visibleAllItemOffersFor(?Member $member = null): Collection
+    {
+        return static::activeAllItemOffers()
+            ->filter(fn (self $offer) => $offer->isVisibleOnMenuFor($member))
+            ->values();
     }
 
     /**

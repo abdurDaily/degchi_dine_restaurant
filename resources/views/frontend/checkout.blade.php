@@ -1031,10 +1031,16 @@
                 };
 
                 @if($loggedInMemberDiscount ?? null)
-                memberDiscountRate = {{ (int) ($loggedInMemberDiscount['rate'] ?? 0) }};
+                memberDiscountRate = {{ (
+                    ($loggedInMemberDiscount['eligible'] ?? false)
+                    && !(($loggedInMemberDiscount['first_order_discount_used'] ?? false) && ($loggedInMemberDiscount['member_type'] ?? '') !== 'golden')
+                ) ? (int) ($loggedInMemberDiscount['rate'] ?? 0) : 0 }};
                 verifiedMember = {
                     verified: true,
-                    eligible: {{ ($loggedInMemberDiscount['eligible'] ?? false) ? 'true' : 'false' }},
+                    eligible: {{ (
+                        ($loggedInMemberDiscount['eligible'] ?? false)
+                        && !(($loggedInMemberDiscount['first_order_discount_used'] ?? false) && ($loggedInMemberDiscount['member_type'] ?? '') !== 'golden')
+                    ) ? 'true' : 'false' }},
                     is_student: {{ ($loggedInMember->is_student ?? false) ? 'true' : 'false' }},
                     approval_status: @json($loggedInMember->approval_status ?? 'approved'),
                     member_type: @json($loggedInMemberDiscount['member_type'] ?? $loggedInMember->type ?? 'membership'),
@@ -1043,6 +1049,10 @@
                 @endif
 
                 function calculateMemberDiscount(subtotal) {
+                    // First-order membership/student discount must not apply on later orders
+                    if (verifiedMember.first_order_discount_used && verifiedMember.member_type !== 'golden') {
+                        return 0;
+                    }
                     if (!verifiedMember.eligible || memberDiscountRate <= 0) {
                         return 0;
                     }
@@ -1055,23 +1065,37 @@
                     return Number.isNaN(n) ? 0 : n;
                 }
 
-                // Single source of truth for "what is the product subtotal right now".
-                // Priority: whatever is already rendered on screen (most trustworthy, since
-                // your cart renderer owns that text) -> the hidden order_total field ->
-                // recompute directly from localStorage as a last resort.
+                function getCartMoneyTotals() {
+                    try {
+                        const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
+                        let original = 0;
+                        let effective = 0;
+                        (Array.isArray(cart) ? cart : []).forEach(item => {
+                            const qty = parseInt(item.quantity, 10) || 1;
+                            const orig = parseFloat(item.original_price ?? item.price) || 0;
+                            const price = parseFloat(item.price) || 0;
+                            original += orig * qty;
+                            effective += price * qty;
+                        });
+                        return {
+                            cart: Array.isArray(cart) ? cart : [],
+                            original: parseFloat(original.toFixed(2)),
+                            effective: parseFloat(effective.toFixed(2)),
+                        };
+                    } catch (e) {
+                        return { cart: [], original: 0, effective: 0 };
+                    }
+                }
+
+                // Displayed subtotal = discounted item prices
                 function getCurrentSubtotal() {
+                    const { effective } = getCartMoneyTotals();
+                    if (effective > 0) return effective;
+
                     const displayed = parseCurrencyText(subtotalDisplay?.textContent);
                     if (displayed > 0) return displayed;
 
-                    const hidden = parseFloat(orderTotalInput?.value) || 0;
-                    if (hidden > 0) return hidden;
-
-                    try {
-                        const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
-                        return cart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
-                    } catch (e) {
-                        return 0;
-                    }
+                    return parseFloat(orderTotalInput?.value) || 0;
                 }
 
                 // NOTE: Coupon discount is always calculated against the product subtotal only
@@ -1087,18 +1111,86 @@
                     return Math.min(parseFloat(discount.toFixed(2)), subtotal);
                 }
 
-                function refreshCheckoutDiscounts(subtotal) {
-                    if (typeof subtotal !== 'number' || Number.isNaN(subtotal) || subtotal <= 0) {
-                        subtotal = getCurrentSubtotal();
+                let isRefreshingCheckoutDiscounts = false;
+
+                function refreshCheckoutDiscounts() {
+                    // Prevent MutationObserver ↔ textContent update feedback loop
+                    if (isRefreshingCheckoutDiscounts) {
+                        return;
                     }
+                    isRefreshingCheckoutDiscounts = true;
 
-                    const memberDiscount = calculateMemberDiscount(subtotal);
-                    const cart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
-                    const offerInfo = calculateOfferDiscount(cart);
-                    const bestPromoDiscount = Math.max(memberDiscount, offerInfo.discount);
-                    const couponDiscount = calculateCouponDiscount(subtotal);
+                    try {
+                        const { cart, original, effective } = getCartMoneyTotals();
+                        const offerInfo = calculateOfferDiscount(cart);
+                        const memberDiscount = calculateMemberDiscount(original);
+                        const foodOfferDiscount = Math.max(
+                            offerInfo.discount || 0,
+                            Math.max(0, parseFloat((original - effective).toFixed(2)))
+                        );
 
-                    updateTotals(subtotal, bestPromoDiscount, offerInfo, memberDiscount, couponDiscount);
+                        // Membership/Student first-order is an all-items checkout benefit.
+                        // Compare against food-item offers and take the better deal (membership wins ties).
+                        const membershipWins = memberDiscount > 0 && memberDiscount >= foodOfferDiscount;
+
+                        let displaySubtotal;
+                        let promoToSubtract;
+                        let displayMemberDiscount;
+                        let displayOfferInfo;
+
+                        if (membershipWins) {
+                            // Show real catalog subtotal + Membership Discount (works even if cart has offer items)
+                            displaySubtotal = original;
+                            promoToSubtract = memberDiscount;
+                            displayMemberDiscount = memberDiscount;
+                            displayOfferInfo = { discount: 0, offerName: '', offerPercent: 0 };
+                        } else if (foodOfferDiscount > 0) {
+                            // Food promo is better — subtotal already uses offer unit prices
+                            displaySubtotal = effective;
+                            promoToSubtract = 0;
+                            displayMemberDiscount = 0;
+                            displayOfferInfo = {
+                                discount: 0,
+                                offerName: offerInfo.offerName,
+                                offerPercent: offerInfo.offerPercent,
+                            };
+                        } else {
+                            displaySubtotal = original > 0 ? original : effective;
+                            promoToSubtract = 0;
+                            displayMemberDiscount = 0;
+                            displayOfferInfo = { discount: 0, offerName: '', offerPercent: 0 };
+                        }
+
+                        if (subtotalDisplay) {
+                            const nextSubtotal = `৳ ${displaySubtotal.toFixed(2)}`;
+                            if (subtotalDisplay.textContent !== nextSubtotal) {
+                                subtotalDisplay.textContent = nextSubtotal;
+                            }
+                        }
+                        if (orderTotalInput) {
+                            const nextOriginal = original.toFixed(2);
+                            if (orderTotalInput.value !== nextOriginal) {
+                                orderTotalInput.value = nextOriginal;
+                            }
+                        }
+
+                        const couponDiscount = calculateCouponDiscount(displaySubtotal);
+
+                        updateTotals(
+                            displaySubtotal,
+                            promoToSubtract,
+                            displayOfferInfo,
+                            displayMemberDiscount,
+                            couponDiscount,
+                            {
+                                original,
+                                membershipWins,
+                                offerMeta: offerInfo,
+                            }
+                        );
+                    } finally {
+                        isRefreshingCheckoutDiscounts = false;
+                    }
                 }
 
                 function offerEligibleForVerifiedMember(offer) {
@@ -1139,71 +1231,82 @@
                     return true;
                 }
 
-                // Calculate offer discount for cart items
+                // Calculate offer discount for cart items (always from original unit price)
                 function calculateOfferDiscount(cartItems) {
                     let totalOfferDiscount = 0;
                     let bestOfferName = '';
                     let bestOfferPercent = 0;
 
-                    if (!Array.isArray(cartItems) || cartItems.length === 0 || activeOffers.length === 0) {
+                    if (!Array.isArray(cartItems) || cartItems.length === 0) {
                         return { discount: 0, offerName: '', offerPercent: 0 };
                     }
 
                     const hasMembershipCard = memberCardInput && memberCardInput.value.trim() !== '';
+                    const memberLoggedIn = !!(window.DEGCHI_MEMBER && window.DEGCHI_MEMBER.loggedIn);
 
-                    const applicableOffers = activeOffers.filter(offer => {
-                        if (!hasMembershipCard) {
-                            if (offer.is_first_order || ['student', 'membership', 'golden'].includes(offer.applicable_to)) {
+                    const applicableOffers = (activeOffers || []).filter(offer => {
+                        // Food menu promos only — membership/student/golden stay on member-card discount
+                        if (offer.applicable_to !== 'all') {
+                            return false;
+                        }
+                        if (!(offer.discount_percent > 0)) {
+                            return false;
+                        }
+                        if (offer.is_first_order) {
+                            if (!hasMembershipCard && !memberLoggedIn) {
                                 return false;
                             }
+                            return offerEligibleForVerifiedMember(offer);
                         }
-                        return offerEligibleForVerifiedMember(offer);
+                        return true;
                     });
 
-                    // For each cart item, find applicable offers
                     cartItems.forEach(item => {
                         const variationId = item.variation_id || item.id;
-                        console.log('Checking item:', item.title, 'variation_id:', variationId);
-                        
-                        if (!variationId) {
-                            console.warn('No variation_id for item:', item);
+                        if (!variationId) return;
+
+                        const basePrice = parseFloat(item.original_price ?? item.price) || 0;
+                        const qty = parseInt(item.quantity, 10) || 1;
+
+                        // Cart already stored a public/member-eligible offer price
+                        if (item.offer_applied && item.offer_percent > 0) {
+                            const linked = applicableOffers.find(o => o.id == item.offer_id);
+                            const raw = (activeOffers || []).find(o => o.id == item.offer_id);
+                            if (raw && (raw.is_first_order || ['student', 'membership', 'golden'].includes(raw.applicable_to))) {
+                                if (!linked && !offerEligibleForVerifiedMember(raw)) {
+                                    return;
+                                }
+                            }
+
+                            const itemDiscount = basePrice * qty * (item.offer_percent / 100);
+                            totalOfferDiscount += itemDiscount;
+                            if (item.offer_percent > bestOfferPercent) {
+                                bestOfferPercent = item.offer_percent;
+                                bestOfferName = linked?.name || raw?.name || 'Offer Discount';
+                            }
                             return;
                         }
 
-                        // Find offers that apply to this variation
                         let bestItemOffer = null;
-                        
                         applicableOffers.forEach(offer => {
-                            // Check if offer applies to this item
-                            const appliesTo = offer.offer_type === 'all_items' || 
-                                (Array.isArray(offer.menu_variations) && 
-                                 offer.menu_variations.some(v => v.id == variationId));
-                            
-                            console.log(`  Offer "${offer.name}" (${offer.offer_type}) applies:`, appliesTo);
-                            
+                            const appliesTo = offer.offer_type === 'all_items' ||
+                                (Array.isArray(offer.menu_variations) &&
+                                    offer.menu_variations.some(v => v.id == variationId));
+
                             if (appliesTo && (!bestItemOffer || offer.discount_percent > bestItemOffer.discount_percent)) {
                                 bestItemOffer = offer;
                             }
                         });
 
-                        // Calculate discount for this item
                         if (bestItemOffer) {
-                            const itemTotal = (item.price || 0) * (item.quantity || 1);
-                            const itemDiscount = itemTotal * (bestItemOffer.discount_percent / 100);
+                            const itemDiscount = basePrice * qty * (bestItemOffer.discount_percent / 100);
                             totalOfferDiscount += itemDiscount;
-                            
-                            console.log(`  ✓ Applied ${bestItemOffer.name} (${bestItemOffer.discount_percent}%): ৳${itemDiscount.toFixed(2)}`);
-
                             if (bestItemOffer.discount_percent > bestOfferPercent) {
                                 bestOfferPercent = bestItemOffer.discount_percent;
                                 bestOfferName = bestItemOffer.name;
                             }
-                        } else {
-                            console.log('  ✗ No offer applies to this item');
                         }
                     });
-
-                    console.log('Total offer discount:', totalOfferDiscount);
 
                     return {
                         discount: parseFloat(totalOfferDiscount.toFixed(2)),
@@ -1212,19 +1315,17 @@
                     };
                 }
 
-                function updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount, couponDiscount) {
+                function updateTotals(subtotal, bestDiscount, offerInfo, memberDiscount, couponDiscount, meta) {
                     offerInfo = offerInfo || { discount: 0, offerName: '', offerPercent: 0 };
-                    memberDiscount = typeof memberDiscount === 'number'
-                        ? memberDiscount
-                        : calculateMemberDiscount(subtotal);
+                    meta = meta || {};
+                    memberDiscount = typeof memberDiscount === 'number' ? memberDiscount : 0;
                     couponDiscount = typeof couponDiscount === 'number'
                         ? couponDiscount
                         : calculateCouponDiscount(subtotal);
-                    const offerDiscount = offerInfo.discount;
+                    const offerDiscount = offerInfo.discount || 0;
 
-                    console.log('updateTotals called:', { subtotal, bestDiscount, memberDiscount, offerDiscount, couponDiscount, shippingCharge });
-
-                    // Update offer display
+                    // Food offer is already included in the discounted Subtotal — do not show a
+                    // second "− offer" line (that would look like double discounting).
                     if (offerDiscount > 0) {
                         offerDiscountRow.style.display = '';
                         offerDiscountEl.textContent = `- ৳ ${offerDiscount.toFixed(2)}`;
@@ -1234,19 +1335,12 @@
                         offerDiscountRow.style.display = 'none';
                     }
 
-                    if (offerDiscount >= memberDiscount) {
-                        // Offer wins — membership row shows 0
-                        discountDisplay.textContent = `- ৳ 0.00`;
-                    } else {
-                        // Membership wins — offer row shows 0 (or hide it)
+                    if (memberDiscount > 0) {
                         discountDisplay.textContent = `- ৳ ${memberDiscount.toFixed(2)}`;
-                        if (offerDiscount > 0) {
-                            offerDiscountRow.style.display = 'none';
-                        }
+                    } else {
+                        discountDisplay.textContent = `- ৳ 0.00`;
                     }
 
-                    // Update coupon display — coupon discount is calculated on product subtotal only,
-                    // it never reduces the delivery charge.
                     if (appliedCoupon && couponDiscount > 0) {
                         couponDiscountRow.style.display = '';
                         checkoutCouponDiscountEl.textContent = `- ৳ ${couponDiscount.toFixed(2)}`;
@@ -1258,14 +1352,9 @@
                     couponCodeHidden.value = (appliedCoupon && couponDiscount > 0) ? appliedCoupon.code : '';
                     couponDiscountHidden.value = couponDiscount.toFixed(2);
 
-                    // --- Final total formula ---
-                    // Subtotal shown = raw product price (before discount); the discount rows above
-                    // show exactly how much is being taken off that product price.
-                    // Coupon discount is ALWAYS calculated against the product subtotal only
-                    // (see calculateCouponDiscount) — the delivery charge is never discounted.
-                    //
-                    //   Total = (Subtotal - Membership/Offer Discount - Coupon Discount) + Delivery Charge
-                    //
+                    // Subtotal is already discounted item prices.
+                    // bestDiscount = extra membership amount only (when membership beats food offer).
+                    // Do NOT subtract bakedOfferSavings again.
                     const discountedProductTotal = Math.max(0, subtotal - bestDiscount - couponDiscount);
                     const deliveryChargeToAdd = typeof shippingCharge === 'number' ? shippingCharge : SHIPPING_CHARGE;
                     const finalTotal = discountedProductTotal + deliveryChargeToAdd;
@@ -1274,12 +1363,10 @@
                     if (shippingChargeDisplay) shippingChargeDisplay.textContent = `৳ ${shippingCharge.toFixed(2)}`;
                     if (shippingChargeHidden) shippingChargeHidden.value = shippingCharge;
 
-                    // Update hidden input for form submission
-                    if (orderTotalInput) {
-                        orderTotalInput.value = subtotal.toFixed(2); // Send original product subtotal, backend will recalculate discount + add shipping
+                    // Keep original catalog total for backend; never overwrite with discounted subtotal
+                    if (orderTotalInput && typeof meta.original === 'number' && meta.original > 0) {
+                        orderTotalInput.value = meta.original.toFixed(2);
                     }
-                    
-                    console.log('Final total displayed:', finalTotal);
                 }
 
                 function updateDiscountDisplay() {
@@ -1287,14 +1374,31 @@
                 }
 
                 function applyMemberCheckResult(result, responseOk) {
-                    memberDiscountRate = responseOk && result.eligible ? (result.discount_rate || 0) : 0;
+                    if (result.account_restricted) {
+                        memberDiscountRate = 0;
+                        verifiedMember = { verified: false, eligible: false, is_student: false, approval_status: 'approved', member_type: 'standard', first_order_discount_used: false, account_restricted: true };
+                        membershipFeedback.textContent = result.message || (window.DEGCHI_MEMBER && window.DEGCHI_MEMBER.accountRestrictedMessage) || 'Your account temporary suspand. contact our help line';
+                        membershipFeedback.classList.remove('text-success', 'text-warning');
+                        membershipFeedback.classList.add('text-danger');
+                        alert(membershipFeedback.textContent);
+                        refreshCheckoutDiscounts();
+                        return;
+                    }
+
+                    const usedFirstOrder = !!result.first_order_discount_used;
+                    const isGolden = (result.member_type || '') === 'golden';
+                    // Never keep a first-order rate after it has been consumed
+                    const allowRate = responseOk && result.eligible && (isGolden || !usedFirstOrder);
+
+                    memberDiscountRate = allowRate ? (result.discount_rate || 0) : 0;
                     verifiedMember = {
                         verified: true,
-                        eligible: !!result.eligible,
+                        eligible: !!allowRate,
                         is_student: !!result.is_student,
                         approval_status: result.approval_status || 'approved',
                         member_type: result.member_type || 'standard',
-                        first_order_discount_used: !!result.first_order_discount_used,
+                        first_order_discount_used: usedFirstOrder,
+                        account_restricted: false,
                     };
 
                     membershipFeedback.textContent = result.message || 'Unable to verify membership card.';
@@ -1345,9 +1449,9 @@
                     }
 
                     try {
-                        const subtotal = getCurrentSubtotal();
+                        const { original } = getCartMoneyTotals();
                         const response = await fetch(
-                            `{{ route('frontend.member.check') }}?member_card_number=${encodeURIComponent(cardNumber)}&order_total=${encodeURIComponent(subtotal)}`
+                            `{{ route('frontend.member.check') }}?member_card_number=${encodeURIComponent(cardNumber)}&order_total=${encodeURIComponent(original || getCurrentSubtotal())}`
                             );
                         const result = await response.json();
                         applyMemberCheckResult(result, response.ok);
@@ -1487,6 +1591,19 @@
                             return;
                         }
 
+                        const restrictedMsg = (window.DEGCHI_MEMBER && window.DEGCHI_MEMBER.accountRestrictedMessage)
+                            || 'Your account temporary suspand. contact our help line';
+
+                        if (window.DEGCHI_MEMBER && window.DEGCHI_MEMBER.loggedIn && window.DEGCHI_MEMBER.canOrderAndComment === false) {
+                            alert(restrictedMsg);
+                            return;
+                        }
+
+                        if (verifiedMember && verifiedMember.account_restricted) {
+                            alert(restrictedMsg);
+                            return;
+                        }
+
                         submitButton.disabled = true;
                         submitButton.innerHTML =
                             '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
@@ -1503,7 +1620,9 @@
                             const result = await response.json();
 
                             if (!response.ok) {
-                                if (result.errors) {
+                                if (result.account_restricted) {
+                                    alert(result.message || restrictedMsg);
+                                } else if (result.errors) {
                                     const messages = Object.values(result.errors).flat().join('\n');
                                     showToast('error', messages);
                                 } else {
@@ -1585,17 +1704,15 @@
                 const initialCart = JSON.parse(localStorage.getItem('degchi_cart') || '[]');
                 console.log('Cart on page load:', initialCart);
 
-                // Paint the delivery charge + total immediately with whatever we can read right now
-                // (won't be wrong for long — the observer below corrects it the moment the real
-                // subtotal is rendered by the cart script).
+                // Initial totals (cartSummaryRendered also refreshes after app.js paints items)
                 refreshCheckoutDiscounts();
 
-                // The cart items/subtotal are rendered by a script we don't control, and its timing
-                // can vary. Rather than guessing with setTimeout, watch the subtotal element itself:
-                // any time its text changes (cart script finishes rendering, quantity changes, etc.),
-                // immediately recompute discounts and the final total.
+                // Watch subtotal only when cart script changes it — skip while we update it ourselves
                 if (subtotalDisplay && typeof MutationObserver !== 'undefined') {
                     const subtotalObserver = new MutationObserver(function() {
+                        if (isRefreshingCheckoutDiscounts) {
+                            return;
+                        }
                         refreshCheckoutDiscounts();
                     });
                     subtotalObserver.observe(subtotalDisplay, { childList: true, characterData: true, subtree: true });

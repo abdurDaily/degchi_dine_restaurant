@@ -11,10 +11,15 @@
     gap: 10px;
     justify-content: center;
     margin-top: 24px;
+    max-width: 100%;
+}
+.member-dashboard .md-hero-actions form {
+    display: contents;
 }
 .member-dashboard .md-hero-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 10px 18px;
     border-radius: 50px;
@@ -22,6 +27,8 @@
     font-weight: 600;
     text-decoration: none;
     transition: all 0.25s ease;
+    white-space: nowrap;
+    max-width: 100%;
 }
 .member-dashboard .md-hero-btn-outline {
     background: transparent;
@@ -45,6 +52,7 @@
     margin-top: -100px;
     position: relative;
     z-index: 2;
+    overflow-x: hidden;
 }
 .member-dashboard .md-stats-row {
     display: grid;
@@ -58,6 +66,7 @@
     border-radius: 16px;
     padding: 20px;
     text-align: center;
+    min-width: 0;
 }
 .member-dashboard .md-stat-icon {
     width: 44px;
@@ -76,6 +85,7 @@
     font-weight: 700;
     color: var(--dd-text-main);
     line-height: 1.2;
+    word-break: break-word;
 }
 .member-dashboard .md-stat-label {
     font-size: 0.78rem;
@@ -90,6 +100,7 @@
     padding: 28px;
     color: #fff;
     height: 100%;
+    min-width: 0;
 }
 .member-dashboard .md-card-visual {
     background: linear-gradient(135deg, rgba(223,166,83,0.18) 0%, rgba(255,255,255,0.06) 100%);
@@ -135,6 +146,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
+    max-width: 100%;
 }
 .member-dashboard .md-copy-btn:hover { background: rgba(255,255,255,0.14); }
 .member-dashboard .md-info-list {
@@ -145,7 +157,8 @@
 .member-dashboard .md-info-list li {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 12px;
     padding: 12px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     font-size: 0.9rem;
@@ -154,6 +167,13 @@
 .member-dashboard .md-info-list span:first-child {
     color: rgba(255,255,255,0.55);
     font-size: 0.82rem;
+    flex-shrink: 0;
+}
+.member-dashboard .md-info-list strong,
+.member-dashboard .md-info-list .md-badge {
+    text-align: right;
+    word-break: break-word;
+    max-width: 60%;
 }
 .member-dashboard .md-login-tip {
     margin-top: 20px;
@@ -175,6 +195,7 @@
     color: rgba(255,255,255,0.75);
     margin: 0;
     line-height: 1.55;
+    word-break: break-word;
 }
 .member-dashboard .md-orders-panel {
     background: #fff;
@@ -182,6 +203,7 @@
     border: 1px solid var(--dd-border);
     padding: 28px;
     box-shadow: 0 20px 50px rgba(31, 20, 18, 0.06);
+    min-width: 0;
 }
 .member-dashboard .md-panel-header {
     display: flex;
@@ -198,6 +220,7 @@
     font-weight: 700;
     color: var(--dd-text-main);
     margin: 0;
+    word-break: break-word;
 }
 .member-dashboard .md-order-success {
     background: linear-gradient(135deg, rgba(40,167,69,0.08), rgba(40,167,69,0.02));
@@ -228,6 +251,7 @@
     margin-bottom: 12px;
     transition: box-shadow 0.2s, border-color 0.2s;
     background: #fff;
+    min-width: 0;
 }
 .member-dashboard .md-order-card.is-highlight {
     border-color: #28a745;
@@ -263,6 +287,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: #28a745;
+    flex-shrink: 0;
 }
 .member-dashboard .md-badge {
     display: inline-block;
@@ -300,9 +325,268 @@
     font-size: 0.92rem;
     margin-bottom: 20px;
 }
+.member-dashboard .md-profile-panel {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid var(--dd-border);
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(31, 20, 18, 0.06);
+    margin-bottom: 28px;
+    min-width: 0;
+}
+.member-dashboard .md-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.member-dashboard .md-profile-grid .md-field-full {
+    grid-column: 1 / -1;
+}
+.member-dashboard .md-field {
+    min-width: 0;
+}
+.member-dashboard .md-field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--dd-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+.member-dashboard .md-field input,
+.member-dashboard .md-field textarea {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--dd-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    color: var(--dd-text-main);
+    background: #fff;
+    box-sizing: border-box;
+}
+.member-dashboard .md-field input[type="file"] {
+    padding: 8px;
+    font-size: 0.82rem;
+}
+.member-dashboard .md-field input:disabled,
+.member-dashboard .md-field input[readonly] {
+    background: #f7f5f2;
+    color: var(--dd-text-muted);
+    cursor: not-allowed;
+}
+.member-dashboard .md-field small {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--dd-text-muted);
+}
+.member-dashboard .md-profile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+.member-dashboard .md-save-btn,
+.member-dashboard .md-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 0.88rem;
+    max-width: 100%;
+}
+.member-dashboard .md-save-btn {
+    background: var(--dd-gold);
+    color: #1f1412;
+    border: none;
+    font-weight: 700;
+}
+.member-dashboard .md-save-btn:hover {
+    background: var(--dd-gold-hover);
+}
+.member-dashboard .md-cancel-btn {
+    background: transparent;
+    color: var(--dd-text-main);
+    border: 1px solid var(--dd-border);
+    font-weight: 600;
+    cursor: pointer;
+}
+.member-dashboard .md-cancel-btn:hover {
+    background: #f7f5f2;
+}
+.member-dashboard .md-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+.member-dashboard .md-avatar {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--dd-border);
+    background: #f7f5f2;
+    flex-shrink: 0;
+}
+.member-dashboard .md-edit-panel {
+    max-width: 820px;
+    margin: 0 auto 28px;
+}
+
+/* Tablet */
 @media (max-width: 991px) {
-    .member-dashboard .md-stats-row { grid-template-columns: 1fr; }
+    .member-dashboard .md-stats-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .member-dashboard .md-main-box { margin-top: -60px; }
+    .member-dashboard .md-profile-grid { grid-template-columns: 1fr; }
+    .member-dashboard .md-stat-card { padding: 14px 10px; }
+    .member-dashboard .md-stat-value { font-size: 1.1rem; }
+    .member-dashboard .md-stat-label { font-size: 0.68rem; letter-spacing: 0.03em; }
+}
+
+/* Mobile */
+@media (max-width: 575.98px) {
+    .member-dashboard .md-main-box {
+        margin-top: -40px;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+    .member-dashboard .md-hero-actions {
+        gap: 8px;
+        margin-top: 18px;
+        padding: 0 4px;
+    }
+    .member-dashboard .md-hero-btn {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+        padding: 9px 10px;
+        font-size: 0.75rem;
+        gap: 5px;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.25;
+    }
+    .member-dashboard .md-hero-btn iconify-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    .member-dashboard .md-stats-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+    .member-dashboard .md-stat-card { padding: 16px; }
+    .member-dashboard .md-stat-value { font-size: 1.25rem; }
+    .member-dashboard .md-stat-label { font-size: 0.74rem; }
+    .member-dashboard .md-sidebar,
+    .member-dashboard .md-orders-panel,
+    .member-dashboard .md-profile-panel {
+        padding: 18px 14px;
+        border-radius: 16px;
+    }
+    .member-dashboard .md-card-visual { padding: 16px; margin-bottom: 16px; }
+    .member-dashboard .md-card-number { font-size: 0.92rem; letter-spacing: 0.03em; }
+    .member-dashboard .md-info-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 10px 0;
+        font-size: 0.85rem;
+    }
+    .member-dashboard .md-info-list strong,
+    .member-dashboard .md-info-list .md-badge {
+        text-align: left;
+        max-width: 100%;
+    }
+    .member-dashboard .md-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .member-dashboard .md-panel-header h3 { font-size: 1.15rem; }
+    .member-dashboard .md-order-success {
+        flex-direction: column;
+        padding: 14px;
+        gap: 10px;
+    }
+    .member-dashboard .md-order-success-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    .member-dashboard .md-order-card { padding: 14px; }
+    .member-dashboard .md-order-top {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .member-dashboard .md-order-amount { font-size: 1rem; }
+    .member-dashboard .md-avatar-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+    .member-dashboard .md-avatar {
+        width: 64px;
+        height: 64px;
+        min-width: 64px;
+    }
+    .member-dashboard .md-avatar-row .md-field {
+        width: 100%;
+    }
+    .member-dashboard .md-profile-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+    .member-dashboard .md-save-btn,
+    .member-dashboard .md-cancel-btn {
+        width: 100%;
+        padding: 12px 16px;
+    }
+    .member-dashboard .md-field input,
+    .member-dashboard .md-field textarea {
+        font-size: 16px; /* prevents iOS zoom */
+        padding: 10px 12px;
+    }
+    .member-dashboard .md-empty-state { padding: 32px 12px; }
+    .member-dashboard .md-empty-state iconify-icon { font-size: 2.6rem; }
+    .member-dashboard .md-login-tip { padding: 12px; }
+}
+
+/* Very small phones (320px) */
+@media (max-width: 374.98px) {
+    .member-dashboard .md-main-box {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+    .member-dashboard .md-hero-btn {
+        flex: 1 1 100%;
+        padding: 10px 12px;
+        font-size: 0.78rem;
+    }
+    .member-dashboard .md-sidebar,
+    .member-dashboard .md-orders-panel,
+    .member-dashboard .md-profile-panel {
+        padding: 14px 12px;
+        border-radius: 14px;
+    }
+    .member-dashboard .md-card-number { font-size: 0.84rem; }
+    .member-dashboard .md-copy-btn {
+        width: 100%;
+        padding: 8px 10px;
+    }
+    .member-dashboard .md-badge {
+        padding: 3px 8px;
+        font-size: 0.66rem;
+    }
+    .member-dashboard .md-panel-header h3 { font-size: 1.05rem; }
 }
 </style>
 @endpush
@@ -334,7 +618,11 @@
                     <iconify-icon icon="solar:phone-calling-linear"></iconify-icon>
                     Contact Us
                 </a>
-                <form method="POST" action="{{ route('frontend.member.logout') }}" class="d-inline">
+                <button type="button" class="md-hero-btn md-hero-btn-outline border-0" id="mdEditProfileBtn">
+                    <iconify-icon icon="solar:user-edit-linear"></iconify-icon>
+                    Edit Profile
+                </button>
+                <form method="POST" action="{{ route('frontend.member.logout') }}">
                     @csrf
                     <button type="submit" class="md-hero-btn md-hero-btn-outline border-0">
                         <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
@@ -350,6 +638,89 @@
             <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 14px;">{{ session('success') }}</div>
         @endif
 
+        {{-- Edit Profile (hidden by default) --}}
+        <div id="mdEditView" class="{{ $errors->any() ? '' : 'd-none' }}">
+            <div class="md-profile-panel md-edit-panel">
+                <div class="md-panel-header">
+                    <h3><iconify-icon icon="solar:user-edit-linear" class="me-2" style="color: var(--dd-gold);"></iconify-icon>Edit Profile</h3>
+                </div>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger border-0 mb-3" style="border-radius: 12px;">
+                        <ul class="mb-0 ps-3">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('frontend.member.profile.update') }}" enctype="multipart/form-data" id="mdProfileForm">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="md-avatar-row">
+                        @if ($member->profile_image_path)
+                            <img src="{{ asset('storage/' . $member->profile_image_path) }}" alt="{{ $member->name }}" class="md-avatar">
+                        @else
+                            <div class="md-avatar d-flex align-items-center justify-content-center">
+                                <iconify-icon icon="solar:user-linear" style="font-size: 1.8rem; color: var(--dd-text-muted);"></iconify-icon>
+                            </div>
+                        @endif
+                        <div class="md-field flex-grow-1 mb-0">
+                            <label for="profile_image">Profile Photo (optional)</label>
+                            <input type="file" id="profile_image" name="profile_image" accept="image/webp,image/png,image/jpeg">
+                        </div>
+                    </div>
+
+                    <div class="md-profile-grid">
+                        <div class="md-field md-field-full">
+                            <label for="unique_card_number">Membership Card Number</label>
+                            <input type="text" id="unique_card_number" value="{{ $member->unique_card_number }}" readonly>
+                            <small>Card number cannot be changed.</small>
+                        </div>
+                        <div class="md-field">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" value="{{ old('name', $member->name) }}" required>
+                        </div>
+                        <div class="md-field">
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" name="phone" value="{{ old('phone', $member->phone) }}" required>
+                        </div>
+                        <div class="md-field">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" value="{{ old('email', $member->email) }}">
+                        </div>
+                        <div class="md-field">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" name="dob" value="{{ old('dob', optional($member->dob)->format('Y-m-d')) }}">
+                        </div>
+                        <div class="md-field">
+                            <label for="marriage_date">Marriage Date</label>
+                            <input type="date" id="marriage_date" name="marriage_date" value="{{ old('marriage_date', optional($member->marriage_date)->format('Y-m-d')) }}">
+                        </div>
+                        <div class="md-field md-field-full">
+                            <label for="address">Address</label>
+                            <textarea id="address" name="address" rows="3">{{ old('address', $member->address) }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="md-profile-actions">
+                        <button type="button" class="md-cancel-btn" id="mdCancelEditBtn">
+                            <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+                            Cancel
+                        </button>
+                        <button type="submit" class="md-save-btn">
+                            <iconify-icon icon="solar:diskette-linear"></iconify-icon>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Default dashboard --}}
+        <div id="mdDefaultView" class="{{ $errors->any() ? 'd-none' : '' }}">
         <div class="row g-4">
             {{-- Sidebar: membership card --}}
             <div class="col-lg-4">
@@ -411,7 +782,7 @@
                 <div class="md-stats-row">
                     <div class="md-stat-card">
                         <div class="md-stat-icon"><iconify-icon icon="solar:bag-check-linear"></iconify-icon></div>
-                        <div class="md-stat-value">{{ $orders->total() }}</div>
+                        <div class="md-stat-value">{{ $orders->total()}}</div>
                         <div class="md-stat-label">Total Orders</div>
                     </div>
                     <div class="md-stat-card">
@@ -518,6 +889,7 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
 </section>
 @endsection
@@ -527,6 +899,34 @@
 document.addEventListener('DOMContentLoaded', function () {
     var copyBtn = document.getElementById('copyCardBtn');
     var cardDisplay = document.getElementById('memberCardNumberDisplay');
+    var defaultView = document.getElementById('mdDefaultView');
+    var editView = document.getElementById('mdEditView');
+    var editBtn = document.getElementById('mdEditProfileBtn');
+    var cancelBtn = document.getElementById('mdCancelEditBtn');
+    var profileForm = document.getElementById('mdProfileForm');
+
+    function showDefaultDashboard() {
+        if (defaultView) defaultView.classList.remove('d-none');
+        if (editView) editView.classList.add('d-none');
+        if (profileForm) profileForm.reset();
+    }
+
+    function showEditProfile() {
+        if (defaultView) defaultView.classList.add('d-none');
+        if (editView) editView.classList.remove('d-none');
+        if (editView) editView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (editBtn) {
+        editBtn.addEventListener('click', showEditProfile);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            showDefaultDashboard();
+        });
+    }
+
     if (copyBtn && cardDisplay) {
         copyBtn.addEventListener('click', function () {
             navigator.clipboard.writeText(cardDisplay.textContent.trim()).then(function () {

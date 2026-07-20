@@ -45,11 +45,12 @@ class ReviewController extends Controller
             ], 422);
         }
 
-        if (!$member->profile_image_path) {
+        if (!$member->canOrderAndComment()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please upload a profile image to your membership account first.',
-            ], 422);
+                'account_restricted' => true,
+                'message' => $member->accountRestrictedMessage(),
+            ], 403);
         }
 
         // Check if member already has a pending or approved review
@@ -95,11 +96,12 @@ class ReviewController extends Controller
             ], 422);
         }
 
-        if (!$member->profile_image_path) {
+        if (!$member->canOrderAndComment()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please upload a profile image to your membership account first.',
-            ], 422);
+                'account_restricted' => true,
+                'message' => $member->accountRestrictedMessage(),
+            ], 403);
         }
 
         // Check if member already has a pending or approved review
@@ -114,7 +116,7 @@ class ReviewController extends Controller
             ], 422);
         }
 
-        // Create review with member data
+        // Create review with member data (profile image optional)
         Review::create([
             'member_id' => $member->id,
             'name' => $member->name,

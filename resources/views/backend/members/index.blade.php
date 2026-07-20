@@ -10,40 +10,51 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">Members</h4>
-                    <form method="GET" class="d-flex align-items-center" action="{{ route('members.index') }}">
-                        @if(request('approval'))
-                            <input type="hidden" name="approval" value="{{ request('approval') }}" />
-                        @endif
-                        <input type="search" name="search" value="{{ $search ?? '' }}" class="form-control me-2" placeholder="Search by card number, name, phone" style="width: 300px;" />
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </form>
-                </div>
-
-                <!-- Student Approval Filter Buttons -->
-                <div class="card-body border-bottom py-3">
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <span class="text-muted me-1" style="font-size: 0.85rem;">Filter student approvals:</span>
-                        @php
-                            $filterParams = fn ($status) => array_filter([
-                                'approval' => $status,
-                                'search' => $search ?? null,
-                            ]);
-                        @endphp
-                        <a href="{{ route('members.index', $filterParams('pending')) }}" class="btn btn-sm {{ request('approval') === 'pending' ? 'btn-warning' : 'btn-outline-warning' }}">
-                            <i class="ri-time-line me-1"></i> Pending <span class="badge bg-white text-warning ms-1" id="count-pending">{{ $pendingCount }}</span>
-                        </a>
-                        <a href="{{ route('members.index', $filterParams('approved')) }}" class="btn btn-sm {{ request('approval') === 'approved' ? 'btn-success' : 'btn-outline-success' }}">
-                            <i class="ri-check-line me-1"></i> Approved <span class="badge bg-white text-success ms-1" id="count-approved">{{ $approvedCount }}</span>
-                        </a>
-                        <a href="{{ route('members.index', $filterParams('rejected')) }}" class="btn btn-sm {{ request('approval') === 'rejected' ? 'btn-danger' : 'btn-outline-danger' }}">
-                            <i class="ri-close-line me-1"></i> Rejected <span class="badge bg-white text-danger ms-1" id="count-rejected">{{ $rejectedCount }}</span>
-                        </a>
-                        @if(request('approval'))
-                            <a href="{{ route('members.index', array_filter(['search' => $search ?? null])) }}" class="btn btn-sm btn-link text-muted">Clear filter</a>
-                        @endif
+                <div class="card-header">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <h4 class="card-title mb-0">Members</h4>
                     </div>
+                    <form method="GET" action="{{ route('members.index') }}" id="membersFilterForm" class="row g-2 align-items-center">
+                        <div class="col-auto">
+                            <select name="status" class="form-select form-select-sm members-filter-select" style="min-width: 130px;">
+                                <option value="active" @selected(($statusFilter ?? 'active') === 'active')>Active</option>
+                                <option value="pending" @selected(($statusFilter ?? '') === 'pending')>Pending</option>
+                                <option value="suspended" @selected(($statusFilter ?? '') === 'suspended')>Suspended</option>
+                                <option value="all" @selected(($statusFilter ?? '') === 'all')>All Status</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <select name="type" class="form-select form-select-sm members-filter-select" style="min-width: 140px;">
+                                <option value="all" @selected(($typeFilter ?? 'all') === 'all')>All Type</option>
+                                <option value="membership" @selected(($typeFilter ?? '') === 'membership')>Membership</option>
+                                <option value="golden" @selected(($typeFilter ?? '') === 'golden')>Golden</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <select name="student" class="form-select form-select-sm members-filter-select" style="min-width: 140px;">
+                                <option value="all" @selected(($studentFilter ?? 'all') === 'all')>All Members</option>
+                                <option value="yes" @selected(($studentFilter ?? '') === 'yes')>Student</option>
+                                <option value="no" @selected(($studentFilter ?? '') === 'no')>Non-Student</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <select name="approval" class="form-select form-select-sm members-filter-select" style="min-width: 150px;">
+                                <option value="all" @selected(($approvalFilter ?? 'all') === 'all')>All Approvals</option>
+                                <option value="pending" @selected(($approvalFilter ?? '') === 'pending')>Student Pending</option>
+                                <option value="approved" @selected(($approvalFilter ?? '') === 'approved')>Student Approved</option>
+                                <option value="rejected" @selected(($approvalFilter ?? '') === 'rejected')>Student Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <input type="search" name="search" value="{{ $search ?? '' }}" class="form-control form-control-sm" placeholder="Search card, name, phone, email" />
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm" type="submit">Search</button>
+                        </div>
+                        <div class="col-auto ms-auto">
+                            <a href="{{ route('members.index', ['status' => 'active', 'type' => 'all', 'student' => 'all', 'approval' => 'all']) }}" class="btn btn-outline-secondary btn-sm">Clear filter</a>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="card-body">
@@ -94,7 +105,17 @@
     <small class="text-muted d-block">{{ $member->orders_count }} order{{ $member->orders_count !== 1 ? 's' : '' }}</small>
 </td>
                                         <td>
-                                            <span id="status-badge-{{ $member->id }}" class="badge bg-{{ $member->status === 'active' ? 'success' : ($member->status === 'suspended' ? 'danger' : 'secondary') }}">
+                                            <select
+                                                class="form-select form-select-sm member-status-select"
+                                                data-id="{{ $member->id }}"
+                                                data-url="{{ route('members.updateStatus', $member->id) }}"
+                                                style="min-width: 120px;"
+                                            >
+                                                <option value="pending" @selected($member->status === 'pending')>Pending</option>
+                                                <option value="active" @selected($member->status === 'active')>Active</option>
+                                                <option value="suspended" @selected($member->status === 'suspended')>Suspended</option>
+                                            </select>
+                                            <span id="status-badge-{{ $member->id }}" class="badge mt-1 bg-{{ $member->status === 'active' ? 'success' : ($member->status === 'suspended' ? 'danger' : 'secondary') }}">
                                                 {{ ucfirst($member->status) }}
                                             </span>
                                         </td>
@@ -164,6 +185,11 @@ $(function () {
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
     var currentModalMember = null;
 
+    // Auto-apply filters when a select changes
+    $(document).on('change', '.members-filter-select', function () {
+        $('#membersFilterForm').trigger('submit');
+    });
+
     // ---- View Member Detail ----
     $(document).on('click', '.view-member-btn', function () {
         var url = $(this).data('url');
@@ -179,7 +205,13 @@ $(function () {
                 var typeBadge = m.type === 'golden'
                     ? '<span class="badge bg-warning text-dark"><i class="ri-vip-crown-fill me-1"></i>Golden</span>'
                     : '<span class="badge bg-info">Membership</span>';
-                var statusBadge = '<span class="badge bg-' + (m.status === 'active' ? 'success' : 'danger') + '">' + m.status.charAt(0).toUpperCase() + m.status.slice(1) + '</span>';
+                var statusBadge = '<span class="badge bg-' + (m.status === 'active' ? 'success' : (m.status === 'suspended' ? 'danger' : 'secondary')) + '">' + m.status.charAt(0).toUpperCase() + m.status.slice(1) + '</span>';
+                var statusSelectHtml =
+                    '<select class="form-select form-select-sm member-status-select mt-1" data-id="' + m.id + '" data-url="{{ url("/members") }}/' + m.id + '/update-status" style="max-width:160px;">' +
+                        '<option value="pending"' + (m.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
+                        '<option value="active"' + (m.status === 'active' ? ' selected' : '') + '>Active</option>' +
+                        '<option value="suspended"' + (m.status === 'suspended' ? ' selected' : '') + '>Suspended</option>' +
+                    '</select>';
                 var studentBadge = m.is_student
                     ? '<span class="badge bg-success"><i class="ri-graduation-cap-line me-1"></i>Student (35% first-order)</span>'
                     : '<span class="badge bg-secondary">Non-Student (30% first-order)</span>';
@@ -237,7 +269,7 @@ $(function () {
                             '<tr><th>Email</th><td>' + (m.email || '<span class="text-muted">N/A</span>') + '</td></tr>' +
                             '<tr><th>Card Number</th><td><code>' + m.unique_card_number + '</code></td></tr>' +
                             '<tr><th>Type</th><td>' + typeBadge + '</td></tr>' +
-                            '<tr><th>Status</th><td>' + statusBadge + '</td></tr>' +
+                            '<tr><th>Status</th><td><div id="modalStatusBadgeWrap">' + statusBadge + '</div>' + statusSelectHtml + '</td></tr>' +
                             '<tr><th>Student</th><td>' + studentBadge + '</td></tr>' +
                             (approvalBadgeHtml ? '<tr><th>Approval</th><td>' + approvalBadgeHtml + '</td></tr>' : '') +
                         '</table>' +
@@ -258,13 +290,89 @@ $(function () {
                 ordersHtml;
 
                 $('#memberDetailBody').html(html);
+                $('#memberDetailBody .member-status-select').each(function () {
+                    $(this).data('previous', $(this).val());
+                });
             }
         }).fail(function () {
             $('#memberDetailBody').html('<div class="alert alert-danger">Failed to load member details.</div>');
         });
     });
 
-    // ---- Toggle Status ----
+    // ---- Update Status (pending / active / suspended) ----
+    function statusBadgeClass(status) {
+        if (status === 'active') return 'bg-success';
+        if (status === 'suspended') return 'bg-danger';
+        return 'bg-secondary';
+    }
+
+    function updateStatusCounts(counts) {
+        if (!counts) return;
+        $('#count-status-pending').text(counts.pending ?? 0);
+        $('#count-status-active').text(counts.active ?? 0);
+        $('#count-status-suspended').text(counts.suspended ?? 0);
+    }
+
+    $(document).on('change', '.member-status-select', function () {
+        var select = $(this);
+        var memberId = select.data('id');
+        var url = select.data('url');
+        var newStatus = select.val();
+        var previous = select.data('previous');
+
+        if (!confirm('Change this member\'s status to "' + newStatus + '"?')) {
+            select.val(previous);
+            return;
+        }
+
+        select.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken },
+            data: { status: newStatus },
+            success: function (res) {
+                select.prop('disabled', false);
+                if (res.success) {
+                    select.data('previous', res.new_status);
+                    $('#status-badge-' + memberId)
+                        .removeClass('bg-success bg-danger bg-secondary')
+                        .addClass(statusBadgeClass(res.new_status))
+                        .text(res.new_status.charAt(0).toUpperCase() + res.new_status.slice(1));
+
+                    // Keep other selects for same member in sync
+                    $('.member-status-select[data-id="' + memberId + '"]').val(res.new_status).data('previous', res.new_status);
+
+                    var modalBadge = $('#modalStatusBadgeWrap .badge');
+                    if (modalBadge.length) {
+                        modalBadge
+                            .removeClass('bg-success bg-danger bg-secondary')
+                            .addClass(statusBadgeClass(res.new_status))
+                            .text(res.new_status.charAt(0).toUpperCase() + res.new_status.slice(1));
+                    }
+
+                    updateStatusCounts(res.counts);
+                    toastr ? toastr.success(res.message) : alert(res.message);
+                }
+            },
+            error: function (xhr) {
+                select.prop('disabled', false);
+                select.val(previous);
+                var errorMsg = xhr.responseJSON && xhr.responseJSON.message
+                    ? xhr.responseJSON.message
+                    : 'Failed to update status.';
+                toastr ? toastr.error(errorMsg) : alert(errorMsg);
+            }
+        });
+    });
+
+    // Store initial status for cancel/revert
+    $('.member-status-select').each(function () {
+        $(this).data('previous', $(this).val());
+    });
+
+    // ---- Toggle Status (legacy) ----
     $(document).on('click', '.toggle-status-btn', function () {
         var btn = $(this);
         var memberId = btn.data('id');
@@ -279,12 +387,12 @@ $(function () {
             success: function (res) {
                 if (res.success) {
                     var isActive = res.new_status === 'active';
-                    // Update status badge
                     $('#status-badge-' + memberId)
                         .removeClass('bg-success bg-danger bg-secondary')
-                        .addClass(isActive ? 'bg-success' : 'bg-danger')
+                        .addClass(statusBadgeClass(res.new_status))
                         .text(res.new_status.charAt(0).toUpperCase() + res.new_status.slice(1));
-                    // Update toggle button
+                    $('.member-status-select[data-id="' + memberId + '"]').val(res.new_status).data('previous', res.new_status);
+                    updateStatusCounts(res.counts);
                     btn.removeClass('btn-outline-warning btn-outline-success')
                         .addClass(isActive ? 'btn-outline-warning' : 'btn-outline-success')
                         .attr('title', isActive ? 'Suspend' : 'Activate')

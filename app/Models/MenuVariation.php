@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Menu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 
 class MenuVariation extends Model
 {
@@ -12,7 +12,7 @@ class MenuVariation extends Model
         'menu_id', // Make sure this matches your migration column
         'name',
         'price',
-        'image'
+        'image',
     ];
 
     /**
@@ -24,7 +24,7 @@ class MenuVariation extends Model
     }
 
     /**
-     * Get the offers that apply to this menu variation.
+     * Get the offers that apply to this menu variation (specific_items pivot).
      */
     public function offers(): BelongsToMany
     {
@@ -37,7 +37,7 @@ class MenuVariation extends Model
     }
 
     /**
-     * Get active, valid offers for this menu variation.
+     * Active, valid offers attached via pivot (specific_items only).
      */
     public function activeOffers()
     {
@@ -52,20 +52,67 @@ class MenuVariation extends Model
     }
 
     /**
-     * Get the best offer (highest discount) for this variation.
+     * Food-menu offers only: specific_items on this variation + all_items (applicable_to = all).
+     * Membership / Student / Golden tier offers are excluded — they apply at checkout via member card.
+     * Highest discount % wins when both all-items and specific-items apply.
+     *
+     * @param  Member|null  $member
+     * @param  bool  $forMenuDisplay  Hide first-order food offers from members who already ordered.
      */
-    public function bestOffer()
+    public function resolveApplicableOffers(?Member $member = null, bool $forMenuDisplay = false): Collection
     {
-        return $this->activeOffers()
-            ->orderBy('discount_percent', 'desc')
-            ->first();
+        $specific = $this->relationLoaded('offers')
+            ? $this->offers
+            : $this->activeOffers()->get();
+
+        $merged = $specific
+            ->concat(Offer::activeAllItemOffers())
+            ->unique('id')
+            ->filter(function ($offer) {
+                if (! $offer instanceof Offer) {
+                    return false;
+                }
+                // Only food promos compete on menu cards / item offer discount
+                if (! $offer->isFoodMenuOffer()) {
+                    return false;
+                }
+                if ($offer->is_active === false) {
+                    return false;
+                }
+
+                return $offer->isValid();
+            });
+
+        if ($forMenuDisplay) {
+            $merged = $merged->filter(
+                fn (Offer $offer) => $offer->isVisibleOnMenuFor($member)
+            );
+        }
+
+        return $merged->sortByDesc('discount_percent')->values();
     }
 
     /**
-     * Check if this variation has any active offers.
+     * Best food-menu offer for product cards (highest %).
+     */
+    public function bestDisplayOffer(?Member $member = null): ?Offer
+    {
+        return $this->resolveApplicableOffers($member, true)->first();
+    }
+
+    /**
+     * Best food-menu offer for helpers.
+     */
+    public function bestOffer()
+    {
+        return $this->resolveApplicableOffers(null, false)->first();
+    }
+
+    /**
+     * Check if this variation has any active food-menu offers.
      */
     public function hasActiveOffer(): bool
     {
-        return $this->activeOffers()->exists();
+        return $this->resolveApplicableOffers(null, false)->isNotEmpty();
     }
 }

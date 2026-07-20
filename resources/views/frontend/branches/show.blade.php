@@ -122,12 +122,21 @@
                 @foreach($categories as $category)
                     @foreach($category->menus as $menu)
                         @php
+                            $viewerMember = Auth::guard('member')->user();
                             $firstVariation = $menu->variations->sortBy('price')->first();
                             $imagePath = $firstVariation?->image ?? null;
                             $imageUrl = $imagePath
                                 ? (str_starts_with($imagePath, 'http') ? $imagePath : asset($imagePath))
                                 : null;
-                            $minPrice = $menu->variations->min('price') ?? 0;
+                            $minPrice = (float) ($menu->variations->min('price') ?? 0);
+                            $activeOffers = $firstVariation
+                                ? $firstVariation->resolveApplicableOffers($viewerMember, true)
+                                : collect();
+                            $bestOffer = $activeOffers->first();
+                            $offerPercent = (int) ($bestOffer->discount_percent ?? 0);
+                            $offerPrice = $bestOffer
+                                ? round($minPrice * (1 - $offerPercent / 100), 2)
+                                : $minPrice;
                         @endphp
                         <div class="col-12 col-sm-6 col-lg-4 d-flex branch-show-menu-item"
                             data-category="{{ $category->id }}"
@@ -135,7 +144,7 @@
                             data-menu-name="{{ $menu->name }}"
                             data-menu-price="{{ $minPrice }}">
                             <div class="menu-offer-card branch-show-menu-card">
-                                <div class="menu-offer-image-wrap">
+                                <div class="menu-offer-image-wrap" style="position: relative;">
                                     @if($imageUrl)
                                         <img src="{{ $imageUrl }}" alt="{{ $menu->name }}" class="menu-offer-image"
                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -147,17 +156,38 @@
                                             <i class="ri-restaurant-2-line"></i>
                                         </span>
                                     @endif
+                                    @if($bestOffer)
+                                        <div class="offer-badge-card">
+                                            <i class="bi bi-tag-fill"></i> {{ $bestOffer->discount_percent }}% OFF
+                                        </div>
+                                        @if($bestOffer->is_first_order)
+                                            <div class="offer-first-order-badge" title="First order only — members">
+                                                <i class="bi bi-1-circle-fill" aria-hidden="true"></i>
+                                                <span>1st Order</span>
+                                            </div>
+                                        @endif
+                                    @endif
                                 </div>
                                 <div class="menu-offer-body">
                                     <h5 class="menu-offer-title">{{ $menu->name }}</h5>
                                     <p class="menu-offer-meta mb-0">{{ Str::limit($menu->description ?? 'Fresh item', 33) }}</p>
                                     <div class="menu-offer-footer">
                                         <div class="menu-offer-price-wrap">
-                                            <span class="menu-offer-price">৳ {{ number_format((float) $minPrice, 2) }}</span>
+                                            @if($bestOffer)
+                                                <span class="menu-offer-price menu-offer-price-old">৳ {{ number_format($minPrice, 2) }}</span>
+                                                <span class="menu-offer-price text-danger fw-bold">৳ {{ number_format($offerPrice, 2) }}</span>
+                                            @else
+                                                <span class="menu-offer-price">৳ {{ number_format($minPrice, 2) }}</span>
+                                            @endif
                                         </div>
                                         <button class="menu-offer-cart-btn" type="button"
                                             data-variation-id="{{ $firstVariation?->id }}"
                                             data-original-price="{{ $minPrice }}"
+                                            data-offer-price="{{ $offerPrice }}"
+                                            data-offer-id="{{ $bestOffer?->id }}"
+                                            data-offer-percent="{{ $offerPercent }}"
+                                            data-is-first-order="{{ $bestOffer?->is_first_order ? '1' : '0' }}"
+                                            data-applicable-to="{{ $bestOffer?->applicable_to ?? 'all' }}"
                                             aria-label="Add {{ $menu->name }} to cart">
                                             <i class="bi bi-plus-lg" aria-hidden="true"></i>
                                         </button>

@@ -119,22 +119,22 @@
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 130px">
+                            style="max-width: 80px">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 130px">
+                            style="max-width: 80px">
                     </span>
                 </a>
                 <!-- Light Logo-->
                 <a href="{{ route('dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 130px">
+                            style="max-width: 80px">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 130px">
+                            style="max-width: 80px">
                     </span>
                 </a>
                 <button type="button" class="p-0 btn btn-sm fs-20 header-item float-end btn-vertical-sm-hover"
@@ -148,11 +148,11 @@
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 130px">
+                            style="max-width: 80px">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 130px">
+                            style="max-width: 80px">
                     </span>
                 </a>
                 <button type="button" class="p-0 btn btn-sm fs-20 header-item float-end btn-vertical-sm-hover"

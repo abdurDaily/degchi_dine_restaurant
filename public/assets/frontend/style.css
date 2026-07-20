@@ -1227,6 +1227,7 @@ h6,
   position: relative;
   overflow: hidden;
   padding: 6px 8px 4px;
+  z-index: 1;
 }
 
 .menu-offer-image {
@@ -1236,6 +1237,8 @@ h6,
   object-fit: cover;
   display: block;
   border-radius: 10px !important;
+  position: relative;
+  z-index: 0;
   transition:
     transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     opacity 0.4s ease;
@@ -1266,8 +1269,8 @@ h6,
 /* Offer Badge on Card */
 .offer-badge-card {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 16px;
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   color: #ffffff;
   font-size: 0.75rem;
@@ -1277,10 +1280,11 @@ h6,
   padding: 0.4rem 0.75rem;
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
-  z-index: 10;
+  z-index: 30;
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  pointer-events: none;
   animation: pulse-badge 2s ease-in-out infinite;
 }
 
@@ -1325,8 +1329,8 @@ h6,
 /* Icon badge for offer - more prominent */
 .offer-icon-badge {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 10px;
+  left: 14px;
   background: #fff;
   color: #e74c3c;
   width: 36px;
@@ -1337,8 +1341,39 @@ h6,
   justify-content: center;
   font-size: 1.1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 11;
+  z-index: 30;
+  pointer-events: none;
   animation: pulse-icon 2s ease-in-out infinite;
+}
+
+/* First-order / members-only chip under discount badge */
+.offer-first-order-badge {
+  position: absolute;
+  top: 48px;
+  right: 12px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #1a5f7a 0%, #116b83 100%);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  box-shadow: 0 3px 10px rgba(17, 107, 131, 0.35);
+  line-height: 1.2;
+}
+
+.offer-first-order-badge i {
+  font-size: 0.8rem;
+}
+
+.offer-members-only-badge {
+  background: linear-gradient(135deg, #6c5ce7 0%, #5a4fcf 100%);
+  box-shadow: 0 3px 10px rgba(108, 92, 231, 0.35);
 }
 
 @keyframes pulse-icon {
@@ -13247,3 +13282,150 @@ body {
 
 
 
+/* ===== MODAL BASE ===== */
+.custom-modal {
+  max-width: 420px;
+  margin: auto;
+}
+
+.custom-modal-content {
+  border-radius: 18px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===== HEADER ===== */
+.custom-modal-header {
+  background: #1f6f7a;
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.header-left i {
+  font-size: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #fff;
+  opacity: 0.8;
+}
+
+/* ===== BODY ===== */
+.custom-modal-body {
+  padding: 18px;
+  background: #f7f9fb;
+}
+
+.message-box {
+  display: flex;
+  gap: 10px;
+  background: #eef5f7;
+  padding: 14px;
+  border-radius: 14px;
+  border-left: 4px solid #1f6f7a;
+}
+
+.message-box i {
+  color: #1f6f7a;
+  font-size: 18px;
+  margin-top: 3px;
+}
+
+.message-box p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1e2a3a;
+}
+
+/* ===== FOOTER ===== */
+.custom-modal-footer {
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* LOGIN BUTTON */
+.btn-login {
+  flex: 1;
+  background: #1f6f7a;
+  color: #fff;
+  padding: 10px;
+  border-radius: 30px;
+  text-align: center;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-login:hover {
+  background: #155a63;
+}
+
+/* REGISTER BUTTON */
+.btn-register {
+  flex: 1;
+  border: 2px solid #1f6f7a;
+  color: #1f6f7a;
+  padding: 10px;
+  border-radius: 30px;
+  text-align: center;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-register:hover {
+  background: #1f6f7a;
+  color: #fff;
+}
+
+/* CLOSE BUTTON */
+.btn-close-outline {
+  width: 100%;
+  border: 1px solid #cfd8e3;
+  background: #fff;
+  padding: 10px;
+  border-radius: 30px;
+  font-size: 14px;
+}
+
+/* ===== MOBILE (320px) ===== */
+@media (max-width: 360px) {
+  .custom-modal-content {
+      border-radius: 14px;
+  }
+
+  .custom-modal-body {
+      padding: 14px;
+  }
+
+  .message-box {
+      padding: 10px;
+  }
+
+  .message-box p {
+      font-size: 13px;
+  }
+
+  .btn-login,
+  .btn-register,
+  .btn-close-outline {
+      font-size: 13px;
+      padding: 8px;
+  }
+}

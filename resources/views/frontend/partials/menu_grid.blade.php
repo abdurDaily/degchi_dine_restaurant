@@ -12,6 +12,9 @@
         </div>
     </div>
     @endif
+    @php
+        $viewerMember = Auth::guard('member')->user();
+    @endphp
     @forelse($menus as $menu)
         @php
             $firstVariation = $menu->variations->sortBy('price')->first();
@@ -19,35 +22,36 @@
             $imageUrl = \Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://'])
                 ? $imagePath
                 : asset($imagePath);
-            
-            // Get ALL active offers on this variation
-            $activeOffers = $firstVariation?->offers->sortByDesc('discount_percent') ?? collect();
+
+            // Includes specific_items pivot + all_items global offers; highest % first
+            $activeOffers = $firstVariation
+                ? $firstVariation->resolveApplicableOffers($viewerMember, true)
+                : collect();
             $bestOffer = $activeOffers->first();
+            $unitPrice = (float) ($firstVariation?->price ?? 0);
+            $offerPercent = (int) ($bestOffer->discount_percent ?? 0);
+            $offerPrice = $bestOffer
+                ? round($unitPrice * (1 - $offerPercent / 100), 2)
+                : $unitPrice;
         @endphp
         <div class="col-12 col-sm-6 col-lg-4 d-flex reveal-scale visible">
             <a href="#" class="menu-offer-card">
                 <div class="menu-offer-image-wrap" style="position: relative;">
                     <img src="{{ $imageUrl }}" alt="{{ $menu->name }}" class="menu-offer-image" />
-                    
-                    @if($activeOffers->count() > 0)
-                        {{-- Offer icon badge (left side) --}}
-                        <div class="offer-icon-badge" title="Special Offer Available!">
+
+                    @if($bestOffer)
+                        <div class="offer-icon-badge" title="{{ $bestOffer->name }}">
                           <i class="bi bi-lightning-charge-fill"></i>
                         </div>
-                        
-                        {{-- Discount badge (right side) --}}
-                        @if($activeOffers->count() === 1)
-                          {{-- Single offer badge --}}
-                          <div class="offer-badge-card">
+
+                        <div class="offer-badge-card">
                             <i class="bi bi-tag-fill"></i> {{ $bestOffer->discount_percent }}% OFF
-                          </div>
-                        @else
-                          {{-- Multiple offers - stack badges --}}
-                          <div class="offer-badge-card offer-badge-multiple" style="padding: 0.3rem 0.6rem;">
-                            <i class="bi bi-tags-fill"></i> {{ $activeOffers->count() }} OFFERS
-                          </div>
-                          <div class="offer-badge-card" style="top: 52px; font-size: 0.7rem; padding: 0.3rem 0.6rem;">
-                            Up to {{ $bestOffer->discount_percent }}% OFF
+                        </div>
+
+                        @if($bestOffer->is_first_order)
+                          <div class="offer-first-order-badge" title="First order only — members">
+                            <i class="bi bi-1-circle-fill" aria-hidden="true"></i>
+                            <span>1st Order</span>
                           </div>
                         @endif
                     @endif
@@ -61,18 +65,23 @@
                         <div class="menu-offer-price-wrap">
                             @if($bestOffer)
                                 <span class="menu-offer-price menu-offer-price-old">
-                                  ৳ {{ number_format((float) ($firstVariation?->price ?? 0), 2) }}
+                                  ৳ {{ number_format($unitPrice, 2) }}
                                 </span>
                                 <span class="menu-offer-price text-danger fw-bold">
-                                  ৳ {{ number_format((float) ($firstVariation?->price ?? 0) * (1 - $bestOffer->discount_percent / 100), 2) }}
+                                  ৳ {{ number_format($offerPrice, 2) }}
                                 </span>
                             @else
-                                <span class="menu-offer-price">৳ {{ number_format((float) ($firstVariation?->price ?? 0), 2) }}</span>
+                                <span class="menu-offer-price">৳ {{ number_format($unitPrice, 2) }}</span>
                             @endif
                         </div>
                         <button class="menu-offer-cart-btn" type="button"
                                 data-variation-id="{{ $firstVariation?->id }}"
-                                data-original-price="{{ $firstVariation?->price ?? 0 }}"
+                                data-original-price="{{ $unitPrice }}"
+                                data-offer-price="{{ $offerPrice }}"
+                                data-offer-id="{{ $bestOffer?->id }}"
+                                data-offer-percent="{{ $offerPercent }}"
+                                data-is-first-order="{{ $bestOffer?->is_first_order ? '1' : '0' }}"
+                                data-applicable-to="{{ $bestOffer?->applicable_to ?? 'all' }}"
                                 aria-label="Add {{ $menu->name }} to cart">
                             <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         </button>

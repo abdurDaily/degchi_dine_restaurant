@@ -491,6 +491,84 @@
     </div>
   </div>
 
+  <!-- First-order / member-only offer gate -->
+  <!-- <div class="modal fade" id="offerMemberLoginModal" tabindex="-1" aria-labelledby="offerMemberLoginTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="offerMemberLoginTitle">Member login required</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">This offer is for members only (including <strong>First Order Only</strong> deals). Please sign in as a member to add this item at the offer price.</p>
+        </div>
+        <div class="modal-footer flex-wrap gap-2">
+          <a href="{{ route('frontend.member.login') }}" class="btn btn-primary">Member Login</a>
+          <a href="{{ route('frontend.card.apply') }}" class="btn btn-outline-primary">Register</a>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <div class="modal fade" id="offerMemberLoginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered custom-modal">
+        <div class="modal-content custom-modal-content">
+
+            <!-- HEADER -->
+            <div class="custom-modal-header">
+                <div class="header-left">
+                    <i class="fas fa-user-circle"></i>
+                    <span>সদস্য লগইন প্রয়োজন</span>
+                </div>
+                <button type="button" class="close-btn" data-bs-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- BODY -->
+            <div class="custom-modal-body">
+                <div class="message-box">
+                    <i class="fas fa-gem"></i>
+                    <p>
+                        এই অফারটি শুধুমাত্র সদস্যদের জন্য (ফার্স্ট অর্ডার অনলি ডিল সহ)। 
+                        দয়া করে সদস্য হিসেবে লগইন করুন এই আইটেমটি অফার মূল্যে যুক্ত করতে।
+                    </p>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="custom-modal-footer">
+
+                <a href="{{ route('frontend.member.login') }}" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    সদস্য লগইন
+                </a>
+
+                <a href="{{ route('frontend.card.apply') }}" class="btn-register">
+                    <i class="fas fa-user-plus"></i>
+                    নিবন্ধন
+                </a>
+
+                <button class="btn-close-outline" data-bs-dismiss="modal">
+                    ✕ বন্ধ করুন
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+  @php
+    $degchiMember = Auth::guard('member')->user();
+  @endphp
+  <script>
+    window.DEGCHI_MEMBER = {
+      loggedIn: @json((bool) $degchiMember),
+      canUseFirstOrder: @json($degchiMember ? $degchiMember->canUseFirstOrderDiscount() : false),
+      canOrderAndComment: @json($degchiMember ? $degchiMember->canOrderAndComment() : false),
+      accountRestrictedMessage: @json(\App\Models\Member::ACCOUNT_RESTRICTED_MESSAGE),
+      loginUrl: @json(route('frontend.member.login')),
+      registerUrl: @json(route('frontend.card.apply')),
+    };
+  </script>
   <script src="{{ asset('assets/frontend/app.js') }}"></script>
   <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
   @stack('front_js')

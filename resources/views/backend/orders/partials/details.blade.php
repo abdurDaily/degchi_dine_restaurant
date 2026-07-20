@@ -58,36 +58,44 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if(is_array($order->items) || is_object($order->items))
-                                @foreach($order->items as $item)
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                @if(!empty($item['image']))
-                                                    <img src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}" class="order-item-thumb me-2">
-                                                @else
-                                                    <div class="order-item-thumb order-item-thumb-placeholder me-2">
-                                                        <i class="ri-restaurant-line"></i>
-                                                    </div>
-                                                @endif
-                                                <div>
-                                                    <div class="fw-semibold text-dark">{{ $item['title'] }}</div>
-                                                    @if(!empty($item['note']))
-                                                        <small class="text-muted">{{ $item['note'] }}</small>
-                                                    @endif
+                            @php
+                                $orderItems = $order->normalizedItems();
+                            @endphp
+                            @forelse($orderItems as $item)
+                                @php
+                                    $title = $item['title'] ?? $item['name'] ?? 'Item';
+                                    $price = (float) ($item['price'] ?? 0);
+                                    $qty = max(1, (int) ($item['quantity'] ?? $item['qty'] ?? 1));
+                                    $image = $item['image'] ?? null;
+                                    $note = $item['note'] ?? null;
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if(!empty($image))
+                                                <img src="{{ str_starts_with($image, 'http') ? $image : asset($image) }}" alt="{{ $title }}" class="order-item-thumb me-2">
+                                            @else
+                                                <div class="order-item-thumb order-item-thumb-placeholder me-2">
+                                                    <i class="ri-restaurant-line"></i>
                                                 </div>
+                                            @endif
+                                            <div>
+                                                <div class="fw-semibold text-dark">{{ $title }}</div>
+                                                @if(!empty($note))
+                                                    <small class="text-muted">{{ $note }}</small>
+                                                @endif
                                             </div>
-                                        </td>
-                                        <td class="text-center">৳{{ number_format($item['price'], 2) }}</td>
-                                        <td class="text-center fw-bold">{{ $item['quantity'] }}</td>
-                                        <td class="text-end fw-bold pe-4">৳{{ number_format($item['price'] * $item['quantity'], 2) }}</td>
-                                    </tr>
-                                @endforeach
-                            @else
+                                        </div>
+                                    </td>
+                                    <td class="text-center">৳{{ number_format($price, 2) }}</td>
+                                    <td class="text-center fw-bold">{{ $qty }}</td>
+                                    <td class="text-end fw-bold pe-4">৳{{ number_format($price * $qty, 2) }}</td>
+                                </tr>
+                            @empty
                                 <tr>
                                     <td colspan="4" class="text-center py-4 text-muted">No items stored for this order.</td>
                                 </tr>
-                            @endif
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

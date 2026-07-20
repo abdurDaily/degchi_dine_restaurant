@@ -42,10 +42,10 @@ class MemberAuthController extends Controller
             return back()->withErrors(['login' => 'Invalid phone/card number or password.'])->withInput();
         }
 
-        if ($member->status === 'suspended') {
-            $message = 'Your membership account is suspended. Please contact support.';
+        if ($member->status !== 'active') {
+            $message = $member->accountRestrictedMessage();
             if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => $message], 403);
+                return response()->json(['success' => false, 'message' => $message, 'account_restricted' => true], 403);
             }
             return back()->withErrors(['login' => $message])->withInput();
         }
@@ -87,6 +87,50 @@ class MemberAuthController extends Controller
         }
 
         return view('frontend.member.dashboard', compact('member', 'orders', 'highlightOrder'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $member = Auth::guard('member')->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                function ($attribute, $value, $fail) use ($member) {
+                    $other = Member::findByPhoneOrCard($value);
+                    if ($other && (int) $other->id !== (int) $member->id) {
+                        $fail('This phone number is already registered to another member.');
+                    }
+                },
+            ],
+            'email' => 'nullable|email|max:255',
+            'dob' => 'nullable|date',
+            'marriage_date' => 'nullable|date',
+            'address' => 'nullable|string|max:1000',
+            'profile_image' => 'nullable|file|image|mimes:webp,png,jpg,jpeg|max:2048',
+        ]);
+
+        $member->name = $validated['name'];
+        $member->phone = $validated['phone'];
+        $member->email = $validated['email'] ?? null;
+        $member->dob = $validated['dob'] ?? null;
+        $member->marriage_date = $validated['marriage_date'] ?? null;
+        $member->address = $validated['address'] ?? null;
+        $member->last4 = substr(preg_replace('/\D+/', '', $validated['phone']), -4) ?: $member->last4;
+
+        if ($request->hasFile('profile_image')) {
+            $member->profile_image_path = $request->file('profile_image')->store('profile_images', 'public');
+        }
+
+        // Card number is intentionally never updated from the dashboard.
+        $member->save();
+
+        return redirect()
+            ->route('frontend.member.dashboard')
+            ->with('success', 'Your profile has been updated successfully.');
     }
 
     public function showTrackOrder(Request $request)
@@ -158,7 +202,7 @@ class MemberAuthController extends Controller
             ->where('key', 'contact_phone')
             ->value('value') ?? '+880 1234 567 890';
 
-        $orderItems = is_array($order->items) ? $order->items : json_decode($order->items ?? '[]', true);
+        $orderItems = $order->normalizedItems();
 
         return view('frontend.order-confirmation', compact(
             'order',

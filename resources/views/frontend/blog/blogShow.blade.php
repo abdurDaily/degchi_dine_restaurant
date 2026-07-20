@@ -693,8 +693,15 @@
         const reactUrl = "{{ route('frontend.blog.react', ':comment') }}";
         const memberLoginUrl = "{{ route('frontend.member.login') }}";
         const isMember = @json(auth('member')->check());
+        const canOrderAndComment = @json(auth('member')->check() ? auth('member')->user()->canOrderAndComment() : false);
+        const accountRestrictedMessage = @json(\App\Models\Member::ACCOUNT_RESTRICTED_MESSAGE);
 
         function postComment(slug, commentText, parentId, onSuccess) {
+            if (isMember && !canOrderAndComment) {
+                alert(accountRestrictedMessage);
+                return;
+            }
+
             $.ajax({
                 url: commentUrl.replace(':slug', slug),
                 method: 'POST',
@@ -714,7 +721,12 @@
                         toastr.error('Please login as member to comment');
                         window.location.href = memberLoginUrl;
                     } else if (xhr.status === 403) {
-                        toastr.error('Comments are disabled for this post');
+                        const msg = (xhr.responseJSON && xhr.responseJSON.error) || 'Comments are disabled for this post';
+                        if (xhr.responseJSON && xhr.responseJSON.account_restricted) {
+                            alert(msg);
+                        } else {
+                            toastr.error(msg);
+                        }
                     } else if (xhr.status === 422) {
                         toastr.error((xhr.responseJSON && xhr.responseJSON.errors && xhr.responseJSON.errors.comment && xhr.responseJSON.errors.comment[0]) || 'Invalid comment');
                     } else {
@@ -766,6 +778,11 @@
                 return;
             }
 
+            if (!canOrderAndComment) {
+                alert(accountRestrictedMessage);
+                return;
+            }
+
             const button = $(this);
             const commentId = button.data('comment-id');
             const reaction = button.data('reaction');
@@ -789,6 +806,8 @@
                     if (xhr.status === 401) {
                         toastr.error('Please login as member to react');
                         window.location.href = memberLoginUrl;
+                    } else if (xhr.status === 403 && xhr.responseJSON && xhr.responseJSON.account_restricted) {
+                        alert(xhr.responseJSON.error || accountRestrictedMessage);
                     } else {
                         toastr.error('Error processing reaction');
                     }
