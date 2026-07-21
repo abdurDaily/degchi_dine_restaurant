@@ -37,7 +37,7 @@ Auth::routes(['register' => true, 'verify' => true]);
 // });
 
 // Route::get('/linkstorage', function () {
-//     Artisan::call('storage:link');
+//     Artisan::call('storage:link'); 
 // });
 
 Route::get('cache-clear', function () {
