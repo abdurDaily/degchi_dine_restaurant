@@ -45,6 +45,9 @@
                 submitBtn.prop('disabled', false).html('<i class="ri-save-3-line me-1"></i> Save Changes');
                 if (res.success) {
                     if (typeof toastr !== 'undefined') toastr.success(res.message);
+                    // Reload so the items panel reflects the new editability
+                    // (Add Extra Item / qty stepper are pending-status only).
+                    setTimeout(() => window.location.reload(), 600);
                 }
             },
             error: function (xhr) {
@@ -54,4 +57,5 @@
         });
     });
 </script>
+<script src="{{ asset('assets/js/backend-order-items.js') }}"></script>
 @endpush

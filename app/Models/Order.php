@@ -29,6 +29,7 @@ class Order extends Model
         'member_credited',
         'coupon_code',
         'coupon_discount',
+        'delivery_charge',
     ];
 
     protected $casts = [
@@ -36,6 +37,7 @@ class Order extends Model
         'discount_amount' => 'decimal:2',
         'final_amount'    => 'decimal:2',
         'coupon_discount' => 'decimal:2',
+        'delivery_charge' => 'decimal:2',
         'student_card_used' => 'boolean',
         'member_credited'   => 'boolean',
         'items'           => 'array',

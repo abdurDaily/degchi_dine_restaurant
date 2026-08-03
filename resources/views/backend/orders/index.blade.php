@@ -442,6 +442,7 @@ $(function () {
             $('#count-canceled').text(c.canceled  ?? 0);
         });
     }
+    window.refreshCounts = refreshCounts;
 
     /* ══════════════════════════════════════════════════
        7. REFRESH ON GLOBAL NEW-ORDER ALERT
@@ -453,4 +454,5 @@ $(function () {
 
 });
 </script>
+<script src="{{ asset('assets/js/backend-order-items.js') }}"></script>
 @endpush

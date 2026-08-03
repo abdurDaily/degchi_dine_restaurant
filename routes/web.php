@@ -57,7 +57,9 @@ Route::get('cache-clear', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('pending-approval', function () {
-        if (auth()->user()->status) {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if ($user?->status) {
             return redirect()->route('dashboard');
         }
 
@@ -154,6 +156,9 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     Route::get('orders/latest-id', [OrderController::class, 'latestOrderId'])->name('orders.latestId');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::get('orders/{order}/menu-picker', [OrderController::class, 'menuPicker'])->name('orders.menuPicker');
+    Route::post('orders/{order}/items/quantity', [OrderController::class, 'updateItemQuantity'])->name('orders.items.quantity');
+    Route::post('orders/{order}/items/add', [OrderController::class, 'addItem'])->name('orders.items.add');
 
     // Offers CRUD
     Route::resource('offers', OfferController::class)->except(['show']);

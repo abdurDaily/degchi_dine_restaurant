@@ -43,61 +43,17 @@
         </div>
 
         <div class="card order-details-card">
-            <div class="card-header order-details-card-header">
+            <div class="card-header order-details-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <h5 class="card-title mb-0"><i class="ri-list-check-2 me-2"></i>Ordered Items</h5>
+                @if($order->status === 'pending')
+                    <button type="button" id="addExtraItemBtn" class="btn btn-sm btn-add-extra-item" data-order-id="{{ $order->id }}" data-menu-picker-url="{{ route('orders.menuPicker', $order->id) }}" data-add-item-url="{{ route('orders.items.add', $order->id) }}">
+                        <i class="ri-add-circle-line me-1"></i> Add Extra Item
+                    </button>
+                @endif
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover order-items-table mb-0 align-middle">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th class="text-center">Price</th>
-                                <th class="text-center">Qty</th>
-                                <th class="text-end pe-4">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $orderItems = $order->normalizedItems();
-                            @endphp
-                            @forelse($orderItems as $item)
-                                @php
-                                    $title = $item['title'] ?? $item['name'] ?? 'Item';
-                                    $price = (float) ($item['price'] ?? 0);
-                                    $qty = max(1, (int) ($item['quantity'] ?? $item['qty'] ?? 1));
-                                    $image = $item['image'] ?? null;
-                                    $note = $item['note'] ?? null;
-                                @endphp
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            @if(!empty($image))
-                                                <img src="{{ str_starts_with($image, 'http') ? $image : asset($image) }}" alt="{{ $title }}" class="order-item-thumb me-2">
-                                            @else
-                                                <div class="order-item-thumb order-item-thumb-placeholder me-2">
-                                                    <i class="ri-restaurant-line"></i>
-                                                </div>
-                                            @endif
-                                            <div>
-                                                <div class="fw-semibold text-dark">{{ $title }}</div>
-                                                @if(!empty($note))
-                                                    <small class="text-muted">{{ $note }}</small>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">৳{{ number_format($price, 2) }}</td>
-                                    <td class="text-center fw-bold">{{ $qty }}</td>
-                                    <td class="text-end fw-bold pe-4">৳{{ number_format($price * $qty, 2) }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center py-4 text-muted">No items stored for this order.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <div id="orderItemsTableWrap" data-order-id="{{ $order->id }}" data-quantity-url="{{ route('orders.items.quantity', $order->id) }}">
+                    @include('backend.orders.partials.items-table', ['order' => $order])
                 </div>
             </div>
         </div>
@@ -191,21 +147,13 @@
             <div class="card-header order-details-card-header">
                 <h5 class="card-title mb-0"><i class="ri-bill-line me-2"></i>Order Summary</h5>
             </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal</span>
-                    <span>৳{{ number_format($order->total_amount, 2) }}</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2 text-success">
-                    <span>Discount</span>
-                    <span>- ৳{{ number_format($order->discount_amount, 2) }}</span>
-                </div>
-                <hr class="my-2">
-                <div class="d-flex justify-content-between fw-bold fs-5 order-total-row">
-                    <span>Total</span>
-                    <span>৳{{ number_format($order->final_amount, 2) }}</span>
-                </div>
+            <div class="card-body" id="orderSummaryWrap">
+                @include('backend.orders.partials.summary', ['order' => $order])
             </div>
         </div>
     </div>
 </div>
+
+@if($order->status === 'pending')
+    @include('backend.orders.partials.menu-picker-modal', ['order' => $order])
+@endif

@@ -16,6 +16,7 @@ use App\Models\Order;
 use App\Models\Review;
 use App\Models\Setting;
 use App\Models\SignaturePlatter;
+use App\Services\OrderPricingService;
 use App\Services\SSLCommerzService;
 use App\Support\NotifyAdminsOfNewOrder;
 use App\Support\OrderRedirect;
@@ -390,7 +391,7 @@ class HomeController extends Controller
         return back()->with('success', $msg);
     }
 
-    public function storeOrder(Request $request)
+    public function storeOrder(Request $request, OrderPricingService $pricing)
     {
         // 1. Validate the Request
         $request->validate([
@@ -403,6 +404,7 @@ class HomeController extends Controller
             'member_card_number' => 'nullable|string|exists:members,unique_card_number',
             'student_card' => 'sometimes|boolean',
             'coupon_code' => 'nullable|string',
+            'shipping_charge' => 'nullable|numeric|min:0',
         ]);
 
         // 2. Generate unique Transaction ID
@@ -460,9 +462,7 @@ class HomeController extends Controller
 
         // Apply promotional offers discount — always price from DB, never trust client unit prices
         $items = json_decode($request->items, true);
-        $offerDiscount = 0;
         $itemDiscountDetails = [];
-        $serverSubtotal = 0;
 
         if (is_array($items) && ! empty($items)) {
             foreach ($items as &$item) {
@@ -484,52 +484,42 @@ class HomeController extends Controller
                 $item['price'] = $unitPrice;
                 $item['original_price'] = $unitPrice;
                 $item['quantity'] = $qty;
-                $serverSubtotal += $unitPrice * $qty;
 
-                $applicableOffers = $variation->resolveApplicableOffers($member, false);
+                $bestOffer = $pricing->resolveBestOffer($variation, $member);
 
-                if ($applicableOffers->isNotEmpty()) {
-                    $bestOffer = Offer::bestEligibleForMember($applicableOffers, $member);
+                if ($bestOffer) {
+                    $itemDiscount = round($unitPrice * $qty * ($bestOffer->discount_percent / 100), 2);
 
-                    if ($bestOffer) {
-                        $itemTotal = $unitPrice * $qty;
-                        $itemDiscount = round($itemTotal * ($bestOffer->discount_percent / 100), 2);
+                    $itemDiscountDetails[] = [
+                        'variation_id' => $menuVariationId,
+                        'offer_id' => $bestOffer->id,
+                        'offer_name' => $bestOffer->name,
+                        'discount_percent' => $bestOffer->discount_percent,
+                        'discount_amount' => $itemDiscount,
+                    ];
 
-                        $offerDiscount += $itemDiscount;
-                        $itemDiscountDetails[] = [
-                            'variation_id' => $menuVariationId,
-                            'offer_id' => $bestOffer->id,
-                            'offer_name' => $bestOffer->name,
-                            'discount_percent' => $bestOffer->discount_percent,
-                            'discount_amount' => $itemDiscount,
-                        ];
-
-                        $item['offer_id'] = $bestOffer->id;
-                        $item['offer_discount'] = $itemDiscount;
-                        $item['offer_percent'] = $bestOffer->discount_percent;
-                    }
+                    $item['offer_id'] = $bestOffer->id;
+                    $item['offer_discount'] = $itemDiscount;
+                    $item['offer_percent'] = $bestOffer->discount_percent;
                 }
             }
             unset($item);
         }
 
-        // Prefer server-calculated subtotal when items resolved cleanly
-        $orderSubtotal = $serverSubtotal > 0 ? $serverSubtotal : (float) $request->order_total;
+        $validItems = is_array($items) ? $items : [];
 
-        // Item-level promo offers are applied first (subtotal net of offers), then the
-        // Membership/Student/Golden discount stacks on top of that already-discounted
-        // amount — matching the checkout page, which always shows offer-discounted unit
-        // prices and applies the member discount to that same discounted subtotal.
-        $subtotalAfterOffers = max(0, $orderSubtotal - $offerDiscount);
-
-        $memberDiscountAmount = 0;
-        if ($member) {
-            $memberDiscount = $member->resolveMemberDiscount($subtotalAfterOffers, true);
-            $memberDiscountAmount = $memberDiscount['amount'];
+        // Prefer server-calculated subtotal (and offer discount) from the priced items
+        $serverSubtotal = 0.0;
+        $rawOfferDiscount = 0.0;
+        foreach ($validItems as $item) {
+            $serverSubtotal += (float) ($item['original_price'] ?? $item['price'] ?? 0) * max(1, (int) ($item['quantity'] ?? 1));
+            $rawOfferDiscount += (float) ($item['offer_discount'] ?? 0);
         }
 
-        $discountAmount = $offerDiscount + $memberDiscountAmount;
+        $orderSubtotal = $serverSubtotal > 0 ? $serverSubtotal : (float) $request->order_total;
+        $subtotalAfterOffers = max(0, $orderSubtotal - $rawOfferDiscount);
 
+        $couponDiscount = 0;
         if ($coupon) {
             if (! $coupon->isValid($subtotalAfterOffers)) {
                 if ($request->ajax()) {
@@ -543,18 +533,28 @@ class HomeController extends Controller
             $couponDiscount = $coupon->calculateDiscount($subtotalAfterOffers);
         }
 
-        $totalDiscount = min($orderSubtotal, $discountAmount + $couponDiscount);
+        // Item offers → then Membership/Student/Golden discount stacked on top → then coupon.
+        // Delivery is a fixed fee added AFTER discounts (never discounted).
+        $deliveryCharge = OrderPricingService::DEFAULT_DELIVERY_CHARGE;
+        if ($request->filled('shipping_charge')) {
+            // Accept the posted fee, but never go below 0. Distance-based extras
+            // are informational in the UI for now — checkout still posts the flat fee.
+            $deliveryCharge = max(0.0, round((float) $request->input('shipping_charge'), 2));
+        }
+
+        $totals = $pricing->recalculateTotals($validItems, $member, $couponDiscount, $deliveryCharge);
 
         $orderData = [
             'customer_name' => $request->customer_name,
             'customer_phone' => $request->customer_phone,
             'customer_address' => $request->customer_address,
-            'total_amount' => $orderSubtotal,
-            'discount_amount' => $totalDiscount,
+            'total_amount' => $totals['total_amount'],
+            'discount_amount' => $totals['discount_amount'],
             'coupon_code' => $coupon ? $coupon->code : null,
-            'coupon_discount' => $couponDiscount,
-            'final_amount' => max(0, $orderSubtotal - $totalDiscount),
-            'items' => is_array($items) ? $items : [],
+            'coupon_discount' => $totals['coupon_discount'],
+            'delivery_charge' => $totals['delivery_charge'],
+            'final_amount' => $totals['final_amount'],
+            'items' => $validItems,
             'payment_method' => $paymentMethod,
             'status' => 'pending',
             'student_card_used' => $request->boolean('student_card'),
