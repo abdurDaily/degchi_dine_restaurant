@@ -176,6 +176,7 @@ class HomeController extends Controller
             ->orderBy('discount_percent', 'desc')
             ->get();
 
+        /** @var \App\Models\Member|null $loggedInMember */
         $loggedInMember = Auth::guard('member')->user();
         $loggedInMemberDiscount = $loggedInMember
             ? $loggedInMember->resolveMemberDiscount(1)
@@ -515,19 +516,22 @@ class HomeController extends Controller
         // Prefer server-calculated subtotal when items resolved cleanly
         $orderSubtotal = $serverSubtotal > 0 ? $serverSubtotal : (float) $request->order_total;
 
-        $discountAmount = 0;
+        // Item-level promo offers are applied first (subtotal net of offers), then the
+        // Membership/Student/Golden discount stacks on top of that already-discounted
+        // amount — matching the checkout page, which always shows offer-discounted unit
+        // prices and applies the member discount to that same discounted subtotal.
+        $subtotalAfterOffers = max(0, $orderSubtotal - $offerDiscount);
+
+        $memberDiscountAmount = 0;
         if ($member) {
-            $memberDiscount = $member->resolveMemberDiscount($orderSubtotal, true);
-            $discountAmount = $memberDiscount['amount'];
+            $memberDiscount = $member->resolveMemberDiscount($subtotalAfterOffers, true);
+            $memberDiscountAmount = $memberDiscount['amount'];
         }
 
-        // Use the higher discount: member discount or accumulated item offers
-        if ($offerDiscount > $discountAmount) {
-            $discountAmount = $offerDiscount;
-        }
+        $discountAmount = $offerDiscount + $memberDiscountAmount;
 
         if ($coupon) {
-            if (! $coupon->isValid($orderSubtotal)) {
+            if (! $coupon->isValid($subtotalAfterOffers)) {
                 if ($request->ajax()) {
                     return response()->json([
                         'success' => false,
@@ -536,7 +540,7 @@ class HomeController extends Controller
                 }
                 return back()->withErrors(['coupon_code' => 'The applied coupon is invalid, expired, or doesn\'t meet the minimum order amount.']);
             }
-            $couponDiscount = $coupon->calculateDiscount($orderSubtotal);
+            $couponDiscount = $coupon->calculateDiscount($subtotalAfterOffers);
         }
 
         $totalDiscount = min($orderSubtotal, $discountAmount + $couponDiscount);
@@ -804,6 +808,7 @@ class HomeController extends Controller
 
         // Generic "has an active offer" filter — only offers this viewer can actually see/use
         if ($offerOnly) {
+            /** @var \App\Models\Member|null $viewerMember */
             $viewerMember = Auth::guard('member')->user();
             $hasVisibleGlobalOffer = Offer::visibleAllItemOffersFor($viewerMember)->isNotEmpty();
 

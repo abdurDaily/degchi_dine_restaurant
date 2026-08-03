@@ -1123,43 +1123,22 @@
                     try {
                         const { cart, original, effective } = getCartMoneyTotals();
                         const offerInfo = calculateOfferDiscount(cart);
-                        const memberDiscount = calculateMemberDiscount(original);
                         const foodOfferDiscount = Math.max(
                             offerInfo.discount || 0,
                             Math.max(0, parseFloat((original - effective).toFixed(2)))
                         );
 
-                        // Membership/Student first-order is an all-items checkout benefit.
-                        // Compare against food-item offers and take the better deal (membership wins ties).
-                        const membershipWins = memberDiscount > 0 && memberDiscount >= foodOfferDiscount;
+                        // Subtotal always reflects each item's own offer-discounted price —
+                        // matching the item rows above it and the Cart page. Membership/Student
+                        // discount then stacks on top of this already-discounted subtotal.
+                        const displaySubtotal = effective > 0 ? effective : original;
+                        const memberDiscount = calculateMemberDiscount(displaySubtotal);
 
-                        let displaySubtotal;
-                        let promoToSubtract;
-                        let displayMemberDiscount;
-                        let displayOfferInfo;
-
-                        if (membershipWins) {
-                            // Show real catalog subtotal + Membership Discount (works even if cart has offer items)
-                            displaySubtotal = original;
-                            promoToSubtract = memberDiscount;
-                            displayMemberDiscount = memberDiscount;
-                            displayOfferInfo = { discount: 0, offerName: '', offerPercent: 0 };
-                        } else if (foodOfferDiscount > 0) {
-                            // Food promo is better — subtotal already uses offer unit prices
-                            displaySubtotal = effective;
-                            promoToSubtract = 0;
-                            displayMemberDiscount = 0;
-                            displayOfferInfo = {
-                                discount: 0,
-                                offerName: offerInfo.offerName,
-                                offerPercent: offerInfo.offerPercent,
-                            };
-                        } else {
-                            displaySubtotal = original > 0 ? original : effective;
-                            promoToSubtract = 0;
-                            displayMemberDiscount = 0;
-                            displayOfferInfo = { discount: 0, offerName: '', offerPercent: 0 };
-                        }
+                        // The food offer is already baked into displaySubtotal — show it as an
+                        // informational line only, don't subtract it again.
+                        const displayOfferInfo = foodOfferDiscount > 0
+                            ? { discount: 0, offerName: offerInfo.offerName, offerPercent: offerInfo.offerPercent }
+                            : { discount: 0, offerName: '', offerPercent: 0 };
 
                         if (subtotalDisplay) {
                             const nextSubtotal = `৳ ${displaySubtotal.toFixed(2)}`;
@@ -1167,6 +1146,7 @@
                                 subtotalDisplay.textContent = nextSubtotal;
                             }
                         }
+
                         if (orderTotalInput) {
                             const nextOriginal = original.toFixed(2);
                             if (orderTotalInput.value !== nextOriginal) {
@@ -1178,13 +1158,12 @@
 
                         updateTotals(
                             displaySubtotal,
-                            promoToSubtract,
+                            memberDiscount,
                             displayOfferInfo,
-                            displayMemberDiscount,
+                            memberDiscount,
                             couponDiscount,
                             {
                                 original,
-                                membershipWins,
                                 offerMeta: offerInfo,
                             }
                         );
@@ -1352,9 +1331,8 @@
                     couponCodeHidden.value = (appliedCoupon && couponDiscount > 0) ? appliedCoupon.code : '';
                     couponDiscountHidden.value = couponDiscount.toFixed(2);
 
-                    // Subtotal is already discounted item prices.
-                    // bestDiscount = extra membership amount only (when membership beats food offer).
-                    // Do NOT subtract bakedOfferSavings again.
+                    // Subtotal is already net of item-level offer discounts.
+                    // bestDiscount = Membership/Student discount, stacked on top of that subtotal.
                     const discountedProductTotal = Math.max(0, subtotal - bestDiscount - couponDiscount);
                     const deliveryChargeToAdd = typeof shippingCharge === 'number' ? shippingCharge : SHIPPING_CHARGE;
                     const finalTotal = discountedProductTotal + deliveryChargeToAdd;
