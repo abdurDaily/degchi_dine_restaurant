@@ -3,7 +3,6 @@
 use App\Http\Controllers\Backend\BlogCategory\BlogCategoryController;
 use App\Http\Controllers\Backend\Comment\CommentController;
 use App\Http\Controllers\Backend\MemberController;
-use App\Http\Controllers\Backend\MenuController;
 use App\Http\Controllers\Backend\OfferController;
 use App\Http\Controllers\Backend\OrderController;
 use App\Http\Controllers\Backend\Post\PostController;
@@ -129,13 +128,8 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     Route::post('members/{member}/approve', [MemberController::class, 'approve'])->name('members.approve');
     Route::post('members/{member}/reject', [MemberController::class, 'reject'])->name('members.reject');
     Route::post('members/{member}/upgrade-golden', [MemberController::class, 'upgradeToGolden'])->name('members.upgradeGolden');
-    // Admin menu management
+    // Admin branch / review management (menu routes live in routes/admin.php)
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::post('admin/menu/{id}/toggle-popular', [MenuController::class, 'togglePopular'])->name('menu.togglePopular');
-        Route::resource('menu', App\Http\Controllers\Backend\MenuController::class)->except(['show']);
-        Route::post('menu/{menu}/delete', [App\Http\Controllers\Backend\MenuController::class, 'destroy'])->name('menu.delete');
-        
-    // Admin branch management
         Route::get('branch', [App\Http\Controllers\Backend\BranchController::class, 'index'])->name('branch.index');
         Route::post('branch', [App\Http\Controllers\Backend\BranchController::class, 'store'])->name('branch.store');
         Route::get('branch/{id}/edit', [App\Http\Controllers\Backend\BranchController::class, 'edit'])->name('branch.edit');

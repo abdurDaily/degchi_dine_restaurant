@@ -28,14 +28,14 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("category")->nam
     Route::delete("/{category}/delete", [CategoryController::class, "destroy"])->name("delete");
 });
 
-// --- MENU MANAGEMENT (NEW) ---
-Route::middleware(['auth', 'setLocale', 'user.active'])->prefix("menu")->name("menu.")->group(function () {
-    Route::get("/index", [MenuController::class, "index"])->name("index");
-    Route::post("/store", [MenuController::class, "store"])->name("store");
-    Route::get("/{menu}/edit", [MenuController::class, "edit"])->name("edit");
-    Route::post("/{menu}/update", [MenuController::class, "update"])->name("update");
-    Route::delete("/{menu}/delete", [MenuController::class, "destroy"])->name("delete");
-    Route::post('menu/{id}/update', [MenuController::class, 'update'])->name('admin.menu.update');
+// --- MENU MANAGEMENT ---
+Route::middleware(['auth', 'setLocale', 'user.active'])->prefix('menu')->name('menu.')->group(function () {
+    Route::get('/index', [MenuController::class, 'index'])->name('index');
+    Route::post('/store', [MenuController::class, 'store'])->name('store');
+    Route::get('/{menu}/edit', [MenuController::class, 'edit'])->name('edit');
+    Route::post('/{menu}/update', [MenuController::class, 'update'])->name('update');
+    Route::delete('/{menu}/delete', [MenuController::class, 'destroy'])->name('delete');
+    Route::post('/{menu}/toggle-popular', [MenuController::class, 'togglePopular'])->name('togglePopular');
 });
 
 // --- SIGNATURE PLATTERS MANAGEMENT ---

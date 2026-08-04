@@ -6,17 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class MenuController extends Controller
 {
+    private const VARIATION_UPLOAD_DIR = 'uploads/menus/variations';
+
     public function __construct()
     {
         $this->middleware('permission:menu-list')->only(['index', 'edit']);
         $this->middleware('permission:menu-create')->only('store');
-        $this->middleware('permission:menu-edit')->only(['update', 'togglePopular']); // ✅ যোগ করুন
+        $this->middleware('permission:menu-edit')->only(['update', 'togglePopular']);
         $this->middleware('permission:menu-delete')->only('destroy');
     }
 
@@ -28,10 +31,9 @@ class MenuController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('image_preview', function ($row) {
-                    $image = $row->variations->first()?->image
-                        ? (strpos($row->variations->first()->image, 'http') === 0
-                            ? $row->variations->first()->image
-                            : asset($row->variations->first()->image))
+                    $path = $row->variations->first()?->image;
+                    $image = $path
+                        ? (str_starts_with($path, 'http') ? $path : asset($path))
                         : asset('assets/placeholder/placeholder.png');
 
                     return '<img src="'.$image.'" width="50" height="50" class="rounded shadow-sm object-fit-cover" />';
@@ -55,7 +57,6 @@ class MenuController extends Controller
                         ? '<span class="badge bg-success"><i class="ri-check-line me-1"></i>Available</span>'
                         : '<span class="badge bg-danger"><i class="ri-close-line me-1"></i>Out of Stock</span>';
                 })
-                // Popular star toggle column
                 ->addColumn('popular_status', function ($row) {
                     $isPopular = (bool) $row->is_popular;
                     $activeClass = $isPopular ? 'is-active' : '';
@@ -86,9 +87,10 @@ class MenuController extends Controller
                         </button>
                     </div>';
                 })
-                ->rawColumns(['action', 'image_preview', 'variations_count', 'status', 'price_range', 'popular_status']) // ✅ যোগ করুন
+                ->rawColumns(['action', 'image_preview', 'variations_count', 'status', 'price_range', 'popular_status'])
                 ->make(true);
         }
+
         $categories = Category::all();
 
         return view('backend.menu.index', compact('categories'));
@@ -111,141 +113,181 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'variations' => 'required|array|min:1',
-            'variations.*.name' => 'required|string',
-            'variations.*.price' => 'required|numeric',
-        ]);
+        $request->validate($this->menuRules(creating: true));
 
         try {
-            return DB::transaction(function () use ($request) {
-                // dd($request->all());
-                // Create Parent
+            DB::transaction(function () use ($request) {
                 $menu = Menu::create([
                     'category_id' => $request->category_id,
                     'name' => $request->name,
                     'slug' => Str::slug($request->name).'-'.rand(1000, 9999),
                     'description' => $request->description,
-                    'is_available' => $request->is_available ?? 1,
+                    'is_available' => (int) $request->input('is_available', 1) === 1,
                 ]);
 
-                // Create Children (Variations)
-                foreach ($request->variations as $index => $vData) {
-                    $imagePath = null;
-                    
-                    if (isset($request->variations[$index]['image'])) {
-                        $file = $request->file("variations.$index.image");
-                        $imageName = time().'_'.$index.'.'.$file->extension();
-                        // $file->move(public_path('uploads/menus/variations'), $imageName);
-                        // $imagePath = 'uploads/menus/variations/'.$imageName;
-                        $file->store('menus/variations', 'public');
-                        dd($file);
-                        $imagePath = 'storage/menus/variations/'.$imageName;
-                    }
-
-                    // dd($imagePath);
-                    $menu->variations()->create([
-                        'name' => $vData['name'],
-                        'price' => $vData['price'],
-                        'image' => $imagePath,
-                    ]);
-                }
-
-                return response()->json(['status' => 'success', 'message' => 'Menu Item & Variations Saved!']);
+                $this->syncVariations($menu, $request);
             });
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Menu item & variations saved!',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Could not save menu item: '.$e->getMessage(),
+            ], 500);
         }
     }
 
     public function edit($id)
     {
-        // Load variations and category so the edit form can see them
         $menu = Menu::with(['variations', 'category'])->findOrFail($id);
 
         return response()->json($menu);
     }
 
-    // app/Http/Controllers/Backend/MenuController.php
-
     public function update(Request $request, $id)
     {
-        $menu = Menu::findOrFail($id);
-
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'variations' => 'required|array|min:1',
-        ]);
+        $menu = Menu::with('variations')->findOrFail($id);
+        $request->validate($this->menuRules(creating: false));
 
         try {
             DB::transaction(function () use ($request, $menu) {
-                // Update Parent
                 $menu->update([
                     'category_id' => $request->category_id,
                     'name' => $request->name,
                     'description' => $request->description,
-                    'is_available' => $request->is_available,
+                    'is_available' => (int) $request->input('is_available', 1) === 1,
                     'slug' => Str::slug($request->name).'-'.$menu->id,
                 ]);
 
-                // Handle Variations
-                // Only delete images if you are replacing them or if business logic requires it.
-                // For simplicity in dynamic forms, we replace:
-                foreach ($menu->variations as $oldVar) {
-                    // Only delete if NOT provided in old_image or if a new file is uploaded
-                    if ($oldVar->image && file_exists(public_path($oldVar->image))) {
-                        // Check if this image is still being used by checking old_image inputs
-                        $stillUsed = false;
-                        foreach ($request->variations as $index => $v) {
-                            if (($v['old_image'] ?? '') == $oldVar->image && ! $request->hasFile('variations.'.$index.'.image')) {
-                                $stillUsed = true;
-                            }
-                        }
-                        if (! $stillUsed) {
-                            unlink(public_path($oldVar->image));
-                        }
-                    }
-                }
-
-                $menu->variations()->delete();
-
-                foreach ($request->variations as $index => $vData) {
-                    $imagePath = $vData['old_image'] ?? null;
-
-                    if ($request->hasFile("variations.$index.image")) {
-                        $file = $request->file("variations.$index.image");
-                        $imageName = time().'_'.$index.'.'.$file->extension();
-                        $file->move(public_path('uploads/menus/variations'), $imageName);
-                        $imagePath = 'uploads/menus/variations/'.$imageName;
-                    }
-
-                    $menu->variations()->create([
-                        'name' => $vData['name'],
-                        'price' => $vData['price'],
-                        'image' => $imagePath,
-                    ]);
-                }
+                $this->syncVariations($menu, $request, replaceExisting: true);
             });
 
-            return response()->json(['status' => 'success', 'message' => 'Updated successfully!']);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Menu item updated successfully!',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Could not update menu item: '.$e->getMessage(),
+            ], 500);
         }
     }
 
     public function destroy($id)
     {
-        $menu = Menu::findOrFail($id);
-        foreach ($menu->variations as $v) {
-            if ($v->image && file_exists(public_path($v->image))) {
-                unlink(public_path($v->image));
-            }
+        $menu = Menu::with('variations')->findOrFail($id);
+
+        foreach ($menu->variations as $variation) {
+            $this->deleteVariationImage($variation->image);
         }
+
         $menu->delete();
 
-        return response()->json(['status' => 'success', 'message' => 'Deleted successfully!']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deleted successfully!',
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function menuRules(bool $creating): array
+    {
+        return [
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_available' => 'nullable|in:0,1,true,false',
+            'variations' => 'required|array|min:1',
+            'variations.*.name' => 'required|string|max:255',
+            'variations.*.price' => 'required|numeric|min:0',
+            'variations.*.old_image' => 'nullable|string',
+            'variations.*.image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+        ];
+    }
+
+    /**
+     * Create variation rows from the request. When replacing, remove old rows
+     * and only delete images that are no longer referenced.
+     */
+    private function syncVariations(Menu $menu, Request $request, bool $replaceExisting = false): void
+    {
+        $incoming = array_values($request->input('variations', []));
+        $keptImages = [];
+
+        if ($replaceExisting) {
+            foreach ($incoming as $index => $vData) {
+                if ($request->hasFile("variations.$index.image")) {
+                    continue;
+                }
+                $old = $vData['old_image'] ?? null;
+                if (is_string($old) && $old !== '') {
+                    $keptImages[] = $old;
+                }
+            }
+
+            foreach ($menu->variations as $oldVar) {
+                if ($oldVar->image && ! in_array($oldVar->image, $keptImages, true)) {
+                    $this->deleteVariationImage($oldVar->image);
+                }
+            }
+
+            $menu->variations()->delete();
+        }
+
+        foreach ($incoming as $index => $vData) {
+            $imagePath = null;
+
+            if ($request->hasFile("variations.$index.image")) {
+                $imagePath = $this->storeVariationImage(
+                    $request->file("variations.$index.image"),
+                    $index
+                );
+            } elseif (! empty($vData['old_image'])) {
+                $imagePath = $vData['old_image'];
+            }
+
+            $menu->variations()->create([
+                'name' => $vData['name'],
+                'price' => $vData['price'],
+                'image' => $imagePath,
+            ]);
+        }
+    }
+
+    private function storeVariationImage(UploadedFile $file, int $index): string
+    {
+        $uploadDir = public_path(self::VARIATION_UPLOAD_DIR);
+
+        if (! is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        $imageName = time().'_'.$index.'_'.Str::random(6).'.'.$extension;
+        $file->move($uploadDir, $imageName);
+
+        return self::VARIATION_UPLOAD_DIR.'/'.$imageName;
+    }
+
+    private function deleteVariationImage(?string $path): void
+    {
+        if (! $path || str_starts_with($path, 'http')) {
+            return;
+        }
+
+        $fullPath = public_path($path);
+        if (is_file($fullPath)) {
+            @unlink($fullPath);
+        }
     }
 }

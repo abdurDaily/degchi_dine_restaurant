@@ -208,7 +208,6 @@
                 }
             });
 
-            // Initialize DataTable
             table = $('.menu-datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -272,118 +271,126 @@
                 ]
             });
 
-            // Add Variation Row
-            $('#add_variation').click(function() {
+            $('#add_variation').on('click', function() {
                 addVariationRow();
+                refreshVariationUi();
             });
 
-            // Remove Variation Row
             $(document).on('click', '.remove-variation', function() {
-                $(this).closest('.admin-variation-row').fadeOut(300, function() {
+                const rows = $('#variation_wrapper .admin-variation-row');
+                if (rows.length <= 1) {
+                    toastr.warning('At least one variation is required.', 'Notice');
+                    return;
+                }
+                $(this).closest('.admin-variation-row').fadeOut(200, function() {
                     $(this).remove();
+                    reindexVariationRows();
+                    refreshVariationUi();
                 });
             });
 
-            // Form Submit
+            $(document).on('change', '.variation-image-input', function() {
+                const input = this;
+                const preview = $(input).closest('.admin-variation-row').find('.variation-image-preview');
+                const file = input.files && input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.attr('src', e.target.result).removeClass('d-none');
+                };
+                reader.readAsDataURL(file);
+            });
+
             $('#menuForm').on('submit', function(e) {
                 e.preventDefault();
                 $('.error-text').text('');
 
-                currentEditId = $(this).attr('data-edit-id');
-                let url = currentEditId ? "{{ route('admin.menu.update', ':id') }}".replace(':id',
-                    currentEditId) : "{{ route('admin.menu.store') }}";
+                reindexVariationRows();
 
-                let formData = new FormData(this);
+                currentEditId = $(this).attr('data-edit-id') || null;
+                const isEdit = !!currentEditId;
+                const url = isEdit
+                    ? "{{ route('admin.menu.update', ':id') }}".replace(':id', currentEditId)
+                    : "{{ route('admin.menu.store') }}";
+
+                const formData = new FormData(this);
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Saving…');
 
                 $.ajax({
                     url: url,
-                    method: "POST",
+                    method: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function(res) {
-                        toastr.success(res.message, 'Success', {
+                        toastr.success(res.message || 'Saved successfully', 'Success', {
                             timeOut: 3000
                         });
                         $('#addMenuModal').modal('hide');
                         resetForm();
-                        table.ajax.reload();
+                        table.ajax.reload(null, false);
                     },
                     error: function(xhr) {
-                        if (xhr.status === 422) {
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
                             $.each(xhr.responseJSON.errors, function(key, val) {
-                                $('.' + key + '_error').text(val[0]);
+                                const field = key.replace(/\./g, '_');
+                                $('.' + field + '_error').text(val[0]);
                             });
+                            const first = Object.values(xhr.responseJSON.errors)[0];
+                            toastr.error(Array.isArray(first) ? first[0] : 'Validation failed', 'Validation');
                         } else {
-                            toastr.error('Error saving menu item', 'Error', {
-                                timeOut: 3000
-                            });
+                            const msg = (xhr.responseJSON && xhr.responseJSON.message)
+                                ? xhr.responseJSON.message
+                                : 'Error saving menu item';
+                            toastr.error(msg, 'Error', { timeOut: 4000 });
                         }
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).html('<i class="ri-save-line me-2"></i>Save Menu Item');
                     }
                 });
             });
 
-            // Edit Button
             $(document).on('click', '.edit-btn', function() {
-                let id = $(this).data('id');
-                $.get("{{ route('admin.menu.edit', ':id') }}".replace(':id', id), function(data) {
-                    currentEditId = id;
-                    $('#menuForm').attr('data-edit-id', id);
-                    $('select[name="category_id"]').val(data.category_id);
-                    $('input[name="name"]').val(data.name);
-                    $('textarea[name="description"]').val(data.description);
-                    $('select[name="is_available"]').val(data.is_available);
-
-                    $('#variation_wrapper').html('');
-                    vIndex = 0;
-                    data.variations.forEach((v, index) => {
-                        addVariationRow(v, index);
-                    });
-
-                    $('#addMenuModal').modal('show');
-                }).fail(function() {
-                    toastr.error('Failed to load menu item', 'Error');
-                });
+                openEditModal($(this).data('id'));
             });
 
-            // View Details Button
             $(document).on('click', '.view-details-btn', function() {
-                let id = $(this).data('id');
+                const id = $(this).data('id');
                 $.get("{{ route('admin.menu.edit', ':id') }}".replace(':id', id), function(data) {
                     currentEditId = id;
 
                     $('#detail_name').text(data.name);
-                    $('#detail_category').text(data.category.name || 'N/A');
+                    $('#detail_category').text((data.category && data.category.name) || 'N/A');
                     $('#detail_slug').text(data.slug || 'N/A');
                     $('#detail_description').text(data.description || 'No description provided');
 
-                    $('#detail_status').html(data.is_available ?
-                        '<span class="badge bg-success"><i class="ri-check-line me-1"></i>Available</span>' :
-                        '<span class="badge bg-danger"><i class="ri-close-line me-1"></i>Out of Stock</span>'
+                    $('#detail_status').html(data.is_available
+                        ? '<span class="badge bg-success"><i class="ri-check-line me-1"></i>Available</span>'
+                        : '<span class="badge bg-danger"><i class="ri-close-line me-1"></i>Out of Stock</span>'
                     );
 
-                    // Variations
-                    if (data.variations.length > 0) {
+                    if (data.variations && data.variations.length > 0) {
                         let variationsHtml = '';
-                        data.variations.forEach((v, index) => {
-                            const image = v.image ? (v.image.includes('http') ? v.image :
-                                '{{ asset('') }}' + v.image) : null;
+                        data.variations.forEach(function(v) {
                             variationsHtml += `
                                 <div class="badge bg-soft-primary text-primary me-2 mb-2" style="padding: 0.6rem 0.9rem; font-size: 0.85rem;">
-                                    <strong>${v.name}</strong> - <strong class="admin-price-accent">৳${parseFloat(v.price).toFixed(2)}</strong>
+                                    <strong>${escapeHtml(v.name)}</strong> —
+                                    <strong class="admin-price-accent">৳${parseFloat(v.price).toFixed(2)}</strong>
                                 </div>`;
                         });
                         $('#detail_variations').html(variationsHtml);
                     } else {
-                        $('#detail_variations').html(
-                            '<p class="text-muted">No variations added</p>');
+                        $('#detail_variations').html('<p class="text-muted">No variations added</p>');
                     }
 
-                    // Show image if exists
-                    if (data.variations.length > 0 && data.variations[0].image) {
-                        const imgUrl = data.variations[0].image.includes('http') ? data.variations[
-                            0].image : '{{ asset('') }}' + data.variations[0].image;
-                        $('#detail_image').attr('src', imgUrl).show();
+                    const firstImage = data.variations && data.variations[0] && data.variations[0].image
+                        ? resolveImageUrl(data.variations[0].image)
+                        : null;
+                    if (firstImage) {
+                        $('#detail_image').attr('src', firstImage).show();
                         $('#no_image').hide();
                     } else {
                         $('#detail_image').hide();
@@ -396,90 +403,107 @@
                 });
             });
 
-            // Edit from detail modal
             $(document).on('click', '#edit_from_detail', function() {
                 $('#viewDetailsModal').modal('hide');
-                let id = currentEditId;
-                $.get("{{ route('admin.menu.edit', ':id') }}".replace(':id', id), function(data) {
-                    $('#menuForm').attr('data-edit-id', id);
-                    $('select[name="category_id"]').val(data.category_id);
-                    $('input[name="name"]').val(data.name);
-                    $('textarea[name="description"]').val(data.description);
-                    $('select[name="is_available"]').val(data.is_available);
-
-                    $('#variation_wrapper').html('');
-                    vIndex = 0;
-                    data.variations.forEach((v, index) => {
-                        addVariationRow(v, index);
-                    });
-
-                    $('#addMenuModal').modal('show');
-                });
+                if (currentEditId) {
+                    openEditModal(currentEditId);
+                }
             });
 
-            // Delete Button
             $(document).on('click', '.delete-btn', function() {
-                let id = $(this).data('id');
+                const id = $(this).data('id');
                 Swal.fire({
                     title: 'Delete Menu Item?',
-                    text: "This action cannot be undone. All variations will be deleted.",
+                    text: 'This action cannot be undone. All variations will be deleted.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Yes, Delete',
                     cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.menu.delete', ':id') }}".replace(':id',
-                                id),
-                            method: 'DELETE',
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(res) {
-                                toastr.success(res.message, 'Deleted', {
-                                    timeOut: 3000
-                                });
-                                table.ajax.reload();
-                            },
-                            error: function() {
-                                toastr.error('Error deleting item', 'Error');
-                            }
-                        });
-                    }
+                }).then(function(result) {
+                    if (!result.isConfirmed) return;
+
+                    $.ajax({
+                        url: "{{ route('admin.menu.delete', ':id') }}".replace(':id', id),
+                        method: 'DELETE',
+                        data: { _token: "{{ csrf_token() }}" },
+                        success: function(res) {
+                            toastr.success(res.message, 'Deleted', { timeOut: 3000 });
+                            table.ajax.reload(null, false);
+                        },
+                        error: function() {
+                            toastr.error('Error deleting item', 'Error');
+                        }
+                    });
                 });
             });
 
             $('#addMenuModal').on('show.bs.modal', function() {
                 if (!$('#variation_wrapper').children().length) {
                     addVariationRow();
+                    refreshVariationUi();
                 }
+                const title = currentEditId || $('#menuForm').attr('data-edit-id')
+                    ? 'Edit Menu Item & Variations'
+                    : 'Add Menu Item & Variations';
+                $('#addMenuModal .modal-title').html('<i class="ri-restaurant-2-fill me-2"></i>' + title);
             });
 
-            // Reset form when modal is hidden
             $('#addMenuModal').on('hidden.bs.modal', function() {
                 resetForm();
             });
         });
 
-        function addVariationRow(data = null, index = null) {
-            let i = index !== null ? index : vIndex++;
-            let name = data ? data.name : '';
-            let price = data ? data.price : '';
-            let oldImage = data ? `<input type="hidden" name="variations[${i}][old_image]" value="${data.image}">` : '';
-            let isFirst = i === 0;
+        function openEditModal(id) {
+            $.get("{{ route('admin.menu.edit', ':id') }}".replace(':id', id), function(data) {
+                currentEditId = id;
+                $('#menuForm').attr('data-edit-id', id);
+                $('select[name="category_id"]').val(data.category_id);
+                $('input[name="name"]').val(data.name);
+                $('textarea[name="description"]').val(data.description);
+                $('select[name="is_available"]').val(data.is_available ? '1' : '0');
 
-            let html = `
-                <div class="admin-variation-row ${isFirst ? 'first' : ''}" style="position: relative;">
-                    ${i > 0 ? '<button type="button" class="btn btn-sm btn-danger remove-variation"><i class="ri-close-line"></i></button>' : ''}
-                    ${oldImage}
+                $('#variation_wrapper').html('');
+                vIndex = 0;
+                (data.variations || []).forEach(function(v) {
+                    addVariationRow(v);
+                });
+                if (!$('#variation_wrapper').children().length) {
+                    addVariationRow();
+                }
+                refreshVariationUi();
+                $('#addMenuModal').modal('show');
+            }).fail(function() {
+                toastr.error('Failed to load menu item', 'Error');
+            });
+        }
+
+        function addVariationRow(data) {
+            data = data || null;
+            const i = vIndex++;
+            const name = data ? escapeHtml(data.name || '') : '';
+            const price = data ? (data.price ?? '') : '';
+            const oldImagePath = data && data.image ? data.image : '';
+            const oldImageInput = oldImagePath
+                ? `<input type="hidden" name="variations[${i}][old_image]" value="${escapeHtml(oldImagePath)}">`
+                : '';
+            const previewUrl = oldImagePath ? resolveImageUrl(oldImagePath) : '';
+            const previewHtml = previewUrl
+                ? `<img src="${previewUrl}" alt="" class="variation-image-preview rounded mt-2" style="width:56px;height:56px;object-fit:cover;">`
+                : `<img src="" alt="" class="variation-image-preview rounded mt-2 d-none" style="width:56px;height:56px;object-fit:cover;">`;
+
+            const html = `
+                <div class="admin-variation-row" data-v-index="${i}">
+                    <button type="button" class="btn btn-sm btn-danger remove-variation" title="Remove variation">
+                        <i class="ri-close-line"></i>
+                    </button>
+                    ${oldImageInput}
                     <div class="row g-3">
-                        <div class="col-12 mb-2">
-                            <small class="text-muted fw-600">
+                        <div class="col-12 mb-1">
+                            <small class="text-muted fw-600 d-flex align-items-center">
                                 <span class="admin-variation-index">${i + 1}</span>
-                                <strong>Variation ${i + 1}</strong>
+                                <strong>Variation <span class="variation-label-num">${i + 1}</span></strong>
                             </small>
                         </div>
                         <div class="col-md-4">
@@ -488,16 +512,40 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small">Price (৳) <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" name="variations[${i}][price]" value="${price}" class="form-control form-control-sm" placeholder="0.00" required>
+                            <input type="number" step="0.01" min="0" name="variations[${i}][price]" value="${price}" class="form-control form-control-sm" placeholder="0.00" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small">Image</label>
-                            <input type="file" name="variations[${i}][image]" class="form-control form-control-sm" accept="image/*">
-                            <small class="text-muted d-block mt-1">Recommended: 500x500px</small>
+                            <input type="file" name="variations[${i}][image]" class="form-control form-control-sm variation-image-input" accept="image/*">
+                            <small class="text-muted d-block mt-1">JPEG/PNG/WebP, max 2MB</small>
+                            ${previewHtml}
                         </div>
                     </div>
                 </div>`;
             $('#variation_wrapper').append(html);
+        }
+
+        /** Keep field names sequential (0..n) so PHP receives every variation + file. */
+        function reindexVariationRows() {
+            vIndex = 0;
+            $('#variation_wrapper .admin-variation-row').each(function(i) {
+                const row = $(this);
+                row.attr('data-v-index', i);
+                row.find('.admin-variation-index, .variation-label-num').text(i + 1);
+                row.find('[name^="variations["]').each(function() {
+                    const name = $(this).attr('name');
+                    if (!name) return;
+                    $(this).attr('name', name.replace(/variations\[\d+\]/, 'variations[' + i + ']'));
+                });
+                vIndex = i + 1;
+            });
+        }
+
+        function refreshVariationUi() {
+            const rows = $('#variation_wrapper .admin-variation-row');
+            rows.removeClass('first');
+            rows.first().addClass('first');
+            rows.find('.remove-variation').toggle(rows.length > 1);
         }
 
         function resetForm() {
@@ -506,11 +554,22 @@
             $('#variation_wrapper').html('');
             vIndex = 0;
             addVariationRow();
+            refreshVariationUi();
             $('.error-text').text('');
             currentEditId = null;
+            $('#addMenuModal .modal-title').html('<i class="ri-restaurant-2-fill me-2"></i>Add Menu Item & Variations');
         }
 
-        // Popular star toggle
+        function resolveImageUrl(path) {
+            if (!path) return '';
+            if (path.indexOf('http') === 0) return path;
+            return "{{ asset('') }}" + path.replace(/^\//, '');
+        }
+
+        function escapeHtml(text) {
+            return $('<div>').text(text == null ? '' : text).html();
+        }
+
         $(document).on('click', '.btn-star-toggle', function() {
             const btn = $(this);
             const id = btn.data('id');
@@ -522,9 +581,7 @@
             $.ajax({
                 url: "{{ route('admin.menu.togglePopular', ':id') }}".replace(':id', id),
                 method: 'POST',
-                data: {
-                    _token: "{{ csrf_token() }}"
-                },
+                data: { _token: "{{ csrf_token() }}" },
                 success: function(res) {
                     if (res.is_popular) {
                         btn.addClass('is-active').attr('data-popular', 1)
@@ -535,9 +592,7 @@
                             .attr('title', 'Mark as Popular');
                         icon.removeClass('ri-star-fill').addClass('ri-star-line');
                     }
-                    toastr.success(res.message, 'Success', {
-                        timeOut: 2000
-                    });
+                    toastr.success(res.message, 'Success', { timeOut: 2000 });
                 },
                 error: function() {
                     toastr.error('Failed to update popular status', 'Error');
