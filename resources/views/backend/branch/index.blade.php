@@ -2,10 +2,6 @@
 
 @section('title', 'Branch Management')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
-@endpush
-
 @section('content')
     <div class="container-fluid py-4 admin-crud-page">
         <div class="admin-crud-header">
@@ -44,7 +40,7 @@
 
     <!-- Add/Edit Branch Modal -->
     <div class="modal fade" id="addBranchModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content border-0">
                 <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
@@ -54,7 +50,7 @@
                 </div>
                 <form id="branchForm" enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <div class="modal-body" >
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Branch Name <span class="text-danger">*</span></label>
@@ -147,7 +143,7 @@
 
     <!-- View Details Modal -->
     <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content border-0">
                 <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
@@ -155,7 +151,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                <div class="modal-body" >
                     <div class="row g-4">
                         <div class="col-12">
                             <div class="admin-detail-section">

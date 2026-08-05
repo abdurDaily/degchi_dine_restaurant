@@ -45,7 +45,9 @@
                                         <label class="col-form-label">Image:</label>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="file" name='image' class="form-control">
+                                        <div class="admin-file-field">
+                                            <input type="file" name='image' class="form-control">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

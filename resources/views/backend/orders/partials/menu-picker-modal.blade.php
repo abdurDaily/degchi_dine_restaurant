@@ -1,7 +1,7 @@
 <div class="modal fade menu-picker-modal" id="addExtraItemModal" data-order-id="{{ $order->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header admin-modal-header">
                 <h5 class="modal-title fw-bold">
                     <i class="ri-restaurant-2-line me-2"></i>Add Item to Order #{{ $order->id }}
                 </h5>

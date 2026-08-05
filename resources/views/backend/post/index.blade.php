@@ -3,7 +3,6 @@
 @section('title', 'Blog Management')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
     <style>
         .nav-tabs .nav-link { color: #495057; border: none; padding: 0.75rem 1.25rem; font-weight: 500; border-radius: 8px 8px 0 0; }
         .nav-tabs .nav-link.active { color: #fff; background: var(--brand); }
@@ -140,7 +139,7 @@
 
     {{-- Post Modal --}}
     <div class="modal fade" id="addPostModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content border-0">
                 <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
@@ -151,7 +150,7 @@
                 <form id="postForm" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="remove_image" value="0">
-                    <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <div class="modal-body" >
                         <div class="row g-3">
                             <div class="col-md-8">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>

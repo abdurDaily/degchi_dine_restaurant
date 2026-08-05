@@ -2,10 +2,6 @@
 
 @section('title', 'Menu Management')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
-@endpush
-
 @section('content')
     <div class="container-fluid py-4 admin-crud-page">
         <div class="admin-crud-header">
@@ -47,7 +43,7 @@
 
         <!-- Add/Edit Menu Item Modal -->
         <div class="modal fade" id="addMenuModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                 <div class="modal-content border-0">
                     <div class="modal-header admin-modal-header">
                         <h5 class="modal-title">
@@ -55,9 +51,9 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <form id="menuForm" enctype="multipart/form-data">
+                    <form id="menuForm" enctype="multipart/form-data" class="d-flex flex-column" style="min-height:0;flex:1 1 auto;">
                         @csrf
-                        <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                        <div class="modal-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Category <span class="text-danger">*</span></label>
@@ -126,7 +122,7 @@
 
         <!-- View Details Modal -->
         <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                 <div class="modal-content border-0">
                     <div class="modal-header admin-modal-header">
                         <h5 class="modal-title">
@@ -134,7 +130,7 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <div class="modal-body">
                         <div class="row g-4">
                             <!-- Image Section -->
                             <div class="col-md-5">
@@ -515,10 +511,12 @@
                             <input type="number" step="0.01" min="0" name="variations[${i}][price]" value="${price}" class="form-control form-control-sm" placeholder="0.00" required>
                         </div>
                         <div class="col-md-4">
+                            <div class="admin-file-field">
                             <label class="form-label small">Image</label>
                             <input type="file" name="variations[${i}][image]" class="form-control form-control-sm variation-image-input" accept="image/*">
                             <small class="text-muted d-block mt-1">JPEG/PNG/WebP, max 2MB</small>
                             ${previewHtml}
+                            </div>
                         </div>
                     </div>
                 </div>`;

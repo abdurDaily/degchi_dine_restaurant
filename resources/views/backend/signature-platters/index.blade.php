@@ -1,10 +1,6 @@
 @extends('layouts.dashboard')
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         table.dataTable {
             width: 100% !important;
@@ -28,7 +24,7 @@
 @endpush
 
 @section('content')
-    <div class="container-fluid py-4">
+    <div class="container-fluid py-4 admin-crud-page">
         <div class="row">
             <div class="col-xl-4 col-lg-5">
                 <div class="card border-0 shadow-sm mb-4">
@@ -53,16 +49,16 @@
                                 <textarea name="description" class="form-control" rows="3" placeholder="Enter description"></textarea>
                                 <span class="text-danger error-text description_error" style="font-size: 13px;"></span>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Thumbnail Image</label>
+                            <div class="admin-file-field mb-3">
+                                <label class="form-label fw-bold">Thumbnail Image <i class="ri-image-add-line"></i></label>
                                 <input type="file" name="thumbnail_image" class="form-control" accept="image/*">
-                                <small class="text-muted d-block mt-1">For slider (500x500px)</small>
+                                <span class="admin-file-field__hint">For slider (500x500px)</span>
                                 <span class="text-danger error-text thumbnail_image_error" style="font-size: 13px;"></span>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Menu Card Image</label>
+                            <div class="admin-file-field mb-3">
+                                <label class="form-label fw-bold">Menu Card Image <i class="ri-image-add-line"></i></label>
                                 <input type="file" name="menu_card_image" class="form-control" accept="image/*">
-                                <small class="text-muted d-block mt-1">For popup (1200x1600px)</small>
+                                <span class="admin-file-field__hint">For popup (1200x1600px)</span>
                                 <span class="text-danger error-text menu_card_image_error" style="font-size: 13px;"></span>
                             </div>
                             <div class="mb-3">
@@ -135,17 +131,17 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Thumbnail Image</label>
+                                <div class="admin-file-field mb-3">
+                                    <label class="form-label">Thumbnail Image <i class="ri-image-add-line"></i></label>
                                     <input type="file" id="edit_thumbnail_image" name="thumbnail_image" class="form-control" accept="image/*">
-                                    <small class="text-muted">Leave empty to keep current</small>
+                                    <span class="admin-file-field__hint">Leave empty to keep current</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Menu Card Image</label>
+                                <div class="admin-file-field mb-3">
+                                    <label class="form-label">Menu Card Image <i class="ri-image-add-line"></i></label>
                                     <input type="file" id="edit_menu_card_image" name="menu_card_image" class="form-control" accept="image/*">
-                                    <small class="text-muted">Leave empty to keep current</small>
+                                    <span class="admin-file-field__hint">Leave empty to keep current</span>
                                 </div>
                             </div>
                         </div>
@@ -178,13 +174,6 @@
 @endsection
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             $.ajaxSetup({

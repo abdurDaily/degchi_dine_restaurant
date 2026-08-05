@@ -92,7 +92,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getProfileImageAttribute()
     {
-        return $this->image ? asset('storage/images/profile/' . $this->image) : null;
+        if ($this->image) {
+            return asset('storage/images/profile/' . $this->image);
+        }
+
+        return asset('assets/images/user-dummy-img.jpg');
     }
 
     public function posts()

@@ -4,9 +4,10 @@
 @section('content')
     <x-breadcrumb></x-breadcrumb>
 
+    <div class="container-fluid py-4 admin-crud-page">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
+            <div class="card admin-crud-card shadow-sm">
                 <div class="card-header py-3" style="background:#f8f9fb; border-bottom:1px solid #e9ecef;">
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <div class="d-flex align-items-center gap-2">
@@ -25,7 +26,7 @@
 
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered w-100 align-middle">
-                            <thead class="table-dark">
+                            <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
@@ -125,5 +126,6 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection

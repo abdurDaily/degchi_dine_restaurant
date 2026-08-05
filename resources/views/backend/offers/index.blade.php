@@ -4,9 +4,10 @@
 @section('content')
 <x-breadcrumb></x-breadcrumb>
 
+<div class="container-fluid py-4 admin-crud-page">
 <div class="row">
     <div class="col-12">
-        <div class="card shadow-sm">
+        <div class="card admin-crud-card shadow-sm">
             <div class="card-header d-flex align-items-center justify-content-between py-3">
                 <h5 class="mb-0 fw-bold"><i class="ri-price-tag-3-line me-2 text-primary"></i>Offers & Promotions</h5>
                 <a href="{{ route('offers.create') }}" class="btn btn-primary btn-sm">
@@ -33,7 +34,7 @@
                 @else
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Image</th>
@@ -51,15 +52,11 @@
                             <tr>
                                 <td class="text-muted small">{{ $i + 1 }}</td>
                                 <td>
-                                    @if($offer->popup_image)
-                                        <img src="{{ asset('storage/' . $offer->popup_image) }}"
-                                             alt="{{ $offer->name }}"
-                                             style="width:52px;height:40px;object-fit:cover;border-radius:6px;">
-                                    @else
-                                        <div style="width:52px;height:40px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#bbb;">
-                                            <i class="ri-image-line"></i>
-                                        </div>
-                                    @endif
+                                    <img src="{{ $offer->popup_image ? asset('storage/' . $offer->popup_image) : asset('assets/placeholder/placeholder.png') }}"
+                                         alt="{{ $offer->name }}"
+                                         class="admin-thumb"
+                                         style="width:52px;height:40px;object-fit:cover;border-radius:6px;"
+                                         onerror="this.onerror=null;this.src='{{ asset('assets/placeholder/placeholder.png') }}';">
                                 </td>
                                 <td>
                                     <div class="fw-semibold">{{ $offer->name }}</div>
@@ -126,6 +123,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

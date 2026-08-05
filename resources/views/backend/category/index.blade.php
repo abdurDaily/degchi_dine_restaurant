@@ -2,10 +2,6 @@
 
 @section('title', 'Category Management')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
-@endpush
-
 @section('content')
     <div class="container-fluid py-4 admin-crud-page">
         <div class="admin-crud-header">
@@ -41,7 +37,7 @@
                                 <span class="text-danger error-text name_error d-block mt-1" style="font-size:0.82rem;"></span>
                             </div>
 
-                            <div class="mb-3">
+                            <div class="admin-file-field mb-3">
                                 <label class="form-label">Category Image</label>
                                 <input type="file" name="image" class="form-control" accept="image/*">
                                 <span class="text-danger error-text image_error d-block mt-1" style="font-size:0.82rem;"></span>
@@ -109,7 +105,7 @@
                             <label class="form-label">Name</label>
                             <input type="text" id="edit_name" name="name" class="form-control">
                         </div>
-                        <div class="mb-3">
+                        <div class="admin-file-field mb-3">
                             <label class="form-label">Image <span class="text-muted fw-normal">(leave blank to keep current)</span></label>
                             <input type="file" name="image" class="form-control" accept="image/*">
                         </div>

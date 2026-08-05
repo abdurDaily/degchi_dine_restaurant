@@ -39,13 +39,13 @@
             </li>
             @endcan
 
-            @can('general-setting')
+            {{-- @can('general-setting')
             <li class="nav-item">
                 <a href="{{ route('seo-setting') }}" class="nav-link" data-key="t-seo-setting">
                     <i class="ri-search-eye-line me-1"></i> SEO & Tracking
                 </a>
             </li>
-            @endcan
+            @endcan --}}
 
         </ul>
     </div>

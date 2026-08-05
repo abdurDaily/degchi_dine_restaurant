@@ -3,7 +3,7 @@
         Assign Permissions
     @endsection
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">

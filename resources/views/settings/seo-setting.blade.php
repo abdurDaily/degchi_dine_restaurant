@@ -9,7 +9,7 @@
     @endsection
 
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
@@ -23,7 +23,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
         <div class="row">
             <div class="col-lg-4 mb-4">
@@ -141,6 +140,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     @endsection
 

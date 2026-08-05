@@ -1,6 +1,7 @@
 <!-- Theme Settings -->
 <form action="javascript:void(0)" method="post" class="border-0 offcanvas offcanvas-end" tabindex="-1"
     id="theme-settings-offcanvas">
+    @csrf
     <div class="p-3 d-flex align-items-center bg-primary bg-gradient offcanvas-header">
         <h5 class="m-0 text-white me-2">Theme Customizer</h5>
 
@@ -1034,26 +1035,48 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-            $('#theme-settings-offcanvas').on('submit', function(e) {
-                e.preventDefault();
-                $('#preloader').show();
-                var formData = $(this).serialize();
-                $.ajax({
-                    url: "{{ route('theme.customize') }}",
-                    type: 'POST',
-                    data: formData,
-                    success: res => {
-                        $('#preloader').hide();
-                        if (res.status == 'success') {
-                            Command: toastr[res.status](res.message);
+        $('#theme-settings-offcanvas').on('submit', function(e) {
+            e.preventDefault();
+            $('#preloader').show();
+            var $form = $(this);
+            var formData = $form.serialize();
+
+            $.ajax({
+                url: "{{ route('theme.customize') }}",
+                type: 'POST',
+                data: formData,
+                success: function(res) {
+                    $('#preloader').hide();
+                    if (res.status == 'success') {
+                        // Apply + persist for Velzon layout.js / live CSS variables
+                        $form.serializeArray().forEach(function(item) {
+                            if (!item.name) return;
+                            localStorage.setItem(item.name, item.value);
+                            document.documentElement.setAttribute(item.name, item.value);
+                        });
+                        var snapshot = {};
+                        Array.from(document.documentElement.attributes).forEach(function(attr) {
+                            snapshot[attr.nodeName] = attr.nodeValue;
+                        });
+                        localStorage.setItem('defaultAttribute', JSON.stringify(snapshot));
+
+                        if (typeof toastr !== 'undefined') {
+                            toastr[res.status](res.message);
                         }
-                    },
-                    error: err => {
-                        $('#preloader').hide();
-                        Command: toastr['error'](err.message);
+                        // Reload so primary/dark CSS variables fully cascade
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 400);
                     }
-                })
-            })
-        })
+                },
+                error: function(err) {
+                    $('#preloader').hide();
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error((err.responseJSON && err.responseJSON.message) || 'Something went wrong');
+                    }
+                }
+            });
+        });
+    });
 </script>
 @endpush

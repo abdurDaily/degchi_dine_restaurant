@@ -1,18 +1,27 @@
 /* ==========================================================================
-   Admin CRUD — matches dashboard.blade.php (Degchi Dine panel)
+   Admin CRUD — aligned with admin-theme.css (Degchi premium shell)
    ========================================================================== */
 .admin-crud-page {
-  --dd-teal: #116b83;
-  --dd-teal-dark: #0d5566;
-  --dd-teal-deep: #083844;
-  --dd-gold: #e7ae07;
+  --dd-teal: var(--admin-primary, #116b83);
+  --dd-teal-dark: var(--admin-primary-dark, #0d5566);
+  --dd-teal-deep: var(--admin-primary-deep, #083844);
+  --dd-gold: var(--admin-accent-gold, #e7ae07);
   --dd-gold-soft: rgba(231, 174, 7, 0.12);
-  --dd-border: rgba(17, 107, 131, 0.1);
+  --dd-border: var(--admin-border, rgba(36, 50, 68, 0.08));
   --dd-border-strong: rgba(17, 107, 131, 0.18);
-  --dd-muted: #6b7280;
-  --dd-text: #111827;
-  --dd-shadow: 0 8px 24px rgba(17, 107, 131, 0.07);
-  --dd-shadow-hover: 0 14px 32px rgba(17, 107, 131, 0.14);
+  --dd-muted: var(--admin-muted, #6b7280);
+  --dd-text: var(--admin-text, #1f2937);
+  --dd-shadow: var(--admin-shadow, 0 8px 24px rgba(36, 50, 68, 0.07));
+  --dd-shadow-hover: var(--admin-shadow-hover, 0 14px 32px rgba(36, 50, 68, 0.12));
+  --dd-radius: var(--admin-radius, 14px);
+  --dd-card: var(--admin-card, #ffffff);
+}
+
+.admin-crud-page .admin-crud-card,
+.admin-crud-page .card.admin-crud-card {
+  background: var(--dd-card);
+  border: 1px solid var(--dd-border);
+  border-radius: var(--dd-radius);
 }
 
 .admin-crud-page.py-4 {
@@ -77,9 +86,9 @@
 
 /* Cards — same feel as .dd-panel / .dd-stat-card */
 .admin-crud-card {
-  background: #fff;
-  border: none;
-  border-radius: 14px;
+  background: var(--dd-card, #fff);
+  border: 1px solid var(--dd-border);
+  border-radius: var(--dd-radius, 14px);
   box-shadow: var(--dd-shadow);
   overflow: hidden;
   transition: box-shadow 0.2s ease;
@@ -115,7 +124,9 @@
   padding: 0;
 }
 
-.admin-crud-form-panel .form-label {
+.admin-crud-form-panel .form-label,
+.admin-crud-page .form-label,
+.main-content .admin-crud-form-panel .form-label {
   font-weight: 600;
   font-size: 0.84rem;
   color: #374151;
@@ -123,16 +134,94 @@
 }
 
 .admin-crud-form-panel .form-control,
-.admin-crud-form-panel .form-select {
-  border-radius: 8px;
+.admin-crud-form-panel .form-select,
+.admin-crud-page .form-control,
+.admin-crud-page .form-select {
+  border-radius: 10px;
   border-color: #d0d7df;
   font-size: 0.88rem;
 }
 
 .admin-crud-form-panel .form-control:focus,
-.admin-crud-form-panel .form-select:focus {
+.admin-crud-form-panel .form-select:focus,
+.admin-crud-page .form-control:focus,
+.admin-crud-page .form-select:focus {
   border-color: var(--dd-teal);
   box-shadow: 0 0 0 3px rgba(17, 107, 131, 0.12);
+}
+
+/* Premium file upload field — dashed zone + soft Choose File chip */
+.admin-file-field {
+  display: block;
+  border: 1.5px dashed rgba(17, 107, 131, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(17, 107, 131, 0.03) 0%, #fff 75%);
+  padding: 0.95rem 1.05rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.admin-file-field:hover {
+  border-color: rgba(17, 107, 131, 0.5);
+  background: rgba(17, 107, 131, 0.05);
+}
+
+.admin-file-field .form-label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.55rem;
+}
+
+.admin-file-field .form-label i {
+  color: var(--dd-teal);
+  font-size: 1.1rem;
+}
+
+.admin-file-field input[type="file"] {
+  border: 1px solid #d0d7df !important;
+  background: #fff !important;
+  border-radius: 10px !important;
+  padding: 0.4rem 0.55rem !important;
+  box-shadow: none !important;
+  color: var(--dd-muted) !important;
+  font-size: 0.82rem !important;
+}
+
+.admin-file-field input[type="file"]::file-selector-button {
+  margin-right: 0.75rem;
+  border: 1px solid rgba(17, 107, 131, 0.28);
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
+  background: rgba(17, 107, 131, 0.08);
+  color: var(--dd-teal-dark);
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.admin-file-field input[type="file"]::file-selector-button:hover {
+  background: rgba(17, 107, 131, 0.14);
+  border-color: var(--dd-teal);
+}
+
+.admin-file-field__hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--dd-muted);
+}
+
+.admin-file-field__preview {
+  margin-top: 0.75rem;
+}
+
+.admin-file-field__preview img {
+  max-height: 120px;
+  width: auto;
+  border-radius: 10px;
+  border: 1px solid var(--dd-border);
+  object-fit: cover;
 }
 
 .admin-crud-form-panel .admin-crud-btn-primary {
@@ -220,13 +309,27 @@
   box-shadow: 0 0 0 3px rgba(17, 107, 131, 0.1);
 }
 
-.admin-crud-page .page-item.active .page-link {
-  background-color: var(--dd-teal);
-  border-color: var(--dd-teal);
+.admin-crud-page .page-item .page-link,
+.admin-crud-page .dataTables_wrapper .dataTables_paginate .paginate_button {
+  border-radius: 8px !important;
+  border: 1px solid var(--dd-border) !important;
+  color: var(--dd-teal-dark) !important;
+  background: #fff !important;
+  font-weight: 600;
 }
 
-.admin-crud-page .page-link {
-  color: var(--dd-teal-dark);
+.admin-crud-page .page-item.active .page-link,
+.admin-crud-page .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: linear-gradient(135deg, var(--dd-teal-deep), var(--dd-teal)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(17, 107, 131, 0.22) !important;
+}
+
+.admin-crud-page .page-item .page-link:hover,
+.admin-crud-page .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
+  background: rgba(17, 107, 131, 0.08) !important;
+  color: var(--dd-teal-deep) !important;
 }
 
 .admin-crud-page .btn-soft-warning,
@@ -274,39 +377,25 @@
   z-index: 1;
 }
 
-.admin-crud-page .modal-content {
+.admin-crud-page .modal-content,
+.main-content .modal-content {
   border: none;
   border-radius: 14px;
   overflow: hidden;
   box-shadow: var(--dd-shadow-hover);
+  max-height: calc(100vh - 3.5rem);
 }
 
-.admin-crud-page .modal-body {
+.admin-crud-page .modal-body,
+.main-content .modal-body {
   padding: 1.25rem;
 }
 
-.admin-crud-page .modal-footer {
+.admin-crud-page .modal-footer,
+.main-content .modal-footer {
   padding: 0.85rem 1.25rem;
   border-top: 1px solid var(--dd-border);
   background: #fafbfc;
-}
-
-.admin-crud-page .form-label {
-  font-weight: 600;
-  font-size: 0.84rem;
-  color: #374151;
-}
-
-.admin-crud-page .form-control,
-.admin-crud-page .form-select {
-  border-radius: 8px;
-  border-color: #d0d7df;
-}
-
-.admin-crud-page .form-control:focus,
-.admin-crud-page .form-select:focus {
-  border-color: var(--dd-teal);
-  box-shadow: 0 0 0 3px rgba(17, 107, 131, 0.12);
 }
 
 /* Detail blocks */
@@ -589,4 +678,12 @@
 .btn-star-toggle i {
     line-height: 1;
 }
+
+/* Smooth CRUD helpers aligned with admin-theme motion */
+.admin-crud-page .admin-crud-card,
+.admin-crud-page .admin-crud-header {
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* CRUD enter animations removed — opacity animations create stacking contexts that trap modals */
 

@@ -29,7 +29,7 @@ class CategoryController extends Controller
                     return $row->branch->name ?? '<span class="text-danger">No Branch</span>';
                 })
                 ->addColumn('image', function ($row) {
-                    $url = $row->image ? asset($row->image) : 'https://via.placeholder.com/50';
+                    $url = $row->image ? asset($row->image) : asset('assets/placeholder/placeholder.png');
                     return '<img src="' . $url . '" width="50" class="rounded shadow-sm" />';
                 })
                 ->addColumn('status', function ($row) {

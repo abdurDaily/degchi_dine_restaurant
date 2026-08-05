@@ -129,7 +129,7 @@
                 </form>
             </div>
 
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center admin-topbar-cluster">
 
                 <div class="dropdown d-md-none topbar-head-dropdown header-item">
                     <button type="button"
@@ -142,10 +142,9 @@
                         aria-labelledby="page-header-search-dropdown">
                         <form class="p-3">
                             <div class="m-0 form-group">
-
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Search ..."
-                                        aria-label="Recipient's username">
+                                        aria-label="Search">
                                     <button class="btn btn-primary" type="submit"><i
                                             class="mdi mdi-magnify"></i></button>
                                 </div>
@@ -153,24 +152,26 @@
                         </form>
                     </div>
                 </div>
-                <div>
-                    <button class="btn btn-primary" id="cacheClear" type="button"><i class="ri-brush-line"></i> Clear
-                        Cache</button>
-                </div>
+
+                <button class="btn btn-primary" id="cacheClear" type="button" title="Clear application cache">
+                    <i class="ri-brush-line"></i>
+                    <span class="d-none d-md-inline ms-1">Clear Cache</span>
+                </button>
 
                 @can('orders-show')
                     @php
                         $adminNotifications = auth()->user()->notifications()->latest()->take(10)->get();
                         $adminUnreadCount = auth()->user()->unreadNotifications()->count();
                     @endphp
-                    <div class="dropdown topbar-head-dropdown ms-1 header-item" id="adminNotificationDropdown">
+                    <div class="dropdown topbar-head-dropdown header-item" id="adminNotificationDropdown">
                         <button type="button"
                             class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
                             id="page-header-notifications-dropdown"
                             data-bs-toggle="dropdown"
                             data-bs-auto-close="outside"
                             aria-haspopup="true"
-                            aria-expanded="false">
+                            aria-expanded="false"
+                            title="Notifications">
                             <i class="bx bx-bell fs-22"></i>
                             <span class="admin-notif-badge {{ $adminUnreadCount > 0 ? '' : 'is-hidden' }}"
                                 id="adminNotifBadge"
@@ -201,48 +202,47 @@
                     </div>
                 @endcan
 
-                <div class="ms-1 header-item d-none d-sm-flex">
+                <div class="header-item d-none d-sm-flex">
                     <button type="button"
                         class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle"
-                        data-toggle="fullscreen">
+                        data-toggle="fullscreen" title="Fullscreen">
                         <i class='bx bx-fullscreen fs-22'></i>
                     </button>
                 </div>
 
-                <div class="ms-1 header-item d-none d-sm-flex">
+                <div class="header-item d-none d-sm-flex">
                     <button type="button"
-                        class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle light-dark-mode">
+                        class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle light-dark-mode"
+                        title="Toggle theme">
                         <i class='bx bx-moon fs-22'></i>
                     </button>
                 </div>
 
-               
-
-                <div class="dropdown ms-sm-3 header-item topbar-user">
+                <div class="dropdown header-item topbar-user">
                     <button type="button" class="btn material-shadow-none" id="page-header-user-dropdown"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
                             <img class="rounded-circle header-profile-user"
-                                src="{{ Auth::user()->profile_image }}" alt="Header Avatar">
+                                src="{{ Auth::user()->profile_image }}"
+                                alt="{{ Auth::user()->name }}"
+                                onerror="this.onerror=null;this.src='{{ asset('assets/images/user-dummy-img.jpg') }}';">
                             <span class="text-start ms-xl-2">
                                 <span
-                                    class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{Auth::user()->name}}</span>
+                                    class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->name }}</span>
                             </span>
                         </span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
-                        <!-- item-->
-                        <h6 class="dropdown-header">Welcome {{Auth::user()->name}}</h6>
-                        <a class="dropdown-item" href="{{route('profile')}}"><i
+                        <h6 class="dropdown-header">Welcome {{ Auth::user()->name }}</h6>
+                        <a class="dropdown-item" href="{{ route('profile') }}"><i
                                 class="align-middle mdi mdi-account-circle text-muted fs-16 me-1"></i> <span
                                 class="align-middle">Profile</span></a>
-                        
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item"><i
-                                        class="align-middle mdi mdi-logout text-muted fs-16 me-1"></i> <span
-                                        class="align-middle" data-key="t-logout">Logout</span></button>
-                                </form>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item"><i
+                                    class="align-middle mdi mdi-logout text-muted fs-16 me-1"></i> <span
+                                    class="align-middle" data-key="t-logout">Logout</span></button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -2,10 +2,6 @@
 
 @section('title', 'Coupon Management')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
-@endpush
-
 @section('content')
     <div class="container-fluid py-4 admin-crud-page">
         <div class="admin-crud-header">
@@ -49,7 +45,7 @@
 
     <!-- Add/Edit Coupon Modal -->
     <div class="modal fade" id="addCouponModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content border-0">
                 <div class="modal-header admin-modal-header">
                     <h5 class="modal-title">
@@ -59,7 +55,7 @@
                 </div>
                 <form id="couponForm">
                     @csrf
-                    <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <div class="modal-body" >
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Coupon Name <span class="text-danger">*</span></label>

@@ -11,7 +11,7 @@
         General Setting
     @endsection
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -28,7 +28,6 @@
                 </div>
             </div>
             <!-- end page title -->
-        </div>
         <div class="row">
             <div class="col-md-4">
                 <div class="card">
@@ -100,6 +99,7 @@
                     <button type="submit" class="btn btn-primary">Save Setting</button>
                 </div>
             </form>
+        </div>
         </div>
     @endsection
     @push('scripts')

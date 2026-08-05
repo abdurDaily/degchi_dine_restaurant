@@ -1,369 +1,5 @@
 <x-admin-master>
     @section('title', 'Dashboard')
-    @push('styles')
-        <style>
-            :root {
-                --dd-teal: #116b83;
-                --dd-teal-dark: #0d5566;
-                --dd-teal-deep: #083844;
-                --dd-gold: #e7ae07;
-                --dd-gold-soft: rgba(231, 174, 7, 0.12);
-            }
-
-            .dd-dash-hero {
-                background: linear-gradient(135deg, var(--dd-teal-deep) 0%, var(--dd-teal) 55%, var(--dd-teal-dark) 100%);
-                border-radius: 16px;
-                padding: 1.75rem 1.85rem;
-                color: #fff;
-                position: relative;
-                overflow: hidden;
-                margin-bottom: 1.5rem;
-            }
-
-            .dd-dash-hero::after {
-                content: "";
-                position: absolute;
-                top: -40%;
-                right: -8%;
-                width: 280px;
-                height: 280px;
-                border-radius: 50%;
-                background: radial-gradient(circle, rgba(231, 174, 7, 0.18) 0%, transparent 70%);
-                pointer-events: none;
-            }
-
-            .dd-dash-hero h2 {
-                font-size: 1.45rem;
-                font-weight: 700;
-                margin-bottom: 0.35rem;
-            }
-
-            .dd-dash-hero p {
-                margin: 0;
-                opacity: 0.85;
-                font-size: 0.92rem;
-            }
-
-            .dd-stat-card {
-                border: none;
-                border-radius: 14px;
-                box-shadow: 0 8px 24px rgba(17, 107, 131, 0.08);
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-                height: 100%;
-                overflow: hidden;
-            }
-
-            .dd-stat-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 14px 32px rgba(17, 107, 131, 0.14);
-            }
-
-            .dd-stat-card .card-body {
-                padding: 1.15rem 1.2rem;
-            }
-
-            .dd-stat-icon {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.35rem;
-                flex-shrink: 0;
-            }
-
-            .dd-stat-icon.teal {
-                background: rgba(17, 107, 131, 0.12);
-                color: var(--dd-teal);
-            }
-
-            .dd-stat-icon.gold {
-                background: var(--dd-gold-soft);
-                color: #b8860b;
-            }
-
-            .dd-stat-icon.green {
-                background: rgba(16, 185, 129, 0.12);
-                color: #10b981;
-            }
-
-            .dd-stat-icon.orange {
-                background: rgba(245, 158, 11, 0.12);
-                color: #f59e0b;
-            }
-
-            .dd-stat-icon.purple {
-                background: rgba(139, 92, 246, 0.12);
-                color: #8b5cf6;
-            }
-
-            .dd-stat-icon.red {
-                background: rgba(239, 68, 68, 0.12);
-                color: #ef4444;
-            }
-
-            .dd-stat-label {
-                font-size: 0.78rem;
-                text-transform: uppercase;
-                letter-spacing: 0.6px;
-                color: #6b7280;
-                margin-bottom: 0.15rem;
-            }
-
-            .dd-stat-value {
-                font-size: 1.55rem;
-                font-weight: 700;
-                color: #111827;
-                line-height: 1.2;
-            }
-
-            .dd-stat-meta {
-                font-size: 0.75rem;
-                color: #9ca3af;
-                margin-top: 0.25rem;
-            }
-
-            .dd-panel {
-                border: none;
-                border-radius: 14px;
-                box-shadow: 0 8px 24px rgba(17, 107, 131, 0.07);
-            }
-
-            .dd-panel .card-header {
-                background: #fff;
-                border-bottom: 1px solid rgba(17, 107, 131, 0.08);
-                padding: 1rem 1.25rem;
-                border-radius: 14px 14px 0 0;
-            }
-
-            .dd-panel .card-title {
-                font-size: 1rem;
-                font-weight: 700;
-                color: var(--dd-teal-dark);
-                margin: 0;
-            }
-
-            .dd-quick-link {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                padding: 0.85rem 1rem;
-                border-radius: 12px;
-                border: 1px solid rgba(17, 107, 131, 0.1);
-                text-decoration: none;
-                color: #374151;
-                transition: all 0.2s ease;
-                margin-bottom: 0.65rem;
-            }
-
-            .dd-quick-link:last-child {
-                margin-bottom: 0;
-            }
-
-            .dd-quick-link:hover {
-                background: rgba(17, 107, 131, 0.06);
-                border-color: rgba(17, 107, 131, 0.22);
-                color: var(--dd-teal-dark);
-                transform: translateX(4px);
-            }
-
-            .dd-quick-link .ql-icon {
-                width: 38px;
-                height: 38px;
-                border-radius: 10px;
-                background: rgba(17, 107, 131, 0.1);
-                color: var(--dd-teal);
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.1rem;
-            }
-
-            .dd-quick-link .ql-badge {
-                margin-left: auto;
-                font-size: 0.72rem;
-                font-weight: 700;
-                padding: 0.2rem 0.55rem;
-                border-radius: 999px;
-                background: var(--dd-gold-soft);
-                color: #92680a;
-            }
-
-            .dd-orders-table th {
-                font-size: 0.72rem;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                color: #6b7280;
-                font-weight: 600;
-                border-bottom-width: 1px;
-            }
-
-            .dd-orders-table td {
-                vertical-align: middle;
-                font-size: 0.86rem;
-            }
-
-            .dd-status-pill {
-                display: inline-block;
-                padding: 0.22rem 0.6rem;
-                border-radius: 999px;
-                font-size: 0.72rem;
-                font-weight: 600;
-                text-transform: capitalize;
-            }
-
-            .dd-status-pill.pending {
-                background: #fef3c7;
-                color: #92400e;
-            }
-
-            .dd-status-pill.confirmed {
-                background: #dbeafe;
-                color: #1e40af;
-            }
-
-            .dd-status-pill.completed {
-                background: #d1fae5;
-                color: #065f46;
-            }
-
-            .dd-status-pill.canceled {
-                background: #fee2e2;
-                color: #991b1b;
-            }
-
-            .dd-new-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: #ef4444;
-                display: inline-block;
-                margin-right: 4px;
-            }
-
-            .dd-bar-chart {
-                display: flex;
-                flex-direction: column;
-                gap: 0.65rem;
-            }
-
-            .dd-bar-row {
-                display: grid;
-                grid-template-columns: 90px 1fr 42px;
-                align-items: center;
-                gap: 0.65rem;
-            }
-
-            .dd-bar-label {
-                font-size: 0.78rem;
-                color: #6b7280;
-                text-transform: capitalize;
-            }
-
-            .dd-bar-track {
-                height: 8px;
-                background: #f3f4f6;
-                border-radius: 999px;
-                overflow: hidden;
-            }
-
-            .dd-bar-fill {
-                height: 100%;
-                border-radius: 999px;
-                background: linear-gradient(90deg, var(--dd-teal), var(--dd-teal-dark));
-            }
-
-            .dd-bar-count {
-                font-size: 0.78rem;
-                font-weight: 700;
-                color: var(--dd-teal-dark);
-                text-align: right;
-            }
-
-            .dd-revenue-bars {
-                display: flex;
-                align-items: flex-end;
-                gap: 0.5rem;
-                height: 120px;
-                padding-top: 0.5rem;
-            }
-
-            .dd-revenue-col {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.35rem;
-                min-width: 0;
-            }
-
-            .dd-revenue-bar {
-                width: 100%;
-                max-width: 36px;
-                border-radius: 6px 6px 2px 2px;
-                background: linear-gradient(180deg, var(--dd-gold), var(--dd-teal));
-                min-height: 8px;
-            }
-
-            .dd-revenue-label {
-                font-size: 0.65rem;
-                color: #9ca3af;
-                text-align: center;
-            }
-
-            .dd-member-chip {
-                font-size: 0.68rem;
-                padding: 0.15rem 0.45rem;
-                border-radius: 999px;
-                font-weight: 600;
-            }
-
-            .dd-member-chip.golden {
-                background: var(--dd-gold-soft);
-                color: #92680a;
-            }
-
-            .dd-member-chip.standard {
-                background: rgba(17, 107, 131, 0.1);
-                color: var(--dd-teal-dark);
-            }
-
-            .dd-dash-empty {
-                border: 1px dashed rgba(17, 107, 131, 0.22);
-                border-radius: 14px;
-                background: rgba(17, 107, 131, 0.04);
-                padding: 2.5rem 1.5rem;
-                text-align: center;
-            }
-
-            .dd-dash-empty-icon {
-                width: 64px;
-                height: 64px;
-                margin: 0 auto 1rem;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(17, 107, 131, 0.1);
-                color: var(--dd-teal);
-                font-size: 1.75rem;
-            }
-
-            .dd-dash-empty h5 {
-                color: var(--dd-teal-dark);
-                font-weight: 700;
-                margin-bottom: 0.5rem;
-            }
-
-            .dd-dash-empty p {
-                color: #6b7280;
-                margin: 0;
-                max-width: 420px;
-                margin-inline: auto;
-            }
-        </style>
-    @endpush
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -390,7 +26,7 @@
                         } else if (range === 'week') {
                             const day = today.getDay() || 7; // Sunday=0 -> 7
                             start = new Date(today);
-                            start.setDate(today.getDate() - day + 1); // সপ্তাহের শুরু (সোমবার)
+                            start.setDate(today.getDate() - day + 1); // week start Monday
                             end = today;
                         } else if (range === 'month') {
                             start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -409,22 +45,21 @@
         </script>
     @endpush
     @section('content')
-        <x-breadcrumb></x-breadcrumb>
-
+        <div class="dd-dash-page admin-page">
         <div class="dd-dash-hero">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 position-relative"
                 style="z-index:1;">
                 <div>
-                    <h2 style="color:#fff;">Welcome back, {{ auth()->user()->name ?? 'Admin' }}</h2>
+                    <h2>Welcome back, {{ auth()->user()->name ?? 'Admin' }}</h2>
                     <p>Degchi Dine control panel · {{ now()->format('l, F j, Y') }}</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
                     @can('orders-show')
-                        <a href="{{ route('orders.index') }}" class="btn btn-light btn-sm fw-semibold"><i
+                        <a href="{{ route('orders.index') }}" class="btn btn-light btn-sm"><i
                                 class="ri-shopping-cart-2-line me-1"></i> Orders</a>
                     @endcan
                     @can('members-show')
-                        <a href="{{ route('members.index') }}" class="btn btn-warning btn-sm fw-semibold text-dark"><i
+                        <a href="{{ route('members.index') }}" class="btn btn-warning btn-sm text-dark"><i
                                 class="ri-user-star-line me-1"></i> Members</a>
                     @endcan
                 </div>
@@ -432,7 +67,7 @@
         </div>
 
         {{-- ================= DATE FILTER BAR ================= --}}
-        <div class="card dd-panel mb-4">
+        <div class="card dd-panel dd-filter-bar mb-4">
             <div class="card-body py-3">
                 <form method="GET" action="{{ route('dashboard') }}" class="row g-2 align-items-end"
                     id="dashboardFilterForm">
@@ -447,38 +82,35 @@
                             class="form-control form-control-sm" max="{{ now()->toDateString() }}">
                     </div>
                     <div class="col-12 col-md-auto d-flex gap-2">
-                        <button type="submit" class="btn btn-sm text-white fw-semibold"
-                            style="background: var(--dd-teal);">
+                        <button type="submit" class="btn btn-sm btn-admin-primary">
                             <i class="ri-filter-3-line me-1"></i> Apply
                         </button>
                         @if ($isFiltered)
-                            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
                                 <i class="ri-refresh-line me-1"></i> Reset
                             </a>
                         @endif
                     </div>
 
                     <div class="col-12 col-md-auto d-flex flex-wrap gap-2 ms-md-auto">
-                        <button type="button" class="btn btn-sm btn-light dd-quick-range" data-range="today">Today</button>
-                        <button type="button" class="btn btn-sm btn-light dd-quick-range" data-range="week">This
-                            Week</button>
-                        <button type="button" class="btn btn-sm btn-light dd-quick-range" data-range="month">This
-                            Month</button>
-                        <button type="button" class="btn btn-sm btn-light dd-quick-range" data-range="year">This
-                            Year</button>
+                        <button type="button" class="btn btn-sm dd-quick-range" data-range="today">Today</button>
+                        <button type="button" class="btn btn-sm dd-quick-range" data-range="week">This Week</button>
+                        <button type="button" class="btn btn-sm dd-quick-range" data-range="month">This Month</button>
+                        <button type="button" class="btn btn-sm dd-quick-range" data-range="year">This Year</button>
                     </div>
                 </form>
 
-                <div class="mt-2">
+                <div class="mt-3 d-flex flex-wrap gap-2">
                     @if ($isFiltered)
-                        <span class="badge bg-soft-info text-info">
-                            <i class="ri-calendar-check-line me-1"></i>
-                            Showing data: {{ \Carbon\Carbon::parse($rangeFrom)->format('M d, Y') }}
-                            &mdash; {{ \Carbon\Carbon::parse($rangeTo)->format('M d, Y') }}
+                        <span class="dd-metric-chip">
+                            <i class="ri-calendar-check-line text-primary"></i>
+                            <span>{{ \Carbon\Carbon::parse($rangeFrom)->format('M d, Y') }}
+                                &mdash; {{ \Carbon\Carbon::parse($rangeTo)->format('M d, Y') }}</span>
                         </span>
                     @else
-                        <span class="badge bg-soft-secondary text-secondary">
-                            <i class="ri-database-2-line me-1"></i> Showing all-time data
+                        <span class="dd-metric-chip">
+                            <i class="ri-database-2-line"></i>
+                            <span>Showing all-time data</span>
                         </span>
                     @endif
                 </div>
@@ -814,5 +446,6 @@
                 @endif
             @endcan
         @endif
+        </div>{{-- /.dd-dash-page --}}
     @endsection
 </x-admin-master>

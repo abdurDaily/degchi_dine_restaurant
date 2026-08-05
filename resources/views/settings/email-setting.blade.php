@@ -1,7 +1,7 @@
 <x-admin-master>
 
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <div class="card" id="email-sidenav">
                 <div class="email-setting-wrap ">
                     <form id="emailSettingForm" action="javascript:void(0)" method="post">

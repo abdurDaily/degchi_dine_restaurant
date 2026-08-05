@@ -178,9 +178,10 @@
 @section('content')
     <x-breadcrumb></x-breadcrumb>
 
+    <div class="container-fluid py-4 admin-crud-page">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
+            <div class="card admin-crud-card shadow-sm">
 
                 {{-- ══ Single toolbar row: pills + date picker + search ══ --}}
                 <div class="card-header py-3" style="background:#f8f9fb; border-bottom:1px solid #e9ecef;">
@@ -235,7 +236,7 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered yajra-datatable w-100 align-middle">
-                            <thead class="table-dark">
+                            <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Customer</th>
@@ -258,16 +259,17 @@
             </div>
         </div>
     </div>
+    </div>
 
     {{-- ══ Order Details Modal ══ --}}
     <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
             <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
+                <div class="modal-header admin-modal-header">
                     <h5 class="modal-title fw-bold">
                         <i class="fas fa-file-invoice me-2"></i>Order Details
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="orderDetailsModalBody">
                     <div class="text-center py-5">

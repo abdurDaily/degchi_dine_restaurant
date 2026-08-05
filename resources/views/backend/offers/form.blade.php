@@ -6,9 +6,10 @@
 
 @php $isEdit = isset($offer->id); @endphp
 
+<div class="container-fluid py-4 admin-crud-page">
 <div class="row justify-content-center">
     <div class="col-xl-8 col-lg-10">
-        <div class="card shadow-sm">
+        <div class="card admin-crud-card shadow-sm">
             <div class="card-header py-3 d-flex align-items-center gap-2">
                 <i class="ri-price-tag-3-line text-primary fs-5"></i>
                 <h5 class="mb-0 fw-bold">{{ $isEdit ? 'Edit Offer' : 'Create New Offer' }}</h5>
@@ -135,22 +136,25 @@
 
                     {{-- Popup image --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Popup Image <span class="text-muted fw-normal">(WebP, PNG, JPG — max 2MB)</span></label>
-
                         {{-- Current image preview --}}
                         @if($isEdit && $offer->popup_image)
                         <div id="currentImgWrap" class="mb-2">
                             <img src="{{ asset('storage/' . $offer->popup_image) }}"
                                  alt="Current" id="currentImg"
                                  style="max-height:160px;border-radius:10px;border:1.5px solid #dee2e6;">
-                            <div class="text-muted small mt-1">Current image — upload a new one to replace it</div>
                         </div>
                         @endif
 
-                        <input type="file" name="popup_image" id="popupImageInput"
-                               class="form-control @error('popup_image') is-invalid @enderror"
-                               accept="image/webp,image/png,image/jpeg">
-                        @error('popup_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <div class="admin-file-field">
+                            <label class="form-label fw-semibold">Popup Image <i class="ri-image-add-line"></i> <span class="text-muted fw-normal">(WebP, PNG, JPG — max 2MB)</span></label>
+                            <input type="file" name="popup_image" id="popupImageInput"
+                                   class="form-control @error('popup_image') is-invalid @enderror"
+                                   accept="image/webp,image/png,image/jpeg">
+                            @error('popup_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            @if($isEdit && $offer->popup_image)
+                            <span class="admin-file-field__hint">Current image — upload a new one to replace it</span>
+                            @endif
+                        </div>
 
                         {{-- New image preview --}}
                         <div id="newImgPreviewWrap" class="d-none mt-2">
@@ -214,6 +218,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

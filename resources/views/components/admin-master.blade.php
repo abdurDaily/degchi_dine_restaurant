@@ -1,6 +1,53 @@
 <!doctype html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg"
-    data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+@php
+    $adminThemeDefaults = [
+        'data-layout' => 'vertical',
+        'data-topbar' => 'light',
+        'data-sidebar' => 'dark',
+        'data-sidebar-size' => 'lg',
+        'data-sidebar-image' => 'none',
+        'data-preloader' => 'disable',
+        'data-theme' => 'default',
+        'data-theme-colors' => 'default',
+        'data-bs-theme' => 'light',
+        'data-layout-width' => 'fluid',
+        'data-layout-position' => 'fixed',
+        'data-layout-style' => 'default',
+        'data-sidebar-visibility' => 'show',
+        'data-body-image' => 'none',
+    ];
+    $adminTheme = $adminThemeDefaults;
+    if (auth()->check()) {
+        try {
+            $savedTheme = \App\Models\Setting::query()
+                ->where('setting_group', 'theme_customization')
+                ->where('user_id', auth()->id())
+                ->pluck('value', 'key');
+            foreach ($adminThemeDefaults as $key => $default) {
+                if (! empty($savedTheme[$key])) {
+                    $adminTheme[$key] = $savedTheme[$key];
+                }
+            }
+        } catch (\Throwable $e) {
+            // keep defaults if settings table unavailable
+        }
+    }
+@endphp
+<html lang="en"
+    data-layout="{{ $adminTheme['data-layout'] }}"
+    data-topbar="{{ $adminTheme['data-topbar'] }}"
+    data-sidebar="{{ $adminTheme['data-sidebar'] }}"
+    data-sidebar-size="{{ $adminTheme['data-sidebar-size'] }}"
+    data-sidebar-image="{{ $adminTheme['data-sidebar-image'] }}"
+    data-preloader="{{ $adminTheme['data-preloader'] }}"
+    data-theme="{{ $adminTheme['data-theme'] }}"
+    data-theme-colors="{{ $adminTheme['data-theme-colors'] }}"
+    data-bs-theme="{{ $adminTheme['data-bs-theme'] }}"
+    data-layout-width="{{ $adminTheme['data-layout-width'] }}"
+    data-layout-position="{{ $adminTheme['data-layout-position'] }}"
+    data-layout-style="{{ $adminTheme['data-layout-style'] }}"
+    data-sidebar-visibility="{{ $adminTheme['data-sidebar-visibility'] }}"
+    data-body-image="{{ $adminTheme['data-body-image'] }}">
 
 <head>
     <meta charset="utf-8" />
@@ -8,6 +55,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="admin-placeholder-img" content="{{ asset('assets/placeholder/placeholder.png') }}">
+    <meta name="admin-avatar-placeholder" content="{{ asset('assets/images/user-dummy-img.jpg') }}">
     @auth
         @can('orders-show')
         <meta name="orders-latest-url" content="{{ route('orders.latestId') }}">
@@ -15,7 +64,19 @@
     @endauth
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ Session::get('favicon') }}">
-
+    <script>
+        /* Seed Velzon localStorage from saved theme so customizer + layout.js stay in sync */
+        (function () {
+            try {
+                var theme = @json($adminTheme);
+                Object.keys(theme).forEach(function (key) {
+                    if (theme[key] != null && theme[key] !== '') {
+                        localStorage.setItem(key, theme[key]);
+                    }
+                });
+            } catch (e) {}
+        })();
+    </script>
     <!-- Layout config Js -->
     <script src="{{ asset('assets/js/layout.js') }}"></script>
     <!-- Favicon -->
@@ -43,6 +104,11 @@
 
     <!-- custom Css-->
     <link rel="stylesheet" href="{{ asset('/assets/css/custom-style.css') }}">
+
+    <!-- Degchi premium admin theme (sidebar + content shell; after app/custom) -->
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-theme.css') }}">
+    <!-- Shared CRUD primitives (forms, tables, uploads) — loaded once for all backend pages -->
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-crud.css') }}">
 
     {{-- tagify --}}
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
@@ -74,7 +140,7 @@
 
 </head>
 
-<body>
+<body class="admin-ui">
 
 
     <!-- Begin page -->
@@ -115,48 +181,24 @@
         <div class="app-menu navbar-menu">
             <!-- LOGO -->
             <div class="navbar-brand-box">
-                <!-- Dark Logo-->
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 80px">
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 80px">
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                 </a>
-                <!-- Light Logo-->
                 <a href="{{ route('dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 80px">
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 80px">
+                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                 </a>
                 <button type="button" class="p-0 btn btn-sm fs-20 header-item float-end btn-vertical-sm-hover"
                     id="vertical-hover">
-                    <i class="ri-record-circle-line"></i>
-                </button>
-            </div>
-            <!-- LOGO -->
-            <div class="navbar-brand-box">
-                <!-- Dark Logo-->
-                <a href="{{ route('dashboard') }}" class="logo logo-dark">
-                    <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 80px">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt=""
-                            style="max-width: 80px">
-                    </span>
-                </a>
-                <button type="button" class="p-0 btn btn-sm fs-20 header-item float-end btn-vertical-sm-hover"
-                    id="vertical-hover-2">
                     <i class="ri-record-circle-line"></i>
                 </button>
             </div>
@@ -383,13 +425,16 @@
 
 
 
-        //* SET ACTIVE  LINKS ON PAGE LOAD
+        //* SET ACTIVE  LINKS ON PAGE LOAD + smooth UX helpers
         document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('admin-ready');
+
             // Get the current URL
             const currentUrl = window.location.href;
 
             // Get all the nav links
             const navLinks = document.querySelectorAll('.nav-link');
+            let activeLink = null;
 
             navLinks.forEach(link => {
                 // Check if the current link href matches the current URL
@@ -398,6 +443,7 @@
                 if (link.href === currentUrl) {
                     // Add active class to the current link
                     link.classList.add('active');
+                    activeLink = link;
 
                     // Expand parents by adding 'show' class
                     let parent = link.closest('.collapse');
@@ -414,6 +460,67 @@
                 }
 
             });
+
+            // Keep active menu item in view (smooth sidebar scroll)
+            if (activeLink) {
+                requestAnimationFrame(function() {
+                    try {
+                        activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    } catch (e) {
+                        activeLink.scrollIntoView(false);
+                    }
+                });
+            }
+
+            // Broken / missing images → local placeholders (no external CDN)
+            const contentPlaceholder = document.querySelector('meta[name="admin-placeholder-img"]')?.content;
+            const avatarPlaceholder = document.querySelector('meta[name="admin-avatar-placeholder"]')?.content;
+            if (contentPlaceholder || avatarPlaceholder) {
+                document.body.addEventListener('error', function(e) {
+                    const img = e.target;
+                    if (!(img instanceof HTMLImageElement) || img.dataset.placeholderApplied) return;
+                    img.dataset.placeholderApplied = '1';
+                    const isAvatar = img.classList.contains('header-profile-user')
+                        || img.classList.contains('rounded-circle')
+                        || img.classList.contains('name-avatar')
+                        || img.classList.contains('profile-wid-img');
+                    const fallback = isAvatar ? (avatarPlaceholder || contentPlaceholder) : contentPlaceholder;
+                    if (fallback && img.src !== fallback) {
+                        img.src = fallback;
+                    }
+                }, true);
+            }
+
+            // Select2: polish open state only (do not re-init — pages own their select2 setup)
+            if (window.jQuery && jQuery.fn.select2) {
+                jQuery(document).on('select2:open', function() {
+                    const dropdown = document.querySelector('.select2-container--open .select2-dropdown');
+                    if (dropdown) dropdown.classList.add('admin-select2-open');
+                });
+            }
+
+            // Move modals to <body> so backdrop never blocks inputs (nested layout stacking)
+            document.querySelectorAll('.modal').forEach(function(modal) {
+                if (modal.parentElement !== document.body) {
+                    document.body.appendChild(modal);
+                }
+            });
+
+            // If a leftover backdrop/preloader is stuck, clear it when any modal hides
+            if (window.jQuery) {
+                jQuery(document).on('hidden.bs.modal', function() {
+                    if (!document.querySelector('.modal.show')) {
+                        document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('padding-right');
+                    }
+                    var pre = document.getElementById('preloader');
+                    if (pre) {
+                        pre.style.display = 'none';
+                    }
+                });
+            }
 
         });
 

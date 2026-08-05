@@ -1,7 +1,7 @@
 <x-admin-master>
     @section('title', 'Profile')
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <div class="profile-foreground position-relative mx-n4 mt-n4">
                 <div class="profile-wid-bg">
                     <img src="{{ Auth::user()->profile_image }}" alt="" class="profile-wid-img" />

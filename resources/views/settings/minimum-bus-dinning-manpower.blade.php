@@ -4,7 +4,7 @@
     @section('title', ' Off Day Minimum Bus Dinning Manpower Setting')
 
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -21,8 +21,6 @@
                 </div>
             </div>
             <!-- end page title -->
-        </div>
-        <div class="container">
             <div class="card">
                 <div class="card-header">
                     <h3 class="h5">{{ __('Off Day Minimum Bus Dinning Manpower Setting') }}</h3>

@@ -2,7 +2,7 @@
     @section('title', 'Users')
 
     @section('content')
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
             <x-breadcrumb />
             <div class="row">
                 <div class="col-12">

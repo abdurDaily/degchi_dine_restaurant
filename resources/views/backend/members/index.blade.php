@@ -1,15 +1,12 @@
 @extends('layouts.dashboard')
 @section('title', 'Members')
 
-@push('styles')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-@endpush
-
 @section('content')
     <x-breadcrumb></x-breadcrumb>
+    <div class="container-fluid py-4 admin-crud-page">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card admin-crud-card">
                 <div class="card-header">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                         <h4 class="card-title mb-0">Members</h4>
@@ -49,7 +46,7 @@
                             <input type="search" name="search" value="{{ $search ?? '' }}" class="form-control form-control-sm" placeholder="Search card, name, phone, email" />
                         </div>
                         <div class="col-auto">
-                            <button class="btn btn-primary btn-sm" type="submit">Search</button>
+                            <button class="btn btn-primary admin-crud-btn-primary btn-sm" type="submit">Search</button>
                         </div>
                         <div class="col-auto ms-auto">
                             <a href="{{ route('members.index', ['status' => 'active', 'type' => 'all', 'student' => 'all', 'approval' => 'all']) }}" class="btn btn-outline-secondary btn-sm">Clear filter</a>
@@ -59,7 +56,7 @@
 
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered mb-0">
+                        <table class="table table-hover align-middle mb-0 admin-datatable">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -79,11 +76,11 @@
                                     <tr id="member-row-{{ $member->id }}">
                                         <td>{{ $member->id }}</td>
                                         <td>
-                                            @if($member->profile_image_path)
-                                                <img src="{{ asset('storage/' . $member->profile_image_path) }}" alt="{{ $member->name }}" class="rounded-circle" style="width:38px;height:38px;object-fit:cover;border:2px solid #e2e8f0;">
-                                            @else
-                                                <span class="avatar-sm rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:38px;height:38px;"><i class="ri-user-line text-muted fs-16"></i></span>
-                                            @endif
+                                            <img src="{{ $member->profile_image_path ? asset('storage/' . $member->profile_image_path) : asset('assets/images/user-dummy-img.jpg') }}"
+                                                 alt="{{ $member->name }}"
+                                                 class="rounded-circle"
+                                                 style="width:38px;height:38px;object-fit:cover;border:2px solid #e2e8f0;"
+                                                 onerror="this.onerror=null;this.src='{{ asset('assets/images/user-dummy-img.jpg') }}';">
                                         </td>
                                         <td>{{ $member->name }}</td>
                                         <td>{{ $member->phone }}</td>
@@ -143,6 +140,7 @@
             </div>
         </div>
     </div>
+    </div>
 
     {{-- Member Detail Modal --}}
     <div class="modal fade" id="memberDetailModal" tabindex="-1" aria-labelledby="memberDetailModalLabel" aria-hidden="true">
@@ -179,7 +177,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
 $(function () {
     var csrfToken = $('meta[name="csrf-token"]').attr('content');

@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4 admin-crud-page">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
@@ -82,24 +82,26 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">
-                                    About Image
-                                    <small class="text-muted">(webp, png, jpg – max 3MB)</small>
-                                </label>
-                                <input type="file" name="about_image" class="form-control" accept="image/webp,image/png,image/jpeg">
-                                @if($val('about_image'))
-                                    <div class="mt-2">
-                                        <img src="{{ asset('uploads/about/' . $val('about_image')) }}"
-                                             onerror="this.style.display='none'"
-                                             class="rounded shadow-sm" height="120" alt="About Image" />
-                                        <p class="text-muted small mt-1">Current image – upload new to replace</p>
-                                    </div>
-                                @endif
+                                <div class="admin-file-field">
+                                    <label class="form-label fw-semibold">
+                                        About Image <i class="ri-image-add-line"></i>
+                                        <small class="text-muted">(webp, png, jpg – max 3MB)</small>
+                                    </label>
+                                    <input type="file" name="about_image" class="form-control" accept="image/webp,image/png,image/jpeg">
+                                    @if($val('about_image'))
+                                        <div class="mt-2">
+                                            <img src="{{ asset('uploads/about/' . $val('about_image')) }}"
+                                                 onerror="this.style.display='none'"
+                                                 class="rounded shadow-sm" height="120" alt="About Image" />
+                                        </div>
+                                        <span class="admin-file-field__hint">Current image – upload new to replace</span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
 
                         <div class="mt-2">
-                            <button type="submit" id="aboutSubmitBtn" class="btn btn-primary px-4">
+                            <button type="submit" id="aboutSubmitBtn" class="btn btn-primary admin-crud-btn-primary px-4">
                                 <i class="ri-save-line me-1"></i> Save About Section
                             </button>
                         </div>

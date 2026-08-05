@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4 admin-crud-page">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
@@ -39,8 +39,8 @@
                             <span class="text-danger error-text facebook_url_error"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Thumbnail Image <small class="text-muted">(webp, png, jpg – portrait preferred)</small></label>
+                        <div class="admin-file-field mb-3">
+                            <label class="form-label fw-semibold">Thumbnail Image <i class="ri-image-add-line"></i> <small class="text-muted">(webp, png, jpg – portrait preferred)</small></label>
                             <input type="file" name="thumbnail" class="form-control" accept="image/webp,image/png,image/jpeg">
                             <span class="text-danger error-text thumbnail_error"></span>
                         </div>
@@ -111,8 +111,8 @@
                         <label class="form-label fw-semibold">Facebook Reel URL <span class="text-danger">*</span></label>
                         <input type="url" name="facebook_url" id="edit_facebook_url" class="form-control">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Thumbnail <small class="text-muted">(Leave blank to keep current)</small></label>
+                    <div class="admin-file-field mb-3">
+                        <label class="form-label fw-semibold">Thumbnail <i class="ri-image-add-line"></i> <small class="text-muted">(Leave blank to keep current)</small></label>
                         <input type="file" name="thumbnail" class="form-control" accept="image/webp,image/png,image/jpeg">
                         <div id="edit_current_thumb" class="mt-1"></div>
                     </div>

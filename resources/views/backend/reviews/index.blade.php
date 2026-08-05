@@ -1,7 +1,7 @@
 @extends('components.admin-master')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4 admin-crud-page">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -196,21 +196,18 @@
 </div>
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.min.css">
 <style>
-    /* Simple & Light Color Design */
+    /* Reviews stats — Degchi tokens (assets already in admin-master) */
     :root {
-        --primary: #5B5FFF;
-        --warning: #FFA500;
-        --success: #4CAF50;
-        --danger: #FF4444;
-        --light-bg: #F7F8FC;
+        --primary: #116b83;
+        --warning: #f59e0b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --light-bg: #f0f3f7;
         --card-bg: #FFFFFF;
-        --text-dark: #2C2C2C;
-        --text-muted: #7A8A99;
-        --border: #E5E9F0;
+        --text-dark: #1f2937;
+        --text-muted: #6b7280;
+        --border: rgba(36, 50, 68, 0.08);
     }
 
     .simple-stat-card {
@@ -400,7 +397,6 @@
 @endpush
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let currentPage = 1;
     const perPage = 10;

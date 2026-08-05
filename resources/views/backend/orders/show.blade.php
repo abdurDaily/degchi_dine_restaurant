@@ -2,6 +2,7 @@
 @section('title', 'Order #' . $order->id)
 
 @section('content')
+    <div class="container-fluid py-4 admin-crud-page">
     <x-breadcrumb></x-breadcrumb>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
@@ -15,6 +16,7 @@
     </div>
 
     @include('backend.orders.partials.details')
+    </div>
 @endsection
 
 @push('scripts')

@@ -2,8 +2,8 @@
     @section('title', __('Add user'))
 
     @section('content')
-        <x-breadcrumb />
-        <div class="container-fluid">
+        <div class="container-fluid py-4 admin-crud-page">
+            <x-breadcrumb />
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -29,7 +29,7 @@
                                     </div>
 
                                     <div class="mt-4 col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group admin-file-field">
                                             <label>{{ trans('Image') }}</label>
                                             <input type="file" name="image" class="form-control"
                                                 accept=".jpg, .png, image/jpeg, image/png">
