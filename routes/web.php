@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\Blog\BlogController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\MemberAuthController;
+use App\Http\Controllers\Frontend\MemberOrderController;
 use App\Http\Controllers\Frontend\PaymentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PermissionController;
@@ -223,6 +224,8 @@ Route::name('frontend.')->group(function () {
     Route::middleware('auth:member')->group(function () {
         Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->name('member.dashboard');
         Route::put('/member/profile', [MemberAuthController::class, 'updateProfile'])->name('member.profile.update');
+        Route::post('/member/orders/{order}/cancel', [MemberOrderController::class, 'cancel'])->name('member.orders.cancel');
+        Route::post('/member/orders/{order}/items/quantity', [MemberOrderController::class, 'updateItemQuantity'])->name('member.orders.items.quantity');
     });
 
     //* REVIEWS

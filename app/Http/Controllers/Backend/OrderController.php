@@ -278,42 +278,7 @@ class OrderController extends Controller
      */
     private function persistItemsAndRespond(Order $order, array $items, OrderPricingService $pricing)
     {
-        $member = $order->member;
-        // Reuse the order's stored delivery charge — never add a second fee when
-        // qty/items change. Discounts still apply to food only.
-        $deliveryCharge = (float) ($order->delivery_charge ?? 0);
-        $totals = $pricing->recalculateTotals(
-            $items,
-            $member,
-            (float) $order->coupon_discount,
-            $deliveryCharge
-        );
-
-        $oldFinalAmount = (float) $order->final_amount;
-
-        $order->items = $items;
-        $order->total_amount = $totals['total_amount'];
-        $order->discount_amount = $totals['discount_amount'];
-        $order->coupon_discount = $totals['coupon_discount'];
-        $order->delivery_charge = $totals['delivery_charge'];
-        $order->final_amount = $totals['final_amount'];
-        $order->save();
-
-        // Safety net: if this order's amount was already credited to the member's
-        // total_purchase, keep that figure in sync with the edited final_amount.
-        if ($order->member_credited && $member) {
-            $delta = round($totals['final_amount'] - $oldFinalAmount, 2);
-
-            if (abs($delta) > 0.004) {
-                $member->total_purchase = max(0, round((float) $member->total_purchase + $delta, 2));
-                $member->save();
-
-                if ($member->qualifiesForGoldenUpgrade()) {
-                    $member->upgradeToGolden();
-                }
-            }
-        }
-
+        $pricing->applyItemsToOrder($order, $items);
         $order->refresh()->load('member');
 
         return response()->json([

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Member;
 use App\Models\MenuVariation;
 use App\Models\Offer;
+use App\Models\Order;
 
 /**
  * Single source of truth for order line-item pricing and discount stacking.
@@ -176,5 +177,48 @@ class OrderPricingService
             'food_total' => $foodTotal,
             'final_amount' => $finalAmount,
         ];
+    }
+
+    /**
+     * Persist line items + recalculated totals on an order, and keep a
+     * previously-credited member total_purchase in sync with the delta.
+     *
+     * @return array{total_amount:float, offer_discount:float, member_discount:float, coupon_discount:float, discount_amount:float, delivery_charge:float, food_total:float, final_amount:float}
+     */
+    public function applyItemsToOrder(Order $order, array $items): array
+    {
+        $member = $order->member;
+        $deliveryCharge = (float) ($order->delivery_charge ?? 0);
+        $totals = $this->recalculateTotals(
+            $items,
+            $member,
+            (float) $order->coupon_discount,
+            $deliveryCharge
+        );
+
+        $oldFinalAmount = (float) $order->final_amount;
+
+        $order->items = $items;
+        $order->total_amount = $totals['total_amount'];
+        $order->discount_amount = $totals['discount_amount'];
+        $order->coupon_discount = $totals['coupon_discount'];
+        $order->delivery_charge = $totals['delivery_charge'];
+        $order->final_amount = $totals['final_amount'];
+        $order->save();
+
+        if ($order->member_credited && $member) {
+            $delta = round($totals['final_amount'] - $oldFinalAmount, 2);
+
+            if (abs($delta) > 0.004) {
+                $member->total_purchase = max(0, round((float) $member->total_purchase + $delta, 2));
+                $member->save();
+
+                if ($member->qualifiesForGoldenUpgrade()) {
+                    $member->upgradeToGolden();
+                }
+            }
+        }
+
+        return $totals;
     }
 }

@@ -289,6 +289,117 @@
     color: #28a745;
     flex-shrink: 0;
 }
+.member-dashboard .md-order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.member-dashboard .md-order-actions .btn {
+    border-radius: 50px;
+    font-size: 0.78rem;
+}
+.member-dashboard .md-manage-panel {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--dd-border);
+}
+.member-dashboard .md-manage-panel.is-open {
+    display: block;
+}
+.member-dashboard .md-item-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(31,20,18,0.06);
+}
+.member-dashboard .md-item-row:last-child {
+    border-bottom: none;
+}
+.member-dashboard .md-item-info {
+    flex: 1;
+    min-width: 0;
+}
+.member-dashboard .md-item-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--dd-text-main);
+}
+.member-dashboard .md-item-meta {
+    font-size: 0.78rem;
+    color: var(--dd-text-muted);
+}
+.member-dashboard .md-item-price {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--dd-text-main);
+    white-space: nowrap;
+}
+.member-dashboard .md-qty-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f7f4ef;
+    border-radius: 50px;
+    padding: 4px 6px;
+}
+.member-dashboard .md-qty-stepper button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--dd-text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    cursor: pointer;
+}
+.member-dashboard .md-qty-stepper button:hover {
+    background: var(--dd-gold);
+    color: #1f1412;
+}
+.member-dashboard .md-qty-stepper button.md-qty-remove {
+    color: #dc3545;
+}
+.member-dashboard .md-qty-stepper button.md-qty-remove:hover {
+    background: #dc3545;
+    color: #fff;
+}
+.member-dashboard .md-qty-value {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.member-dashboard .md-manage-summary {
+    margin-top: 12px;
+    background: #faf8f4;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.85rem;
+}
+.member-dashboard .md-manage-summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.member-dashboard .md-manage-summary-row:last-child {
+    margin-bottom: 0;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #28a745;
+    padding-top: 6px;
+    border-top: 1px solid var(--dd-border);
+}
+.member-dashboard .md-order-card.is-busy {
+    opacity: 0.65;
+    pointer-events: none;
+}
 .member-dashboard .md-badge {
     display: inline-block;
     padding: 4px 10px;
@@ -841,35 +952,121 @@
                                 'canceled' => 'md-badge-canceled',
                                 default => 'md-badge-pending',
                             };
+                            $isPending = $order->status === 'pending';
+                            $orderItems = $order->normalizedItems();
+                            $offerDiscountTotal = round(collect($orderItems)->sum(fn ($i) => (float) ($i['offer_discount'] ?? 0)), 2);
+                            $displaySubtotal = round(max(0, (float) $order->total_amount - $offerDiscountTotal), 2);
                         @endphp
-                        <div class="md-order-card {{ $highlightOrder && $highlightOrder->id === $order->id ? 'is-highlight' : '' }}">
+                        <div class="md-order-card {{ $highlightOrder && $highlightOrder->id === $order->id ? 'is-highlight' : '' }}"
+                             data-order-id="{{ $order->id }}"
+                             data-order-status="{{ $order->status }}"
+                             @if($isPending)
+                             data-cancel-url="{{ route('frontend.member.orders.cancel', $order) }}"
+                             data-qty-url="{{ route('frontend.member.orders.items.quantity', $order) }}"
+                             @endif>
                             <div class="md-order-top">
                                 <div>
                                     <div class="md-order-id">Order #{{ $order->id }}</div>
                                     <div class="md-order-date">{{ $order->created_at->format('d M Y · h:i A') }}</div>
                                 </div>
-                                <div class="md-order-amount">৳{{ number_format($order->final_amount, 2) }}</div>
+                                <div class="md-order-amount js-order-amount">৳{{ number_format($order->final_amount, 2) }}</div>
                             </div>
                             <div class="md-order-meta">
-                                <span class="md-badge {{ $statusClass }}">{{ ucfirst($order->status) }}</span>
+                                <span class="md-badge {{ $statusClass }} js-order-status-badge">{{ ucfirst($order->status) }}</span>
                                 <span class="text-muted" style="font-size: 0.82rem;">
                                     <iconify-icon icon="solar:card-linear" class="me-1"></iconify-icon>
                                     {{ strtoupper($order->payment_method ?? 'N/A') }}
                                 </span>
-                                @if ((float) $order->discount_amount > 0)
-                                    <span class="text-success" style="font-size: 0.82rem;">
-                                        Saved ৳{{ number_format($order->discount_amount, 2) }}
-                                    </span>
-                                @endif
+                                <span class="text-success js-order-saved" style="font-size: 0.82rem; {{ (float) $order->discount_amount > 0 ? '' : 'display:none;' }}">
+                                    Saved ৳<span class="js-order-saved-val">{{ number_format($order->discount_amount, 2) }}</span>
+                                </span>
                             </div>
                             @if ($order->status === 'canceled' && !empty($order->status_remarks))
-                                <p class="text-danger mb-2" style="font-size: 0.78rem; line-height: 1.45;">
+                                <p class="text-danger mb-2 js-order-remarks" style="font-size: 0.78rem; line-height: 1.45;">
                                     <strong>Remarks:</strong> {{ $order->status_remarks }}
                                 </p>
+                            @else
+                                <p class="text-danger mb-2 js-order-remarks" style="font-size: 0.78rem; line-height: 1.45; display:none;"></p>
                             @endif
-                            <a href="{{ route('frontend.order.confirmation', $order) }}" class="btn btn-sm btn-outline-dark mt-1" style="border-radius: 50px; font-size: 0.78rem;">
-                                View Order Details
-                            </a>
+
+                            <div class="md-order-actions">
+                                <a href="{{ route('frontend.order.confirmation', $order) }}" class="btn btn-sm btn-outline-dark">
+                                    View Order Details
+                                </a>
+                                @if ($isPending)
+                                    <button type="button" class="btn btn-sm btn-dark js-manage-order-btn">
+                                        Manage Items
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger js-cancel-order-btn">
+                                        Cancel Order
+                                    </button>
+                                @endif
+                            </div>
+
+                            @if ($isPending)
+                                <div class="md-manage-panel js-manage-panel">
+                                    <div class="js-manage-items">
+                                        @foreach ($orderItems as $index => $item)
+                                            @php
+                                                $title = $item['title'] ?? $item['name'] ?? 'Item';
+                                                $price = (float) ($item['original_price'] ?? $item['price'] ?? 0);
+                                                $qty = max(1, (int) ($item['quantity'] ?? $item['qty'] ?? 1));
+                                                $offerDiscount = (float) ($item['offer_discount'] ?? 0);
+                                                $offerPercent = (int) ($item['offer_percent'] ?? 0);
+                                                $discountedUnit = $offerPercent > 0 && $qty > 0
+                                                    ? max(0, $price - ($offerDiscount / $qty))
+                                                    : $price;
+                                                $lineSubtotal = max(0, ($price * $qty) - $offerDiscount);
+                                            @endphp
+                                            <div class="md-item-row" data-item-index="{{ $index }}">
+                                                <div class="md-item-info">
+                                                    <div class="md-item-title">{{ $title }}</div>
+                                                    <div class="md-item-meta">
+                                                        @if($offerPercent > 0)
+                                                            <span class="text-decoration-line-through text-muted">৳{{ number_format($price, 2) }}</span>
+                                                            <span class="text-danger fw-semibold">৳{{ number_format($discountedUnit, 2) }}</span>
+                                                            <span class="badge bg-danger-subtle text-danger">{{ $offerPercent }}% OFF</span>
+                                                        @else
+                                                            ৳{{ number_format($price, 2) }}
+                                                        @endif
+                                                        @if(!empty($item['note']))
+                                                            · {{ $item['note'] }}
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="md-qty-stepper">
+                                                    <button type="button" class="js-qty-minus" aria-label="Decrease">−</button>
+                                                    <span class="md-qty-value">{{ $qty }}</span>
+                                                    <button type="button" class="js-qty-plus" aria-label="Increase">+</button>
+                                                    <button type="button" class="md-qty-remove js-qty-remove" aria-label="Remove" title="Remove item">×</button>
+                                                </div>
+                                                <div class="md-item-price js-line-subtotal">৳{{ number_format($lineSubtotal, 2) }}</div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="md-manage-summary js-manage-summary">
+                                        <div class="md-manage-summary-row">
+                                            <span>Subtotal</span>
+                                            <span class="js-sum-subtotal">৳{{ number_format($displaySubtotal, 2) }}</span>
+                                        </div>
+                                        <div class="md-manage-summary-row js-sum-discount-row" style="{{ (float) $order->discount_amount - $offerDiscountTotal > 0.004 || $offerDiscountTotal > 0.004 ? '' : 'display:none;' }}">
+                                            <span>Discounts</span>
+                                            <span class="text-success js-sum-discount">- ৳{{ number_format((float) $order->discount_amount, 2) }}</span>
+                                        </div>
+                                        <div class="md-manage-summary-row">
+                                            <span>Delivery</span>
+                                            <span class="js-sum-delivery">৳{{ number_format((float) ($order->delivery_charge ?? 0), 2) }}</span>
+                                        </div>
+                                        <div class="md-manage-summary-row">
+                                            <span>Total</span>
+                                            <span class="js-sum-total">৳{{ number_format($order->final_amount, 2) }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mb-0 mt-2" style="font-size: 0.75rem;">
+                                        You can change quantity or remove items while this order is still pending. Delivery charge stays fixed.
+                                    </p>
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <div class="md-empty-state">
@@ -904,6 +1101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var editBtn = document.getElementById('mdEditProfileBtn');
     var cancelBtn = document.getElementById('mdCancelEditBtn');
     var profileForm = document.getElementById('mdProfileForm');
+    var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     function showDefaultDashboard() {
         if (defaultView) defaultView.classList.remove('d-none');
@@ -917,15 +1115,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (editView) editView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    if (editBtn) {
-        editBtn.addEventListener('click', showEditProfile);
-    }
-
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', function () {
-            showDefaultDashboard();
-        });
-    }
+    if (editBtn) editBtn.addEventListener('click', showEditProfile);
+    if (cancelBtn) cancelBtn.addEventListener('click', showDefaultDashboard);
 
     if (copyBtn && cardDisplay) {
         copyBtn.addEventListener('click', function () {
@@ -937,6 +1128,220 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    function money(value) {
+        return '৳' + (Number(value) || 0).toFixed(2);
+    }
+
+    function notify(type, message) {
+        if (!message) return;
+        if (typeof toastr !== 'undefined') {
+            toastr[type === 'error' ? 'error' : 'success'](message);
+        } else if (type === 'error') {
+            alert(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    function escapeHtml(text) {
+        var d = document.createElement('div');
+        d.textContent = text == null ? '' : String(text);
+        return d.innerHTML;
+    }
+
+    function setCardBusy(card, busy) {
+        card.classList.toggle('is-busy', !!busy);
+    }
+
+    function markCanceled(card, order, message) {
+        card.dataset.orderStatus = 'canceled';
+        var badge = card.querySelector('.js-order-status-badge');
+        if (badge) {
+            badge.className = 'md-badge md-badge-canceled js-order-status-badge';
+            badge.textContent = 'Canceled';
+        }
+        var amount = card.querySelector('.js-order-amount');
+        if (amount && order) amount.textContent = money(order.final_amount);
+
+        var remarks = card.querySelector('.js-order-remarks');
+        if (remarks && order && order.status_remarks) {
+            remarks.style.display = '';
+            remarks.innerHTML = '<strong>Remarks:</strong> ' + escapeHtml(order.status_remarks);
+        }
+
+        card.querySelectorAll('.js-manage-order-btn, .js-cancel-order-btn').forEach(function (btn) {
+            btn.remove();
+        });
+        var panel = card.querySelector('.js-manage-panel');
+        if (panel) panel.remove();
+        notify('success', message || 'Order canceled.');
+    }
+
+    function renderManagePanel(card, order) {
+        var itemsWrap = card.querySelector('.js-manage-items');
+        var amountEl = card.querySelector('.js-order-amount');
+        var savedWrap = card.querySelector('.js-order-saved');
+        var savedVal = card.querySelector('.js-order-saved-val');
+
+        if (amountEl) amountEl.textContent = money(order.final_amount);
+        if (savedWrap && savedVal) {
+            if ((order.discount_amount || 0) > 0.004) {
+                savedWrap.style.display = '';
+                savedVal.textContent = Number(order.discount_amount).toFixed(2);
+            } else {
+                savedWrap.style.display = 'none';
+            }
+        }
+
+        if (itemsWrap) {
+            itemsWrap.innerHTML = (order.items || []).map(function (item) {
+                var priceHtml = item.offer_percent > 0
+                    ? '<span class="text-decoration-line-through text-muted">' + money(item.price) + '</span> ' +
+                      '<span class="text-danger fw-semibold">' + money(item.discounted_unit) + '</span> ' +
+                      '<span class="badge bg-danger-subtle text-danger">' + item.offer_percent + '% OFF</span>'
+                    : money(item.price);
+                var noteHtml = item.note ? ' · ' + escapeHtml(item.note) : '';
+
+                return '<div class="md-item-row" data-item-index="' + item.index + '">' +
+                    '<div class="md-item-info"><div class="md-item-title">' + escapeHtml(item.title) + '</div>' +
+                    '<div class="md-item-meta">' + priceHtml + noteHtml + '</div></div>' +
+                    '<div class="md-qty-stepper">' +
+                    '<button type="button" class="js-qty-minus" aria-label="Decrease">−</button>' +
+                    '<span class="md-qty-value">' + item.quantity + '</span>' +
+                    '<button type="button" class="js-qty-plus" aria-label="Increase">+</button>' +
+                    '<button type="button" class="md-qty-remove js-qty-remove" aria-label="Remove" title="Remove item">×</button>' +
+                    '</div><div class="md-item-price js-line-subtotal">' + money(item.line_subtotal) + '</div></div>';
+            }).join('');
+        }
+
+        var subtotal = card.querySelector('.js-sum-subtotal');
+        var discount = card.querySelector('.js-sum-discount');
+        var discountRow = card.querySelector('.js-sum-discount-row');
+        var delivery = card.querySelector('.js-sum-delivery');
+        var total = card.querySelector('.js-sum-total');
+        if (subtotal) subtotal.textContent = money(order.display_subtotal);
+        if (discount) discount.textContent = '- ' + money(order.discount_amount);
+        if (discountRow) discountRow.style.display = (order.discount_amount || 0) > 0.004 ? '' : 'none';
+        if (delivery) delivery.textContent = money(order.delivery_charge);
+        if (total) total.textContent = money(order.final_amount);
+    }
+
+    function postQuantity(card, index, quantity) {
+        var url = card.dataset.qtyUrl;
+        if (!url) return;
+        setCardBusy(card, true);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ index: index, quantity: quantity })
+        })
+        .then(function (res) {
+            return res.json().then(function (data) {
+                return { ok: res.ok, data: data };
+            });
+        })
+        .then(function (result) {
+            if (!result.ok || !result.data.success) {
+                notify('error', (result.data && result.data.message) || 'Unable to update item.');
+                setCardBusy(card, false);
+                return;
+            }
+            if (result.data.canceled) {
+                markCanceled(card, result.data.order, result.data.message);
+                return;
+            }
+            renderManagePanel(card, result.data.order);
+            notify('success', result.data.message);
+            setCardBusy(card, false);
+        })
+        .catch(function () {
+            notify('error', 'Unable to update item. Please try again.');
+            setCardBusy(card, false);
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        var manageBtn = e.target.closest('.js-manage-order-btn');
+        if (manageBtn) {
+            var card = manageBtn.closest('.md-order-card');
+            var panel = card && card.querySelector('.js-manage-panel');
+            if (panel) {
+                panel.classList.toggle('is-open');
+                manageBtn.textContent = panel.classList.contains('is-open') ? 'Hide Items' : 'Manage Items';
+            }
+            return;
+        }
+
+        var cancelBtnEl = e.target.closest('.js-cancel-order-btn');
+        if (cancelBtnEl) {
+            var cancelCard = cancelBtnEl.closest('.md-order-card');
+            var cancelUrl = cancelCard && cancelCard.dataset.cancelUrl;
+            if (!cancelUrl) return;
+            if (!confirm('Cancel this pending order? This cannot be undone.')) return;
+
+            setCardBusy(cancelCard, true);
+            fetch(cancelUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({})
+            })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { ok: res.ok, data: data };
+                });
+            })
+            .then(function (result) {
+                if (!result.ok || !result.data.success) {
+                    notify('error', (result.data && result.data.message) || 'Unable to cancel order.');
+                    setCardBusy(cancelCard, false);
+                    return;
+                }
+                markCanceled(cancelCard, result.data.order, result.data.message);
+            })
+            .catch(function () {
+                notify('error', 'Unable to cancel order. Please try again.');
+                setCardBusy(cancelCard, false);
+            });
+            return;
+        }
+
+        var plus = e.target.closest('.js-qty-plus');
+        var minus = e.target.closest('.js-qty-minus');
+        var remove = e.target.closest('.js-qty-remove');
+        if (!plus && !minus && !remove) return;
+
+        var row = e.target.closest('.md-item-row');
+        var qtyCard = e.target.closest('.md-order-card');
+        if (!row || !qtyCard) return;
+
+        var index = parseInt(row.dataset.itemIndex, 10);
+        var currentQty = parseInt((row.querySelector('.md-qty-value') || {}).textContent || '1', 10) || 1;
+
+        if (remove) {
+            if (!confirm('Remove this item from the order?')) return;
+            postQuantity(qtyCard, index, 0);
+            return;
+        }
+
+        var nextQty = plus ? currentQty + 1 : currentQty - 1;
+        if (nextQty <= 0) {
+            if (!confirm('Quantity would drop to 0 — remove this item?')) return;
+            nextQty = 0;
+        }
+        postQuantity(qtyCard, index, nextQty);
+    });
 });
 </script>
 @endpush
