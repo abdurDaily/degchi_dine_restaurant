@@ -59,7 +59,20 @@ class OrderController extends Controller
                 ->addColumn('total', fn($order) => '৳ ' . number_format($order->total_amount, 2))
                 ->addColumn('discount', fn($order) => '৳ ' . number_format($order->discount_amount, 2))
                 ->addColumn('final', fn($order) => '৳ ' . number_format($order->final_amount, 2))
-                ->addColumn('status_name', fn($order) => ucfirst($order->status))
+                ->addColumn('status_name', function ($order) {
+                    $label = e(ucfirst($order->status));
+
+                    // Use dedicated badge classes (not bare text-danger / text-warning).
+                    // A global modal-close handler clears span.text-danger validation
+                    // errors and must never wipe these status chips.
+                    return match ($order->status) {
+                        'canceled' => '<span class="badge order-status-badge order-status-canceled">'.$label.'</span>',
+                        'pending' => '<span class="badge order-status-badge order-status-pending">'.$label.'</span>',
+                        'confirmed' => '<span class="badge order-status-badge order-status-confirmed">'.$label.'</span>',
+                        'completed' => '<span class="badge order-status-badge order-status-completed">'.$label.'</span>',
+                        default => $label,
+                    };
+                })
                 ->addColumn('date', fn($order) => $order->created_at->format('Y-m-d H:i'))
                 ->addColumn('is_new', fn($order) => is_null($order->viewed_at) ? 1 : 0)
                 ->addColumn('action', function($order) {

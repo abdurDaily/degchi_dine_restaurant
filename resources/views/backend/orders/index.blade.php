@@ -131,6 +131,45 @@
         50%       { opacity: .55; }
     }
 
+    /* ─── Canceled order rows (member or admin) ─── */
+    tr.row-canceled-order td {
+        background: linear-gradient(90deg, #fde8e8 0%, #fff5f5 100%) !important;
+        border-top: 1px solid #f5c2c7 !important;
+        border-bottom: 1px solid #f5c2c7 !important;
+        color: #842029;
+    }
+    tr.row-canceled-order td:first-child {
+        border-left: 3px solid #dc3545 !important;
+        padding-left: 10px !important;
+    }
+    tr.row-canceled-order:hover td {
+        background: linear-gradient(90deg, #f8d7da 0%, #fde8e8 100%) !important;
+    }
+
+    /* Status chips — independent of Bootstrap text-* utility classes */
+    .order-status-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding: 0.35em 0.65em;
+    }
+    .order-status-canceled {
+        background: #f8d7da !important;
+        color: #842029 !important;
+    }
+    .order-status-pending {
+        background: #fff3cd !important;
+        color: #856404 !important;
+    }
+    .order-status-confirmed {
+        background: #cff4fc !important;
+        color: #055160 !important;
+    }
+    .order-status-completed {
+        background: #d1e7dd !important;
+        color: #0f5132 !important;
+    }
+
     /* ─── Hide DataTable's own search box ─── */
     .dataTables_wrapper .dataTables_filter { display: none; }
 </style>
@@ -344,10 +383,17 @@ $(function () {
         order: [[9, 'desc']],
 
         rowCallback: function (row, data) {
-            if (parseInt(data.is_new) === 1) {
-                $(row).addClass('row-new-order');
-            } else {
-                $(row).removeClass('row-new-order');
+            // Prefer the raw status field; never parse status_name HTML.
+            const status = String(data.status || '').toLowerCase();
+            const $row = $(row);
+
+            $row.removeClass('row-new-order row-canceled-order');
+
+            if (status === 'canceled') {
+                // Canceled wins over "NEW" highlight so canceled rows stay clearly red.
+                $row.addClass('row-canceled-order');
+            } else if (parseInt(data.is_new) === 1) {
+                $row.addClass('row-new-order');
             }
         },
 

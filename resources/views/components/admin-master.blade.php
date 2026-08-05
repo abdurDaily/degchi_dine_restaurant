@@ -338,8 +338,11 @@
             })
             $('#preloader').hide();
 
-            $(document).on('hidden.bs.modal', function() {
-                $('span.text-danger').html('')
+            // Only clear form validation errors inside the closed modal —
+            // never wipe every span.text-danger on the page (that also
+            // destroyed order-status badges in the Orders DataTable).
+            $(document).on('hidden.bs.modal', function (e) {
+                $(e.target).find('span.error-text, .error-text, span.invalid-feedback').html('');
             })
 
             $('#cacheClear').on('click', function() {
