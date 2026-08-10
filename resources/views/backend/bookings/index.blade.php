@@ -60,9 +60,12 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group">
+                                                @can('party-bookings-edit')
                                                 <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#editBookingModal{{ $booking->id }}" title="Edit Booking">
                                                     <i class="ri-edit-line"></i>
                                                 </button>
+                                                @endcan
+                                                @can('party-bookings-delete')
                                                 <form action="{{ route('admin.party-bookings.delete', $booking->id) }}" method="POST" class="d-inline-block">
                                                     @csrf
                                                     @method('DELETE')
@@ -70,10 +73,12 @@
                                                         <i class="ri-delete-bin-line"></i>
                                                     </button>
                                                 </form>
+                                                @endcan
                                             </div>
                                         </td>
                                     </tr>
 
+                                    @can('party-bookings-edit')
                                     <!-- Edit Modal -->
                                     <div class="modal fade" id="editBookingModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
@@ -109,6 +114,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @endcan
                                 @empty
                                     <tr>
                                         <td colspan="8" class="text-center py-4 text-muted">No bookings found.</td>

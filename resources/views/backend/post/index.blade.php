@@ -2,6 +2,20 @@
 
 @section('title', 'Blog Management')
 
+@php
+    $canPostsList = auth()->user()->can('posts-list');
+    $canPostsCreate = auth()->user()->can('posts-create');
+    $canPostsEdit = auth()->user()->can('posts-edit');
+    $canPostsDelete = auth()->user()->can('posts-delete');
+    $canCategoriesList = auth()->user()->can('blog-categories-list');
+    $canCategoriesCreate = auth()->user()->can('blog-categories-create');
+    $canCategoriesEdit = auth()->user()->can('blog-categories-edit');
+    $canCategoriesDelete = auth()->user()->can('blog-categories-delete');
+    $canCommentsShow = auth()->user()->can('comments-show');
+    $canCommentsModerate = auth()->user()->can('comments-moderate');
+    $defaultBlogTab = $canPostsList ? 'posts' : ($canCategoriesList ? 'categories' : 'comments');
+@endphp
+
 @push('styles')
     <style>
         .nav-tabs .nav-link { color: #495057; border: none; padding: 0.75rem 1.25rem; font-weight: 500; border-radius: 8px 8px 0 0; }
@@ -34,31 +48,40 @@
     </div>
 
     <ul class="nav nav-tabs" id="blogTabs" role="tablist">
+        @can('posts-list')
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-pane" type="button" role="tab">
+            <button class="nav-link {{ $defaultBlogTab === 'posts' ? 'active' : '' }}" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts-pane" type="button" role="tab">
                 <i class="ri-file-text-line"></i> Posts
             </button>
         </li>
+        @endcan
+        @can('blog-categories-list')
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-pane" type="button" role="tab">
+            <button class="nav-link {{ $defaultBlogTab === 'categories' ? 'active' : '' }}" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-pane" type="button" role="tab">
                 <i class="ri-price-tag-3-line"></i> Categories
             </button>
         </li>
+        @endcan
+        @can('comments-show')
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments-pane" type="button" role="tab">
+            <button class="nav-link {{ $defaultBlogTab === 'comments' ? 'active' : '' }}" id="comments-tab" data-bs-toggle="tab" data-bs-target="#comments-pane" type="button" role="tab">
                 <i class="ri-chat-3-line"></i> Comments
             </button>
         </li>
+        @endcan
     </ul>
 
     <div class="tab-content" id="blogTabsContent">
-        <div class="tab-pane fade show active" id="posts-pane" role="tabpanel">
+        @can('posts-list')
+        <div class="tab-pane fade {{ $defaultBlogTab === 'posts' ? 'show active' : '' }}" id="posts-pane" role="tabpanel">
             <div class="admin-crud-card">
                 <div class="admin-crud-card__head d-flex justify-content-between align-items-center">
                     <h5><i class="ri-file-text-line me-1"></i> All Posts</h5>
+                    @can('posts-create')
                     <button type="button" class="admin-crud-btn-primary" data-bs-toggle="modal" data-bs-target="#addPostModal">
                         <i class="ri-add-line"></i>Create Post
                     </button>
+                    @endcan
                 </div>
                 <div class="admin-crud-card__body admin-crud-card__body--flush">
                     <div class="admin-crud-table-wrap">
@@ -81,14 +104,18 @@
                 </div>
             </div>
         </div>
+        @endcan
 
-        <div class="tab-pane fade" id="categories-pane" role="tabpanel">
+        @can('blog-categories-list')
+        <div class="tab-pane fade {{ $defaultBlogTab === 'categories' ? 'show active' : '' }}" id="categories-pane" role="tabpanel">
             <div class="admin-crud-card">
                 <div class="admin-crud-card__head d-flex justify-content-between align-items-center">
                     <h5><i class="ri-price-tag-3-line me-1"></i> All Categories</h5>
+                    @can('blog-categories-create')
                     <button type="button" class="admin-crud-btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                         <i class="ri-add-line"></i>Add Category
                     </button>
+                    @endcan
                 </div>
                 <div class="admin-crud-card__body admin-crud-card__body--flush">
                     <div class="admin-crud-table-wrap">
@@ -108,8 +135,10 @@
                 </div>
             </div>
         </div>
+        @endcan
 
-        <div class="tab-pane fade" id="comments-pane" role="tabpanel">
+        @can('comments-show')
+        <div class="tab-pane fade {{ $defaultBlogTab === 'comments' ? 'show active' : '' }}" id="comments-pane" role="tabpanel">
             <div class="admin-crud-card">
                 <div class="admin-crud-card__head">
                     <h5><i class="ri-chat-3-line me-1"></i> All Comments</h5>
@@ -135,8 +164,10 @@
                 </div>
             </div>
         </div>
+        @endcan
     </div>
 
+    @canAny(['posts-create', 'posts-edit'])
     {{-- Post Modal --}}
     <div class="modal fade" id="addPostModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
@@ -218,7 +249,9 @@
             </div>
         </div>
     </div>
+    @endcanAny
 
+    @canAny(['blog-categories-create', 'blog-categories-edit'])
     {{-- Category Modal --}}
     <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -257,6 +290,7 @@
             </div>
         </div>
     </div>
+    @endcanAny
 </div>
 @endsection
 
@@ -267,13 +301,25 @@
     let currentCategoryId = null;
     const authUserId = Number('{{ auth()->id() }}') || null;
     const postImageBaseUrl = @json(asset('uploads/posts'));
+    const blogPerms = {
+        postsList: @json($canPostsList),
+        postsCreate: @json($canPostsCreate),
+        postsEdit: @json($canPostsEdit),
+        postsDelete: @json($canPostsDelete),
+        categoriesList: @json($canCategoriesList),
+        categoriesCreate: @json($canCategoriesCreate),
+        categoriesEdit: @json($canCategoriesEdit),
+        categoriesDelete: @json($canCategoriesDelete),
+        commentsShow: @json($canCommentsShow),
+        commentsModerate: @json($canCommentsModerate),
+    };
 
     $(document).ready(function() {
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-        initPostsTable();
-        initCategoriesTable();
-        initCommentsTable();
+        if (blogPerms.postsList) initPostsTable();
+        if (blogPerms.categoriesList) initCategoriesTable();
+        if (blogPerms.commentsShow) initCommentsTable();
 
         $('#postForm').on('submit', function(e) {
             e.preventDefault();
@@ -597,18 +643,24 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
-                        return `
-                            <div class="admin-crud-actions">
+                        let actions = '<div class="admin-crud-actions">';
+                        if (blogPerms.postsEdit) {
+                            actions += `
                                 <button class="admin-crud-actions__btn admin-crud-actions__btn--view edit-post-btn" data-id="${data}" title="Edit">
                                     <i class="ri-pencil-line"></i>
                                 </button>
                                 <button class="admin-crud-actions__btn admin-crud-actions__btn--toggle toggle-comments-btn" data-id="${data}" data-status="${row.comments_enabled ? 1 : 0}" title="Toggle Comments">
                                     <i class="ri-chat-${row.comments_enabled ? '3' : 'off'}-line"></i>
-                                </button>
+                                </button>`;
+                        }
+                        if (blogPerms.postsDelete) {
+                            actions += `
                                 <button class="admin-crud-actions__btn admin-crud-actions__btn--delete delete-post-btn" data-id="${data}" data-title="${$('<div>').text(row.title).html()}" title="Delete">
                                     <i class="ri-delete-bin-line"></i>
-                                </button>
-                            </div>`;
+                                </button>`;
+                        }
+                        actions += '</div>';
+                        return actions;
                     }
                 }
             ]
@@ -636,15 +688,21 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
-                        return `
-                            <div class="admin-crud-actions">
+                        let actions = '<div class="admin-crud-actions">';
+                        if (blogPerms.categoriesEdit) {
+                            actions += `
                                 <button class="admin-crud-actions__btn admin-crud-actions__btn--view edit-category-btn" data-id="${data}" title="Edit">
                                     <i class="ri-pencil-line"></i>
-                                </button>
+                                </button>`;
+                        }
+                        if (blogPerms.categoriesDelete) {
+                            actions += `
                                 <button class="admin-crud-actions__btn admin-crud-actions__btn--delete delete-category-btn" data-id="${data}" data-name="${$('<div>').text(row.name).html()}" title="Delete">
                                     <i class="ri-delete-bin-line"></i>
-                                </button>
-                            </div>`;
+                                </button>`;
+                        }
+                        actions += '</div>';
+                        return actions;
                     }
                 }
             ]
@@ -687,6 +745,9 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
+                        if (!blogPerms.commentsModerate) {
+                            return '<span class="text-muted">—</span>';
+                        }
                         let statusIcon = row.is_active ? 'ri-eye-off-line' : 'ri-eye-line';
                         let statusClass = row.is_active ? 'hide' : 'show';
                         return `

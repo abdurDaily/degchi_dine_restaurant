@@ -35,11 +35,11 @@ class MemberAuthController extends Controller
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid phone/card number or password.',
+                    'message' => 'Invalid phone, email, card number, or password.',
                 ], 422);
             }
 
-            return back()->withErrors(['login' => 'Invalid phone/card number or password.'])->withInput();
+            return back()->withErrors(['login' => 'Invalid phone, email, card number, or password.'])->withInput();
         }
 
         if ($member->status !== 'active') {
@@ -47,6 +47,15 @@ class MemberAuthController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $message, 'account_restricted' => true], 403);
             }
+            return back()->withErrors(['login' => $message])->withInput();
+        }
+
+        if (blank($member->email)) {
+            $message = 'Your account has no email address. Please contact support to add your email before signing in. Email is required for password recovery.';
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $message], 422);
+            }
+
             return back()->withErrors(['login' => $message])->withInput();
         }
 
@@ -75,6 +84,10 @@ class MemberAuthController extends Controller
     public function dashboard(Request $request)
     {
         $member = Auth::guard('member')->user();
+        if (! $member instanceof Member) {
+            abort(403);
+        }
+
         $orders = Order::where('member_id', $member->id)
             ->orderByDesc('created_at')
             ->paginate(10);
@@ -92,6 +105,9 @@ class MemberAuthController extends Controller
     public function updateProfile(Request $request)
     {
         $member = Auth::guard('member')->user();
+        if (! $member instanceof Member) {
+            abort(403);
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -106,7 +122,19 @@ class MemberAuthController extends Controller
                     }
                 },
             ],
-            'email' => 'nullable|email|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                function ($attribute, $value, $fail) use ($member) {
+                    $exists = Member::where('email', $value)
+                        ->where('id', '!=', $member->id)
+                        ->exists();
+                    if ($exists) {
+                        $fail('This email is already registered to another member.');
+                    }
+                },
+            ],
             'dob' => 'nullable|date',
             'marriage_date' => 'nullable|date',
             'address' => 'nullable|string|max:1000',
@@ -115,7 +143,7 @@ class MemberAuthController extends Controller
 
         $member->name = $validated['name'];
         $member->phone = $validated['phone'];
-        $member->email = $validated['email'] ?? null;
+        $member->email = strtolower(trim($validated['email']));
         $member->dob = $validated['dob'] ?? null;
         $member->marriage_date = $validated['marriage_date'] ?? null;
         $member->address = $validated['address'] ?? null;
@@ -187,6 +215,7 @@ class MemberAuthController extends Controller
     public function orderConfirmation(Order $order)
     {
         $member = Auth::guard('member')->user();
+        $member = $member instanceof Member ? $member : null;
 
         $needsPhoneVerification = false;
 

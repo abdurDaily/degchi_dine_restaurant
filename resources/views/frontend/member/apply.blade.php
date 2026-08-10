@@ -5,18 +5,232 @@
 
 @push('front_css')
 <style>
-    .dd-input-field[type="file"] {
-        padding-top: 24px;
-        padding-bottom: 8px;
-        line-height: 1.2;
+    .dd-apply-right-form .dd-apply-form-header {
+        margin-bottom: 8px;
     }
-    .dd-input-field[type="file"] ~ .dd-floating-label {
-        transform: translateY(-10px) !important;
-        font-size: 0.75rem !important;
-        color: var(--dd-gold) !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
+    .dd-apply-right-form .dd-apply-form-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .dd-apply-right-form .dd-apply-form-header p {
+        margin-bottom: 1.5rem;
+        font-size: 0.92rem;
+    }
+    .dd-apply-section {
+        margin-bottom: 1.35rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 1px solid rgba(17, 107, 131, 0.08);
+    }
+    .dd-apply-section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 0.5rem;
+    }
+    .dd-apply-section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #116b83;
+        margin: 0 0 0.9rem;
+    }
+    .dd-apply-section-title iconify-icon {
+        font-size: 1rem;
+        color: var(--dd-gold, #e7ae07);
+    }
+    .dd-apply-field-hint {
+        font-size: 0.78rem;
+        color: var(--dd-text-muted, #6c757d);
+        margin: -8px 0 1rem;
+        line-height: 1.45;
+    }
+    .dd-apply-field-hint a {
+        color: #116b83;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .dd-apply-field-hint a:hover {
+        text-decoration: underline;
+    }
+    .dd-apply-dropzone {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        width: 100%;
+        min-height: 140px;
+        padding: 1.25rem 1rem;
+        margin-bottom: 1rem;
+        background: #fff;
+        border: 1.5px dashed rgba(17, 107, 131, 0.35);
+        border-radius: 14px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        box-sizing: border-box;
+    }
+    .dd-apply-dropzone:hover,
+    .dd-apply-dropzone.is-dragover {
+        border-color: #116b83;
+        background: #f4fafc;
+        box-shadow: 0 0 0 4px rgba(17, 107, 131, 0.08);
+    }
+    .dd-apply-dropzone.has-file {
+        border-style: solid;
+        border-color: rgba(17, 107, 131, 0.35);
+    }
+    .dd-apply-dropzone-input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+    .dd-apply-dropzone-icon {
+        font-size: 2rem;
+        color: #116b83;
+        line-height: 1;
+        pointer-events: none;
+    }
+    .dd-apply-dropzone-title {
+        margin: 0;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        pointer-events: none;
+    }
+    .dd-apply-dropzone-title span {
+        color: #116b83;
+    }
+    .dd-apply-dropzone-sub {
+        margin: 0;
+        font-size: 0.78rem;
+        color: #888;
+        pointer-events: none;
+    }
+    .dd-apply-dropzone-name {
+        margin: 0.15rem 0 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #116b83;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+    .dd-apply-student-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        width: 100%;
+        padding: 0.75rem 0.9rem;
+        background: var(--dd-input-bg, #eef7fa);
+        border: 1px solid rgba(17, 107, 131, 0.2);
+        border-radius: 12px;
+        margin-bottom: 0.85rem;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .dd-apply-student-toggle .form-check-input {
+        width: 1.1rem;
+        height: 1.1rem;
+        margin: 0;
+        flex-shrink: 0;
+        border-color: rgba(17, 107, 131, 0.35);
+    }
+    .dd-apply-student-toggle .form-check-input:checked {
+        background-color: #116b83;
+        border-color: #116b83;
+    }
+    .dd-apply-student-toggle span {
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: var(--dd-text-main, #1a1a1a);
+    }
+    .dd-apply-student-info {
+        background: linear-gradient(135deg, rgba(40,167,69,0.08), rgba(40,167,69,0.02));
+        border: 1px solid rgba(40,167,69,0.2);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+    }
+    .dd-apply-student-info-inner {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .dd-apply-student-info-inner iconify-icon {
+        font-size: 22px;
+        color: #28a745;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    .dd-apply-student-info strong {
+        color: #28a745;
+        font-size: 0.92rem;
+    }
+    .dd-apply-student-info p {
+        margin: 4px 0 0;
+        font-size: 0.82rem;
+        color: #555;
+        line-height: 1.5;
+    }
+    .dd-apply-preview {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .dd-apply-preview img {
+        max-height: 160px;
+        border-radius: 12px;
+        border: 1px solid rgba(17, 107, 131, 0.15);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .dd-apply-preview-caption {
+        margin-top: 6px;
+        font-size: 0.78rem;
+        color: #888;
+    }
+    .dd-apply-form-footer {
+        text-align: center;
+        margin-top: 1.25rem;
+        padding-top: 1.1rem;
+        border-top: 1px solid rgba(17, 107, 131, 0.1);
+    }
+    .dd-apply-form-footer p {
+        font-size: 0.88rem;
+        color: var(--dd-text-muted, #6c757d);
+        margin-bottom: 0.65rem;
+    }
+    .dd-apply-login-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #116b83;
+        border: 1.5px solid rgba(17, 107, 131, 0.35);
+        border-radius: 999px;
+        text-decoration: none;
+        transition: all 0.25s ease;
+    }
+    .dd-apply-login-link:hover {
+        background: #116b83;
+        color: #fff;
+        border-color: #116b83;
+    }
+    @media (max-width: 575px) {
+        .dd-apply-right-form .dd-apply-form-header h2 {
+            font-size: 1.45rem;
+        }
     }
 </style>
 @endpush
@@ -50,7 +264,6 @@
                 <div class="dd-apply-stage-wrap" style="position: relative;">
                     <div class="dd-apply-card-stage">
                         <div class="dd-apply-glow"></div>
-                        <!-- Reference your actual card image here -->
                         <img src="{{ asset('assets/frontend/images/membership.svg') }}" alt="Degchi Premium Card" class="dd-apply-card-img" />
                     </div>
                 </div>
@@ -95,96 +308,132 @@
 
                 <div class="dd-apply-form-header">
                     <h2>Application Form</h2>
-                    <p>Please provide your details below. Approvals are typically processed within one business day.</p>
+                    <p>Fill in your details below. Approvals are usually processed within one business day.</p>
                 </div>
 
                 <form id="privilegeCardForm" class="dd-apply-form-element" method="POST" action="{{ route('frontend.members.register') }}" enctype="multipart/form-data">
                     @csrf
-                    <div class="dd-input-group">
-                        <input type="text" name="name" id="dd_name" class="dd-input-field" placeholder=" " required>
-                        <label for="dd_name" class="dd-floating-label">Full Name</label>
-                    </div>
 
-                    <div class="dd-input-group">
-                        <input type="tel" name="phone" id="dd_phone" class="dd-input-field" placeholder=" " required autocomplete="tel">
-                        <label for="dd_phone" class="dd-floating-label">Phone Number</label>
-                    </div>
-                    <div id="dd_phone_feedback" class="dd-phone-feedback d-none" role="status"></div>
+                    <div class="dd-apply-section">
+                        <h3 class="dd-apply-section-title">
+                            <iconify-icon icon="solar:user-circle-linear"></iconify-icon>
+                            Account details
+                        </h3>
 
-                    <div class="dd-input-grid">
                         <div class="dd-input-group">
-                            <input type="password" name="password" id="dd_password" class="dd-input-field" placeholder=" " required minlength="8" autocomplete="new-password">
-                            <label for="dd_password" class="dd-floating-label">Create Password</label>
+                            <input type="text" name="name" id="dd_name" class="dd-input-field" placeholder=" " value="{{ old('name') }}" required autocomplete="name">
+                            <label for="dd_name" class="dd-floating-label">Full Name</label>
                         </div>
-                        <div class="dd-input-group">
-                            <input type="password" name="password_confirmation" id="dd_password_confirm" class="dd-input-field" placeholder=" " required minlength="8" autocomplete="new-password">
-                            <label for="dd_password_confirm" class="dd-floating-label">Confirm Password</label>
-                        </div>
-                    </div>
-                    <p class="text-muted mb-3" style="font-size: 0.78rem; margin-top: -8px;">Use at least 8 characters. You'll sign in later at <strong>Member Login</strong> using your phone (or card number) and this password.</p>
 
-                    <div class="dd-input-grid">
-                        <div class="dd-input-group">
-                            <input type="date" name="dob" id="dd_dob" class="dd-input-field" placeholder=" " required>
-                            <label for="dd_dob" class="dd-floating-label">Date of Birth</label>
-                        </div>
-                        <div class="dd-input-group">
-                            <input type="date" name="marriage_date" id="dd_marriage" class="dd-input-field" placeholder=" ">
-                            <label for="dd_marriage" class="dd-floating-label">Marriage Date (optional)</label>
-                        </div>
-                    </div>
-
-                    <div class="dd-input-group">
-                        <textarea name="address" id="dd_address" class="dd-input-field" rows="2" placeholder=" " required></textarea>
-                        <label for="dd_address" class="dd-floating-label">Address</label>
-                    </div>
-
-                    <!-- Profile Image Upload -->
-                    <div class="dd-input-group">
-                        <input type="file" name="profile_image" id="dd_profile_image" class="dd-input-field" accept="image/webp,image/png,image/jpeg">
-                        <label for="dd_profile_image" class="dd-floating-label">Upload Profile Image (WebP, PNG, JPG) (optional)</label>
-                    </div>
-
-                    <!-- Profile Image Preview -->
-                    <div class="d-none mb-3" id="profile_image_preview_wrap" style="text-align:center;">
-                        <img id="profile_image_preview" src="" alt="Profile Image Preview" style="max-height:180px;border-radius:10px;border:2px solid rgba(40,167,69,0.3);box-shadow:0 2px 12px rgba(0,0,0,0.08);" />
-                        <div style="margin-top:6px;font-size:0.78rem;color:#888;">Preview of your profile image</div>
-                    </div>
-                    <div class="dd-input-grid align-items-center">
-                        <div class="dd-input-group">
-                            <label class="form-check form-check-inline" style="cursor: pointer;">
-                                <input type="checkbox" name="is_student" id="dd_is_student" value="1" class="form-check-input">
-                                <span class="form-check-label text-dark fw-semibold ms-1">I am a student</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    {{-- Student discount info callout --}}
-                    <div id="student_discount_info" style="background: linear-gradient(135deg, rgba(40,167,69,0.08), rgba(40,167,69,0.02)); border: 1px solid rgba(40,167,69,0.2); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;">
-                        <div style="display:flex;align-items:flex-start;gap:10px;">
-                            <iconify-icon icon="solar:graduation-cap-bold" style="font-size:22px;color:#28a745;margin-top:2px;"></iconify-icon>
-                            <div>
-                                <strong style="color:#28a745;font-size:0.92rem;">Student Benefit — 35% First Order Discount!</strong>
-                                <p style="margin:4px 0 0;font-size:0.82rem;color:#555;line-height:1.5;">Upload your valid student ID card to verify your student status. Students receive a <strong>35% discount</strong> on their first order, compared to <strong>30%</strong> for non-student members. The image is required for student verification.</p>
+                        <div class="dd-input-grid">
+                            <div class="dd-input-group">
+                                <input type="tel" name="phone" id="dd_phone" class="dd-input-field" placeholder=" " value="{{ old('phone') }}" required autocomplete="tel">
+                                <label for="dd_phone" class="dd-floating-label">Phone Number</label>
+                            </div>
+                            <div class="dd-input-group">
+                                <input type="email" name="email" id="dd_email" class="dd-input-field" placeholder=" " value="{{ old('email') }}" required autocomplete="email">
+                                <label for="dd_email" class="dd-floating-label">Email Address</label>
                             </div>
                         </div>
-                    </div>
+                        <div id="dd_phone_feedback" class="dd-phone-feedback d-none" role="status"></div>
+                        <p class="dd-apply-field-hint">Email is required for password recovery. You can also sign in with email at <a href="{{ route('frontend.member.login') }}">Member Login</a>.</p>
 
-                    <div class="dd-input-group d-none" id="student_card_group">
-                        <input type="file" name="student_card" id="dd_student_card" class="dd-input-field" accept="image/png,image/jpeg,image/jpg,application/pdf">
-                        <label for="dd_student_card" class="dd-floating-label">Upload your valid student ID (JPG, PNG, PDF)*</label>
-                    </div>
-
-                    {{-- Student card preview (image or PDF indicator) --}}
-                    <div class="d-none mb-3" id="student_card_preview_wrap">
-                        <div id="student_card_img_preview" class="d-none" style="text-align:center;">
-                            <img id="student_card_preview" src="" alt="Student Card Preview"
-                                 style="max-height:180px; border-radius:10px; border:2px solid rgba(40,167,69,.3); box-shadow:0 2px 12px rgba(0,0,0,.08);" />
+                        <div class="dd-input-grid">
+                            <div class="dd-input-group">
+                                <input type="password" name="password" id="dd_password" class="dd-input-field" placeholder=" " required minlength="8" autocomplete="new-password">
+                                <label for="dd_password" class="dd-floating-label">Create Password</label>
+                            </div>
+                            <div class="dd-input-group">
+                                <input type="password" name="password_confirmation" id="dd_password_confirm" class="dd-input-field" placeholder=" " required minlength="8" autocomplete="new-password">
+                                <label for="dd_password_confirm" class="dd-floating-label">Confirm Password</label>
+                            </div>
                         </div>
-                        <div id="student_card_pdf_indicator" class="d-none" style="text-align:center; padding:18px; border:2px dashed rgba(40,167,69,.4); border-radius:10px; background:rgba(40,167,69,.04);">
-                            <iconify-icon icon="solar:document-bold" style="font-size:2.5rem; color:#28a745;"></iconify-icon>
-                            <div style="margin-top:6px; font-size:.85rem; font-weight:600; color:#28a745;" id="student_card_pdf_name"></div>
-                            <div style="font-size:.75rem; color:#888; margin-top:2px;">PDF document ready to upload</div>
+                        <p class="dd-apply-field-hint">At least 8 characters. Sign in later with your <strong>phone</strong>, <strong>email</strong>, or <strong>card number</strong> plus this password.</p>
+                    </div>
+
+                    <div class="dd-apply-section">
+                        <h3 class="dd-apply-section-title">
+                            <iconify-icon icon="solar:calendar-linear"></iconify-icon>
+                            Personal details
+                        </h3>
+
+                        <div class="dd-input-grid">
+                            <div class="dd-input-group">
+                                <input type="date" name="dob" id="dd_dob" class="dd-input-field" placeholder=" " value="{{ old('dob') }}" required>
+                                <label for="dd_dob" class="dd-floating-label">Date of Birth</label>
+                            </div>
+                            <div class="dd-input-group">
+                                <input type="date" name="marriage_date" id="dd_marriage" class="dd-input-field" placeholder=" " value="{{ old('marriage_date') }}">
+                                <label for="dd_marriage" class="dd-floating-label">Marriage Date (optional)</label>
+                            </div>
+                        </div>
+
+                        <div class="dd-input-group">
+                            <textarea name="address" id="dd_address" class="dd-input-field" rows="2" placeholder=" " required>{{ old('address') }}</textarea>
+                            <label for="dd_address" class="dd-floating-label">Address</label>
+                        </div>
+                    </div>
+
+                    <div class="dd-apply-section">
+                        <h3 class="dd-apply-section-title">
+                            <iconify-icon icon="solar:camera-linear"></iconify-icon>
+                            Profile photo
+                        </h3>
+
+                        <div class="dd-apply-dropzone" id="profile_image_dropzone">
+                            <input type="file" name="profile_image" id="dd_profile_image" class="dd-apply-dropzone-input" accept="image/webp,image/png,image/jpeg">
+                            <iconify-icon icon="solar:gallery-add-linear" class="dd-apply-dropzone-icon"></iconify-icon>
+                            <p class="dd-apply-dropzone-title">Drop your image here, or <span>browse</span></p>
+                            <p class="dd-apply-dropzone-sub">Supports: JPG, PNG, WebP (optional)</p>
+                            <p class="dd-apply-dropzone-name d-none" id="profile_image_file_name"></p>
+                        </div>
+
+                        <div class="d-none dd-apply-preview" id="profile_image_preview_wrap">
+                            <img id="profile_image_preview" src="" alt="Profile Image Preview" />
+                            <div class="dd-apply-preview-caption">Preview of your profile image</div>
+                        </div>
+                    </div>
+
+                    <div class="dd-apply-section">
+                        <h3 class="dd-apply-section-title">
+                            <iconify-icon icon="solar:square-academic-cap-linear"></iconify-icon>
+                            Student status
+                        </h3>
+
+                        <label class="dd-apply-student-toggle" for="dd_is_student">
+                            <input type="checkbox" name="is_student" id="dd_is_student" value="1" class="form-check-input" @checked(old('is_student'))>
+                            <span>I am a student</span>
+                        </label>
+
+                        <div id="student_extra_fields" class="{{ old('is_student') ? '' : 'd-none' }}">
+                            <div id="student_discount_info" class="dd-apply-student-info">
+                                <div class="dd-apply-student-info-inner">
+                                    <iconify-icon icon="solar:graduation-cap-bold"></iconify-icon>
+                                    <div>
+                                        <strong>Student Benefit — 35% First Order Discount!</strong>
+                                        <p>Upload a valid student ID to verify. Students get <strong>35%</strong> on the first order (vs <strong>30%</strong> for other members).</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="dd-apply-dropzone" id="student_card_dropzone">
+                                <input type="file" name="student_card" id="dd_student_card" class="dd-apply-dropzone-input" accept="image/png,image/jpeg,image/jpg,application/pdf">
+                                <iconify-icon icon="solar:document-add-linear" class="dd-apply-dropzone-icon"></iconify-icon>
+                                <p class="dd-apply-dropzone-title">Drop student ID here, or <span>browse</span></p>
+                                <p class="dd-apply-dropzone-sub">Supports: JPG, PNG, PDF *</p>
+                                <p class="dd-apply-dropzone-name d-none" id="student_card_file_name"></p>
+                            </div>
+
+                            <div class="d-none mb-3" id="student_card_preview_wrap">
+                                <div id="student_card_img_preview" class="d-none dd-apply-preview">
+                                    <img id="student_card_preview" src="" alt="Student Card Preview" />
+                                </div>
+                                <div id="student_card_pdf_indicator" class="d-none" style="text-align:center; padding:18px; border:1.5px dashed rgba(40,167,69,.4); border-radius:14px; background:rgba(40,167,69,.04);">
+                                    <iconify-icon icon="solar:document-bold" style="font-size:2.5rem; color:#28a745;"></iconify-icon>
+                                    <div style="margin-top:6px; font-size:.85rem; font-weight:600; color:#28a745;" id="student_card_pdf_name"></div>
+                                    <div style="font-size:.75rem; color:#888; margin-top:2px;">PDF document ready to upload</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -199,7 +448,7 @@
                                 <iconify-icon icon="solar:check-read-linear"></iconify-icon>
                             </div>
                             <span class="dd-terms-text">
-                                <strong>I agree to the Degchi Dine rewards program terms.</strong>
+                                <strong>I agree to the {{ config('app.name') }} rewards program terms.</strong>
                                 I confirm that all details provided in this application are accurate and complete.
                             </span>
                         </label>
@@ -214,6 +463,14 @@
                         <iconify-icon icon="solar:arrow-right-linear" class="dd-btn-icon dd-submit-icon"></iconify-icon>
                     </button>
                 </form>
+
+                <div class="dd-apply-form-footer">
+                    <p>Already a member?</p>
+                    <a href="{{ route('frontend.member.login') }}" class="dd-apply-login-link">
+                        <iconify-icon icon="solar:login-2-linear"></iconify-icon>
+                        Sign in to Member Login
+                    </a>
+                </div>
 
                 <div id="applyProcessingOverlay" class="dd-apply-processing d-none" aria-live="polite" aria-busy="true">
                     <div class="dd-apply-processing-inner">
@@ -291,22 +548,51 @@
             }
         }
 
-        // Toggle student card upload input
+        // Toggle student fields
         $('#dd_is_student').on('change', function() {
             if($(this).is(':checked')) {
-                $('#student_card_group').removeClass('d-none');
+                $('#student_extra_fields').removeClass('d-none');
                 $('#dd_student_card').prop('required', true);
             } else {
-                $('#student_card_group').addClass('d-none');
+                $('#student_extra_fields').addClass('d-none');
                 $('#dd_student_card').prop('required', false).val('');
+                $('#student_card_dropzone').removeClass('has-file');
+                $('#student_card_file_name').addClass('d-none').text('');
                 resetStudentCardPreview();
             }
         });
+
+        function bindDropzone(zoneSelector, inputSelector) {
+            var $zone = $(zoneSelector);
+            var $input = $(inputSelector);
+            $zone.on('dragenter dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $zone.addClass('is-dragover');
+            });
+            $zone.on('dragleave drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $zone.removeClass('is-dragover');
+            });
+            $zone.on('drop', function(e) {
+                var files = e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files;
+                if (files && files.length) {
+                    $input[0].files = files;
+                    $input.trigger('change');
+                }
+            });
+        }
+
+        bindDropzone('#profile_image_dropzone', '#dd_profile_image');
+        bindDropzone('#student_card_dropzone', '#dd_student_card');
 
         // Profile image preview
         $('#dd_profile_image').on('change', function(){
             var file = this.files[0];
             if(file){
+                $('#profile_image_dropzone').addClass('has-file');
+                $('#profile_image_file_name').removeClass('d-none').text(file.name);
                 var reader = new FileReader();
                 reader.onload = function(e){
                     $('#profile_image_preview').attr('src', e.target.result);
@@ -314,6 +600,8 @@
                 };
                 reader.readAsDataURL(file);
             } else {
+                $('#profile_image_dropzone').removeClass('has-file');
+                $('#profile_image_file_name').addClass('d-none').text('');
                 $('#profile_image_preview_wrap').addClass('d-none');
                 $('#profile_image_preview').attr('src', '');
             }
@@ -322,17 +610,22 @@
         // Student card preview — supports image + PDF
         $('#dd_student_card').on('change', function(){
             var file = this.files[0];
-            if(!file){ resetStudentCardPreview(); return; }
+            if(!file){
+                $('#student_card_dropzone').removeClass('has-file');
+                $('#student_card_file_name').addClass('d-none').text('');
+                resetStudentCardPreview();
+                return;
+            }
 
+            $('#student_card_dropzone').addClass('has-file');
+            $('#student_card_file_name').removeClass('d-none').text(file.name);
             $('#student_card_preview_wrap').removeClass('d-none');
 
             if(file.type === 'application/pdf'){
-                // PDF: show file name indicator
                 $('#student_card_img_preview').addClass('d-none');
                 $('#student_card_pdf_name').text(file.name);
                 $('#student_card_pdf_indicator').removeClass('d-none');
             } else {
-                // Image: show preview
                 $('#student_card_pdf_indicator').addClass('d-none');
                 var reader = new FileReader();
                 reader.onload = function(e){
@@ -379,6 +672,12 @@
                 return;
             }
 
+            var email = $('#dd_email').val().trim();
+            if (!email || email.indexOf('@') === -1) {
+                showErrorPopup('Please enter a valid email address. Email is required for password recovery.');
+                return;
+            }
+
             setProcessing(true);
 
             $.get('{{ route('frontend.members.check-phone') }}', { phone: phone })
@@ -415,8 +714,10 @@
                         form[0].reset();
                         phoneAvailable = false;
                         $('#dd_phone_feedback').addClass('d-none');
-                        $('#student_card_group').addClass('d-none');
+                        $('#student_extra_fields').addClass('d-none');
                         $('#dd_student_card').prop('required', false);
+                        $('#profile_image_dropzone, #student_card_dropzone').removeClass('has-file');
+                        $('#profile_image_file_name, #student_card_file_name').addClass('d-none').text('');
                         $('#profile_image_preview_wrap').addClass('d-none');
                         $('#profile_image_preview').attr('src', '');
                         resetStudentCardPreview();
@@ -461,7 +762,7 @@
                 <div style="background:#f8f5ef;border:1px solid #e6dfd7;border-radius:12px;padding:14px 18px;margin-bottom:18px;text-align:left;">
                     <div style="font-size:.75rem;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Sign in again later</div>
                     <p style="font-size:.85rem;color:#555;line-height:1.55;margin:0;">
-                        Go to <strong>Member Login</strong> in the top menu (or <strong>/member/login</strong>) and use your <strong>phone number</strong> or <strong>card number</strong> with the <strong>password</strong> you just created.
+                        Go to <strong>Member Login</strong> in the top menu (or <strong>/member/login</strong>) and use your <strong>phone</strong>, <strong>email</strong>, or <strong>card number</strong> with the <strong>password</strong> you just created.
                     </p>
                 </div>
                 ${dashboardUrl ? `

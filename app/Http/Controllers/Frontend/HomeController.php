@@ -156,7 +156,7 @@ class HomeController extends Controller
 
     public function cardApply()
     {
-        return view('frontend.apply');
+        return view('frontend.member.apply');
     }
 
     public function checkout()
@@ -207,7 +207,7 @@ class HomeController extends Controller
                     }
                 },
             ],
-            'email' => 'nullable|email|max:255',
+            'email' => 'required|email|max:255|unique:members,email',
             'password' => 'required|string|min:8|confirmed',
             'dob' => 'required|date',
             'marriage_date' => 'nullable|date',
@@ -236,7 +236,7 @@ class HomeController extends Controller
         $member = Member::create([
             'name' => $request->name,
             'phone' => $request->phone,
-            'email' => $request->email,
+            'email' => strtolower(trim($request->email)),
             'password' => $request->password,
             'dob' => $request->dob,
             'marriage_date' => $request->marriage_date,
@@ -267,7 +267,7 @@ class HomeController extends Controller
             $message .= '. You can now use 30% first-order discount!';
         }
 
-        $message .= ' Use your phone number and password to access your member dashboard anytime.';
+        $message .= ' Use your phone number and password to access your member dashboard anytime. Keep your email safe — you will need it if you forget your password.';
 
         if ($request->ajax()) {
             return response()->json([

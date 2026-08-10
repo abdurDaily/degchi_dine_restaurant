@@ -42,7 +42,9 @@
             <x-category></x-category>
             <x-coupon></x-coupon>
 
-            <li class="menu-title"><span data-key="t-menu-content">Content</span></li>
+            @canAny(['signature-platters-list', 'facebook-reels-list', 'about-show', 'contact-show', 'party-bookings-show', 'blog-categories-list', 'posts-list', 'comments-show'])
+                <li class="menu-title"><span data-key="t-menu-content">Content</span></li>
+            @endcanAny
             <x-frontend-content-nav></x-frontend-content-nav>
             <x-party-booking-nav></x-party-booking-nav>
             <x-blog-nav></x-blog-nav>

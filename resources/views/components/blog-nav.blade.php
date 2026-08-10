@@ -1,3 +1,4 @@
+@canAny(['blog-categories-list', 'posts-list', 'comments-show'])
 <li class="nav-item">
     <a class="nav-link menu-link" href="#blogNav" data-bs-toggle="collapse" role="button"
         aria-expanded="{{ request()->routeIs('admin.blogCategories.*') || request()->routeIs('admin.posts.*') || request()->routeIs('admin.comments.*') ? 'true' : 'false' }}"
@@ -7,18 +8,23 @@
     <div class="collapse menu-dropdown {{ request()->routeIs('admin.blogCategories.*') || request()->routeIs('admin.posts.*') || request()->routeIs('admin.comments.*') ? 'show' : '' }}"
         id="blogNav">
         <ul class="nav nav-sm flex-column">
+            @can('blog-categories-list')
             <li class="nav-item">
                 <a href="{{ route('admin.blogCategories.index') }}"
                     class="nav-link {{ request()->routeIs('admin.blogCategories.*') ? 'active' : '' }}">
                     <span data-key="t-blog-categories">Blog Categories</span>
                 </a>
             </li>
+            @endcan
+            @canAny(['posts-list', 'comments-show'])
             <li class="nav-item">
                 <a href="{{ route('admin.posts.index') }}"
                     class="nav-link {{ request()->routeIs('admin.posts.*') || request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                     <span data-key="t-blog-posts">Blog Posts</span>
                 </a>
             </li>
+            @endcanAny
         </ul>
     </div>
 </li>
+@endcanAny

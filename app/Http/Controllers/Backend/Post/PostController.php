@@ -14,6 +14,15 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:posts-list|blog-categories-list|comments-show')->only('index');
+        $this->middleware('permission:posts-list')->only('edit');
+        $this->middleware('permission:posts-create')->only('store');
+        $this->middleware('permission:posts-edit')->only(['update', 'toggleComments']);
+        $this->middleware('permission:posts-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -80,7 +89,7 @@ class PostController extends Controller
                     'slug' => $this->uniqueSlug(Str::slug($request->title)),
                     'blog_category_id' => $request->blog_category_id,
                     'author_id' => $request->author_id ?? Auth::id(),
-                    'content' => $request->content,
+                    'content' => $request->input('content'),
                     'image' => $imagePath,
                     'is_active' => $request->has('is_active') ? $request->boolean('is_active') : true,
                     'comments_enabled' => $request->has('comments_enabled') ? $request->boolean('comments_enabled') : true,
@@ -144,7 +153,7 @@ class PostController extends Controller
                     'slug' => $this->uniqueSlug(Str::slug($request->title), $post->id),
                     'blog_category_id' => $request->blog_category_id,
                     'author_id' => $request->author_id ?? Auth::id(),
-                    'content' => $request->content,
+                    'content' => $request->input('content'),
                     'image' => $imagePath,
                     'is_active' => $request->has('is_active') ? $request->boolean('is_active') : false,
                     'comments_enabled' => $request->has('comments_enabled') ? $request->boolean('comments_enabled') : true,

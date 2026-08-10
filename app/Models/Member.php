@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Notifications\MemberResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class Member extends Authenticatable
 {
+    use Notifiable;
+
     public const GOLDEN_UPGRADE_THRESHOLD = 2000;
 
     public const FIRST_ORDER_RATE_STANDARD = 0.30;
@@ -383,13 +387,24 @@ class Member extends Authenticatable
     {
         $login = trim($login);
 
+        if ($login === '') {
+            return null;
+        }
+
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            return static::query()
+                ->whereNotNull('email')
+                ->whereRaw('LOWER(email) = ?', [strtolower($login)])
+                ->first();
+        }
+
         $member = static::where('unique_card_number', $login)->first();
         if ($member) {
             return $member;
         }
 
         $target = self::normalizePhone($login);
-        if ($target === '') {
+        if ($target === '' || strlen($target) < 10) {
             return null;
         }
 
@@ -397,5 +412,10 @@ class Member extends Authenticatable
             ->whereNotNull('phone')
             ->get()
             ->first(fn (Member $member) => self::normalizePhone($member->phone) === $target);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new MemberResetPassword($token));
     }
 }

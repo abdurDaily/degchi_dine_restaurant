@@ -70,6 +70,25 @@ class RestaurantPermissionSeeder extends Seeder
             ['name' => 'contact-show', 'group' => 'frontend-content', 'details' => 'View contact/location settings'],
             ['name' => 'contact-edit', 'group' => 'frontend-content', 'details' => 'Update contact/location content'],
 
+            // Party bookings
+            ['name' => 'party-bookings-show', 'group' => 'party-bookings', 'details' => 'View party booking requests'],
+            ['name' => 'party-bookings-edit', 'group' => 'party-bookings', 'details' => 'Update party booking status and notes'],
+            ['name' => 'party-bookings-delete', 'group' => 'party-bookings', 'details' => 'Delete party bookings'],
+
+            // Blog
+            ['name' => 'blog-categories-list', 'group' => 'blog', 'details' => 'View blog categories'],
+            ['name' => 'blog-categories-create', 'group' => 'blog', 'details' => 'Create blog categories'],
+            ['name' => 'blog-categories-edit', 'group' => 'blog', 'details' => 'Edit blog categories'],
+            ['name' => 'blog-categories-delete', 'group' => 'blog', 'details' => 'Delete blog categories'],
+
+            ['name' => 'posts-list', 'group' => 'blog', 'details' => 'View blog posts'],
+            ['name' => 'posts-create', 'group' => 'blog', 'details' => 'Create blog posts'],
+            ['name' => 'posts-edit', 'group' => 'blog', 'details' => 'Edit blog posts and comment settings'],
+            ['name' => 'posts-delete', 'group' => 'blog', 'details' => 'Delete blog posts'],
+
+            ['name' => 'comments-show', 'group' => 'blog', 'details' => 'View blog comments'],
+            ['name' => 'comments-moderate', 'group' => 'blog', 'details' => 'Show, hide, or delete blog comments'],
+
             // Users & access
             ['name' => 'users-show', 'group' => 'users', 'details' => 'View admin users'],
             ['name' => 'users-create', 'group' => 'users', 'details' => 'Create admin users'],

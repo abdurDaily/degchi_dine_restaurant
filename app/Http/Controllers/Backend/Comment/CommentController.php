@@ -9,6 +9,12 @@ use Yajra\DataTables\Facades\DataTables;
 
 class CommentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:comments-show')->only('index');
+        $this->middleware('permission:comments-moderate')->only(['toggleActive', 'destroy']);
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

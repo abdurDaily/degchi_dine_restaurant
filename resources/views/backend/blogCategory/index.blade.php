@@ -17,11 +17,13 @@
                 <h3 class="admin-crud-header__title">Blog Category Management</h3>
                 <p class="admin-crud-header__lead">Add, edit, and manage blog categories</p>
             </div>
+            @can('blog-categories-create')
             <div class="admin-crud-header__actions">
                 <button type="button" class="admin-crud-btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                     <i class="ri-add-line"></i>Add New Category
                 </button>
             </div>
+            @endcan
         </div>
 
         <div class="admin-crud-card">

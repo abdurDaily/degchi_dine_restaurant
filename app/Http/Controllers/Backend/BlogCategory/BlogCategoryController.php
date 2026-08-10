@@ -10,6 +10,14 @@ use Yajra\DataTables\Facades\DataTables;
 
 class BlogCategoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:blog-categories-list')->only(['index', 'edit']);
+        $this->middleware('permission:blog-categories-create')->only('store');
+        $this->middleware('permission:blog-categories-edit')->only('update');
+        $this->middleware('permission:blog-categories-delete')->only('destroy');
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {

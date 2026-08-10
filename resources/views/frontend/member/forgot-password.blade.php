@@ -1,6 +1,6 @@
 @extends('frontend.layout')
 
-@section('meta_title', 'Member Login')
+@section('meta_title', 'Forgot Member Password')
 @section('meta_robots', 'noindex, nofollow')
 
 @push('front_css')
@@ -146,36 +146,15 @@
     margin-bottom: 1rem;
     line-height: 1.45;
 }
-.member-login .md-forgot-link {
-    color: #116b83;
-    font-size: 0.88rem;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    white-space: nowrap;
-}
-.member-login .md-forgot-link:hover {
-    color: #0b4f61;
-}
-.member-login .md-options-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-}
 .member-login .md-remember {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0;
+    margin-bottom: 1.25rem;
     padding: 0.65rem 0.85rem;
     background: var(--dd-input-bg);
     border: 1px solid var(--dd-border);
     border-radius: 10px;
-    flex: 1 1 auto;
-    min-width: 0;
 }
 .member-login .md-remember .form-check-input {
     width: 1.1rem;
@@ -347,8 +326,8 @@
                 <div class="md-icon-ring">
                     <iconify-icon icon="solar:user-circle-bold"></iconify-icon>
                 </div>
-                <h1 class="dd-apply-headline">Member Sign In</h1>
-                <p class="dd-apply-subhead">Access your dashboard to view orders and membership details anytime.</p>
+                <h1 class="dd-apply-headline">Forgot Password</h1>
+                <p class="dd-apply-subhead">Enter your membership email and we will send you a reset link.</p>
             </div>
         </div>
     </div>
@@ -356,85 +335,70 @@
     <div class="container px-3 px-sm-4 px-lg-5 md-login-box">
         <div class="md-login-grid">
             <div class="md-login-help">
-                <h3>How to sign in</h3>
-                <p>Use the same credentials you created when you applied for your membership card.</p>
+                <h3>How password reset works</h3>
+                <p>Use the email address you registered with when you applied for your membership card.</p>
 
                 <div class="md-step">
                     <div class="md-step-num">1</div>
                     <div class="md-step-text">
-                        <strong>Phone, email, or card number</strong>
-                        <span>Enter your registered phone, email, or card ID (e.g. <code>MEM0001_5678</code>)</span>
+                        <strong>Enter your email</strong>
+                        <span>This must match the email on your membership account</span>
                     </div>
                 </div>
                 <div class="md-step">
                     <div class="md-step-num">2</div>
                     <div class="md-step-text">
-                        <strong>Your password</strong>
-                        <span>The password you set on the membership application form</span>
+                        <strong>Check your inbox</strong>
+                        <span>Open the reset link from Degchi Dine (also check spam)</span>
                     </div>
                 </div>
                 <div class="md-step">
                     <div class="md-step-num">3</div>
                     <div class="md-step-text">
-                        <strong>Forgot password?</strong>
-                        <span>Use the link on the right to reset via your membership email</span>
+                        <strong>Set a new password</strong>
+                        <span>Then sign in with your phone/card number and new password</span>
                     </div>
                 </div>
 
                 <div class="md-example-box">
-                    <h6>Example</h6>
-                    <div class="md-example-row">Phone: <code>01712345678</code></div>
-                    <div class="md-example-row">Email: <code>you@email.com</code></div>
-                    <div class="md-example-row">Card: <code>MEM0001_5678</code></div>
+                    <h6>Need help?</h6>
+                    <div class="md-example-row">Contact: <code>support@degchidine.com</code></div>
                 </div>
             </div>
 
             <div class="md-login-form-side">
                 <div class="md-form-header">
-                    <h2>Sign In</h2>
-                    <p>Enter your phone, email, or card number and password below.</p>
+                    <h2>Reset Link</h2>
+                    <p>We will email a secure password reset link to your membership email.</p>
                 </div>
 
                 @if ($errors->any())
                     <div class="alert alert-danger md-alert">{{ $errors->first() }}</div>
                 @endif
 
-                @if (session('success'))
-                    <div class="alert alert-success md-alert">{{ session('success') }}</div>
+                @if (session('status'))
+                    <div class="alert alert-success md-alert">{{ session('status') }}</div>
                 @endif
 
-                <form method="POST" action="{{ route('frontend.member.login.submit') }}" class="dd-apply-form-element">
+                <form method="POST" action="{{ route('frontend.member.password.email') }}" class="dd-apply-form-element">
                     @csrf
                     <div class="dd-input-group">
-                        <input type="text" name="login" id="member_login" class="dd-input-field" placeholder=" " value="{{ old('login') }}" required autofocus autocomplete="username">
-                        <label for="member_login" class="dd-floating-label">Phone, Email or Card Number</label>
+                        <input type="email" name="email" id="member_reset_email" class="dd-input-field" placeholder=" " value="{{ old('email') }}" required autofocus autocomplete="email">
+                        <label for="member_reset_email" class="dd-floating-label">Email Address</label>
                     </div>
-                    <p class="md-field-hint">You can sign in with phone number, email address, or membership card number.</p>
-
-                    <div class="dd-input-group">
-                        <input type="password" name="password" id="member_password" class="dd-input-field" placeholder=" " required autocomplete="current-password">
-                        <label for="member_password" class="dd-floating-label">Password</label>
-                    </div>
-
-                    <div class="md-options-row">
-                        <div class="md-remember">
-                            <input class="form-check-input" type="checkbox" name="remember" id="member_remember" value="1">
-                            <label class="form-check-label" for="member_remember">Keep me signed in</label>
-                        </div>
-                        <a href="{{ route('frontend.member.password.request') }}" class="md-forgot-link">Forgot password?</a>
-                    </div>
+                    <p class="md-field-hint">Must be the email saved on your membership profile.</p>
 
                     <button type="submit" class="dd-submit-btn">
-                        <span>Sign In to Dashboard</span>
-                        <iconify-icon icon="solar:login-2-linear" class="dd-btn-icon"></iconify-icon>
+                        <span>Send Reset Link</span>
+                        <iconify-icon icon="solar:letter-linear" class="dd-btn-icon"></iconify-icon>
                     </button>
                 </form>
 
                 <div class="md-footer-cta">
-                    <p>Don't have a membership yet?</p>
-                    <a href="{{ route('frontend.card.apply') }}" class="md-apply-btn">
-                        <iconify-icon icon="solar:card-2-linear"></iconify-icon>
-                        Apply for Membership Card
+                    <p>Remembered your password?</p>
+                    <a href="{{ route('frontend.member.login') }}" class="md-apply-btn">
+                        <iconify-icon icon="solar:login-2-linear"></iconify-icon>
+                        Back to Member Login
                     </a>
                 </div>
             </div>

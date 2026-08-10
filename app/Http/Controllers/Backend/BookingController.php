@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:party-bookings-show')->only('index');
+        $this->middleware('permission:party-bookings-edit')->only('update');
+        $this->middleware('permission:party-bookings-delete')->only('destroy');
+    }
+
     public function index()
     {
         $bookings = Booking::with('branch')->latest()->paginate(15);

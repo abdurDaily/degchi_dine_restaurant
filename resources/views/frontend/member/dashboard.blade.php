@@ -799,8 +799,8 @@
                             <input type="text" id="phone" name="phone" value="{{ old('phone', $member->phone) }}" required>
                         </div>
                         <div class="md-field">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" value="{{ old('email', $member->email) }}">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" value="{{ old('email', $member->email) }}" required>
                         </div>
                         <div class="md-field">
                             <label for="dob">Date of Birth</label>

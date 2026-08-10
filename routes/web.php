@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\Blog\BlogController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\MemberAuthController;
+use App\Http\Controllers\Frontend\MemberPasswordController;
 use App\Http\Controllers\Frontend\MemberOrderController;
 use App\Http\Controllers\Frontend\PaymentController;
 use App\Http\Controllers\NotificationController;
@@ -217,6 +218,10 @@ Route::name('frontend.')->group(function () {
     Route::get('/member/login', [MemberAuthController::class, 'showLoginForm'])->name('member.login');
     Route::post('/member/login', [MemberAuthController::class, 'login'])->name('member.login.submit');
     Route::post('/member/logout', [MemberAuthController::class, 'logout'])->name('member.logout');
+    Route::get('/member/forgot-password', [MemberPasswordController::class, 'showForgotForm'])->name('member.password.request');
+    Route::post('/member/forgot-password', [MemberPasswordController::class, 'sendResetLink'])->name('member.password.email');
+    Route::get('/member/reset-password/{token}', [MemberPasswordController::class, 'showResetForm'])->name('member.password.reset');
+    Route::post('/member/reset-password', [MemberPasswordController::class, 'reset'])->name('member.password.update');
     Route::get('/order-confirmation/{order}', [MemberAuthController::class, 'orderConfirmation'])->name('order.confirmation');
     Route::get('/track-order', [MemberAuthController::class, 'showTrackOrder'])->name('order.track');
     Route::post('/track-order', [MemberAuthController::class, 'trackOrder'])->name('order.track.submit');
