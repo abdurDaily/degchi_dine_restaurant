@@ -106,6 +106,12 @@ class RestaurantPermissionSeeder extends Seeder
             ['name' => 'general-setting', 'group' => 'settings', 'details' => 'Logo, app name, SEO, SSLCommerz'],
             ['name' => 'email-setting', 'group' => 'settings', 'details' => 'Email configuration'],
             ['name' => 'pusher-setting', 'group' => 'settings', 'details' => 'Pusher / realtime settings'],
+
+            // Currency
+            ['name' => 'currency-show', 'group' => 'currency', 'details' => 'View currencies'],
+            ['name' => 'currency-create', 'group' => 'currency', 'details' => 'Create currencies'],
+            ['name' => 'currency-edit', 'group' => 'currency', 'details' => 'Edit currencies'],
+            ['name' => 'currency-delete', 'group' => 'currency', 'details' => 'Delete currencies'],
         ];
 
         foreach ($permissions as $permission) {
@@ -118,7 +124,10 @@ class RestaurantPermissionSeeder extends Seeder
             );
         }
 
+        // Ensure Super Admin always has every web permission (needed for full sidebar).
         $superAdmin = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
         $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->pluck('name'));
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

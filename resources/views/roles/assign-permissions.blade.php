@@ -1,130 +1,156 @@
 <x-admin-master>
-    @section('name')
+    @section('title')
         Assign Permissions
     @endsection
     @section('content')
-        <div class="container-fluid py-4 admin-crud-page">
-            <!-- start page title -->
+        <div class="container-fluid py-4 admin-crud-page permissions-page">
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
                         <h4 class="mb-sm-0">Assign Permissions</h4>
-
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Home</a></li>
-                                <li class="breadcrumb-item"><a href="{{route('roles.index')}}">Roles</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Roles</a></li>
                                 <li class="breadcrumb-item active">Assign Permissions</li>
                             </ol>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- end page title -->
 
-            <div class="row">
-                <form id="updatePermissions" action="javascript:void(0)" method="post">
-                    @csrf
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h3 class="mb-0">
-                                {{ str($role->name)->headline() }}
-                            </h3>
-                            <div class="btn-group align-items-center ">
-                                <label for="selectAllCheckBox" class="mb-0 me-3"><input id="selectAllCheckBox" type="checkbox">
-                                    Check All Permissions</label>
-                            </div>
+            <form id="updatePermissions" action="javascript:void(0)" method="post">
+                @csrf
+
+                <div class="card mb-4">
+                    <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <h3 class="mb-1">{{ str($role->name)->headline() }}</h3>
+                            <p class="text-muted mb-0">
+                                Open each sidebar section dropdown and assign View / Create / Edit / Delete permissions.
+                                For status updates, also enable the <strong>Edit</strong> (or Moderate) permission for that section.
+                            </p>
+                        </div>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <label for="selectAllCheckBox" class="mb-0 d-flex align-items-center gap-2">
+                                <input id="selectAllCheckBox" type="checkbox" class="form-check-input m-0">
+                                <span>Check All Permissions</span>
+                            </label>
+                            <a href="{{ route('roles.index') }}" class="btn btn-light">Back to Roles</a>
+                            <button type="submit" class="btn btn-primary">Update Permissions</button>
                         </div>
                     </div>
-                    @foreach ($permissions as $group=>$permission)
-                        <div class="card">
-                            <div class="card-header align-items-center d-flex">
-                                <h4 class="card-title mb-0 flex-grow-1">{{ str($group)->headline() }} Permissions</h4>
+                </div>
 
-                            </div><!-- end card header -->
-                            <div class="card-body px-0">
+                @if (empty($sections))
+                    <div class="alert alert-warning">
+                        No permissions found. Run
+                        <code>php artisan db:seed --class=RestaurantPermissionSeeder</code>
+                        then refresh this page.
+                    </div>
+                @else
+                    @include('permission.partials.grouped-list', [
+                        'sections' => $sections,
+                        'selectable' => true,
+                        'role' => $role,
+                    ])
+                @endif
 
-                                <table class="table table-bordered table-nowrap align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" style="width: 10%; text-align:center;">
-                                                <label for="{{ $group }}_group" class="mb-0 d-block h-100"><input
-                                                        id="{{ $group }}_group" class="grpCheckbox" type="checkbox"
-                                                        value="{{ $group }}"></label>
-                                            </th>
-                                            <th scope="col" style="width: 30%;">Permission</th>
-                                            <th scope="col" style="width: 60%;">Permission Detail</th>
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody>
-
-                                        @foreach ($permission as $key=>$item)
-                                        {{-- @dd($item); --}}
-                                        <tr>
-                                            <td class="text-center">
-                                                <label for="{{ $item->name }}" class="mb-0 d-block h-100">
-                                                    <input {{$role->hasPermissionTo($item->name)? 'checked' :''}}
-                                                    value="{{ $item->id }}"
-                                                    class="itemCheckBox" id="{{ $item->name }}" type="checkbox" name="permissions[]"
-                                                    data-grp="{{ $item->group }}">
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label for="{{ $item->name }}" class="mb-0 d-block h-100">{{ $item->name }}</label>
-                                            </td>
-                                            <td>{{ $item->details ?? 'N/A' }}</td>
-
-                                        </tr>
-                                        @endforeach
-                                    </tbody><!-- end tbody -->
-                                </table>
-                            </div>
-                        </div>
-                    @endforeach
-                    <button class="btn btn-primary btn-lg">Update Permissions</button>
-                </form>
-            </div>
+                <div class="sticky-update-bar">
+                    <button type="submit" class="btn btn-primary btn-lg">Update Permissions</button>
+                </div>
+            </form>
         </div>
     @endsection
+
+    @push('styles')
+        @include('permission.partials.styles')
+    @endpush
+
     @push('scripts')
         <script>
-            $(document).ready(function() {
-                $('#selectAllCheckBox').on('click', function() {
-                    $('.itemCheckBox').prop('checked', $(this).prop('checked'));
-                })
+            $(document).ready(function () {
+                function syncGroupCheckbox($card) {
+                    const $items = $card.find('.itemCheckBox');
+                    const total = $items.length;
+                    const checked = $items.filter(':checked').length;
+                    $card.find('.grpCheckbox').prop('checked', total > 0 && total === checked);
+                }
 
-                $('#updatePermissions').on('submit', function(e) {
+                function syncSectionCheckbox(sectionKey) {
+                    const $items = $('.itemCheckBox[data-section="' + sectionKey + '"]');
+                    const total = $items.length;
+                    const checked = $items.filter(':checked').length;
+                    $('.sectionCheckbox[data-section="' + sectionKey + '"]').prop('checked', total > 0 && total === checked);
+                }
+
+                function syncSelectAll() {
+                    const $items = $('.itemCheckBox');
+                    const total = $items.length;
+                    const checked = $items.filter(':checked').length;
+                    $('#selectAllCheckBox').prop('checked', total > 0 && total === checked);
+                }
+
+                function refreshAllStates() {
+                    $('.permission-group-card').each(function () {
+                        syncGroupCheckbox($(this));
+                    });
+                    $('.sectionCheckbox').each(function () {
+                        syncSectionCheckbox($(this).data('section'));
+                    });
+                    syncSelectAll();
+                }
+
+                refreshAllStates();
+
+                $('#selectAllCheckBox').on('change', function () {
+                    const checked = $(this).prop('checked');
+                    $('.itemCheckBox, .grpCheckbox, .sectionCheckbox').prop('checked', checked);
+                });
+
+                $('.sectionCheckbox').on('change', function () {
+                    const section = $(this).data('section');
+                    const checked = $(this).prop('checked');
+                    $('.itemCheckBox[data-section="' + section + '"]').prop('checked', checked);
+                    $('.grpCheckbox[data-section="' + section + '"]').prop('checked', checked);
+                    syncSelectAll();
+                });
+
+                $('.grpCheckbox').on('change', function () {
+                    const checked = $(this).prop('checked');
+                    const $card = $(this).closest('.permission-group-card');
+                    $card.find('.itemCheckBox').prop('checked', checked);
+                    syncSectionCheckbox($(this).data('section'));
+                    syncSelectAll();
+                });
+
+                $(document).on('change', '.itemCheckBox', function () {
+                    syncGroupCheckbox($(this).closest('.permission-group-card'));
+                    syncSectionCheckbox($(this).data('section'));
+                    syncSelectAll();
+                });
+
+                $('#updatePermissions').on('submit', function (e) {
                     e.preventDefault();
                     $('#preloader').show();
                     $.ajax({
                         url: "{{ route('roles.assignPermissions', $role->id) }}",
                         type: "POST",
                         data: $(this).serialize(),
-                        success: function(response) {
+                        success: function (response) {
                             $('#preloader').hide();
                             if (response.status == 'success') {
                                 toastr.success(response.message);
                                 window.location.href = "{{ route('roles.index') }}";
                             }
                         },
-                        error: err =>{
+                        error: function (err) {
                             $('#preloader').hide();
-                            console.log(err);
-                            toastr.error(err.responseJSON.message);
+                            toastr.error(err.responseJSON?.message || 'Something went wrong');
                         }
-                    })
-                })
-
-                $('.grpCheckbox').on('click', function() {
-                    if ($(this).is(':checked')) {
-                        $(this).closest('table').find('.itemCheckBox').prop('checked', true);
-                    } else {
-                        $(this).closest('table').find('.itemCheckBox').prop('checked', false);
-                    }
-                })
-            })
+                    });
+                });
+            });
         </script>
     @endpush
 </x-admin-master>

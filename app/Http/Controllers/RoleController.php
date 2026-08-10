@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Artisan;
-use stdClass;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 use App\Services\Api\ApiUserService;
+use App\Support\PermissionGroups;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use stdClass;
 
 class RoleController extends Controller
 {
@@ -24,15 +25,24 @@ class RoleController extends Controller
                 ->addIndexColumn()
                 ->addColumn('permissions', function ($row)
                 {
-                    $permissions = $row->permissions->pluck('name')->toArray();
-                    if ($permissions == [])
+                    $permissions = $row->permissions;
+                    if ($permissions->isEmpty())
                     {
-                        return 'No Permissions';
+                        return '<span class="text-muted">No Permissions</span>';
                     }
-                    return collect($permissions)->map(function ($permission)
+
+                    return $permissions->take(8)->map(function ($permission)
                     {
-                        return '<span class="mb-1 badge bg-success fs-12">' . e($permission) . '</span>';
-                    })->implode(' ');
+                        $action = \App\Support\PermissionGroups::actionFromName($permission->name);
+                        $class = \App\Support\PermissionGroups::actionBadgeClass($action);
+
+                        return '<span class="mb-1 me-1 badge '.$class.'" title="'.e($permission->name).'">'
+                            .e(\App\Support\PermissionGroups::groupLabel($permission->group)).': '.e($action)
+                            .'</span>';
+                    })->implode(' ')
+                    .($permissions->count() > 8
+                        ? '<span class="badge bg-light text-body">+'.($permissions->count() - 8).' more</span>'
+                        : '');
                 })
                 ->addColumn('action', function ($row)
                 {
@@ -169,10 +179,15 @@ class RoleController extends Controller
      */
     public function rolePermission(Request $request, $id)
     {
+        $role = Role::with('permissions')->where('id', $id)->firstOrFail();
+        $permissions = Permission::query()
+            ->orderBy('group')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('group');
+        $sections = PermissionGroups::organize($permissions);
 
-        $role = Role::with('permissions')->where('id', $id)->first();
-        $permissions = Permission::get()->collect()->groupBy('group');
-        return view('roles.assign-permissions', compact('role', 'permissions'));
+        return view('roles.assign-permissions', compact('role', 'sections'));
     }
 
     /**
@@ -184,7 +199,7 @@ class RoleController extends Controller
         try
         {
             $role = Role::find($id);
-            $role->permissions()->sync($request['permissions']);
+            $role->permissions()->sync($request->input('permissions', []));
 
             Artisan::call('cache:forget spatie.permission.cache');
 

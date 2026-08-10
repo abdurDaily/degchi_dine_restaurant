@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
-                        <h4 class="mb-sm-0">Roles</h4>
+                        <h4 class="mb-sm-0">Users — {{ $role->name }}</h4>
 
                         <div class="page-title-right">
                             <ol class="m-0 breadcrumb">
@@ -44,7 +44,6 @@
                     </table>
                 </div>
             </div>
-        </div>
         </div>
         {{-- @include('roles.user-remove') --}}
         @include('roles.add-users')
