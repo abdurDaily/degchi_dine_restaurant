@@ -2,7 +2,7 @@
 
 @section('meta_title', 'Blog')
 @section('meta_robots', 'index, follow')
- 
+  
 @push('front_css')
 <style>
     .blog-card {
