@@ -5,87 +5,23 @@
 
 @section('frontend_content')
 
-@php
-  $aboutKicker     = optional($aboutSettings->get('about_kicker'))->value ?? 'Our Heritage';
-  $aboutTitle      = optional($aboutSettings->get('about_title'))->value ?? 'The Story of Degchi Dine';
-  $aboutLead       = optional($aboutSettings->get('about_lead'))->value ?? 'Bringing the authentic, slow-cooked royal culinary traditions of heritage clay-pot dining straight to your contemporary table.';
-  $aboutParagraph  = optional($aboutSettings->get('about_paragraph'))->value ?? 'At Degchi Dine, every recipe tells a story of patience, craft, and passion. We specialize in traditional Dum cooking methods—where premium cuts of meat, fragrant basmati rice, and freshly crushed spice masalas are sealed tightly inside heavy vessels, allowing the ingredients to mature perfectly in their own steam.';
-  $aboutFeature1Icon = optional($aboutSettings->get('about_feature_1_icon'))->value ?? 'bi bi-fire';
-  $aboutFeature1Text = optional($aboutSettings->get('about_feature_1_text'))->value ?? 'Authentic Dum Style';
-  $aboutFeature2Icon = optional($aboutSettings->get('about_feature_2_icon'))->value ?? 'bi bi-patch-check-fill';
-  $aboutFeature2Text = optional($aboutSettings->get('about_feature_2_text'))->value ?? 'Premium Ingredients';
-  $aboutExpNumber  = optional($aboutSettings->get('about_exp_number'))->value ?? '10+';
-  $aboutExpText    = optional($aboutSettings->get('about_exp_text'))->value ?? 'Years Of Culinary Craft';
-  $aboutCtaUrl     = optional($aboutSettings->get('about_cta_url'))->value ?? route('frontend.completeMenu');
-  $aboutImage      = optional($aboutSettings->get('about_image'))->value
-    ? asset('uploads/about/' . optional($aboutSettings->get('about_image'))->value)
-    : asset('assets/frontend/images/about/about.jpg');
-@endphp
-
-{{-- ─── Page hero banner ─── --}}
-<div class="about-page-hero position-relative overflow-hidden">
-  <div class="about-hero-overlay"></div>
-  <div class="container px-4 px-lg-5 position-relative text-center py-5">
-    <span class="about-kicker text-uppercase d-block mb-3 text-white">
-      <i class="bi bi-heart-fill me-1" aria-hidden="true"></i> {{ $aboutKicker }}
-    </span>
-    <h1 class="about-hero-title">{{ $aboutTitle }}</h1>
-    <p class="about-hero-sub mx-auto">{{ $aboutLead }}</p>
-  </div>
-</div>
-
-{{-- ─── About Content Section ─── --}}
-<section class="section-block py-5 about-section about-page" id="about">
-  <div class="container px-4 px-lg-5">
-    <div class="row align-items-center g-4 g-lg-5">
-
-      {{-- Left: text content --}}
-      <div class="col-12 col-lg-6 reveal">
-        <div class="about-content-block">
-          <h2 class="section-title mt-2 mb-3">{{ $aboutTitle }}</h2>
-          <p class="about-lead mb-4">{{ $aboutLead }}</p>
-          <div class="about-paragraph mb-4">{!! $aboutParagraph !!}</div>
-
-          <div class="about-features-grid mb-4">
-            <div class="about-feature-item">
-              <div class="feature-icon-box"><i class="{{ $aboutFeature1Icon }}"></i></div>
-              <span class="feature-text text-uppercase">{{ $aboutFeature1Text }}</span>
-            </div>
-            <div class="about-feature-item">
-              <div class="feature-icon-box"><i class="{{ $aboutFeature2Icon }}"></i></div>
-              <span class="feature-text text-uppercase">{{ $aboutFeature2Text }}</span>
-            </div>
-          </div>
-
-          <div class="about-cta-wrap">
-            <a href="{{ $aboutCtaUrl }}" class="btn about-explore-btn">
-              <span>Order Now <i class="bi bi-arrow-right ms-2"></i></span>
-            </a>
-          </div>
-        </div>
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero-inner">
+      <div class="page-hero-eyebrow">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        Our Stories
       </div>
-
-      {{-- Right: image with badge --}}
-      <div class="col-12 col-lg-6 reveal">
-        <div class="about-media-frame position-relative">
-          <div class="about-shape-backdrop"></div>
-          <div class="about-img-container">
-            <img src="{{ $aboutImage }}"
-                 alt="About Degchi Dine"
-                 class="about-main-img"
-                 onerror="this.src='{{ asset('assets/frontend/images/about.png') }}'" />
-            <div class="about-img-overlay"></div>
-          </div>
-          <div class="about-experience-badge text-center">
-            <span class="exp-number">{{ $aboutExpNumber }}</span>
-            <span class="exp-text text-uppercase">{{ $aboutExpText }}</span>
-          </div>
-        </div>
-      </div>
-
+      <h1>About Degchi Dine</h1>
+      <p>Discover the heritage, passion, and authentic Dum-style cooking traditions behind every clay-pot meal at Degchi Dine.</p>
     </div>
   </div>
 </section>
+
+{{-- ─── About Content Section (shared partial) ─── --}}
+@include('frontend.partials.home.about_partials', ['ctaText' => 'Contact Us', 'aboutPage' => true])
 
 {{-- ─── Video Showcase Section ─── --}}
 @if($videos->isNotEmpty())
@@ -169,30 +105,6 @@
 
 @push('front_css')
 <style>
-/* ─── Hero ─── */
-.about-page-hero {
-  background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 60%, var(--brand-teal-dark) 100%);
-  padding: 100px 0 80px;
-}
-.about-hero-overlay {
-  position: absolute; inset: 0;
-  background: url('{{ asset('assets/frontend/images/about/about.jpg') }}') center/cover no-repeat;
-  opacity: 0.08;
-  pointer-events: none;
-}
-.about-hero-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 1rem;
-}
-.about-hero-sub {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.8);
-  max-width: 640px;
-}
-
 /* ─── Video Cards ─── */
 .about-videos-section {
   background: var(--bg-soft);

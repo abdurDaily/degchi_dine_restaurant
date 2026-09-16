@@ -1,0 +1,137 @@
+/* ==========================================================================
+   BASE.CSS — Single Source of Truth for Design Tokens
+   All CSS variables consolidated here. No other file should define :root.
+   ========================================================================== */
+
+:root {
+
+    /* ── Brand Primary — Deep Teal ── */
+    --brand: #1a6674;
+    --brand-dark: #0f4a55;
+    --brand-light: rgba(26, 102, 116, 0.12);
+    --brand-gredient: linear-gradient(160deg, #0f4a55 0%, #1a6674 50%, #0f4a55 100%);
+    --brand-gradient: linear-gradient(160deg, #0f4a55 0%, #1a6674 50%, #0f4a55 100%);
+    --brand-gradient-vertical: linear-gradient(135deg, #1a6674, #0f4a55);
+
+    /* ── Brand Secondary — Warm Orange-Red ── */
+    --brand-secondary: #ff6b35;
+    --brand-secondary-dark: #e63946;
+    --brand-secondary-light: rgba(255, 107, 53, 0.12);
+    --brand-secondary-gradient: linear-gradient(135deg, #ff6b35, #e63946);
+    --secondary-10: rgba(255, 107, 53, 0.1);
+    --secondary-25: rgba(255, 107, 53, 0.25);
+    --secondary-30: rgba(255, 107, 53, 0.3);
+
+    /* ── Brand Gold ── */
+    --brand-gold: #fcc00a;
+    --brand-gold-dark: #c99606;
+    --brand-gold-hover: #f8bc0a;
+    --brand-gold-light: rgba(231, 175, 7, 0.889);
+    --brand-gold-gradient: linear-gradient(135deg, #e7ae07, #c99606);
+    --gold-10: rgba(231, 174, 7, 0.1);
+    --gold-25: rgba(231, 174, 7, 0.25);
+    --gold-30: rgba(231, 174, 7, 0.3);
+
+    /* ── Accent Colors ── */
+    --brand-orange: #f15a24;
+    --brand-accent: #ffc20c;
+    --brand-maroon: #6b1d2f;
+
+    /* ── Cream / Neutral ── */
+    --cream: #faf5eb;
+    --cream-card: #faf5eb;
+    --warm-cream: #faf7f2;
+    --bg-cream: #faf7f2;
+
+    /* ── Backgrounds ── */
+    --bg-main: #f4f9fb;
+    --bg-soft: #fafdfe;
+    --bg-accent: #e8f4f7;
+
+    /* ── Text ── */
+    --text-main: #0d3d4a;
+    --text-muted: #5a7a85;
+    --text-light: #8aa3ad;
+    --text-on-dark: #faf5eb;
+    --text-on-dark-muted: rgba(250, 245, 235, 0.85);
+    --text-on-dark-subtle: rgba(250, 245, 235, 0.7);
+    --text-on-dark-faint: rgba(250, 245, 235, 0.6);
+    --luxury-dark: #1a1512;
+
+    /* ── Dark Card Surfaces ── */
+    --card-dark-bg: rgba(255, 255, 255, 0.08);
+    --card-dark-bg-hover: rgba(255, 255, 255, 0.14);
+    --card-dark-border: rgba(250, 245, 235, 0.15);
+    --card-dark-border-hover: rgba(255, 107, 53, 0.35);
+
+    /* ── Dark Card Shadows ── */
+    --card-dark-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --card-dark-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+    /* ── Shine & Reflection Effects ── */
+    --shine-edge: rgba(255, 255, 255, 0.08);
+    --shine-center: rgba(255, 255, 255, 0.18);
+    --reflection: rgba(255, 255, 255, 0.06);
+
+    /* ── Shadows ── */
+    --shadow-sm: 0 4px 10px rgba(26, 102, 116, 0.08);
+    --shadow-md: 0 8px 20px rgba(26, 102, 116, 0.12);
+    --shadow-lg: 0 16px 40px rgba(26, 102, 116, 0.15);
+    --shadow-dark-sm: 0 6px 16px rgba(0, 0, 0, 0.15);
+    --card-shadow: 0 16px 30px rgba(26, 102, 116, 0.12);
+
+    /* ── Semantic ── */
+    --success: #10b981;
+    --warning: #e7ae07;
+    --danger: #ef4444;
+    --info: #1a6674;
+
+    /* ── Borders ── */
+    --border-color: #d4e8ee;
+    --border-light: rgba(17, 107, 131, 0.08);
+
+    /* ── Glassmorphism ── */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.9);
+    --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    --glass-blur: blur(24px);
+
+    /* ── Input ── */
+    --input-bg: #fdfdfd;
+
+    /* ── Layout ── */
+    --mobile-nav-height: 60px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* ── Section Headings ── */
+    --section-title-font: "Poppins", sans-serif;
+    --section-title-size: clamp(1.75rem, 3.2vw, 2.35rem);
+    --section-title-weight: 700;
+    --section-title-color: #1a6674;
+    --section-title-spacing: -0.02em;
+    --section-title-line-height: 1.25;
+    --section-subtitle-font: "Manrope", sans-serif;
+    --section-subtitle-size: clamp(0.9rem, 1.8vw, 1.05rem);
+    --section-subtitle-color: #5a7a85;
+    --section-kicker-size: 0.72rem;
+    --section-kicker-spacing: 0.16em;
+
+    /* ── Z-Index Scale ── */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-navbar: 1080;
+    --z-toast: 1090;
+}
+
+/* ── Responsive overrides ── */
+@media (max-width: 767.98px) {
+    :root {
+        --section-title-size: clamp(1.5rem, 5.5vw, 1.85rem);
+        --section-subtitle-size: 0.9rem;
+    }
+}

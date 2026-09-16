@@ -6,23 +6,7 @@
 @section('frontend_content')
 
     <style>
-        /* --- Premium Formal Glassmorphism Theme --- */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
-            --glass-blur: blur(24px);
-            --brand-dark: #0a4554;
-            --text-muted: #5a7a85;
-            --border-light: rgba(17, 107, 131, 0.08);
-            --brand-accent: #116b83;
-        }
-
-        body {
-            background-color: #f9fafb;
-        }
-
-        /* Deeper background gradient to make the glass effect pop */
+        /* --- Checkout Page Styles (scoped) --- */
         .cart-page-section {
             min-height: calc(100vh - 200px);
             padding-top: 3rem;

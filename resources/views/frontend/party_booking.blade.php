@@ -4,41 +4,6 @@
 
 @push('front_css')
 <style>
-    :root {
-        /* Primary Brand Colors — Degchi Dine palette */
-        --brand: #116b83;
-        --brand-dark: #0a4554;
-        --brand-teal: #116b83;
-        --brand-teal-dark: #083844;
-        --brand-gold: #e7ae07;
-        --brand-gold-hover: #c99606;
-        --brand-gold-light: rgba(231, 174, 7, 0.15);
-        --brand-teal-light: rgba(17, 107, 131, 0.12);
-        --brand-red: #0d5566;
-
-        /* Background Colors */
-        --bg-main: #f4f9fb;
-        --bg-soft: #fafdfe;
-        --bg-accent: #e8f4f7;
-        --bg-light: #f8fafc;
-
-        /* Text Colors */
-        --text-main: #0d3d4a;
-        --text-muted: #5a7a85;
-        --text-light: #8aa3ad;
-        --text-dark: #083844;
-
-        /* Shadow */
-        --card-shadow: 0 16px 30px rgba(17, 107, 131, 0.12);
-        --shadow-sm: 0 4px 10px rgba(17, 107, 131, 0.08);
-        --shadow-md: 0 8px 20px rgba(17, 107, 131, 0.12);
-        --shadow-lg: 0 16px 40px rgba(17, 107, 131, 0.15);
-
-        /* Borders */
-        --border-color: #d4e8ee;
-        --border-dark: #b8d4dc;
-    }
-
     .booking-section {
         background-color: var(--bg-main);
         padding: 80px 0;

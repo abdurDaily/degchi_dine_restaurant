@@ -6,18 +6,6 @@
 
 @push('front_css')
 <style>
-    :root {
-        --brand: #116b83;
-        --brand-dark: #0a4554;
-        --brand-teal: #116b83;
-        --brand-teal-dark: #083844;
-        --brand-gold: #e7ae07;
-        --brand-gold-hover: #c99606;
-        --brand-gold-light: rgba(231, 174, 7, 0.15);
-        --brand-teal-light: rgba(17, 107, 131, 0.12);
-        --brand-red: #0d5566;
-    }
-
     /* Hero — centered heritage style */
     .blog-detail-header {
         background:

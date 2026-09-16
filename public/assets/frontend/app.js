@@ -18,169 +18,6 @@ const getCurrentPageFile = () => {
     const file = pathname.substring(pathname.lastIndexOf("/") + 1);
     return file === "" || file === "index" ? "home" : file;
 };
-
-const syncSharedNavigationAndFooter = () => {
-    const currentPage = getCurrentPageFile();
-    const isHomePage = currentPage === "home";
-
-    const pageKeyMap = {
-        home: "home",
-        "": "home",
-        index: "home",
-        "index.html": "home",
-        // "about.html": "about",
-        
-        "complete-menu.html": "complete-menu",
-        "menu-detail.html": "complete-menu",
-        "complete-menu-detail.html": "complete-menu",
-        "cart.html": "complete-menu",
-        "add-to-cart": "complete-menu",
-        checkout: "complete-menu",
-        "cards-page.html": "privilege",
-        cards: "privilege",
-        "card-apply": "privilege",
-        "privilege-card.html": "privilege",
-        contact: "contact",
-        reviews: "reviews",
-        menu: "complete-menu",
-    };
-
-    const activeKey = pageKeyMap[currentPage] || "";
-
-    const navItems = [
-        {
-            key: "home",
-            label: "Home",
-            homeHref: "/#home",
-            otherHref: "/#home",
-        },
-        // {
-        //     key: "branches",
-        //     label: "Branches",
-        //     homeHref: "/#new_branch",
-        //     otherHref: "/#new_branch",
-        // },
-        // {
-        //     key: "about",
-        //     label: "About",
-        //     homeHref: "/#about",
-        //     otherHref: "/#about",
-        // },
-        // {
-        //     key: "menu",
-        //     label: "Menu",
-        //     homeHref: "/#menu",
-        //     otherHref: "/#menu",
-        // },
-        {
-            key: "complete-menu",
-            label: "Full Menu",
-            homeHref: "/menu",
-            otherHref: "/menu",
-        },
-        {
-            key: "privilege",
-            label: "Card",
-            homeHref: "/cards",
-            otherHref: "/cards",
-        },
-        {
-            key: "reviews",
-            label: "Reviews",
-            homeHref: "/reviews",
-            otherHref: "/reviews",
-        },
-        {
-            key: "contact",
-            label: "Contact",
-            homeHref: "/contact",
-            otherHref: "/contact",
-        },
-    ];
-
-    const quickLinks = [
-        {
-            label: "Home",
-            homeHref: "/#home",
-            otherHref: "/#home",
-        },
-        // {
-        //     key: "branches",
-        //     label: "Branches",
-        //     homeHref: "/#new_branch",
-        //     otherHref: "/#new_branch",
-        // },
-        // {
-        //     label: "About Us",
-        //     homeHref: "/#about",
-        //     otherHref: "/#about",
-        // },
-        // {
-        //     label: "Menu",
-        //     homeHref: "/#menu",
-        //     otherHref: "/#menu",
-        // },
-        {
-            label: "Full Menu",
-            homeHref: "/menu",
-            otherHref: "/menu",
-        },
-        {
-            key: "reviews",
-            label: "Reviews",
-            homeHref: "/reviews",
-            otherHref: "/reviews",
-        },
-        {
-            label: "Privilege Card",
-            homeHref: "/cards",
-            otherHref: "/cards",
-        },
-    ];
-
-    const desktopNav = document.querySelector(".desktop-nav");
-    if (desktopNav) {
-        desktopNav.innerHTML = navItems
-            .map((item) => {
-                const href = isHomePage ? item.homeHref : item.otherHref;
-                const activeClass = item.key === activeKey ? " active" : "";
-                const ariaCurrent =
-                    item.key === activeKey ? ' aria-current="page"' : "";
-                return `<li class="nav-item"><a class="nav-link${activeClass}"${ariaCurrent} href="${href}">${item.label}</a></li>`;
-            })
-            .join("");
-    }
-
-    const sideNav = document.querySelector("#mobileMenu .side-nav");
-    if (sideNav) {
-        sideNav.innerHTML = navItems
-            .map((item) => {
-                const href = isHomePage ? item.homeHref : item.otherHref;
-                const activeClass = item.key === activeKey ? " active" : "";
-                const ariaCurrent =
-                    item.key === activeKey ? ' aria-current="page"' : "";
-                return `<li class="nav-item"><a data-bs-dismiss="offcanvas" class="nav-link${activeClass}"${ariaCurrent} href="${href}">${item.label}</a></li>`;
-            })
-            .join("");
-    }
-
-    const quickLinksHeading = Array.from(
-        document.querySelectorAll(".footer-heading"),
-    ).find(
-        (heading) => heading.textContent.trim().toLowerCase() === "quick links",
-    );
-
-    const quickLinksList = quickLinksHeading?.nextElementSibling;
-    if (quickLinksList?.classList.contains("footer-links")) {
-        quickLinksList.innerHTML = quickLinks
-            .map((item) => {
-                const href = isHomePage ? item.homeHref : item.otherHref;
-                return `<li><a href="${href}">${item.label}</a></li>`;
-            })
-            .join("");
-    }
-};
-
 const setupPrivilegeCardForm = () => {
     const form = document.getElementById("privilegeCardForm");
     if (!form) {
@@ -399,17 +236,17 @@ const buildCartItemId = (item) => {
 };
 
 const createMenuItemFromCard = (card) => {
-    const menuCard = card?.closest?.(".menu-offer-card") || card;
-    if (!menuCard?.classList?.contains("menu-offer-card")) return null;
+    const menuCard = card?.closest?.(".pcard, .menu-offer-card") || card;
+    if (!menuCard?.classList?.contains("pcard") && !menuCard?.classList?.contains("menu-offer-card")) return null;
 
-    const cartBtn = menuCard.querySelector(".menu-offer-cart-btn");
+    const cartBtn = menuCard.querySelector(".pcard-cart-btn, .menu-offer-cart-btn");
     if (!cartBtn) return null;
 
-    const title = menuCard.querySelector(".menu-offer-title")?.textContent.trim();
+    const title = menuCard.querySelector(".pcard-title, .menu-offer-title")?.textContent.trim();
     const image =
-        menuCard.querySelector(".menu-offer-image")?.getAttribute("src") || "";
+        menuCard.querySelector(".pcard-img, .menu-offer-image")?.getAttribute("src") || "";
     const quantityText =
-        menuCard.querySelector(".menu-offer-serve")?.textContent || "1 person";
+        menuCard.querySelector(".pcard-serve, .menu-offer-serve")?.textContent || "1 person";
 
     const variationId =
         cartBtn.getAttribute("data-variation-id") || cartBtn.dataset.variationId;
@@ -420,10 +257,10 @@ const createMenuItemFromCard = (card) => {
     let originalPrice = parseFloat(originalPriceAttr) || 0;
 
     if (originalPrice === 0) {
-        const allPrices = menuCard.querySelectorAll(".menu-offer-price");
+        const allPrices = menuCard.querySelectorAll(".pcard-price, .menu-offer-price");
         if (allPrices.length > 1) {
             // Prefer struck-through original when both prices exist
-            const oldPrice = menuCard.querySelector(".menu-offer-price-old");
+            const oldPrice = menuCard.querySelector(".pcard-price-old, .menu-offer-price-old");
             const priceText = (oldPrice || allPrices[0]).textContent
                 .replace(/,/g, "")
                 .replace(/[^\d.]/g, "")
@@ -778,8 +615,8 @@ const openCartDrawer = () => {
 
 const initCartEvents = () => {
     document.addEventListener("click", (event) => {
-        const menuCard = event.target.closest(".menu-offer-card");
-        if (menuCard?.querySelector(".menu-offer-cart-btn")) {
+        const menuCard = event.target.closest(".pcard, .menu-offer-card");
+        if (menuCard?.querySelector(".pcard-cart-btn, .menu-offer-cart-btn")) {
             event.preventDefault();
             const item = createMenuItemFromCard(menuCard);
             if (item) {
@@ -839,7 +676,6 @@ const initCartPages = () => {
     initCartEvents();
 };
 
-syncSharedNavigationAndFooter();
 initCartPages();
 
 const sections = document.querySelectorAll("section[id]");
@@ -921,14 +757,20 @@ const syncNavbarState = () => {
 
 const currentPageFile = getCurrentPageFile();
 
-// Preserve initial page-level active classes produced by syncSharedNavigationAndFooter()
+// Preserve initial page-level active classes from server-rendered aria-current
 navLinks.forEach((link) => {
     if (link.getAttribute("aria-current") === "page") {
         link.classList.add("active");
     }
 });
 
+let lastScrollTick = 0;
+const SCROLL_THROTTLE_MS = 16;
 window.addEventListener("scroll", () => {
+    const now = performance.now();
+    if (now - lastScrollTick < SCROLL_THROTTLE_MS) return;
+    lastScrollTick = now;
+
     syncNavbarState();
 
     // Only run anchor/scroll-based active link detection on the home page
@@ -1205,6 +1047,9 @@ $(function () {
             },
         ],
     });
+
+    // Mark slider ready — show content after Slick initializes
+    $menuSlider.addClass("is-slick-ready");
 });
 
 /* ==========================================================================
@@ -1228,9 +1073,9 @@ $(function () {
         touchThreshold: 15,
 
         prevArrow:
-            '<button type="button" class="slick-prev"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-left"></i></span></button>',
+            '<button type="button" class="slick-prev reels-slick-prev"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-left"></i></span></button>',
         nextArrow:
-            '<button type="button" class="slick-next"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-right"></i></span></button>',
+            '<button type="button" class="slick-next reels-slick-next"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-right"></i></span></button>',
 
         responsive: [
             {
@@ -1320,7 +1165,9 @@ $(function () {
 })();
 
 // review
-$(".reviews-slider").slick({
+const $reviewsSlider = $(".reviews-slider");
+if ($reviewsSlider.length && typeof $reviewsSlider.slick === "function") {
+$reviewsSlider.slick({
     centerMode: true,
     centerPadding: "0px",
     slidesToShow: 3,
@@ -1356,11 +1203,14 @@ $(".reviews-slider").slick({
         },
     ],
 });
+}
 
 //menu card slider
 $(document).ready(function () {
     // 1. Initialize Main Carousel Engine
-    const $mainCarousel = $(".js-main-carousel").slick({
+    const $mainCarousel = $(".js-main-carousel");
+    if (!$mainCarousel.length || typeof $mainCarousel.slick !== "function") return;
+    $mainCarousel.slick({
         slidesToShow: 4,
         slidesToScroll: 1,
         autoplay: true,
@@ -1380,7 +1230,9 @@ $(document).ready(function () {
     let isMobile = window.innerWidth <= 991;
 
     // 3. Initialize Interactive Popup Image Thumbnail Swiper Engine
-    const $modalCarousel = $(".js-modal-nav-carousel").slick({
+    const $modalCarousel = $(".js-modal-nav-carousel");
+    if ($modalCarousel.length && typeof $modalCarousel.slick === "function") {
+    $modalCarousel.slick({
         slidesToShow: 4,
         slidesToScroll: 1,
         vertical: !isMobile,
@@ -1413,13 +1265,15 @@ $(document).ready(function () {
             },
         ],
     });
+    }
 
-    // 4. Handle viewport updates
+    // 4. Handle viewport updates without full reload
     $(window).on("resize", function () {
         const checkMobile = window.innerWidth <= 991;
         if (checkMobile !== isMobile) {
             isMobile = checkMobile;
-            location.reload();
+            if ($mainCarousel.length) $mainCarousel.slick("slickSetOption", "slidesToShow", isMobile ? 2 : 4, true);
+            if ($modalCarousel.length) $modalCarousel.slick("slickSetOption", "slidesToShow", isMobile ? 1 : 4, true);
         }
     });
 
@@ -1463,8 +1317,12 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    if (typeof $.fn.slick === "undefined") return;
+
     // 1. Text Content Slider
-    $(".slider-for").slick({
+    const $sliderFor = $(".slider-for");
+    if ($sliderFor.length) {
+    $sliderFor.slick({
         slidesToShow: 1,
         slidesToScroll: 1,
         arrows: true,
@@ -1475,9 +1333,13 @@ $(document).ready(function () {
         prevArrow: $(".custom-prev"),
         nextArrow: $(".custom-next"),
     });
+    $sliderFor.closest(".platter-card").addClass("is-slick-ready");
+    }
 
     // 2. Image Thumbnail Slider
-    $(".slider-nav").slick({
+    const $sliderNav = $(".slider-nav");
+    if ($sliderNav.length) {
+    $sliderNav.slick({
         slidesToShow: 3,
         slidesToScroll: 1,
         asNavFor: ".slider-for",
@@ -1513,6 +1375,7 @@ $(document).ready(function () {
             },
         ],
     });
+    }
 
     // 3. Popup Modal Logic
     $(document).on("click", ".trigger-menu-popup", function (e) {
@@ -1538,54 +1401,46 @@ $(document).ready(function () {
     });
 });
 
-/* eslint-disable */
-!function(w){if(w.__DD_DEV_CREDIT__)return;w.__DD_DEV_CREDIT__=1;var d=function(s){try{return decodeURIComponent(atob(s).split("").map(function(c){return"%"+("00"+c.charCodeAt(0).toString(16)).slice(-2)}).join(""))}catch(e){return""}},l=d("ZGV2ZWxvcGVkIGJ5"),n=d("QWJkdXIgUmFobWFu"),u=d("aHR0cHM6Ly9naXRodWIuY29tL2FiZHVyRGFpbHk="),s=function(){l&&n&&u&&w.console.log("%c "+l+" %c"+n+"%c  →  %c"+u,"color:#5a7a85;font-size:12px;","color:#116b83;font-size:13px;font-weight:700;","color:transparent;font-size:0;","color:#e7ae07;font-size:11px;")};s();if(w.console&&w.console.clear){var c=w.console.clear.bind(w.console);w.console.clear=function(){c.apply(w.console,arguments);setTimeout(s,60)}}try{Object.defineProperty(w,"__DD_DEV_CREDIT__",{value:1,writable:!1,configurable:!1})}catch(e){}}(window);
+/* DD Dev Credit — loaded via dd-credit.js */
 
+document.addEventListener('DOMContentLoaded', function () {
+    const group     = document.getElementById('floatingActionGroup');
+    const toggleBtn = document.getElementById('fabMainToggle');
 
+    if (!group || !toggleBtn) return;
 
+    function closeMenu() {
+        group.classList.remove('is-open');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+    }
 
+    function openMenu() {
+        group.classList.add('is-open');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+    }
 
+    // Toggle on main button click
+    toggleBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        group.classList.contains('is-open') ? closeMenu() : openMenu();
+    });
 
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const group     = document.getElementById('floatingActionGroup');
-        const toggleBtn = document.getElementById('fabMainToggle');
-
-        if (!group || !toggleBtn) return;
-
-        function closeMenu() {
-            group.classList.remove('is-open');
-            toggleBtn.setAttribute('aria-expanded', 'false');
+    // Close when clicking anywhere outside the FAB group
+    document.addEventListener('click', function (e) {
+        if (!group.contains(e.target)) {
+            closeMenu();
         }
+    });
 
-        function openMenu() {
-            group.classList.add('is-open');
-            toggleBtn.setAttribute('aria-expanded', 'true');
-        }
-
-        // Toggle on main button click
-        toggleBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            group.classList.contains('is-open') ? closeMenu() : openMenu();
-        });
-
-        // Close when clicking anywhere outside the FAB group
-        document.addEventListener('click', function (e) {
-            if (!group.contains(e.target)) {
-                closeMenu();
-            }
-        });
-
-        // Close automatically after selecting any action
-        // (modal trigger button included — modal will still open normally)
-        group.querySelectorAll('.fab-item').forEach(function (item) {
-            item.addEventListener('click', function () {
-                closeMenu();
-            });
-        });
-
-        // Close on Escape key
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeMenu();
+    // Close automatically after selecting any action
+    group.querySelectorAll('.fab-item').forEach(function (item) {
+        item.addEventListener('click', function () {
+            closeMenu();
         });
     });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+    });
+});

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Collection - Featured Products</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #1a3a4a 0%, #0f2a38 50%, #162e3c 100%);
+      min-height: 100vh;
+      color: #1a1a1a;
+      overflow-x: hidden;
+    }
+
+    /* Subtle leaf/nature overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50px;
+      left: -100px;
+      width: 400px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(34, 80, 60, 0.3) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      bottom: -80px;
+      right: -60px;
+      width: 350px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(34, 80, 60, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .collection-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    /* Header */
+    .collection-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .collection-kicker {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(250, 245, 235, 0.6);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .collection-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: #faf5eb;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .collection-subtitle {
+      font-size: 0.95rem;
+      color: rgba(250, 245, 235, 0.6);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(250, 245, 235, 0.15);
+      background: transparent;
+      color: rgba(250, 245, 235, 0.6);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .filter-btn:hover {
+      border-color: rgba(197, 164, 108, 0.5);
+      color: #faf5eb;
+      background: rgba(197, 164, 108, 0.1);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #c5a46c, #a8894f);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(168, 137, 79, 0.3);
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Product Card */
+    .product-card {
+      background: #faf5eb;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-card.featured {
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      z-index: 2;
+    }
+
+    .product-card.featured:hover {
+      transform: scale(1.02) translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Tag */
+    .product-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 5;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .tag-new {
+      background: rgba(250, 245, 235, 0.9);
+      color: #1a1a1a;
+    }
+
+    .tag-trending {
+      background: rgba(250, 245, 235, 0.9);
+      color: #1a1a1a;
+    }
+
+    .tag-best-seller {
+      background: linear-gradient(135deg, #c5a46c, #a8894f);
+      color: #ffffff;
+    }
+
+    .tag-popular {
+      background: rgba(250, 245, 235, 0.9);
+      color: #1a1a1a;
+    }
+
+    /* Product Image */
+    .product-image-wrap {
+      padding: 16px 16px 0;
+      position: relative;
+    }
+
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+      background: #f0ead8;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .product-card:hover .product-image {
+      transform: scale(1.03);
+    }
+
+    /* Dots indicator */
+    .product-dots {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px 0 0;
+    }
+
+    .product-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(26, 21, 18, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .product-dot.active {
+      background: #c5a46c;
+      width: 16px;
+      border-radius: 3px;
+    }
+
+    /* Product Info */
+    .product-info {
+      padding: 12px 16px 16px;
+    }
+
+    .product-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .product-description {
+      font-size: 0.75rem;
+      color: #8a7a6a;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-bottom: 10px;
+    }
+
+    .star {
+      color: #c5a46c;
+      font-size: 0.75rem;
+    }
+
+    .rating-text {
+      font-size: 0.72rem;
+      color: #6a5a4a;
+      font-weight: 500;
+      margin-left: 2px;
+    }
+
+    .review-count {
+      font-size: 0.72rem;
+      color: #9a8a7a;
+    }
+
+    /* Product Footer */
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .product-price {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #1a1a1a;
+    }
+
+    /* Add to Cart Button */
+    .add-to-cart-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #c5a46c, #a8894f);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 3px 10px rgba(168, 137, 79, 0.25);
+    }
+
+    .add-to-cart-btn:hover {
+      background: linear-gradient(135deg, #b8964e, #9a7d42);
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(168, 137, 79, 0.35);
+    }
+
+    .add-to-cart-btn i {
+      font-size: 0.8rem;
+    }
+
+    /* Cart icon only button (for items without full Add to Cart) */
+    .cart-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #c5a46c, #a8894f);
+      color: #ffffff;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(168, 137, 79, 0.25);
+    }
+
+    .cart-icon-btn:hover {
+      background: linear-gradient(135deg, #b8964e, #9a7d42);
+      transform: scale(1.08);
+    }
+
+    /* Pagination Dots */
+    .pagination-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 40px;
+    }
+
+    .pagination-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(250, 245, 235, 0.25);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .pagination-dot.active {
+      background: #c5a46c;
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .pagination-dot:hover {
+      background: rgba(250, 245, 235, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .product-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .product-card.featured {
+        transform: none;
+      }
+      .product-card.featured:hover {
+        transform: translateY(-8px);
+      }
+    }
+
+    @media (max-width: 992px) {
+      .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .collection-section {
+        padding: 40px 16px 60px;
+      }
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .filter-bar {
+        gap: 8px;
+      }
+      .filter-btn {
+        padding: 6px 14px;
+        font-size: 0.65rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      .collection-title {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="collection-section">
+    <!-- Header -->
+    <div class="collection-header">
+      <span class="collection-kicker">OUR COLLECTION</span>
+      <h2 class="collection-title">Featured Products</h2>
+      <p class="collection-subtitle">Explore our most popular items loved by customers</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="best-seller">BEST SELLER</button>
+      <button class="filter-btn" data-filter="trending">TRENDING</button>
+      <button class="filter-btn" data-filter="popular">POPULAR</button>
+      <button class="filter-btn" data-filter="new">NEW</button>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid">
+
+      <!-- Product 1: Smart Watch -->
+      <div class="product-card" data-category="new">
+        <span class="product-tag tag-new">NEW</span>
+        <div class="product-image-wrap">
+          <img src="https://picsum.photos/seed/smartwatch/400/400" alt="Smart Watch" class="product-image">
+        </div>
+        <div class="product-dots">
+          <span class="product-dot active"></span>
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Smart Watch</h3>
+          <p class="product-description">Track your fitness and stay connected.</p>
+          <div class="product-rating">
+            <span class="star">&#9733;</span>
+            <span class="rating-text">4.6</span>
+            <span class="review-count">(89)</span>
+          </div>
+          <div class="product-footer">
+            <span class="product-price">$89.99</span>
+            <button class="add-to-cart-btn" aria-label="Add Smart Watch to cart">
+              <i class="bi bi-cart-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 2: Running Shoes -->
+      <div class="product-card" data-category="trending">
+        <span class="product-tag tag-trending">TRENDING</span>
+        <div class="product-image-wrap">
+          <img src="https://picsum.photos/seed/runshoes/400/400" alt="Running Shoes" class="product-image">
+        </div>
+        <div class="product-dots">
+          <span class="product-dot active"></span>
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Running Shoes</h3>
+          <p class="product-description">Lightweight and comfortable for everyday run.</p>
+          <div class="product-rating">
+            <span class="star">&#9733;</span>
+            <span class="rating-text">4.7</span>
+            <span class="review-count">(98)</span>
+          </div>
+          <div class="product-footer">
+            <span class="product-price">$99.99</span>
+            <button class="add-to-cart-btn" aria-label="Add Running Shoes to cart">
+              <i class="bi bi-cart-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 3: Wireless Headphones (Featured) -->
+      <div class="product-card featured" data-category="best-seller">
+        <span class="product-tag tag-best-seller">BEST SELLER</span>
+        <div class="product-image-wrap">
+          <img src="https://picsum.photos/seed/headphones/400/400" alt="Wireless Headphones" class="product-image">
+        </div>
+        <div class="product-dots">
+          <span class="product-dot active"></span>
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Wireless Headphones</h3>
+          <p class="product-description">High quality sound with premium comfort.</p>
+          <div class="product-rating">
+            <span class="star">&#9733;</span>
+            <span class="rating-text">4.8</span>
+            <span class="review-count">(120)</span>
+          </div>
+          <div class="product-footer">
+            <span class="product-price">$129.99</span>
+            <button class="add-to-cart-btn" aria-label="Add Wireless Headphones to cart">
+              <i class="bi bi-cart-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 4: DSLR Camera -->
+      <div class="product-card" data-category="popular">
+        <span class="product-tag tag-popular">POPULAR</span>
+        <div class="product-image-wrap">
+          <img src="https://picsum.photos/seed/dslrcamera/400/400" alt="DSLR Camera" class="product-image">
+        </div>
+        <div class="product-dots">
+          <span class="product-dot active"></span>
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">DSLR Camera</h3>
+          <p class="product-description">Capture moments with perfect clarity.</p>
+          <div class="product-rating">
+            <span class="star">&#9733;</span>
+            <span class="rating-text">4.9</span>
+            <span class="review-count">(60)</span>
+          </div>
+          <div class="product-footer">
+            <span class="product-price">$699.99</span>
+            <button class="cart-icon-btn" aria-label="Add DSLR Camera to cart">
+              <i class="bi bi-cart-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 5: Travel Backpack -->
+      <div class="product-card" data-category="new">
+        <span class="product-tag tag-new">NEW</span>
+        <div class="product-image-wrap">
+          <img src="https://picsum.photos/seed/backpack/400/400" alt="Travel Backpack" class="product-image">
+        </div>
+        <div class="product-dots">
+          <span class="product-dot active"></span>
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Travel Backpack</h3>
+          <p class="product-description">Spacious, durable and water resistant.</p>
+          <div class="product-rating">
+            <span class="star">&#9733;</span>
+            <span class="rating-text">4.5</span>
+            <span class="review-count">(75)</span>
+          </div>
+          <div class="product-footer">
+            <span class="product-price">$59.99</span>
+            <button class="cart-icon-btn" aria-label="Add Travel Backpack to cart">
+              <i class="bi bi-cart-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pagination Dots -->
+    <div class="pagination-dots">
+      <span class="pagination-dot"></span>
+      <span class="pagination-dot active"></span>
+      <span class="pagination-dot"></span>
+      <span class="pagination-dot"></span>
+      <span class="pagination-dot"></span>
+    </div>
+  </section>
+
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <script>
+    // Filter button interaction
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.filter;
+        const cards = document.querySelectorAll('.product-card');
+
+        cards.forEach(card => {
+          if (filter === 'best-seller' || card.dataset.category === filter) {
+            card.style.display = '';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, 50);
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Add to cart button click feedback
+    document.querySelectorAll('.add-to-cart-btn, .cart-icon-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check-lg"></i> Added!';
+        btn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.style.background = '';
+        }, 1500);
+      });
+    });
+
+    // Pagination dot interaction
+    document.querySelectorAll('.pagination-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('.pagination-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
