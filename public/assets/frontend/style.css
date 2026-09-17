@@ -14341,3 +14341,150 @@ body {
         padding: 8px;
     }
 }
+
+/* ==========================================================================
+   REUSABLE: DARK GLASS CARD — Shine effect (branches, values, features)
+   Use .dark-glass-card on any card in dark sections for consistent styling
+   ========================================================================== */
+
+.dark-glass-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--card-dark-bg);
+    border-radius: 16px;
+    padding: 2.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--card-dark-border);
+    box-shadow: var(--card-dark-shadow);
+    transition:
+        background 0.35s ease,
+        border-color 0.35s ease,
+        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%;
+}
+
+.dark-glass-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        transparent 20%,
+        var(--shine-edge) 40%,
+        var(--shine-center) 50%,
+        var(--shine-edge) 60%,
+        transparent 80%
+    );
+    transition: left 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.dark-glass-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, var(--reflection), transparent);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.dark-glass-card:hover {
+    background: var(--card-dark-bg-hover);
+    border-color: var(--card-dark-border-hover);
+    transform: translateY(-6px);
+    box-shadow: var(--card-dark-shadow-hover);
+}
+
+.dark-glass-card:hover::before {
+    left: 120%;
+}
+
+.dark-glass-card:hover::after {
+    opacity: 1;
+}
+
+.dark-glass-card > * {
+    position: relative;
+    z-index: 1;
+    transition: all 0.35s ease;
+}
+
+/* --- Dark Glass Card: Icon --- */
+.dark-glass-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--brand-secondary-light);
+    border: 1px solid rgba(255, 107, 53, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.15rem;
+    font-size: 1.4rem;
+    color: var(--brand-secondary);
+    transition: all 0.35s ease;
+}
+
+.dark-glass-card:hover .dark-glass-card-icon {
+    transform: scale(1.1) rotate(-5deg);
+    background: rgba(255, 107, 53, 0.2);
+    border-color: rgba(255, 107, 53, 0.35);
+}
+
+/* --- Dark Glass Card: Title --- */
+.dark-glass-card-title {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-on-dark);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.2px;
+}
+
+/* --- Dark Glass Card: Text --- */
+.dark-glass-card-text {
+    font-size: 0.92rem;
+    color: var(--text-on-dark-subtle);
+    margin: 0;
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   ABOUT VALUES SECTION — Reuses .dark-glass-card
+   ========================================================================== */
+
+.about-values-section {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #0e4450 0%, #1a5c6a 50%, #0e4450 100%);
+}
+
+.about-values-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.about-values-section .container {
+    position: relative;
+    z-index: 1;
+}

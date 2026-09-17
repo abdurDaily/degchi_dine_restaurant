@@ -147,11 +147,15 @@ class HomeController extends Controller
             ->get()
             ->keyBy('key');
 
-        $videos = FacebookReel::where('status', true)
+        $facebookReels = FacebookReel::where('status', true)
             ->orderBy('sort_order')
             ->get();
 
-        return view('frontend.about', compact('aboutSettings', 'videos'));
+        $contactSettings = Setting::where('setting_group', 'contact_section')
+            ->get()
+            ->keyBy('key');
+
+        return view('frontend.about', compact('aboutSettings', 'facebookReels', 'contactSettings'));
     }
 
     public function cardApply()
