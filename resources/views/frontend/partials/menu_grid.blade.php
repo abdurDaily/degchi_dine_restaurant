@@ -32,10 +32,11 @@
             <x-frontend.product.product-card
                 :menu="$menu"
                 :firstVariation="$firstVariation"
+                :activeOffers="$activeOffers"
                 :bestOffer="$bestOffer"
                 :unitPrice="$unitPrice"
                 :offerPrice="$offerPrice"
-                cartIcon="bi-plus-lg"
+                cartIcon="bi-cart-plus"
             />
         </div>
     @empty

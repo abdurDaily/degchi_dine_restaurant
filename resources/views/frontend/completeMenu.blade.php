@@ -7,11 +7,20 @@
 @section('frontend_content')
     <div class="menu-page">
 
-        <section class="menu-hero-section py-5 text-center position-relative">
-            <div class="container px-4 px-lg-5">
-                @if (isset($activeOfferDetails) && $activeOfferDetails)
+        <x-frontend.page-header
+            :title="isset($activeOfferDetails) && $activeOfferDetails ? 'Special Offer Items' : (!empty($offerOnly) ? 'All Offer Items' : (!empty($popularOnly) ? 'Customer Favorites' : 'Our Complete Menu'))"
+            eyebrow="Degchi Dine"
+        >
+            <x-slot:eyebrowIcon>
+                <iconify-icon icon="solar:plate-bold"></iconify-icon>
+            </x-slot:eyebrowIcon>
+        </x-frontend.page-header>
+
+        @if (isset($activeOfferDetails) && $activeOfferDetails)
+            <section class="menu-hero-section pt-0 pb-4">
+                <div class="container px-4 px-lg-5">
                     <div class="alert alert-dismissible fade show"
-                        style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border: none; border-radius: 15px; box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3); margin-bottom: 2rem;">
+                        style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border: none; border-radius: 15px; box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);">
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
                             aria-label="Close"></button>
                         <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 py-2">
@@ -31,24 +40,11 @@
                             </div>
                         </div>
                     </div>
-                @endif
+                </div>
+            </section>
+        @endif
 
-                <span class="luxury-meta-label mb-2">Degchi Dine</span>
-                <h1 class="luxury-title text-uppercase mb-2">
-                    @if (isset($activeOfferDetails) && $activeOfferDetails)
-                        Special Offer Items
-                    @elseif(!empty($offerOnly))
-                        All Offer Items
-                    @elseif(!empty($popularOnly))
-                        Customer Favorites
-                    @else
-                        Our Complete Menu
-                    @endif
-                </h1>
-            </div>
-        </section>
-
-        <section class="menu-grid-section py-4 py-lg-5">
+        <section class="menu-grid-section py-4 py-lg-5" style="background: linear-gradient(160deg, #1a3a4a 0%, #0f2a38 50%, #162e3c 100%);">
             <div class="container px-4 px-lg-5">
                 <div class="row g-4 menu-layout-row">
 
