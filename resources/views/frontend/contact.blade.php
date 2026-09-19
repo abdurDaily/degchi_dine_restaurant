@@ -17,26 +17,19 @@
     $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
 @endphp
 
-<section class="dd-apply-wrapper contact-page">
-    <div class="dd-apply-hero-banner">
-        <div class="container px-4 px-lg-5 text-center position-relative">
-            <a href="{{ route('frontend.home') }}" class="dd-apply-back-btn">
-                <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
-                <span>Back to Home</span>
-            </a>
+<x-frontend.page-header
+    title="Get In Touch"
+    eyebrow="Connect With Us"
+    subtitle="Reach out for reservations, feedback, or membership reviews. We would love to hear from you."
+    :backLink="route('frontend.home')"
+    backText="Back to Home"
+>
+    <x-slot:eyebrowIcon>
+        <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
+    </x-slot:eyebrowIcon>
+</x-frontend.page-header>
 
-            <div class="contact-page-hero-icon">
-                <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
-            </div>
-
-            <span class="contact-page-kicker">Connect With Us</span>
-            <h1 class="dd-apply-headline mb-2">Get In Touch</h1>
-            <p class="contact-page-hero-lead mx-auto">
-                Reach out for reservations, feedback, or membership reviews. We would love to hear from you.
-            </p>
-        </div>
-    </div>
-
+<section class="contact-page" style="background: var(--brand-gredient); min-height: 60vh;">
     <div class="container px-4 px-lg-5 contact-page-main-box">
         <div class="contact-page-grid">
             <aside class="contact-page-info order-2 order-lg-1">
@@ -84,11 +77,11 @@
                     </div>
 
                     <div class="contact-page-actions">
-                        <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer" class="contact-page-btn contact-page-btn-teal">
+                        <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer" class="btn-dine btn-dine-primary btn-dine-sm">
                             <i class="bi bi-signpost-split-fill"></i>
                             Get Directions
                         </a>
-                        <a href="tel:{{ $contactPhoneDigits }}" class="contact-page-btn contact-page-btn-gold">
+                        <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-sm" style="background: var(--brand-gradient); color: #fff;">
                             <i class="bi bi-telephone-fill"></i>
                             Call Now
                         </a>
@@ -132,7 +125,7 @@
                                 <input type="text" class="cp-input" id="cardNumberCheck" name="card_number" required placeholder="Ex: DD-XXXX-XXXX">
                             </div>
 
-                            <button type="submit" class="cp-btn cp-btn-primary w-100" id="verifyBtn">
+                            <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm w-100" id="verifyBtn">
                                 <span id="verifyBtnText">Verify Membership Identity</span>
                                 <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                             </button>
@@ -144,7 +137,6 @@
                                 </a>
                             </p>
                         </form>
-                    </div>
 
                     <div id="reviewFormCard" class="cp-form-card cp-form-card-review d-none">
                         <div class="cp-alert-success mb-4" role="alert">
@@ -183,13 +175,13 @@
                             </div>
 
                             <div class="cp-form-actions">
-                                <button type="submit" class="cp-btn cp-btn-primary flex-grow-1" id="submitReviewBtn">
+                                <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm flex-grow-1" id="submitReviewBtn">
                                     <span id="submitBtnText">
                                         <i class="bi bi-send me-2"></i>Publish Review
                                     </span>
                                     <span id="submitBtnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                                 </button>
-                                <button type="button" class="cp-btn cp-btn-outline" id="backBtn" onclick="goBackToVerification()">
+                                <button type="button" class="btn-dine btn-dine-outline btn-dine-sm" id="backBtn" onclick="goBackToVerification()">
                                     <i class="bi bi-chevron-left"></i> Change ID
                                 </button>
                             </div>

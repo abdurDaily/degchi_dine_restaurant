@@ -63,7 +63,7 @@
                 @endauth
 
                 @if($replyCount > 0)
-                    <span class="comment-action-btn" style="cursor: default; pointer-events: none;">
+                    <span class="comment-action-btn reply-count-label">
                         Reply ({{ $replyCount }})
                     </span>
                 @endif
