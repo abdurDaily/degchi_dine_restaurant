@@ -457,43 +457,46 @@ const renderCartPage = () => {
     }
 
     if (cartPageEmpty) cartPageEmpty.style.display = "none";
-    cartPageItems.innerHTML = cart
-        .map(
-            (item) => `
-      <div class="cart-product-card" data-item-id="${item.id}">
-        <div class="cart-product-img-wrap">
-          <img src="${item.image}" alt="${item.title}" class="cart-product-img" />
-        </div>
-        <div class="cart-product-body">
-          <div class="cart-product-top">
-            <div>
-              <h6 class="cart-product-name">${item.title}</h6>
-              <span class="cart-product-tag">${item.note}${item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : ""}</span>
-            </div>
-            <button class="btn cart-remove-btn" type="button" aria-label="Remove item">
-              <i class="bi bi-x-lg"></i>
-            </button>
-          </div>
-          <div class="cart-product-bottom">
-            <div class="cart-product-qty">
-              <button class="btn cart-qty-btn" type="button" data-change="-1">
-                <i class="bi bi-dash"></i>
-              </button>
-              <span class="cart-qty-val">${item.quantity}</span>
-              <button class="btn cart-qty-btn" type="button" data-change="1">
-                <i class="bi bi-plus"></i>
-              </button>
-            </div>
-            <div class="cart-product-price-wrap">
-              <span class="cart-product-unit">${renderCartItemPriceLabel(item)} × ${item.quantity}</span>
-              <strong class="cart-product-total">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    `,
-        )
-        .join("");
+    cartPageItems.innerHTML = "";
+
+    const template = document.getElementById("cartItemTemplate");
+    if (!template) return;
+
+    const fragment = document.createDocumentFragment();
+
+    cart.forEach((item) => {
+        const card = template.content.firstElementChild.cloneNode(true);
+
+        card.setAttribute("data-item-id", item.id);
+
+        const img = card.querySelector(".cart-product-img");
+        if (img) {
+            img.src = item.image;
+            img.alt = item.title;
+        }
+
+        const name = card.querySelector(".cart-product-name");
+        if (name) name.textContent = item.title;
+
+        const tag = card.querySelector(".cart-product-tag");
+        if (tag) {
+            tag.textContent = item.note + (item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : "");
+            if (!tag.textContent.trim()) tag.style.display = "none";
+        }
+
+        const qtyVal = card.querySelector(".cart-qty-val");
+        if (qtyVal) qtyVal.textContent = item.quantity;
+
+        const unit = card.querySelector(".cart-product-unit");
+        if (unit) unit.innerHTML = `${renderCartItemPriceLabel(item)} × ${item.quantity}`;
+
+        const total = card.querySelector(".cart-product-total");
+        if (total) total.textContent = formatCurrency(getItemUnitPrice(item) * item.quantity);
+
+        fragment.appendChild(card);
+    });
+
+    cartPageItems.appendChild(fragment);
 
     cartPageSubtotal.textContent = formatCurrency(getCartTotal(cart));
     cartPageTotal.textContent = formatCurrency(getCartTotal(cart));
