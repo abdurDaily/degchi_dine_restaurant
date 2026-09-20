@@ -100,6 +100,14 @@ body.dd-apply-busy { overflow: hidden; }
 /* ── Two-column grid ── */
 .member-apply .cp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
+/* ── Sticky left panel ── */
+@media (min-width: 992px) {
+    .member-apply .contact-page-info-panel {
+        position: sticky;
+        top: 100px;
+    }
+}
+
 /* ── Responsive ── */
 @media (max-width: 575px) {
     .member-apply .cp-dropzone { min-height: 110px; padding: 1rem; }
