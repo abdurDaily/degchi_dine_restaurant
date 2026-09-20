@@ -4,13 +4,22 @@
    ========================================================================== */
 
 :root {
-
     /* ── Brand Primary — Deep Teal ── */
     --brand: #1a6674;
     --brand-dark: #0f4a55;
     --brand-light: rgba(26, 102, 116, 0.12);
-    --brand-gredient: linear-gradient(160deg, #0f4a55 0%, #1a6674 50%, #0f4a55 100%);
-    --brand-gradient: linear-gradient(160deg, #0f4a55 0%, #1a6674 50%, #0f4a55 100%);
+    --brand-gredient: linear-gradient(
+        160deg,
+        #0f4a55 0%,
+        #1a6674 50%,
+        #0f4a55 100%
+    );
+    --brand-gradient: linear-gradient(
+        160deg,
+        #0f4a55 0%,
+        #1a6674 50%,
+        #0f4a55 100%
+    );
     --brand-gradient-vertical: linear-gradient(135deg, #1a6674, #0f4a55);
 
     /* ── Brand Secondary — Warm Orange-Red ── */
@@ -52,10 +61,10 @@
     --text-main: #0d3d4a;
     --text-muted: #5a7a85;
     --text-light: #8aa3ad;
-    --text-on-dark: #faf5eb;
-    --text-on-dark-muted: rgba(250, 245, 235, 0.85);
-    --text-on-dark-subtle: rgba(250, 245, 235, 0.7);
-    --text-on-dark-faint: rgba(250, 245, 235, 0.6);
+    --text-on-dark: #ffffff;
+    --text-on-dark-muted: rgba(255, 255, 255, 0.85);
+    --text-on-dark-subtle: rgba(255, 255, 255, 0.7);
+    --text-on-dark-faint: rgba(255, 255, 255, 0.6);
     --luxury-dark: #1a1512;
 
     /* ── Dark Card Surfaces ── */
@@ -93,7 +102,8 @@
     /* ── Glassmorphism ── */
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.9);
-    --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    --glass-shadow:
+        0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
     --glass-blur: blur(24px);
 
     /* ── Input ── */

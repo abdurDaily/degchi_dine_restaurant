@@ -113,6 +113,7 @@
       registerUrl: @json(route('frontend.card.apply')),
     };
   </script>
+  <script src="{{ asset('assets/frontend/js/cart.js') }}" defer></script>
   <script src="{{ asset('assets/frontend/app.js') }}" defer></script>
   <script src="{{ asset('assets/frontend/dd-credit.js') }}" defer></script>
   @stack('front_js')

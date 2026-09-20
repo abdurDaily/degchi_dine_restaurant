@@ -18,668 +18,6 @@ const getCurrentPageFile = () => {
     const file = pathname.substring(pathname.lastIndexOf("/") + 1);
     return file === "" || file === "index" ? "home" : file;
 };
-const setupPrivilegeCardForm = () => {
-    const form = document.getElementById("privilegeCardForm");
-    if (!form) {
-        return;
-    }
-
-    const fields = {
-        name: document.getElementById("applicantName"),
-        email: document.getElementById("applicantEmail"),
-        phone: document.getElementById("applicantPhone"),
-    };
-
-    const submitBtn = document.getElementById("privilegeSubmitBtn");
-    const liveStatus = document.getElementById("privilegeLiveStatus");
-    const thanksBox = document.getElementById("privilegeThanks");
-
-    if (
-        !fields.name ||
-        !fields.email ||
-        !fields.phone ||
-        !submitBtn ||
-        !thanksBox
-    ) {
-        return;
-    }
-
-    const getFieldNote = (fieldId) =>
-        form.querySelector(`[data-note-for="${fieldId}"]`);
-
-    const getValidationState = (field) => {
-        const value = field.value.trim();
-
-        if (field.id === "applicantName") {
-            const isValid = value.length >= 3;
-            return {
-                isValid,
-                message: isValid
-                    ? "Looks good."
-                    : "Please enter at least 3 characters.",
-            };
-        }
-
-        if (field.id === "applicantEmail") {
-            const isValid = field.checkValidity() && value.length > 0;
-            return {
-                isValid,
-                message: isValid
-                    ? "Email is valid."
-                    : "Enter a valid email address.",
-            };
-        }
-
-        if (field.id === "applicantPhone") {
-            const digits = value.replace(/\D/g, "");
-            const isValid = digits.length >= 10 && digits.length <= 14;
-            return {
-                isValid,
-                message: isValid
-                    ? "Phone number is valid."
-                    : "Phone must contain 10 to 14 digits.",
-            };
-        }
-
-        return { isValid: false, message: "This field is required." };
-    };
-
-    const updateFieldState = (field) => {
-        const value = field.value.trim();
-        const note = getFieldNote(field.id);
-
-        if (!value) {
-            field.classList.remove("is-valid", "is-invalid");
-            if (note) {
-                note.textContent = "Required";
-                note.classList.remove("is-valid");
-            }
-            return false;
-        }
-
-        const { isValid, message } = getValidationState(field);
-        field.classList.toggle("is-valid", isValid);
-        field.classList.toggle("is-invalid", !isValid);
-
-        if (note) {
-            note.textContent = message;
-            note.classList.toggle("is-valid", isValid);
-            note.classList.toggle("is-invalid", !isValid);
-        }
-
-        return isValid;
-    };
-
-    const updateFormState = () => {
-        const fieldList = [fields.name, fields.email, fields.phone];
-        const validCount = fieldList.filter((field) =>
-            updateFieldState(field),
-        ).length;
-        const allValid = validCount === fieldList.length;
-
-        submitBtn.disabled = !allValid;
-        if (liveStatus) {
-            liveStatus.textContent = allValid
-                ? "Everything looks good. You can submit now."
-                : `Complete ${validCount} of ${fieldList.length} fields correctly.`;
-        }
-
-        return allValid;
-    };
-
-    [fields.name, fields.email, fields.phone].forEach((field) => {
-        field.addEventListener("input", updateFormState);
-        field.addEventListener("blur", updateFormState);
-    });
-
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        if (!updateFormState()) {
-            const firstInvalid = [fields.name, fields.email, fields.phone].find(
-                (field) => !field.classList.contains("is-valid"),
-            );
-            firstInvalid?.focus();
-            return;
-        }
-
-        submitBtn.classList.add("is-loading");
-        submitBtn.disabled = true;
-
-        window.setTimeout(() => {
-            const applicantName = fields.name.value.trim();
-            form.classList.add("d-none");
-            if (liveStatus) {
-                liveStatus.classList.add("d-none");
-            }
-            thanksBox.innerHTML = `<i class="bi bi-patch-check-fill me-2"></i>Thank you, ${applicantName}! Your privilege card application has been received.`;
-            thanksBox.classList.remove("d-none");
-            submitBtn.classList.remove("is-loading");
-        }, 650);
-    });
-
-    updateFormState();
-};
-
-const CART_STORAGE_KEY = "degchi_cart";
-
-const getMemberState = () => {
-    return (
-        window.DEGCHI_MEMBER || {
-            loggedIn: false,
-            canUseFirstOrder: false,
-            loginUrl: "/member/login",
-            registerUrl: "/card-apply",
-        }
-    );
-};
-
-const offerRequiresMemberLogin = (isFirstOrder, applicableTo) => {
-    // Food promos: only First Order Only requires member login.
-    // Membership / Student / Golden benefits are applied at checkout via member card.
-    return !!isFirstOrder;
-};
-
-const showOfferMemberLoginModal = () => {
-    const modalEl = document.getElementById("offerMemberLoginModal");
-    if (modalEl && window.bootstrap?.Modal) {
-        bootstrap.Modal.getOrCreateInstance(modalEl).show();
-        return;
-    }
-    const member = getMemberState();
-    window.location.href = member.loginUrl || "/member/login";
-};
-
-const getCartData = () => {
-    try {
-        const raw = localStorage.getItem(CART_STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
-    } catch (error) {
-        return [];
-    }
-};
-
-const saveCartData = (cart) => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-};
-
-const formatCurrency = (value) => {
-    return `৳ ${Number(value || 0).toFixed(2)}`;
-};
-
-const getItemUnitPrice = (item) => Number(item.price || 0);
-
-const getItemOriginalPrice = (item) =>
-    Number(item.original_price ?? item.price ?? 0);
-
-const getCartTotal = (cart) => {
-    return cart.reduce((total, item) => {
-        return total + getItemUnitPrice(item) * Number(item.quantity || 0);
-    }, 0);
-};
-
-const getCartOriginalTotal = (cart) => {
-    return cart.reduce((total, item) => {
-        return total + getItemOriginalPrice(item) * Number(item.quantity || 0);
-    }, 0);
-};
-
-const buildCartItemId = (item) => {
-    // Use variation_id if available for better uniqueness, otherwise use title
-    if (item.variation_id) {
-        return `variation-${item.variation_id}`;
-    }
-    return `${item.title}`
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-");
-};
-
-const createMenuItemFromCard = (card) => {
-    const menuCard = card?.closest?.(".pcard, .menu-offer-card") || card;
-    if (!menuCard?.classList?.contains("pcard") && !menuCard?.classList?.contains("menu-offer-card")) return null;
-
-    const cartBtn = menuCard.querySelector(".pcard-cart-btn, .menu-offer-cart-btn");
-    if (!cartBtn) return null;
-
-    const title = menuCard.querySelector(".pcard-title, .menu-offer-title")?.textContent.trim();
-    const image =
-        menuCard.querySelector(".pcard-img, .menu-offer-image")?.getAttribute("src") || "";
-    const quantityText =
-        menuCard.querySelector(".pcard-serve, .menu-offer-serve")?.textContent || "1 person";
-
-    const variationId =
-        cartBtn.getAttribute("data-variation-id") || cartBtn.dataset.variationId;
-
-    const originalPriceAttr =
-        cartBtn.getAttribute("data-original-price") ||
-        cartBtn.dataset.originalPrice;
-    let originalPrice = parseFloat(originalPriceAttr) || 0;
-
-    if (originalPrice === 0) {
-        const allPrices = menuCard.querySelectorAll(".pcard-price, .menu-offer-price");
-        if (allPrices.length > 1) {
-            // Prefer struck-through original when both prices exist
-            const oldPrice = menuCard.querySelector(".pcard-price-old, .menu-offer-price-old");
-            const priceText = (oldPrice || allPrices[0]).textContent
-                .replace(/,/g, "")
-                .replace(/[^\d.]/g, "")
-                .trim();
-            originalPrice = parseFloat(priceText) || 0;
-        } else if (allPrices.length === 1) {
-            const priceText = allPrices[0].textContent
-                .replace(/,/g, "")
-                .replace(/[^\d.]/g, "")
-                .trim();
-            originalPrice = parseFloat(priceText) || 0;
-        }
-    }
-
-    const offerPercent =
-        parseFloat(
-            cartBtn.getAttribute("data-offer-percent") ||
-                cartBtn.dataset.offerPercent ||
-                "0",
-        ) || 0;
-    const offerId =
-        cartBtn.getAttribute("data-offer-id") || cartBtn.dataset.offerId || null;
-    const isFirstOrder =
-        (cartBtn.getAttribute("data-is-first-order") ||
-            cartBtn.dataset.isFirstOrder ||
-            "0") === "1";
-    const applicableTo = (
-        cartBtn.getAttribute("data-applicable-to") ||
-        cartBtn.dataset.applicableTo ||
-        "all"
-    ).toLowerCase();
-
-    const member = getMemberState();
-    const requiresMember = offerRequiresMemberLogin(isFirstOrder, applicableTo);
-
-    if (requiresMember && !member.loggedIn) {
-        showOfferMemberLoginModal();
-        return null;
-    }
-
-    let offerPriceAttr =
-        parseFloat(
-            cartBtn.getAttribute("data-offer-price") ||
-                cartBtn.dataset.offerPrice ||
-                "0",
-        ) || 0;
-
-    let price = originalPrice;
-    let offerApplied = false;
-    let appliedOfferPercent = 0;
-
-    const canApplyOffer =
-        offerPercent > 0 &&
-        (!requiresMember ||
-            (member.loggedIn &&
-                (!isFirstOrder || member.canUseFirstOrder !== false)));
-
-    if (canApplyOffer) {
-        price =
-            offerPriceAttr > 0
-                ? offerPriceAttr
-                : Math.round(originalPrice * (1 - offerPercent / 100) * 100) /
-                  100;
-        offerApplied = true;
-        appliedOfferPercent = offerPercent;
-    }
-
-    const item = {
-        title: title || "Menu item",
-        price: price,
-        original_price: originalPrice,
-        quantity: 1,
-        image,
-        note: quantityText.trim() || "1 person",
-        variation_id: variationId ? parseInt(variationId, 10) : null,
-        offer_id: offerId ? parseInt(offerId, 10) : null,
-        offer_percent: appliedOfferPercent,
-        offer_applied: offerApplied,
-    };
-
-    item.id = buildCartItemId(item);
-
-    return item;
-};
-
-const updateCartBadges = (cart) => {
-    const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document
-        .querySelectorAll(".desktop-order-qty, .mobile-order-qty")
-        .forEach((node) => {
-            node.textContent = totalCount;
-            node.setAttribute("aria-label", `${totalCount} items`);
-        });
-};
-
-const renderCartItemPriceLabel = (item) => {
-    const unit = getItemUnitPrice(item);
-    const original = getItemOriginalPrice(item);
-    if (item.offer_applied && original > unit) {
-        return `<span class="text-decoration-line-through text-muted me-1">${formatCurrency(original)}</span>${formatCurrency(unit)}`;
-    }
-    return formatCurrency(unit);
-};
-
-const renderCartDrawer = () => {
-    const cart = getCartData();
-    const cartDrawerItems = document.getElementById("cartDrawerItems");
-    const subtotalNode = document.getElementById("cartDrawerSubtotal");
-    const cartDrawerCount = document.getElementById("cartDrawerCount");
-
-    if (!cartDrawerItems || !subtotalNode) return;
-
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    if (cartDrawerCount) {
-        cartDrawerCount.textContent =
-            itemCount === 0
-                ? "No items yet"
-                : `${itemCount} item${itemCount === 1 ? "" : "s"}`;
-    }
-
-    if (!cart.length) {
-        cartDrawerItems.innerHTML = `
-      <div class="cart-drawer-empty">
-        <div class="cart-drawer-empty-icon" aria-hidden="true">
-          <i class="bi bi-bag"></i>
-        </div>
-        <p class="cart-drawer-empty-title">Your cart is empty</p>
-        <p class="cart-drawer-empty-text">Add dishes from the menu to get started.</p>
-      </div>
-    `;
-    } else {
-        cartDrawerItems.innerHTML = cart
-            .map(
-                (item) => `
-        <article class="cart-item" data-item-id="${item.id}">
-          <div class="cart-item-image-wrap">
-            <img src="${item.image}" alt="${item.title}" class="cart-item-image" />
-          </div>
-          <div class="cart-item-body">
-            <div class="cart-item-header-row">
-              <div class="cart-item-info">
-                <h6 class="cart-item-title">${item.title}</h6>
-                <span class="cart-item-unit">${renderCartItemPriceLabel(item)} each${item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : ""}</span>
-              </div>
-              <button class="cart-item-remove-btn" type="button" aria-label="Remove ${item.title}">
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-            <div class="cart-item-footer-row">
-              <div class="cart-qty-row">
-                <button class="qty-adjust-btn" type="button" data-change="-1" aria-label="Decrease quantity">
-                  <i class="bi bi-dash"></i>
-                </button>
-                <span class="cart-qty">${item.quantity}</span>
-                <button class="qty-adjust-btn" type="button" data-change="1" aria-label="Increase quantity">
-                  <i class="bi bi-plus"></i>
-                </button>
-              </div>
-              <div class="cart-item-meta">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</div>
-            </div>
-          </div>
-        </article>
-      `,
-            )
-            .join("");
-    }
-
-    subtotalNode.textContent = formatCurrency(getCartTotal(cart));
-    updateCartBadges(cart);
-
-    const checkoutBtn = document.querySelector(".cart-drawer .cart-checkout-btn");
-    if (checkoutBtn) {
-        checkoutBtn.classList.toggle("is-cart-empty", !cart.length);
-    }
-};
-
-const renderCartPage = () => {
-    const cart = getCartData();
-    const cartPageItems = document.getElementById("cartPageItems");
-    const cartPageSubtotal = document.getElementById("cartPageSubtotal");
-    const cartPageTotal = document.getElementById("cartPageTotal");
-    const cartCountBadge = document.querySelector(".cart-count-badge");
-    const cartPageEmpty = document.getElementById("cartPageEmpty");
-
-    if (!cartPageItems || !cartPageSubtotal || !cartPageTotal) return;
-
-    if (!cart.length) {
-        if (cartPageEmpty) cartPageEmpty.style.display = "block";
-        cartPageItems.innerHTML = "";
-        cartPageSubtotal.textContent = formatCurrency(0);
-        cartPageTotal.textContent = formatCurrency(0);
-        if (cartCountBadge) cartCountBadge.textContent = "0 Items";
-        return;
-    }
-
-    if (cartPageEmpty) cartPageEmpty.style.display = "none";
-    cartPageItems.innerHTML = "";
-
-    const template = document.getElementById("cartItemTemplate");
-    if (!template) return;
-
-    const fragment = document.createDocumentFragment();
-
-    cart.forEach((item) => {
-        const card = template.content.firstElementChild.cloneNode(true);
-
-        card.setAttribute("data-item-id", item.id);
-
-        const img = card.querySelector(".cart-product-img");
-        if (img) {
-            img.src = item.image;
-            img.alt = item.title;
-        }
-
-        const name = card.querySelector(".cart-product-name");
-        if (name) name.textContent = item.title;
-
-        const tag = card.querySelector(".cart-product-tag");
-        if (tag) {
-            tag.textContent = item.note + (item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : "");
-            if (!tag.textContent.trim()) tag.style.display = "none";
-        }
-
-        const qtyVal = card.querySelector(".cart-qty-val");
-        if (qtyVal) qtyVal.textContent = item.quantity;
-
-        const unit = card.querySelector(".cart-product-unit");
-        if (unit) unit.innerHTML = `${renderCartItemPriceLabel(item)} × ${item.quantity}`;
-
-        const total = card.querySelector(".cart-product-total");
-        if (total) total.textContent = formatCurrency(getItemUnitPrice(item) * item.quantity);
-
-        fragment.appendChild(card);
-    });
-
-    cartPageItems.appendChild(fragment);
-
-    cartPageSubtotal.textContent = formatCurrency(getCartTotal(cart));
-    cartPageTotal.textContent = formatCurrency(getCartTotal(cart));
-
-    const cartSectionLabel = document.querySelector(".cart-section-label");
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    if (cartSectionLabel) {
-        cartSectionLabel.innerHTML = `<i class="bi bi-list-check me-2"></i>${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
-    }
-
-    if (cartCountBadge) cartCountBadge.textContent = `${itemCount} Items`;
-};
-
-const renderCheckoutSummary = () => {
-    const cart = getCartData();
-    const checkoutItemsWrap = document.querySelector(
-        ".checkout-summary-items-wrap",
-    );
-    const checkoutSubtotal = document.getElementById("checkoutSubtotal");
-    const checkoutTotal = document.getElementById("checkoutTotal");
-    const orderTotalInput = document.querySelector("input[name='order_total']");
-    const itemsInput = document.querySelector("input[name='items']");
-    const itemCountHint = document.querySelector(
-        ".cart-summary-row small.text-muted",
-    );
-
-    if (!checkoutItemsWrap || !checkoutSubtotal || !checkoutTotal) return;
-
-    if (!cart.length) {
-        checkoutItemsWrap.innerHTML = `<div class="text-center py-5"><p class="mb-0">Your cart is empty. Add items before checking out.</p></div>`;
-        checkoutSubtotal.textContent = formatCurrency(0);
-        checkoutTotal.textContent = formatCurrency(0);
-        if (orderTotalInput) orderTotalInput.value = "0";
-        if (itemsInput) itemsInput.value = JSON.stringify([]);
-        if (itemCountHint) itemCountHint.textContent = "(0 items)";
-        return;
-    }
-
-    checkoutItemsWrap.innerHTML = cart
-        .map(
-            (item) => `
-      <div class="checkout-order-item">
-        <img src="${item.image}" alt="${item.title}" class="checkout-order-img" />
-        <div class="checkout-order-info">
-          <p class="checkout-order-name">${item.title}</p>
-          <span class="checkout-order-price">${renderCartItemPriceLabel(item)} × ${item.quantity}${item.offer_applied && item.offer_percent ? ` <span class="badge bg-danger-subtle text-danger">${item.offer_percent}% OFF</span>` : ""}</span>
-        </div>
-        <strong class="checkout-order-subtotal">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</strong>
-      </div>
-    `,
-        )
-        .join("");
-
-    // Subtotal = offer/discounted unit prices (what the customer pays for items)
-    const discountedTotal = getCartTotal(cart);
-    const originalTotal = getCartOriginalTotal(cart);
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    checkoutSubtotal.textContent = formatCurrency(discountedTotal);
-    checkoutTotal.textContent = formatCurrency(discountedTotal);
-    // Backend recalculates from DB using original catalog prices
-    if (orderTotalInput) orderTotalInput.value = originalTotal.toFixed(2);
-    if (itemsInput) itemsInput.value = JSON.stringify(cart);
-    if (itemCountHint) {
-        itemCountHint.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
-    }
-    document.dispatchEvent(
-        new CustomEvent("cartSummaryRendered", {
-            detail: { total: discountedTotal, originalTotal },
-        }),
-    );
-};
-
-const addToCart = (item) => {
-    const cart = getCartData();
-    const existing = cart.find((entry) => entry.id === item.id);
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        cart.push(item);
-    }
-    saveCartData(cart);
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
-};
-
-const removeFromCart = (itemId) => {
-    const cart = getCartData().filter((item) => item.id !== itemId);
-    saveCartData(cart);
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
-};
-
-const changeCartQuantity = (itemId, delta) => {
-    const cart = getCartData().map((item) => {
-        if (item.id !== itemId) return item;
-        return { ...item, quantity: Math.max(1, item.quantity + delta) };
-    });
-    saveCartData(cart.filter((item) => item.quantity > 0));
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
-};
-
-const clearCart = () => {
-    saveCartData([]);
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
-};
-
-const openCartDrawer = () => {
-    const drawerEl = document.getElementById("cartDrawer");
-    if (!drawerEl || !window.bootstrap?.Offcanvas) return;
-    const drawer = bootstrap.Offcanvas.getOrCreateInstance(drawerEl);
-    drawer.show();
-};
-
-const initCartEvents = () => {
-    document.addEventListener("click", (event) => {
-        const menuCard = event.target.closest(".pcard, .menu-offer-card");
-        if (menuCard?.querySelector(".pcard-cart-btn, .menu-offer-cart-btn")) {
-            event.preventDefault();
-            const item = createMenuItemFromCard(menuCard);
-            if (item) {
-                addToCart(item);
-                openCartDrawer();
-            }
-            return;
-        }
-
-        const removeButton = event.target.closest(
-            ".cart-item-remove-btn, .cart-remove-btn",
-        );
-        if (removeButton) {
-            const card = removeButton.closest("[data-item-id]");
-            if (card) {
-                const itemId = card.getAttribute("data-item-id");
-                removeFromCart(itemId);
-            }
-            return;
-        }
-
-        const qtyButton = event.target.closest(
-            ".qty-adjust-btn, .cart-qty-btn",
-        );
-        if (qtyButton) {
-            const change = Number(
-                qtyButton.dataset.change ||
-                    qtyButton.getAttribute("data-change") ||
-                    0,
-            );
-            const card = qtyButton.closest("[data-item-id]");
-            if (card && change !== 0) {
-                const itemId = card.getAttribute("data-item-id");
-                changeCartQuantity(itemId, change);
-            }
-            return;
-        }
-
-        const clearBtn = event.target.closest(".cart-clear-btn");
-        if (clearBtn) {
-            event.preventDefault();
-            clearCart();
-            return;
-        }
-    });
-
-};
-
-const initCartPages = () => {
-    if (new URLSearchParams(window.location.search).get("clear_cart") === "1") {
-        localStorage.removeItem(CART_STORAGE_KEY);
-    }
-
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
-    initCartEvents();
-};
-
-initCartPages();
 
 const sections = document.querySelectorAll("section[id]");
 const navLinks = document.querySelectorAll(
@@ -760,7 +98,6 @@ const syncNavbarState = () => {
 
 const currentPageFile = getCurrentPageFile();
 
-// Preserve initial page-level active classes from server-rendered aria-current
 navLinks.forEach((link) => {
     if (link.getAttribute("aria-current") === "page") {
         link.classList.add("active");
@@ -776,7 +113,6 @@ window.addEventListener("scroll", () => {
 
     syncNavbarState();
 
-    // Only run anchor/scroll-based active link detection on the home page
     if (currentPageFile !== "index.html") return;
 
     const current = Array.from(sections).find((section) => {
@@ -784,10 +120,8 @@ window.addEventListener("scroll", () => {
         const bottom = top + section.offsetHeight;
         return window.scrollY >= top && window.scrollY < bottom;
     });
-    // If no section is in view, keep existing page-level active states
     if (!current) return;
 
-    // Only consider nav links that are same-page anchors (e.g. index.html#home)
     const anchorLinks = Array.from(navLinks).filter((link) => {
         const href = link.getAttribute("href") || "";
         const linkUrl = new URL(href, window.location.href);
@@ -798,7 +132,6 @@ window.addEventListener("scroll", () => {
         );
     });
 
-    // If the current section does not correspond to any anchor link, do nothing
     const matchingAnchorExists = anchorLinks.some((link) => {
         const linkUrl = new URL(
             link.getAttribute("href"),
@@ -823,15 +156,12 @@ window.addEventListener("scroll", () => {
 });
 
 syncNavbarState();
-setupPrivilegeCardForm();
 
-// Handle continue as guest from modal
 document.addEventListener("click", function (e) {
     const btn = e.target.closest("#continueAsGuestBtn");
     if (!btn) return;
     const pending = window.__pendingCheckoutForm;
     if (!pending) return;
-    // inject a hidden flag to bypass the modal prompt
     let flag = pending.querySelector("input[name='__guest_continue']");
     if (!flag) {
         flag = document.createElement("input");
@@ -842,12 +172,11 @@ document.addEventListener("click", function (e) {
     } else {
         flag.value = "1";
     }
-    // submit the form (will be intercepted by AJAX handler and proceed)
     $(pending).submit();
 });
 
 /* ==========================================================================
-   06. DISHES HIGHLIGHTS SLIDER INITIALIZATION
+   DISHES HIGHLIGHTS SLIDER INITIALIZATION
    ========================================================================== */
 $(function () {
     const $mcSliderWrap = $(".mc-slider-wrap");
@@ -878,32 +207,10 @@ $(function () {
             );
         },
         responsive: [
-            {
-                breakpoint: 1200,
-                settings: { slidesToShow: 3 },
-            },
-            {
-                breakpoint: 992,
-                settings: { slidesToShow: 2 },
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 2,
-                    arrows: false,
-                    dots: true,
-                },
-            },
-            {
-                breakpoint: 576,
-                settings: {
-                    slidesToShow: 1,
-                    arrows: false,
-                    dots: true,
-                    centerMode: true,
-                    centerPadding: "20px",
-                },
-            },
+            { breakpoint: 1200, settings: { slidesToShow: 3 } },
+            { breakpoint: 992, settings: { slidesToShow: 2 } },
+            { breakpoint: 768, settings: { slidesToShow: 2, arrows: false, dots: true } },
+            { breakpoint: 576, settings: { slidesToShow: 1, arrows: false, dots: true, centerMode: true, centerPadding: "20px" } },
         ],
     });
 });
@@ -911,10 +218,7 @@ $(function () {
 /* ── Featured Dishes Quick View Modal ─────────────────────── */
 (function () {
     const modalEl = document.getElementById("mcQuickViewModal");
-
-    if (!modalEl || !window.bootstrap?.Modal) {
-        return;
-    }
+    if (!modalEl || !window.bootstrap?.Modal) return;
 
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     const modalImage = document.getElementById("mcQuickViewImage");
@@ -931,51 +235,29 @@ $(function () {
         const desc = card.querySelector(".mc-desc");
         const serve = card.querySelector(".mc-serve-info");
         const price = card.querySelector(".mc-price");
-
-        if (!img || !badge || !title || !desc || !serve || !price) {
-            return;
-        }
+        if (!img || !badge || !title || !desc || !serve || !price) return;
 
         modalImage.src = img.getAttribute("src") || "";
-        modalImage.alt =
-            img.getAttribute("alt") ||
-            title.textContent?.trim() ||
-            "Dish preview";
+        modalImage.alt = img.getAttribute("alt") || title.textContent?.trim() || "Dish preview";
         modalBadge.textContent = badge.textContent?.trim() || "Dish";
-        modalBadge.classList.toggle(
-            "mc-badge--gold",
-            badge.classList.contains("mc-badge--gold"),
-        );
+        modalBadge.classList.toggle("mc-badge--gold", badge.classList.contains("mc-badge--gold"));
         modalTitle.textContent = title.textContent?.trim() || "";
         modalDesc.textContent = desc.textContent?.trim() || "";
         modalServe.innerHTML = serve.innerHTML;
         modalPrice.textContent = price.textContent?.trim() || "";
-
         modal.show();
     };
 
     document.addEventListener("click", (event) => {
         const card = event.target.closest(".mc-card-trigger");
-        if (!card) {
-            return;
-        }
-
-        // Ignore drag-end clicks from Slick while the slider is being swiped.
-        if (
-            card.closest(".slick-slider")?.querySelector(".slick-list.dragging")
-        ) {
-            return;
-        }
-
+        if (!card) return;
+        if (card.closest(".slick-slider")?.querySelector(".slick-list.dragging")) return;
         openQuickView(card);
     });
 
     document.addEventListener("keydown", (event) => {
         const card = event.target.closest(".mc-card-trigger");
-        if (!card) {
-            return;
-        }
-
+        if (!card) return;
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
             openQuickView(card);
@@ -984,14 +266,12 @@ $(function () {
 })();
 
 /* ==========================================================================
-   05. HOUSE SIGNATURES & MAIN MENU SLIDER (FIXED INITIALIZATION)
+   HOUSE SIGNATURES & MAIN MENU SLIDER
    ========================================================================== */
 $(function () {
-    // Target the main slider shell instead of a nested track selector
     const $menuSlider = $("#menuSlider");
     if (!$menuSlider.length) return;
 
-    // Find the slider viewport container holding the slide items directly
     const $sliderViewport = $menuSlider.find(".menu-slider-track");
 
     $sliderViewport.slick({
@@ -1010,53 +290,18 @@ $(function () {
         prevArrow: $menuSlider.find(".menu-slider-prev"),
         nextArrow: $menuSlider.find(".menu-slider-next"),
         responsive: [
-            {
-                breakpoint: 1200,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                    dots: false,
-                },
-            },
-            {
-                breakpoint: 992,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                    dots: false,
-                },
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    arrows: true,
-                    dots: false,
-                    centerMode: false,
-                    centerPadding: "0px",
-                },
-            },
-            {
-                breakpoint: 576,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    arrows: true,
-                    dots: false,
-                    centerMode: false,
-                    centerPadding: "0px",
-                },
-            },
+            { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 1, dots: false } },
+            { breakpoint: 992, settings: { slidesToShow: 2, slidesToScroll: 1, dots: false } },
+            { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1, arrows: true, dots: false, centerMode: false, centerPadding: "0px" } },
+            { breakpoint: 576, settings: { slidesToShow: 1, slidesToScroll: 1, arrows: true, dots: false, centerMode: false, centerPadding: "0px" } },
         ],
     });
 
-    // Mark slider ready — show content after Slick initializes
     $menuSlider.addClass("is-slick-ready");
 });
 
 /* ==========================================================================
-   07. WATCH US ON REELS HUB SLIDER INITIALIZATION (EXACT ICON MARKUP FIX)
+   WATCH US ON REELS HUB SLIDER
    ========================================================================== */
 $(function () {
     const $reelsSlider = $("#reelsSlider");
@@ -1074,43 +319,13 @@ $(function () {
         speed: 500,
         swipe: true,
         touchThreshold: 15,
-
-        prevArrow:
-            '<button type="button" class="slick-prev reels-slick-prev"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-left"></i></span></button>',
-        nextArrow:
-            '<button type="button" class="slick-next reels-slick-next"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-right"></i></span></button>',
-
+        prevArrow: '<button type="button" class="slick-prev reels-slick-prev"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-left"></i></span></button>',
+        nextArrow: '<button type="button" class="slick-next reels-slick-next"><span class="menu-control-icon" aria-hidden="true"><i class="bi bi-chevron-right"></i></span></button>',
         responsive: [
-            {
-                breakpoint: 1200,
-                settings: { slidesToShow: 3, dots: false },
-            },
-            {
-                breakpoint: 992,
-                settings: { slidesToShow: 2, dots: false },
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    arrows: false,
-                    dots: false,
-                    centerMode: false,
-                    centerPadding: "0px",
-                },
-            },
-            {
-                breakpoint: 576,
-                settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    arrows: false,
-                    dots: false,
-                    centerMode: false,
-                    centerPadding: "0px",
-                },
-            },
+            { breakpoint: 1200, settings: { slidesToShow: 3, dots: false } },
+            { breakpoint: 992, settings: { slidesToShow: 2, dots: false } },
+            { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1, arrows: false, dots: false, centerMode: false, centerPadding: "0px" } },
+            { breakpoint: 576, settings: { slidesToShow: 1, slidesToScroll: 1, arrows: false, dots: false, centerMode: false, centerPadding: "0px" } },
         ],
     });
 });
@@ -1120,7 +335,6 @@ $(function () {
     const whatsappBtn = document.getElementById("whatsappBtn");
     if (!whatsappBtn) return;
 
-    // Click feedback animation.
     whatsappBtn.addEventListener("click", () => {
         whatsappBtn.animate(
             [
@@ -1133,7 +347,6 @@ $(function () {
         );
     });
 
-    // Periodic nudge to draw attention without being distracting.
     setInterval(() => {
         whatsappBtn.classList.add("is-nudging");
         setTimeout(() => whatsappBtn.classList.remove("is-nudging"), 700);
@@ -1170,47 +383,27 @@ $(function () {
 // review
 const $reviewsSlider = $(".reviews-slider");
 if ($reviewsSlider.length && typeof $reviewsSlider.slick === "function") {
-$reviewsSlider.slick({
-    centerMode: true,
-    centerPadding: "0px",
-    slidesToShow: 3,
-    infinite: true,
-    speed: 900, // Slightly slower for a more "expensive" feel
-    // This curve provides a very smooth, soft deceleration
-    cssEase: "cubic-bezier(0.23, 1, 0.32, 1)",
-    autoplay: true,
-    autoplaySpeed: 4000,
-    dots: true,
-    arrows: false,
-    useTransform: true, // Forces GPU acceleration
-    responsive: [
-        {
-            breakpoint: 768,
-            settings: {
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                centerMode: false,
-                centerPadding: "0px",
-                dots: true,
-            },
-        },
-        {
-            breakpoint: 576,
-            settings: {
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                centerMode: false,
-                centerPadding: "0px",
-                dots: true,
-            },
-        },
-    ],
-});
+    $reviewsSlider.slick({
+        centerMode: true,
+        centerPadding: "0px",
+        slidesToShow: 3,
+        infinite: true,
+        speed: 900,
+        cssEase: "cubic-bezier(0.23, 1, 0.32, 1)",
+        autoplay: true,
+        autoplaySpeed: 4000,
+        dots: true,
+        arrows: false,
+        useTransform: true,
+        responsive: [
+            { breakpoint: 768, settings: { slidesToShow: 1, slidesToScroll: 1, centerMode: false, centerPadding: "0px", dots: true } },
+            { breakpoint: 576, settings: { slidesToShow: 1, slidesToScroll: 1, centerMode: false, centerPadding: "0px", dots: true } },
+        ],
+    });
 }
 
-//menu card slider
+// menu card slider
 $(document).ready(function () {
-    // 1. Initialize Main Carousel Engine
     const $mainCarousel = $(".js-main-carousel");
     if (!$mainCarousel.length || typeof $mainCarousel.slick !== "function") return;
     $mainCarousel.slick({
@@ -1229,48 +422,27 @@ $(document).ready(function () {
         ],
     });
 
-    // 2. Active Adaptive Layout Flag Variable
     let isMobile = window.innerWidth <= 991;
 
-    // 3. Initialize Interactive Popup Image Thumbnail Swiper Engine
     const $modalCarousel = $(".js-modal-nav-carousel");
     if ($modalCarousel.length && typeof $modalCarousel.slick === "function") {
-    $modalCarousel.slick({
-        slidesToShow: 4,
-        slidesToScroll: 1,
-        vertical: !isMobile,
-        verticalSwiping: !isMobile,
-        arrows: !isMobile,
-        prevArrow: $(".vert-prev"),
-        nextArrow: $(".vert-next"),
-        infinite: true,
-        focusOnSelect: true,
-        responsive: [
-            {
-                breakpoint: 991,
-                settings: {
-                    vertical: false,
-                    verticalSwiping: false,
-                    arrows: false,
-                    slidesToShow: 3,
-                    variableWidth: true,
-                },
-            },
-            {
-                breakpoint: 480,
-                settings: {
-                    vertical: false,
-                    verticalSwiping: false,
-                    arrows: false,
-                    slidesToShow: 2,
-                    variableWidth: true,
-                },
-            },
-        ],
-    });
+        $modalCarousel.slick({
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            vertical: !isMobile,
+            verticalSwiping: !isMobile,
+            arrows: !isMobile,
+            prevArrow: $(".vert-prev"),
+            nextArrow: $(".vert-next"),
+            infinite: true,
+            focusOnSelect: true,
+            responsive: [
+                { breakpoint: 991, settings: { vertical: false, verticalSwiping: false, arrows: false, slidesToShow: 3, variableWidth: true } },
+                { breakpoint: 480, settings: { vertical: false, verticalSwiping: false, arrows: false, slidesToShow: 2, variableWidth: true } },
+            ],
+        });
     }
 
-    // 4. Handle viewport updates without full reload
     $(window).on("resize", function () {
         const checkMobile = window.innerWidth <= 991;
         if (checkMobile !== isMobile) {
@@ -1280,39 +452,27 @@ $(document).ready(function () {
         }
     });
 
-    // 5. Instantly swap active big menu card photo frame elements
     $modalCarousel.on("afterChange", function (event, slick, currentSlide) {
         const activeImgSrc = $(slick.$slides[currentSlide]).attr("data-img");
         $("#modal-active-display-img").attr("src", activeImgSrc);
     });
 
-    // 6. Interaction Event: Popup Window Open Action
     $(".menu-thumb-card").on("click", function () {
-        // ADD THESE TWO LINES:
         $(".menu-thumb-card").removeClass("active-card");
         $(this).addClass("active-card");
-
         const targetIndex = $(this).data("index");
         const targetImg = $(this).data("img");
-
         $mainCarousel.slick("slickPause");
-
         $("#modal-active-display-img").attr("src", targetImg);
         $(".js-modal-overlay").addClass("active");
-
         setTimeout(() => {
             $modalCarousel.slick("setPosition");
             $modalCarousel.slick("slickGoTo", targetIndex, true);
         }, 60);
     });
 
-    // 7. Interaction Event: Popup Window Close Action
     $(".js-close-modal, .js-modal-overlay").on("click", function (e) {
-        if (
-            e.target === this ||
-            $(this).hasClass("js-close-modal") ||
-            $(this).parents(".js-close-modal").length
-        ) {
+        if (e.target === this || $(this).hasClass("js-close-modal") || $(this).parents(".js-close-modal").length) {
             $(".js-modal-overlay").removeClass("active");
             $mainCarousel.slick("slickPlay");
         }
@@ -1322,94 +482,65 @@ $(document).ready(function () {
 $(document).ready(function () {
     if (typeof $.fn.slick === "undefined") return;
 
-    // 1. Text Content Slider
     const $sliderFor = $(".slider-for");
     if ($sliderFor.length) {
-    $sliderFor.slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: true,
-        fade: true,
-        cssEase: "cubic-bezier(0.25, 1, 0.5, 1)",
-        speed: 800 /* Synchronized with CSS transition */,
-        asNavFor: ".slider-nav",
-        prevArrow: $(".custom-prev"),
-        nextArrow: $(".custom-next"),
-    });
-    $sliderFor.closest(".platter-card").addClass("is-slick-ready");
+        $sliderFor.slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: true,
+            fade: true,
+            cssEase: "cubic-bezier(0.25, 1, 0.5, 1)",
+            speed: 800,
+            asNavFor: ".slider-nav",
+            prevArrow: $(".custom-prev"),
+            nextArrow: $(".custom-next"),
+        });
+        $sliderFor.closest(".platter-card").addClass("is-slick-ready");
     }
 
-    // 2. Image Thumbnail Slider
     const $sliderNav = $(".slider-nav");
     if ($sliderNav.length) {
-    $sliderNav.slick({
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        asNavFor: ".slider-for",
-        dots: false,
-        arrows: false,
-        centerMode: true,
-        focusOnSelect: true,
-        vertical: true,
-        verticalSwiping: true,
-        centerPadding: "0px",
-        cssEase: "cubic-bezier(0.25, 1, 0.5, 1)",
-        speed: 800 /* Synchronized with CSS transition */,
-        responsive: [
-            {
-                breakpoint: 991,
-                settings: {
-                    vertical: false,
-                    verticalSwiping: false,
-                    centerMode: true,
-                    centerPadding: "0px",
-                    slidesToShow: 3,
-                },
-            },
-            {
-                breakpoint: 576,
-                settings: {
-                    vertical: false,
-                    verticalSwiping: false,
-                    centerMode: true,
-                    centerPadding: "24px",
-                    slidesToShow: 1,
-                },
-            },
-        ],
-    });
+        $sliderNav.slick({
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            asNavFor: ".slider-for",
+            dots: false,
+            arrows: false,
+            centerMode: true,
+            focusOnSelect: true,
+            vertical: true,
+            verticalSwiping: true,
+            centerPadding: "0px",
+            cssEase: "cubic-bezier(0.25, 1, 0.5, 1)",
+            speed: 800,
+            responsive: [
+                { breakpoint: 991, settings: { vertical: false, verticalSwiping: false, centerMode: true, centerPadding: "0px", slidesToShow: 3 } },
+                { breakpoint: 576, settings: { vertical: false, verticalSwiping: false, centerMode: true, centerPadding: "24px", slidesToShow: 1 } },
+            ],
+        });
     }
 
-    // 3. Popup Modal Logic
     $(document).on("click", ".trigger-menu-popup", function (e) {
         e.preventDefault();
         const menuImage = $(this).data("menu-image");
         const platterTitle = $(this).data("platter-title");
-        
         if (menuImage) {
             $("#menuPopup img").attr("src", menuImage).attr("alt", platterTitle);
         }
-        
         $("#menuPopup").css("display", "flex").hide().fadeIn(300);
     });
 
     $("#menuPopup, .menu-modal-close").on("click", function (e) {
-        if (
-            e.target === this ||
-            $(this).hasClass("menu-modal-close") ||
-            $(this).closest(".menu-modal-close").length
-        ) {
+        if (e.target === this || $(this).hasClass("menu-modal-close") || $(this).closest(".menu-modal-close").length) {
             $("#menuPopup").fadeOut(300);
         }
     });
 });
 
-/* DD Dev Credit — loaded via dd-credit.js */
-
+/* ── Floating Action Button Group ─────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
-    const group     = document.getElementById('floatingActionGroup');
+    const group = document.getElementById('floatingActionGroup');
     const toggleBtn = document.getElementById('fabMainToggle');
-
     if (!group || !toggleBtn) return;
 
     function closeMenu() {
@@ -1422,27 +553,19 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleBtn.setAttribute('aria-expanded', 'true');
     }
 
-    // Toggle on main button click
     toggleBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         group.classList.contains('is-open') ? closeMenu() : openMenu();
     });
 
-    // Close when clicking anywhere outside the FAB group
     document.addEventListener('click', function (e) {
-        if (!group.contains(e.target)) {
-            closeMenu();
-        }
+        if (!group.contains(e.target)) closeMenu();
     });
 
-    // Close automatically after selecting any action
     group.querySelectorAll('.fab-item').forEach(function (item) {
-        item.addEventListener('click', function () {
-            closeMenu();
-        });
+        item.addEventListener('click', function () { closeMenu(); });
     });
 
-    // Close on Escape key
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeMenu();
     });

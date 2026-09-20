@@ -392,3 +392,5 @@ const initCartPages = () => {
     renderCheckoutSummary();
     initCartEvents();
 };
+
+initCartPages();
