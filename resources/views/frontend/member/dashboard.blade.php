@@ -32,21 +32,23 @@
 }
 .member-dashboard .md-hero-btn-outline {
     background: transparent;
-    border: 1px solid rgba(223, 166, 83, 0.45);
-    color: var(--dd-gold);
+    border: 1px solid rgba(255, 107, 53, 0.45);
+    color: var(--brand-secondary);
 }
 .member-dashboard .md-hero-btn-outline:hover {
-    background: rgba(223, 166, 83, 0.12);
-    color: var(--dd-gold);
+    background: rgba(255, 107, 53, 0.12);
+    color: var(--brand-secondary);
 }
-.member-dashboard .md-hero-btn-solid {
-    background: var(--dd-gold);
-    border: 1px solid var(--dd-gold);
-    color: #1f1412;
+.member-dashboard .md-hero-btn-solid,
+.member-dashboard .md-hero-btn.is-active {
+    background: var(--brand-secondary);
+    border: 1px solid var(--brand-secondary);
+    color: #fff;
 }
-.member-dashboard .md-hero-btn-solid:hover {
-    background: var(--dd-gold-hover);
-    color: #1f1412;
+.member-dashboard .md-hero-btn-solid:hover,
+.member-dashboard .md-hero-btn.is-active:hover {
+    background: var(--brand-secondary-dark);
+    color: #fff;
 }
 .member-dashboard .md-main-box {
     margin-top: -100px;
@@ -72,8 +74,8 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(223, 166, 83, 0.12);
-    color: var(--dd-gold);
+    background: rgba(255, 107, 53, 0.1);
+    color: var(--brand-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -103,8 +105,8 @@
     min-width: 0;
 }
 .member-dashboard .md-card-visual {
-    background: linear-gradient(135deg, rgba(223,166,83,0.18) 0%, rgba(255,255,255,0.06) 100%);
-    border: 1px solid rgba(223, 166, 83, 0.35);
+    background: linear-gradient(135deg, rgba(255,107,53,0.18) 0%, rgba(255,255,255,0.06) 100%);
+    border: 1px solid rgba(255, 107, 53, 0.35);
     border-radius: 16px;
     padding: 22px;
     margin-bottom: 22px;
@@ -118,7 +120,7 @@
     right: -40px;
     width: 120px;
     height: 120px;
-    background: radial-gradient(circle, rgba(223,166,83,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,107,53,0.2) 0%, transparent 70%);
     border-radius: 50%;
 }
 .member-dashboard .md-card-label {
@@ -132,7 +134,7 @@
     font-family: 'Courier New', monospace;
     font-size: 1.05rem;
     font-weight: 700;
-    color: var(--dd-gold);
+    color: var(--brand-secondary);
     letter-spacing: 0.06em;
     word-break: break-all;
 }
@@ -176,14 +178,14 @@
     max-width: 60%;
 }
 .member-dashboard .md-login-tip {
-    margin-top: 20px;
+    margin-top: 16px;
     padding: 16px;
     border-radius: 12px;
-    background: rgba(223, 166, 83, 0.1);
-    border: 1px dashed rgba(223, 166, 83, 0.35);
+    background: rgba(255, 107, 53, 0.1);
+    border: 1px dashed rgba(255, 107, 53, 0.35);
 }
 .member-dashboard .md-login-tip h6 {
-    color: var(--dd-gold);
+    color: var(--brand-secondary);
     font-size: 0.82rem;
     font-weight: 700;
     margin-bottom: 8px;
@@ -359,8 +361,8 @@
     cursor: pointer;
 }
 .member-dashboard .md-qty-stepper button:hover {
-    background: var(--dd-gold);
-    color: #1f1412;
+    background: var(--brand-secondary);
+    color: #fff;
 }
 .member-dashboard .md-qty-stepper button.md-qty-remove {
     color: #dc3545;
@@ -413,7 +415,7 @@
 .member-dashboard .md-badge-confirmed { background: #cce5ff; color: #004085; }
 .member-dashboard .md-badge-completed { background: #d4edda; color: #155724; }
 .member-dashboard .md-badge-canceled { background: #f8d7da; color: #721c24; }
-.member-dashboard .md-badge-golden { background: rgba(223,166,83,0.2); color: #a67c2e; }
+.member-dashboard .md-badge-golden { background: rgba(255,107,53,0.2); color: var(--brand-secondary); }
 .member-dashboard .md-badge-member { background: rgba(13,202,240,0.15); color: #0aa2c0; }
 .member-dashboard .md-badge-approved { background: #d4edda; color: #155724; }
 .member-dashboard .md-badge-rejected { background: #f8d7da; color: #721c24; }
@@ -429,12 +431,23 @@
 }
 .member-dashboard .md-empty-state h5 {
     color: var(--dd-text-main);
+    font-size: 14px;
     margin-bottom: 8px;
 }
 .member-dashboard .md-empty-state p {
     color: var(--dd-text-muted);
-    font-size: 0.92rem;
+    font-size: 14px;
     margin-bottom: 20px;
+}
+.member-dashboard .md-empty-state .dd-submit-btn {
+    background: var(--brand-secondary);
+    border: none;
+}
+.member-dashboard .md-empty-state .dd-submit-btn::before {
+    background: var(--brand-secondary-dark);
+}
+.member-dashboard .md-empty-state .dd-submit-btn:hover {
+    background: var(--brand-secondary-dark);
 }
 .member-dashboard .md-profile-panel {
     background: #fff;
@@ -512,13 +525,13 @@
     max-width: 100%;
 }
 .member-dashboard .md-save-btn {
-    background: var(--dd-gold);
-    color: #1f1412;
+    background: var(--brand-secondary);
+    color: #fff;
     border: none;
     font-weight: 700;
 }
 .member-dashboard .md-save-btn:hover {
-    background: var(--dd-gold-hover);
+    background: var(--brand-secondary-dark);
 }
 .member-dashboard .md-cancel-btn {
     background: transparent;
@@ -721,7 +734,7 @@
                     <iconify-icon icon="solar:delivery-linear"></iconify-icon>
                     Track Order
                 </a>
-                <a href="{{ route('frontend.completeMenu') }}" class="md-hero-btn md-hero-btn-solid">
+                <a href="{{ route('frontend.completeMenu') }}" class="md-hero-btn md-hero-btn-outline" data-tab="order">
                     <iconify-icon icon="solar:chef-hat-linear"></iconify-icon>
                     Order Food
                 </a>
@@ -729,7 +742,7 @@
                     <iconify-icon icon="solar:phone-calling-linear"></iconify-icon>
                     Contact Us
                 </a>
-                <button type="button" class="md-hero-btn md-hero-btn-outline border-0" id="mdEditProfileBtn">
+                <button type="button" class="md-hero-btn md-hero-btn-outline border-0" id="mdEditProfileBtn" data-tab="profile">
                     <iconify-icon icon="solar:user-edit-linear"></iconify-icon>
                     Edit Profile
                 </button>
@@ -753,7 +766,7 @@
         <div id="mdEditView" class="{{ $errors->any() ? '' : 'd-none' }}">
             <div class="md-profile-panel md-edit-panel">
                 <div class="md-panel-header">
-                    <h3><iconify-icon icon="solar:user-edit-linear" class="me-2" style="color: var(--dd-gold);"></iconify-icon>Edit Profile</h3>
+                    <h3><iconify-icon icon="solar:user-edit-linear" class="me-2" style="color: var(--brand-secondary);"></iconify-icon>Edit Profile</h3>
                 </div>
 
                 @if ($errors->any())
@@ -926,7 +939,7 @@
 
                 <div class="md-orders-panel">
                     <div class="md-panel-header">
-                        <h3><iconify-icon icon="solar:clipboard-list-linear" class="me-2" style="color: var(--dd-gold);"></iconify-icon>My Orders</h3>
+                        <h3><iconify-icon icon="solar:clipboard-list-linear" class="me-2" style="color: var(--brand-secondary);"></iconify-icon>My Orders</h3>
                         <a href="{{ route('frontend.completeMenu') }}" class="btn btn-sm btn-dark">+ New Order</a>
                     </div>
 
@@ -1102,21 +1115,36 @@ document.addEventListener('DOMContentLoaded', function () {
     var cancelBtn = document.getElementById('mdCancelEditBtn');
     var profileForm = document.getElementById('mdProfileForm');
     var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    var heroBtns = document.querySelectorAll('.md-hero-actions .md-hero-btn[data-tab]');
+
+    function setActiveTab(tab) {
+        heroBtns.forEach(function(btn) {
+            if (btn.getAttribute('data-tab') === tab) {
+                btn.classList.add('is-active');
+            } else {
+                btn.classList.remove('is-active');
+            }
+        });
+    }
 
     function showDefaultDashboard() {
         if (defaultView) defaultView.classList.remove('d-none');
         if (editView) editView.classList.add('d-none');
         if (profileForm) profileForm.reset();
+        setActiveTab('order');
     }
 
     function showEditProfile() {
         if (defaultView) defaultView.classList.add('d-none');
         if (editView) editView.classList.remove('d-none');
         if (editView) editView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveTab('profile');
     }
 
     if (editBtn) editBtn.addEventListener('click', showEditProfile);
     if (cancelBtn) cancelBtn.addEventListener('click', showDefaultDashboard);
+
+    setActiveTab('order');
 
     if (copyBtn && cardDisplay) {
         copyBtn.addEventListener('click', function () {
