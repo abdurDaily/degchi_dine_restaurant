@@ -41,7 +41,7 @@ class ResponsiveImage extends Component
         $this->sizes = $sizes;
     }
 
-    public function render(): string
+    public function render(): \Illuminate\View\View
     {
         return view('components.responsive-image');
     }
