@@ -65,6 +65,8 @@
 
                     <div class="about-img-container">
                         <img src="{{ $aboutImage }}" alt="Degchi Dine - About Our Restaurant" class="about-main-img"
+                            width="600" height="600"
+                            loading="lazy"
                             onerror="this.src='{{ asset('assets/frontend/images/about.png') }}'" />
                         <div class="about-img-overlay"></div>
                     </div>

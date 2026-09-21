@@ -87,6 +87,8 @@ class FacebookReelController extends Controller
 
             FacebookReel::create($data);
 
+            cache()->forget('home_reels');
+
             return response()->json(['status' => 'success', 'message' => 'Facebook Reel added successfully!']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -125,6 +127,8 @@ class FacebookReelController extends Controller
 
             $facebookReel->update($data);
 
+            cache()->forget('home_reels');
+
             return response()->json(['status' => 'success', 'message' => 'Facebook Reel updated successfully!']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -137,6 +141,8 @@ class FacebookReelController extends Controller
             unlink(public_path('uploads/reels/' . $facebookReel->thumbnail));
         }
         $facebookReel->delete();
+
+        cache()->forget('home_reels');
 
         return response()->json(['status' => 'success', 'message' => 'Facebook Reel deleted!']);
     }

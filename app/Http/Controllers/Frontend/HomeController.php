@@ -88,27 +88,37 @@ class HomeController extends Controller
             return Branch::orderBy('name')->select(['id', 'name', 'location', 'phone', 'slug', 'foodpanda_url', 'pathao_url', 'foodi_url', 'foodpanda_logo', 'pathao_logo', 'foodi_logo'])->get();
         });
 
-        $signaturePlatters = SignaturePlatter::where('status', 1)
-            ->orderBy('sort_order')
-            ->get();
+        $signaturePlatters = cache()->remember('home_platters', 600, function () {
+            return SignaturePlatter::where('status', 1)
+                ->orderBy('sort_order')
+                ->get();
+        });
 
-        $facebookReels = FacebookReel::where('status', true)
-            ->orderBy('sort_order')
-            ->get();
+        $facebookReels = cache()->remember('home_reels', 600, function () {
+            return FacebookReel::where('status', true)
+                ->orderBy('sort_order')
+                ->get();
+        });
 
-        $aboutSettings = Setting::where('setting_group', 'about_section')
-            ->get()
-            ->keyBy('key');
+        $aboutSettings = cache()->remember('home_about_settings', 1800, function () {
+            return Setting::where('setting_group', 'about_section')
+                ->get()
+                ->keyBy('key');
+        });
 
-        $contactSettings = Setting::where('setting_group', 'contact_section')
-            ->get()
-            ->keyBy('key');
+        $contactSettings = cache()->remember('home_contact_settings', 1800, function () {
+            return Setting::where('setting_group', 'contact_section')
+                ->get()
+                ->keyBy('key');
+        });
 
         // Fetch last 10 approved reviews
-        $reviews = Review::where('status', 'approved')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+        $reviews = cache()->remember('home_reviews', 300, function () {
+            return Review::where('status', 'approved')
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
+        });
 
         // Cache popup offer for 5 minutes
         $popupOffer = cache()->remember('home_popup_offer', 300, function () {

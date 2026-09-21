@@ -38,6 +38,7 @@
 @endif
     <div class="pcard-img-wrap">
         <img src="{{ $imageUrl }}" alt="{{ $menu->name }}" class="pcard-img"
+             width="400" height="300"
              loading="lazy"
              onerror="this.src='{{ asset('assets/placeholder/placeholder.png') }}'" />
 

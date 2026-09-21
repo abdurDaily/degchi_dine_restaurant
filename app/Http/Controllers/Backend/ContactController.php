@@ -62,6 +62,7 @@ class ContactController extends Controller
             }
 
             DB::commit();
+            cache()->forget('home_contact_settings');
             return response()->json(['status' => 'success', 'message' => 'Contact section updated successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();

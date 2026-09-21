@@ -101,6 +101,8 @@ class SignaturePlatterController extends Controller
 
             SignaturePlatter::create($data);
 
+            cache()->forget('home_platters');
+
             return response()->json(['status' => 'success', 'message' => 'Signature Platter created successfully!']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -161,6 +163,8 @@ class SignaturePlatterController extends Controller
 
             $signaturePlatter->update($data);
 
+            cache()->forget('home_platters');
+
             return response()->json(['status' => 'success', 'message' => 'Signature Platter updated successfully!']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -180,6 +184,8 @@ class SignaturePlatterController extends Controller
         }
         
         $signaturePlatter->delete();
+
+        cache()->forget('home_platters');
 
         return response()->json(['status' => 'success', 'message' => 'Signature Platter deleted!']);
     }

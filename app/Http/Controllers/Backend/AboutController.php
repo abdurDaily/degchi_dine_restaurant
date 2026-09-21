@@ -85,6 +85,7 @@ class AboutController extends Controller
             }
 
             DB::commit();
+            cache()->forget('home_about_settings');
             return response()->json(['status' => 'success', 'message' => 'About section updated successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();

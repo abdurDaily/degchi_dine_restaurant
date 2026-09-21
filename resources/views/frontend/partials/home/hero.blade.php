@@ -1,6 +1,6 @@
 <!-- HERO -->
 <section id="home" class="hero">
-    <video class="hero-video" autoplay muted loop playsinline preload="auto"
+    <video class="hero-video" autoplay muted loop playsinline preload="metadata"
         poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
         <source src="{{ asset('assets/frontend/video/degchi_dine_banner_video.mp4') }}" type="video/mp4" />
     </video>

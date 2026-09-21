@@ -34,12 +34,17 @@ class UploadService
             $manager = ImageManager::gd();
             $image = $manager
                 ->read($img);
-            // ->scale(height: 200);
+
+            // Resize large images to max 1200px width (preserve aspect ratio, never upscale)
+            $originalWidth = $image->width();
+            if ($originalWidth > 1200) {
+                $image->resize(width: 1200);
+            }
 
             // Get original extension
             $extension = $img->getClientOriginalExtension();
 
-            // Encode image in its original format
+            // Encode image in its original format with quality optimization
             switch (strtolower($extension))
             {
                 case 'png':
@@ -49,7 +54,7 @@ class UploadService
                     $imagedata = (string) $image->toGif();
                     break;
                 case 'webp':
-                    $imagedata = (string) $image->toWebp();
+                    $imagedata = (string) $image->toWebp(80);
                     break;
                 case 'bmp':
                     $imagedata = (string) $image->toBmp();
@@ -57,7 +62,7 @@ class UploadService
                 case 'jpg':
                 case 'jpeg':
                 default:
-                    $imagedata = (string) $image->toJpeg(); // Default to JPEG (no transparency)
+                    $imagedata = (string) $image->toJpeg(80);
                     break;
             }
 

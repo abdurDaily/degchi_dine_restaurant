@@ -131,6 +131,8 @@ class ReviewController extends Controller
             'approved_by' => auth()->id(),
         ]);
 
+        cache()->forget('home_reviews');
+
         return response()->json([
             'success' => true,
             'message' => 'Review approved successfully!',
@@ -144,6 +146,8 @@ class ReviewController extends Controller
             'approved_by' => auth()->id(),
         ]);
 
+        cache()->forget('home_reviews');
+
         return response()->json([
             'success' => true,
             'message' => 'Review rejected.',
@@ -153,6 +157,8 @@ class ReviewController extends Controller
     public function delete(Review $review)
     {
         $review->delete();
+
+        cache()->forget('home_reviews');
 
         return response()->json([
             'success' => true,

@@ -31,6 +31,8 @@
                             @endphp
                             <img src="{{ $avatarUrl }}" class="review-avatar"
                                 alt="{{ $review->name }} - Degchi Dine Guest Review"
+                                width="48" height="48"
+                                loading="lazy"
                                 onerror="this.src='{{ asset('assets/images/defult_image/degchi_dine_avater.jpg') }}'" />
                             <div class="author-info">
                                 <strong class="d-block">{{ $review->name }}</strong>
@@ -57,7 +59,7 @@
                         </p>
                         <hr class="review-divider" />
                         <div class="review-author">
-                            <img src="{{ asset('assets/images/defult_image/degchi_dine_avater.jpg') }}" class="review-avatar" alt="Degchi Dine" />
+                            <img src="{{ asset('assets/images/defult_image/degchi_dine_avater.jpg') }}" class="review-avatar" alt="Degchi Dine" width="48" height="48" loading="lazy" />
                             <div class="author-info">
                                 <strong class="d-block">Degchi Dine</strong>
                                 <span class="text-muted small">Coming Soon</span>
