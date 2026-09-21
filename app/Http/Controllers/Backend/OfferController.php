@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Offer;
 use App\Models\MenuVariation;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class OfferController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:offers-show')->only(['index', 'create', 'edit']);
         $this->middleware('permission:offers-create')->only('store');
@@ -38,7 +39,7 @@ class OfferController extends Controller
         $data = $this->validated($request);
 
         if ($request->hasFile('popup_image')) {
-            $data['popup_image'] = $request->file('popup_image')->store('offers', 'public');
+            $data['popup_image'] = $this->uploadService->uploadToDisk($request->file('popup_image'), 'offers', 'public');
         }
 
         $offer = Offer::create($data);
@@ -72,11 +73,10 @@ class OfferController extends Controller
         $data = $this->validated($request, $offer->id);
 
         if ($request->hasFile('popup_image')) {
-            // Delete old image
             if ($offer->popup_image) {
                 Storage::disk('public')->delete($offer->popup_image);
             }
-            $data['popup_image'] = $request->file('popup_image')->store('offers', 'public');
+            $data['popup_image'] = $this->uploadService->uploadToDisk($request->file('popup_image'), 'offers', 'public');
         }
 
         $offer->update($data);

@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Category;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:category-list')->only(['index', 'edit']);
         $this->middleware('permission:category-create')->only('store');
@@ -29,7 +30,7 @@ class CategoryController extends Controller
                     return $row->branch->name ?? '<span class="text-danger">No Branch</span>';
                 })
                 ->addColumn('image', function ($row) {
-                    $url = $row->image ? asset($row->image) : asset('assets/placeholder/placeholder.png');
+                    $url = $row->image ? asset('uploads/categories/' . $row->image) : asset('assets/placeholder/placeholder.png');
                     return '<img src="' . $url . '" width="50" class="rounded shadow-sm" />';
                 })
                 ->addColumn('status', function ($row) {
@@ -68,15 +69,10 @@ class CategoryController extends Controller
             $data = $request->only(['branch_id', 'name', 'status']);
             $data['slug'] = \Illuminate\Support\Str::slug($request->name);
 
-            // 2. Handle Image Upload
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('uploads/categories'), $imageName);
-                $data['image'] = 'uploads/categories/' . $imageName;
+                $data['image'] = $this->uploadService->uploadTo($request->file('image'), public_path('uploads/categories'));
             }
 
-            // 3. Create Record
             Category::create($data);
 
             return response()->json([
@@ -108,12 +104,10 @@ class CategoryController extends Controller
         $data['slug'] = Str::slug($request->name);
 
         if ($request->hasFile('image')) {
-            if ($category->image && file_exists(public_path($category->image))) {
-                unlink(public_path($category->image));
+            if ($category->image && file_exists(public_path('uploads/categories/' . $category->image))) {
+                unlink(public_path('uploads/categories/' . $category->image));
             }
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('uploads/categories'), $imageName);
-            $data['image'] = 'uploads/categories/' . $imageName;
+            $data['image'] = $this->uploadService->uploadTo($request->file('image'), public_path('uploads/categories'));
         }
 
         $category->update($data);
@@ -122,8 +116,8 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        if ($category->image && file_exists(public_path($category->image))) {
-            unlink(public_path($category->image));
+        if ($category->image && file_exists(public_path('uploads/categories/' . $category->image))) {
+            unlink(public_path('uploads/categories/' . $category->image));
         }
         $category->delete();
         return response()->json(['status' => 'success', 'message' => 'Category deleted!']);

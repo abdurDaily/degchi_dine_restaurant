@@ -151,7 +151,7 @@ class MemberAuthController extends Controller
 
         if ($request->hasFile('profile_image')) {
             $uploadService = app(\App\Services\UploadService::class);
-            $uploaded = $uploadService->upload([$request->file('profile_image')], 'profile_images', 'public', 300);
+            $uploaded = $uploadService->upload([$request->file('profile_image')], 'profile_images', 'public');
             $member->profile_image_path = $uploaded[0] ?? null;
         }
 

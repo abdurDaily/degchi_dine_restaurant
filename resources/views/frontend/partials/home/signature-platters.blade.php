@@ -21,9 +21,9 @@
                             @endphp
                             <div class="nav-item">
                                 <div class="nav-img-wrapper">
-                                    <x-responsive-image src="{{ $platter->thumbnail_image ? (strpos($platter->thumbnail_image, 'http') === 0 ? $platter->thumbnail_image : 'uploads/platters/' . $platter->thumbnail_image) : 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80' }}" alt="{{ $platter->title }}"
+                                    <img src="{{ $platter->thumbnail_image ? (strpos($platter->thumbnail_image, 'http') === 0 ? $platter->thumbnail_image : asset('uploads/platters/' . $platter->thumbnail_image)) : 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80' }}" alt="{{ $platter->title }}"
                                         width="130" height="130"
-                                        sizes="130px"
+                                        loading="lazy"
                                         onerror="this.src='https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&q=80'" />
                                     <div class="sticker-badge">
                                         <div class="sticker-inner">

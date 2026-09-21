@@ -65,7 +65,7 @@
                     <div class="about-shape-backdrop"></div>
 
                     <div class="about-img-container">
-                        <x-responsive-image src="{{ $aboutImageRaw }}" alt="Degchi Dine - About Our Restaurant" class="about-main-img"
+                        <img src="{{ $aboutImage }}" alt="Degchi Dine - About Our Restaurant" class="about-main-img"
                             width="600" height="600"
                             loading="lazy"
                             onerror="this.src='{{ asset('assets/frontend/images/about.webp') }}'" />

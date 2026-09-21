@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\SignaturePlatter;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class SignaturePlatterController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:signature-platters-list')->only(['index', 'edit']);
         $this->middleware('permission:signature-platters-create')->only('store');
@@ -83,20 +84,12 @@ class SignaturePlatterController extends Controller
                 $data['features'] = $features ?: null;
             }
 
-            // Handle thumbnail image upload
             if ($request->hasFile('thumbnail_image')) {
-                $file      = $request->file('thumbnail_image');
-                $imageName = time() . '_thumb_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/platters'), $imageName);
-                $data['thumbnail_image'] = $imageName;
+                $data['thumbnail_image'] = $this->uploadService->uploadTo($request->file('thumbnail_image'), public_path('uploads/platters'));
             }
 
-            // Handle menu card image upload
             if ($request->hasFile('menu_card_image')) {
-                $file      = $request->file('menu_card_image');
-                $imageName = time() . '_menu_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/platters'), $imageName);
-                $data['menu_card_image'] = $imageName;
+                $data['menu_card_image'] = $this->uploadService->uploadTo($request->file('menu_card_image'), public_path('uploads/platters'));
             }
 
             SignaturePlatter::create($data);
@@ -137,28 +130,18 @@ class SignaturePlatterController extends Controller
                 $data['features'] = $features ?: null;
             }
 
-            // Handle thumbnail image upload
             if ($request->hasFile('thumbnail_image')) {
-                // Delete old thumbnail
                 if ($signaturePlatter->thumbnail_image && file_exists(public_path('uploads/platters/' . $signaturePlatter->thumbnail_image))) {
                     unlink(public_path('uploads/platters/' . $signaturePlatter->thumbnail_image));
                 }
-                $file      = $request->file('thumbnail_image');
-                $imageName = time() . '_thumb_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/platters'), $imageName);
-                $data['thumbnail_image'] = $imageName;
+                $data['thumbnail_image'] = $this->uploadService->uploadTo($request->file('thumbnail_image'), public_path('uploads/platters'));
             }
 
-            // Handle menu card image upload
             if ($request->hasFile('menu_card_image')) {
-                // Delete old menu card image
                 if ($signaturePlatter->menu_card_image && file_exists(public_path('uploads/platters/' . $signaturePlatter->menu_card_image))) {
                     unlink(public_path('uploads/platters/' . $signaturePlatter->menu_card_image));
                 }
-                $file      = $request->file('menu_card_image');
-                $imageName = time() . '_menu_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/platters'), $imageName);
-                $data['menu_card_image'] = $imageName;
+                $data['menu_card_image'] = $this->uploadService->uploadTo($request->file('menu_card_image'), public_path('uploads/platters'));
             }
 
             $signaturePlatter->update($data);

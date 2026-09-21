@@ -29,10 +29,9 @@
                                     ? 'storage/' . $review->image
                                     : 'assets/images/defult_image/degchi_dine_avater.jpg';
                             @endphp
-                            <x-responsive-image src="{{ $avatarUrl }}" class="review-avatar"
+                            <img src="{{ asset($avatarUrl) }}" class="review-avatar"
                                 alt="{{ $review->name }} - Degchi Dine Guest Review"
                                 width="48" height="48"
-                                sizes="48px"
                                 loading="lazy"
                                 onerror="this.src='{{ asset('assets/images/defult_image/degchi_dine_avater.jpg') }}'" />
                             <div class="author-info">

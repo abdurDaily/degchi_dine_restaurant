@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PostController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:posts-list|blog-categories-list|comments-show')->only('index');
         $this->middleware('permission:posts-list')->only('edit');
@@ -78,10 +79,7 @@ class PostController extends Controller
                 $imagePath = null;
 
                 if ($request->hasFile('image')) {
-                    $file = $request->file('image');
-                    $imageName = time().'_'.uniqid().'.'.$file->extension();
-                    $file->move(public_path('uploads/posts'), $imageName);
-                    $imagePath = $imageName;
+                    $imagePath = $this->uploadService->uploadTo($request->file('image'), public_path('uploads/posts'));
                 }
 
                 $post = Post::create([
@@ -136,16 +134,11 @@ class PostController extends Controller
                     $imagePath = null;
                 }
 
-                // Replace with newly uploaded image
                 if ($request->hasFile('image')) {
                     if ($post->image && file_exists(public_path('uploads/posts/'.$post->image))) {
                         unlink(public_path('uploads/posts/'.$post->image));
                     }
-
-                    $file = $request->file('image');
-                    $imageName = time().'_'.uniqid().'.'.$file->extension();
-                    $file->move(public_path('uploads/posts'), $imageName);
-                    $imagePath = $imageName;
+                    $imagePath = $this->uploadService->uploadTo($request->file('image'), public_path('uploads/posts'));
                 }
 
                 $post->update([

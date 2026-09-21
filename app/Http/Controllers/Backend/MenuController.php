@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Menu;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class MenuController extends Controller
 {
     private const VARIATION_UPLOAD_DIR = 'uploads/menus/variations';
 
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:menu-list')->only(['index', 'edit']);
         $this->middleware('permission:menu-create')->only('store');
@@ -272,9 +273,7 @@ class MenuController extends Controller
             mkdir($uploadDir, 0755, true);
         }
 
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
-        $imageName = time().'_'.$index.'_'.Str::random(6).'.'.$extension;
-        $file->move($uploadDir, $imageName);
+        $imageName = $this->uploadService->uploadTo($file, $uploadDir);
 
         return self::VARIATION_UPLOAD_DIR.'/'.$imageName;
     }

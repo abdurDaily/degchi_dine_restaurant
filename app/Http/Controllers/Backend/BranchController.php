@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class BranchController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:branch-list')->only(['index', 'edit']);
         $this->middleware('permission:branch-create')->only('store');
@@ -251,15 +252,12 @@ class BranchController extends Controller
         $logoFields = ['foodpanda_logo', 'pathao_logo', 'foodi_logo'];
         $uploadDir = public_path('uploads/branches');
 
-        // Create directory if it doesn't exist
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
         foreach ($logoFields as $field) {
-            // Check if file was uploaded
             if ($request->hasFile($field) && $request->file($field)->isValid()) {
-                // Delete old file if updating
                 if ($branch && isset($branch->$field) && $branch->$field) {
                     $oldPath = $uploadDir . '/' . $branch->$field;
                     if (file_exists($oldPath)) {
@@ -267,22 +265,15 @@ class BranchController extends Controller
                     }
                 }
 
-                // Upload new file
                 try {
-                    $file = $request->file($field);
-                    $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-                    $file->move($uploadDir, $filename);
-                    $branchData[$field] = $filename;
-                    \Log::info('Uploaded file for ' . $field . ': ' . $filename);
+                    $branchData[$field] = $this->uploadService->uploadTo($request->file($field), $uploadDir);
                 } catch (\Exception $e) {
                     \Log::error('File upload error for ' . $field . ': ' . $e->getMessage());
-                    // Continue without this file - don't break the update
                     if (!$branch) {
                         $branchData[$field] = null;
                     }
                 }
             } else if ($branch) {
-                // If updating and no new file uploaded, keep existing
                 if (isset($branch->$field) && $branch->$field) {
                     $branchData[$field] = $branch->$field;
                 }

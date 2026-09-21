@@ -245,7 +245,7 @@ class HomeController extends Controller
         $profileImagePath = null;
         if ($request->hasFile('profile_image')) {
             $uploadService = app(\App\Services\UploadService::class);
-            $uploaded = $uploadService->upload([$request->file('profile_image')], 'profile_images', 'public', 300);
+            $uploaded = $uploadService->upload([$request->file('profile_image')], 'profile_images', 'public');
             $profileImagePath = $uploaded[0] ?? null;
         }
 

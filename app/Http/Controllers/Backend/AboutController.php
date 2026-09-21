@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AboutController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:about-show')->only('index');
         $this->middleware('permission:about-edit')->only('store');
@@ -62,13 +63,9 @@ class AboutController extends Controller
                 );
             }
 
-            // Handle image upload separately
             if ($request->hasFile('about_image')) {
-                $file      = $request->file('about_image');
-                $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/about'), $imageName);
+                $imageName = $this->uploadService->uploadTo($request->file('about_image'), public_path('uploads/about'));
 
-                // Delete old image if it exists
                 $old = Setting::where('key', 'about_image')->first();
                 if ($old && $old->value && file_exists(public_path('uploads/about/' . $old->value))) {
                     unlink(public_path('uploads/about/' . $old->value));

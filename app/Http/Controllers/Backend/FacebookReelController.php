@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\FacebookReel;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class FacebookReelController extends Controller
 {
-    public function __construct()
+    public function __construct(protected UploadService $uploadService)
     {
         $this->middleware('permission:facebook-reels-list')->only(['index', 'edit']);
         $this->middleware('permission:facebook-reels-create')->only('store');
@@ -79,10 +80,7 @@ class FacebookReelController extends Controller
             $data['sort_order'] = $data['sort_order'] ?? 0;
 
             if ($request->hasFile('thumbnail')) {
-                $file      = $request->file('thumbnail');
-                $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/reels'), $imageName);
-                $data['thumbnail'] = $imageName;
+                $data['thumbnail'] = $this->uploadService->uploadTo($request->file('thumbnail'), public_path('uploads/reels'));
             }
 
             FacebookReel::create($data);
@@ -115,14 +113,10 @@ class FacebookReelController extends Controller
             $data['sort_order'] = $data['sort_order'] ?? $facebookReel->sort_order;
 
             if ($request->hasFile('thumbnail')) {
-                // Delete old thumbnail
                 if ($facebookReel->thumbnail && file_exists(public_path('uploads/reels/' . $facebookReel->thumbnail))) {
                     unlink(public_path('uploads/reels/' . $facebookReel->thumbnail));
                 }
-                $file      = $request->file('thumbnail');
-                $imageName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/reels'), $imageName);
-                $data['thumbnail'] = $imageName;
+                $data['thumbnail'] = $this->uploadService->uploadTo($request->file('thumbnail'), public_path('uploads/reels'));
             }
 
             $facebookReel->update($data);
