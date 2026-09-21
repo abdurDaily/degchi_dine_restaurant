@@ -81,7 +81,9 @@ class ResponsiveImage extends Component
         $basename = $pathInfo['filename']; // e.g., '1780748896_0'
         $ext = ($format === 'webp') ? 'webp' : 'jpg';
 
-        $variantRelative = $dirname . '/_variants/' . $basename . '_' . $width . 'w.' . $ext;
+        // Strip 'uploads/' prefix — variants live at public/uploads/_variants/{subdir}/
+        $relativeDir = preg_replace('#^uploads/#', '', $dirname);
+        $variantRelative = 'uploads/_variants/' . $relativeDir . '/' . $basename . '_' . $width . 'w.' . $ext;
         $variantAbsolute = public_path($variantRelative);
 
         if (file_exists($variantAbsolute)) {

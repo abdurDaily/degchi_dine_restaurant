@@ -33,6 +33,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://images.unsplash.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+  <!-- Preload Bootstrap Icons font (avoids 3s render-blocking chain) -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff2?dd67030699838ea613ee6dbda90effa6" />
 
   <!-- LCP: preload hero poster image -->
   <link rel="preload" as="image" fetchpriority="high"
@@ -60,10 +65,8 @@
   <link rel="stylesheet" href="{{ asset('assets/frontend/css/base.css') }}?v={{ filemtime(public_path('assets/frontend/css/base.css')) }}" />
   <link rel="stylesheet" href="{{ asset('assets/frontend/style.min.css') }}?v={{ filemtime(public_path('assets/frontend/style.min.css')) }}" />
   <link rel="stylesheet" href="{{ asset('assets/frontend/css/cart-checkout.css') }}?v={{ filemtime(public_path('assets/frontend/css/cart-checkout.css')) }}" media="print" onload="this.media='all'" />
-  <link rel="stylesheet" href="{{ asset('assets/frontend/css/member-auth.css') }}?v={{ filemtime(public_path('assets/frontend/css/member-auth.css')) }}" media="print" onload="this.media='all'" />
   <noscript>
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/cart-checkout.css') }}?v={{ filemtime(public_path('assets/frontend/css/cart-checkout.css')) }}" />
-    <link rel="stylesheet" href="{{ asset('assets/frontend/css/member-auth.css') }}?v={{ filemtime(public_path('assets/frontend/css/member-auth.css')) }}" />
   </noscript>
 
   <!-- Inline critical JS to avoid render-blocking -->

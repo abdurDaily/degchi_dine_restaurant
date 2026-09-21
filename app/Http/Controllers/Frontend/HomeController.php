@@ -244,7 +244,9 @@ class HomeController extends Controller
 
         $profileImagePath = null;
         if ($request->hasFile('profile_image')) {
-            $profileImagePath = $request->file('profile_image')->store('profile_images', 'public');
+            $uploadService = app(\App\Services\UploadService::class);
+            $uploaded = $uploadService->upload([$request->file('profile_image')], 'profile_images', 'public', 300);
+            $profileImagePath = $uploaded[0] ?? null;
         }
 
         $member = Member::create([

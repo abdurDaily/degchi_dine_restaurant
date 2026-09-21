@@ -21,9 +21,10 @@ class UploadService
      * @param array $images
      * @param string $dir
      * @param string $disk The disk to store the images on. Defaults to 'public'.
+     * @param int $maxWidth Maximum width to resize to (0 = no resize, default 1200).
      * @return array An array of the uploaded images file names.
      */
-    public function upload(array $images, $dir = 'others', $disk = 'public')
+    public function upload(array $images, $dir = 'others', $disk = 'public', int $maxWidth = 1200)
     {
         $imgData = [];
 
@@ -45,10 +46,10 @@ class UploadService
             $manager = ImageManager::gd();
             $image = $manager->read($img);
 
-            // Resize large images to max 1200px width (preserve aspect ratio, never upscale)
+            // Resize large images (preserve aspect ratio, never upscale)
             $originalWidth = $image->width();
-            if ($originalWidth > 1200) {
-                $image->resize(width: 1200);
+            if ($maxWidth > 0 && $originalWidth > $maxWidth) {
+                $image->resize(width: $maxWidth);
             }
 
             // Encode image in its original format with quality optimization

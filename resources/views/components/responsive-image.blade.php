@@ -34,26 +34,26 @@
         sizes="{{ $sizes ?: '100vw' }}" />
     <img
         src="{{ $originalUrl }}"
-        alt="{{ $alt }}"
+        alt="{!! $alt !!}"
         @if($width) width="{{ $width }}" @endif
         @if($height) height="{{ $height }}" @endif
         @if($class) class="{{ $class }}" @endif
         @if($loading) loading="{{ $loading }}" @endif
         @if($decoding) decoding="{{ $decoding }}" @endif
         @if($fetchpriority) fetchpriority="{{ $fetchpriority }}" @endif
-        @if($onerror) onerror="{{ $onerror }}" @endif
+        @if($onerror) onerror="{!! $onerror !!}" @endif
     />
 </picture>
 @else
 <img
     src="{{ $originalUrl }}"
-    alt="{{ $alt }}"
+    alt="{!! $alt !!}"
     @if($width) width="{{ $width }}" @endif
     @if($height) height="{{ $height }}" @endif
     @if($class) class="{{ $class }}" @endif
     @if($loading) loading="{{ $loading }}" @endif
     @if($decoding) decoding="{{ $decoding }}" @endif
     @if($fetchpriority) fetchpriority="{{ $fetchpriority }}" @endif
-    @if($onerror) onerror="{{ $onerror }}" @endif
+    @if($onerror) onerror="{!! $onerror !!}" @endif
 />
 @endif

@@ -77,8 +77,8 @@
         </button>
 
         <a class="navbar-brand mobile-nav-brand" href="{{ route('frontend.home') }}#home">
-            <img src="{{ asset('assets/frontend/images/degchi-dine-logo.webp') }}" class="mobile-logo-img"
-                alt="Degchi Dine Restaurant" loading="eager" width="272" height="269" />
+            <img src="{{ asset('assets/frontend/images/degchi-dine-logo-sm.webp') }}" class="mobile-logo-img"
+                alt="Degchi Dine Restaurant" loading="eager" width="262" height="259" />
         </a>
 
         <div class="d-flex align-items-center gap-2 mobile-nav-actions">
@@ -109,8 +109,8 @@
     aria-labelledby="mobileMenuLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="mobileMenuLabel">
-            <img src="{{ asset('assets/frontend/images/degchi-dine-logo.webp') }}" class="offcanvas-logo-img"
-                alt="Degchi Dine Restaurant" width="272" height="269" />
+            <img src="{{ asset('assets/frontend/images/degchi-dine-logo-sm.webp') }}" class="offcanvas-logo-img"
+                alt="Degchi Dine Restaurant" width="262" height="259" />
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>

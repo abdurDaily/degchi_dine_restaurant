@@ -5,9 +5,7 @@
     priority service.')
 
     @push('front_css')
-        <style>
-            /* All apply styles are in member-auth.css — no inline overrides needed */
-        </style>
+        <link rel="stylesheet" href="{{ asset('assets/frontend/css/member-auth.css') }}?v={{ filemtime(public_path('assets/frontend/css/member-auth.css')) }}" media="print" onload="this.media='all'" />
     @endpush
 
 @section('frontend_content')

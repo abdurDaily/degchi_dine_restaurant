@@ -40,6 +40,12 @@ class OptimizeImages extends Command
                 ->filter(fn($d) => !str_contains($d, '_variants'))
                 ->map(fn($d) => str_replace('\\', '/', $d))
                 ->toArray();
+
+            // Also include storage/profile_images if it exists
+            $storageProfileDir = str_replace('\\', '/', public_path('storage/profile_images'));
+            if (is_dir($storageProfileDir)) {
+                $dirs[] = $storageProfileDir;
+            }
         }
 
         $totalProcessed = 0;
@@ -56,7 +62,16 @@ class OptimizeImages extends Command
                 continue;
             }
 
-            $relativeDir = str_replace($uploadDir . '/', '', $dir);
+            // For storage files, map to uploads/_variants/ structure
+            $isStorage = str_contains($dir, '/storage/');
+            if ($isStorage) {
+                $storageSubDir = str_replace(public_path('storage') . '/', '', $dir);
+                $relativeDir = $storageSubDir; // e.g., 'profile_images'
+                $variantOutputDir = $variantsDir . '/' . $storageSubDir;
+            } else {
+                $relativeDir = str_replace($uploadDir . '/', '', $dir);
+                $variantOutputDir = $variantsDir . '/' . $relativeDir;
+            }
             $this->info("Processing: {$relativeDir} ({$files->count()} images)");
 
             foreach ($files as $file) {
@@ -96,7 +111,7 @@ class OptimizeImages extends Command
                             ? $image->resize(width: $targetWidth)
                             : $image;
 
-                        $variantDir = $variantsDir . '/' . $relativeDir;
+                        $variantDir = $variantOutputDir;
                         File::ensureDirectoryExists($variantDir);
 
                         // WebP variant

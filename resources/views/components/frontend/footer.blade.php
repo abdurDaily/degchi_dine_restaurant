@@ -6,7 +6,7 @@
     <div class="container px-4 px-lg-5">
       <div class="footer-grid">
         <div class="footer-brand-block">
-          <img src="{{ asset('assets/frontend/images/degchi-dine-logo.webp') }}" alt="Degchi Dine - Authentic Kacchi & Bangla Restaurant" class="footer-logo mb-3" loading="lazy" width="80" height="80" />
+          <img src="{{ asset('assets/frontend/images/degchi-dine-logo-sm.webp') }}" alt="Degchi Dine - Authentic Kacchi & Bangla Restaurant" class="footer-logo mb-3" loading="lazy" width="262" height="259" />
           <p class="footer-tagline">Degchi Dine · ডেক্সি ডাইন</p>
           <p class="footer-about">
             A refined dining destination in Halishahar, Chittagong — warm hospitality, signature flavors, and memorable evenings.

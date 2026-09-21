@@ -150,7 +150,9 @@ class MemberAuthController extends Controller
         $member->last4 = substr(preg_replace('/\D+/', '', $validated['phone']), -4) ?: $member->last4;
 
         if ($request->hasFile('profile_image')) {
-            $member->profile_image_path = $request->file('profile_image')->store('profile_images', 'public');
+            $uploadService = app(\App\Services\UploadService::class);
+            $uploaded = $uploadService->upload([$request->file('profile_image')], 'profile_images', 'public', 300);
+            $member->profile_image_path = $uploaded[0] ?? null;
         }
 
         // Card number is intentionally never updated from the dashboard.

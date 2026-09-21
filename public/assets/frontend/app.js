@@ -111,15 +111,21 @@ window.addEventListener("scroll", () => {
     if (now - lastScrollTick < SCROLL_THROTTLE_MS) return;
     lastScrollTick = now;
 
-    syncNavbarState();
+    if (currentPageFile !== "index.html") {
+        syncNavbarState();
+        return;
+    }
 
-    if (currentPageFile !== "index.html") return;
-
+    // Batch DOM reads before writes to avoid forced reflow
     const current = Array.from(sections).find((section) => {
         const top = section.offsetTop - 120;
         const bottom = top + section.offsetHeight;
         return window.scrollY >= top && window.scrollY < bottom;
     });
+
+    // Write after reads
+    syncNavbarState();
+
     if (!current) return;
 
     const anchorLinks = Array.from(navLinks).filter((link) => {
@@ -569,4 +575,18 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeMenu();
     });
+});
+
+/* ── Slick cloned slides: prevent focus in aria-hidden containers ── */
+document.addEventListener('DOMContentLoaded', function () {
+    var focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    function inertClonedSlides() {
+        document.querySelectorAll('.slick-cloned[aria-hidden="true"]').forEach(function (clone) {
+            clone.querySelectorAll(focusableSelector).forEach(function (el) {
+                el.setAttribute('tabindex', '-1');
+            });
+        });
+    }
+    inertClonedSlides();
+    document.addEventListener('DOMNodeInserted', inertClonedSlides);
 });

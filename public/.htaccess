@@ -64,3 +64,15 @@
     AddOutputFilterByType DEFLATE application/xml
     AddOutputFilterByType DEFLATE text/plain
 </IfModule>
+
+# --- Brotli Compression (LiteSpeed / Apache 2.4.26+) ---
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+</IfModule>
