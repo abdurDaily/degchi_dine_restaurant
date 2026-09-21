@@ -26,10 +26,10 @@
                         <div class="review-author">
                             @php
                                 $avatarUrl = $review->image
-                                    ? asset('storage/' . $review->image)
-                                    : asset('assets/images/defult_image/degchi_dine_avater.jpg');
+                                    ? 'storage/' . $review->image
+                                    : 'assets/images/defult_image/degchi_dine_avater.jpg';
                             @endphp
-                            <img src="{{ $avatarUrl }}" class="review-avatar"
+                            <x-responsive-image src="{{ $avatarUrl }}" class="review-avatar"
                                 alt="{{ $review->name }} - Degchi Dine Guest Review"
                                 width="48" height="48"
                                 loading="lazy"

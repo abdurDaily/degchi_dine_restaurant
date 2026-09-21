@@ -14,9 +14,10 @@
     $aboutExpNumber = optional($aboutSettings->get('about_exp_number'))->value ?? '10+';
     $aboutExpText = optional($aboutSettings->get('about_exp_text'))->value ?? 'Years Of Culinary Craft';
     $aboutCtaUrl = optional($aboutSettings->get('about_cta_url'))->value ?? route('frontend.completeMenu');
-    $aboutImage = optional($aboutSettings->get('about_image'))->value
-        ? asset('uploads/about/' . optional($aboutSettings->get('about_image'))->value)
-        : asset('assets/frontend/images/about/about.jpg');
+    $aboutImageRaw = optional($aboutSettings->get('about_image'))->value
+        ? 'uploads/about/' . optional($aboutSettings->get('about_image'))->value
+        : 'assets/frontend/images/about.webp';
+    $aboutImage = asset($aboutImageRaw);
     $ctaText = $ctaText ?? 'Contact Us';
     $aboutPage = $aboutPage ?? false;
 @endphp
@@ -64,10 +65,10 @@
                     <div class="about-shape-backdrop"></div>
 
                     <div class="about-img-container">
-                        <img src="{{ $aboutImage }}" alt="Degchi Dine - About Our Restaurant" class="about-main-img"
+                        <x-responsive-image src="{{ $aboutImageRaw }}" alt="Degchi Dine - About Our Restaurant" class="about-main-img"
                             width="600" height="600"
                             loading="lazy"
-                            onerror="this.src='{{ asset('assets/frontend/images/about.png') }}'" />
+                            onerror="this.src='{{ asset('assets/frontend/images/about.webp') }}'" />
                         <div class="about-img-overlay"></div>
                     </div>
 

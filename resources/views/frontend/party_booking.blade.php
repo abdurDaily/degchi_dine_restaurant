@@ -19,7 +19,7 @@
                             <source src="{{ asset('assets/frontend/video/PartyHallDegciDine.mp4') }}" type="video/mp4" />
                         </video> --}}
                         <video class="hero-video" autoplay muted loop playsinline preload="metadata"
-                                poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=80">
+                                poster="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=75">
                                 <source src="{{ asset('assets/frontend/video/PartyHallDegciDine.mp4') }}"
                                     type="video/mp4" />
                             </video>

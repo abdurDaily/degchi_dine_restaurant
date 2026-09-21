@@ -93,6 +93,15 @@
 
 @once
 @if(request()->routeIs('frontend.home'))
+@php
+    $contactSettings = cache()->remember('home_contact_settings', 1800, function () {
+        return \App\Models\Setting::where('setting_group', 'contact_section')
+            ->get()
+            ->keyBy('key');
+    });
+    $contactPhone = optional($contactSettings->get('contact_phone'))->value ?? '01898-795400';
+    $contactAddress = optional($contactSettings->get('contact_address'))->value ?? 'Boropool Circle, Kaptan Villa, Halishahar, Chittagong';
+@endphp
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -101,12 +110,29 @@
     "url": @json(url('/')),
     "image": @json($metaImage),
     "description": @json($metaDescription),
-    "servesCuisine": ["Bangladeshi", "Biryani", "Kacchi"],
+    "telephone": @json($contactPhone),
+    "servesCuisine": ["Bangladeshi", "Biryani", "Kacchi", "Mezban"],
+    "priceRange": "$$",
     "address": {
         "@type": "PostalAddress",
+        "streetAddress": @json($contactAddress),
         "addressLocality": "Chittagong",
         "addressCountry": "BD"
-    }
+    },
+    "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 22.3569,
+        "longitude": 91.7832
+    },
+    "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "opens": "17:00",
+        "closes": "23:30"
+    },
+    "sameAs": [
+        "https://www.facebook.com/DegchiDine"
+    ]
 }
 </script>
 @endif

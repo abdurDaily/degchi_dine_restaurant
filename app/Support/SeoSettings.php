@@ -88,7 +88,7 @@ class SeoSettings
             return asset('storage/seo/' . ltrim($image, '/'));
         }
 
-        return asset('assets/frontend/images/logo.webp');
+        return asset('assets/frontend/images/degchi-dine-logo.webp');
     }
 
     public function canonical(?string $override = null): string

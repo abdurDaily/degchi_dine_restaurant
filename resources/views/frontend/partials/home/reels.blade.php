@@ -40,8 +40,8 @@
                         <a class="reel-card" href="{{ $reelUrl }}" target="_blank" rel="noopener noreferrer">
                             <div class="reel-card-thumb">
                                 <div class="reel-progress-indicator"></div>
-                                <img src="{{ $reelThumbnail }}"
-                                    alt="{{ $reel->title ?? 'Degchi Dine Facebook Reel' }}" loading="lazy" />
+                                <x-responsive-image src="{{ $reel->thumbnail ? (strpos($reel->thumbnail, 'http') === 0 ? $reel->thumbnail : 'uploads/reels/' . $reel->thumbnail) : 'assets/placeholder/placeholder.png' }}"
+                                    alt="{{ $reel->title ?? 'Degchi Dine Facebook Reel' }}" width="360" height="640" loading="lazy" />
                                 <div class="reel-card-overlay">
                                     @if($reel->title)
                                         <span class="reel-card-title">{{ $reel->title }}</span>
@@ -59,7 +59,7 @@
                             <div class="reel-card-thumb">
                                 <div class="reel-progress-indicator"></div>
                                 <img src="{{ asset('assets/placeholder/placeholder.png') }}" alt="No reels available"
-                                    loading="lazy" />
+                                    width="360" height="640" loading="lazy" />
                                 <div class="reel-card-overlay">
                                     <span class="reel-play-icon"><i class="bi bi-play-fill"></i></span>
                                     <span class="reel-watch-label text-uppercase"><i

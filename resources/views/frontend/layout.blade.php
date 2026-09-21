@@ -25,11 +25,23 @@
   />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="{{ asset('assets/frontend/images/logo.webp') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/frontend/images/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('assets/frontend/images/favicon-192x192.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/frontend/images/apple-touch-icon.png') }}">
 
   <!-- Preconnect for external resources -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+
+  <!-- LCP: preload hero poster image -->
+  <link rel="preload" as="image" fetchpriority="high"
+      href="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=75"
+      imagesrcset="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=640&q=75 640w,
+                   https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=75 800w,
+                   https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=75 1200w,
+                   https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1800&q=75 1800w"
+      imagesizes="100vw" />
 
   <!-- Critical CSS: Bootstrap + Icons + all layout styles (render-blocking for above-the-fold) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
@@ -46,7 +58,7 @@
 
   <!-- App CSS: base tokens + main layout are critical; page-specific are deferred -->
   <link rel="stylesheet" href="{{ asset('assets/frontend/css/base.css') }}?v={{ filemtime(public_path('assets/frontend/css/base.css')) }}" />
-  <link rel="stylesheet" href="{{ asset('assets/frontend/style.css') }}?v={{ filemtime(public_path('assets/frontend/style.css')) }}" />
+  <link rel="stylesheet" href="{{ asset('assets/frontend/style.min.css') }}?v={{ filemtime(public_path('assets/frontend/style.min.css')) }}" />
   <link rel="stylesheet" href="{{ asset('assets/frontend/css/cart-checkout.css') }}?v={{ filemtime(public_path('assets/frontend/css/cart-checkout.css')) }}" media="print" onload="this.media='all'" />
   <link rel="stylesheet" href="{{ asset('assets/frontend/css/member-auth.css') }}?v={{ filemtime(public_path('assets/frontend/css/member-auth.css')) }}" media="print" onload="this.media='all'" />
   <noscript>
