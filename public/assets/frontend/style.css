@@ -4571,10 +4571,16 @@ h6,
 }
 
 .footer-logo {
-    height: 52px;
-    filter: brightness(0) invert(1);
-    opacity: 0.95;
+    width: 20%;
+    height: auto;
+    display: block;
 }
+
+/* @media (max-width: 575.98px) {
+    .footer-logo {
+        max-width: 180px;
+    }
+} */
 
 .footer-about {
     font-size: 0.88rem;

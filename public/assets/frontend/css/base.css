@@ -5,22 +5,22 @@
 
 :root {
     /* ── Brand Primary — Deep Teal ── */
-    --brand: #1a6674;
-    --brand-dark: #0f4a55;
+    --brand: #0F6A8B;
+    --brand-dark: #0F6A8B;
     --brand-light: rgba(26, 102, 116, 0.12);
     --brand-gredient: linear-gradient(
         160deg,
-        #0f4a55 0%,
+        #0F6A8B 0%,
         #1a6674 50%,
-        #0f4a55 100%
+        #0F6A8B 100%
     );
     --brand-gradient: linear-gradient(
         160deg,
-        #0f4a55 0%,
+        #0F6A8B 0%,
         #1a6674 50%,
-        #0f4a55 100%
+        #0F6A8B 100%
     );
-    --brand-gradient-vertical: linear-gradient(135deg, #1a6674, #0f4a55);
+    --brand-gradient-vertical: linear-gradient(135deg, #1a6674, #0F6A8B);
 
     /* ── Brand Secondary — Warm Orange-Red ── */
     --brand-secondary: #ff6b35;
