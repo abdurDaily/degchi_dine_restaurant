@@ -142,7 +142,7 @@ const renderCartItemPriceLabel = (item) => {
     const unit = getItemUnitPrice(item);
     const original = getItemOriginalPrice(item);
     if (item.offer_applied && original > unit) {
-        return `<span class="text-decoration-line-through text-muted me-1">${formatCurrency(original)}</span>${formatCurrency(unit)}`;
+        return `<span class="text-decoration-line-through text-white me-1">${formatCurrency(original)}</span>${formatCurrency(unit)}`;
     }
     return formatCurrency(unit);
 };
@@ -262,34 +262,63 @@ const renderCartPage = () => {
 
 const renderCheckoutSummary = () => {
     const cart = getCartData();
-    const checkoutItemsWrap = document.querySelector(".checkout-summary-items-wrap");
+    const checkoutItemsWrap = document.getElementById("orderSummaryList");
     const checkoutSubtotal = document.getElementById("checkoutSubtotal");
     const checkoutTotal = document.getElementById("checkoutTotal");
     const orderTotalInput = document.querySelector("input[name='order_total']");
     const itemsInput = document.querySelector("input[name='items']");
-    const itemCountHint = document.querySelector(".cart-summary-row small.text-muted");
+    const itemCountEl = document.getElementById("itemCount");
+    const tpl = document.getElementById("checkoutItemTpl");
 
     if (!checkoutItemsWrap || !checkoutSubtotal || !checkoutTotal) return;
 
+    const emptyState = checkoutItemsWrap.querySelector(".checkout-summary-empty");
+
     if (!cart.length) {
-        checkoutItemsWrap.innerHTML = `<div class="text-center py-5"><p class="mb-0">Your cart is empty. Add items before checking out.</p></div>`;
+        checkoutItemsWrap.querySelectorAll(".checkout-order-item").forEach(el => el.remove());
+        if (emptyState) emptyState.style.display = "";
         checkoutSubtotal.textContent = formatCurrency(0);
         checkoutTotal.textContent = formatCurrency(0);
         if (orderTotalInput) orderTotalInput.value = "0";
         if (itemsInput) itemsInput.value = JSON.stringify([]);
-        if (itemCountHint) itemCountHint.textContent = "(0 items)";
+        if (itemCountEl) itemCountEl.textContent = "(0 items)";
         return;
     }
 
-    checkoutItemsWrap.innerHTML = cart.map((item) => `
-      <div class="checkout-order-item">
-        <img src="${item.image}" alt="${item.title}" class="checkout-order-img" />
-        <div class="checkout-order-info">
-          <p class="checkout-order-name">${item.title}</p>
-          <span class="checkout-order-price">${renderCartItemPriceLabel(item)} × ${item.quantity}${item.offer_applied && item.offer_percent ? ` <span class="badge bg-danger-subtle text-danger">${item.offer_percent}% OFF</span>` : ""}</span>
-        </div>
-        <strong class="checkout-order-subtotal">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</strong>
-      </div>`).join("");
+    if (emptyState) emptyState.style.display = "none";
+    checkoutItemsWrap.querySelectorAll(".checkout-order-item").forEach(el => el.remove());
+
+    cart.forEach((item) => {
+        let row;
+        if (tpl) {
+            row = tpl.content.cloneNode(true);
+        } else {
+            row = document.createElement("div");
+            row.innerHTML = `<div class="checkout-order-item"><div class="checkout-order-img-wrap"><img class="checkout-order-img" /></div><div class="checkout-order-body"><div class="checkout-order-top"><p class="checkout-order-name"></p><span class="checkout-order-tag text-white"></span></div><div class="checkout-order-bottom"><span class="checkout-order-price"></span><strong class="checkout-order-subtotal"></strong></div></div></div>`;
+            row = row.firstElementChild;
+        }
+
+        const root = row.querySelector ? row : row;
+        const img = root.querySelector(".checkout-order-img");
+        const name = root.querySelector(".checkout-order-name");
+        const tag = root.querySelector(".checkout-order-tag");
+        const price = root.querySelector(".checkout-order-price");
+        const subtotal = root.querySelector(".checkout-order-subtotal");
+        const itemWrap = root.querySelector(".checkout-order-item") || root;
+
+        if (itemWrap.dataset) itemWrap.dataset.itemId = item.id;
+        if (img) { img.src = item.image; img.alt = item.title; }
+        if (name) name.textContent = item.title;
+        if (tag) {
+            const parts = [item.note || ""];
+            if (item.offer_applied && item.offer_percent) parts.push(`${item.offer_percent}% OFF`);
+            tag.textContent = parts.filter(Boolean).join(" · ");
+        }
+        if (price) price.innerHTML = renderCartItemPriceLabel(item) + ` &times; ${item.quantity}`;
+        if (subtotal) subtotal.textContent = formatCurrency(getItemUnitPrice(item) * item.quantity);
+
+        checkoutItemsWrap.appendChild(row);
+    });
 
     const discountedTotal = getCartTotal(cart);
     const originalTotal = getCartOriginalTotal(cart);
@@ -298,7 +327,7 @@ const renderCheckoutSummary = () => {
     checkoutTotal.textContent = formatCurrency(discountedTotal);
     if (orderTotalInput) orderTotalInput.value = originalTotal.toFixed(2);
     if (itemsInput) itemsInput.value = JSON.stringify(cart);
-    if (itemCountHint) itemCountHint.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
+    if (itemCountEl) itemCountEl.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
     document.dispatchEvent(new CustomEvent("cartSummaryRendered", { detail: { total: discountedTotal, originalTotal } }));
 };
 

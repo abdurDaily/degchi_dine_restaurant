@@ -52,6 +52,9 @@
     --warm-cream: #faf7f2;
     --bg-cream: #faf7f2;
 
+    /* ── Body Background ── */
+    --body-background: linear-gradient(160deg, #1a3a4a 0%, #0f2a38 50%, #162e3c 100%);
+
     /* ── Backgrounds ── */
     --bg-main: #f4f9fb;
     --bg-soft: #fafdfe;

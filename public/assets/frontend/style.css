@@ -16003,3 +16003,249 @@ body {
         display: block;
     }
 }
+
+/* ==========================================================================
+   LUXURY CARD SYSTEM — Used by cards.blade.php
+   ========================================================================== */
+
+.luxury-portal-container {
+    background: var(--cream);
+    min-height: 100vh;
+}
+
+.premium-identity-showcase {
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-identity-showcase::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -60px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gold-10) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.premium-identity-showcase::after {
+    content: "";
+    position: absolute;
+    bottom: -60px;
+    left: -40px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--secondary-10) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.luxury-meta-label {
+    display: inline-block;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--brand-secondary);
+    background: var(--secondary-10);
+    border: 1px solid var(--secondary-25);
+    padding: 0.4rem 1.1rem;
+    border-radius: 999px;
+    font-family: var(--section-subtitle-font);
+}
+
+.luxury-title {
+    font-family: var(--section-title-font);
+    font-size: var(--section-title-size);
+    font-weight: var(--section-title-weight);
+    color: var(--text-main);
+    letter-spacing: var(--section-title-spacing);
+    line-height: var(--section-title-line-height);
+    margin: 0;
+}
+
+.luxury-accent-line {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(180deg, var(--brand-gold), var(--brand-secondary));
+    border-radius: 50px;
+    margin-top: 1rem;
+}
+
+.luxury-card-anchor {
+    text-decoration: none !important;
+    display: block;
+}
+
+.luxury-interactive-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    transition:
+        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.35s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.luxury-interactive-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        transparent 20%,
+        rgba(223, 166, 83, 0.06) 40%,
+        rgba(223, 166, 83, 0.12) 50%,
+        rgba(223, 166, 83, 0.06) 60%,
+        transparent 80%
+    );
+    transition: left 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.luxury-interactive-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(250, 245, 235, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.luxury-card-anchor:hover .luxury-interactive-card {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(223, 166, 83, 0.3);
+}
+
+.luxury-card-anchor:hover .luxury-interactive-card::before {
+    left: 120%;
+}
+
+.luxury-card-anchor:hover .luxury-interactive-card::after {
+    opacity: 1;
+}
+
+.luxury-interactive-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.card-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 16px 16px 0;
+    background: linear-gradient(135deg, rgba(250, 245, 235, 0.6), rgba(244, 249, 251, 0.6));
+}
+
+.card-img-fit {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    border-radius: 14px;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card-anchor:hover .card-img-fit {
+    transform: scale(1.04);
+}
+
+.card-body-details {
+    position: relative;
+}
+
+.card-main-title {
+    font-family: "Fraunces", "Playfair Display", serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    transition: color 0.3s ease;
+}
+
+.luxury-card-anchor:hover .card-main-title {
+    color: var(--brand-dark);
+}
+
+.card-summary-text {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.luxury-action-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--secondary-10);
+    color: var(--brand-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.luxury-card-anchor:hover .luxury-action-arrow {
+    background: var(--brand-secondary);
+    color: #ffffff;
+    transform: translateX(4px);
+}
+
+/* Golden Card Modal */
+.btn-close-custom {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 0.35rem;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.btn-close-custom:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--brand-secondary);
+}
+
+.golden-card-modal .modal-content {
+    border-radius: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+    .card-img-fit {
+        height: 180px;
+    }
+
+    .luxury-title {
+        font-size: clamp(1.5rem, 5.5vw, 1.85rem);
+    }
+
+    .card-main-title {
+        font-size: 1.15rem;
+    }
+}
