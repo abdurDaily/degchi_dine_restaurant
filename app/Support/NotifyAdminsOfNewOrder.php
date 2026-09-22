@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\NewOrderNotification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyAdminsOfNewOrder
@@ -17,6 +18,10 @@ class NotifyAdminsOfNewOrder
             return;
         }
 
-        Notification::send($admins, new NewOrderNotification($order));
+        try {
+            Notification::send($admins, new NewOrderNotification($order));
+        } catch (\Throwable $e) {
+            Log::error('Failed to notify admins of new order #'.$order->id.': '.$e->getMessage());
+        }
     }
 }
