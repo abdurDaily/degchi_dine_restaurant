@@ -700,7 +700,6 @@ h6,
     text-decoration: none;
     justify-self: center;
     padding: 0.28rem 0.65rem 0.32rem;
-    background: var(--brand);
     border-radius: 0;
     transition: all 0.4s linear;
 }
@@ -7667,7 +7666,7 @@ footer[id],
             position: -webkit-sticky !important;
             position: sticky !important;
             top: 0 !important;
-            z-index: 1060 !important;
+            z-index: 1030 !important;
             border-bottom-color: rgba(17, 107, 131, 0.15);
         }
         .nav-logo-img {
@@ -7820,7 +7819,7 @@ footer[id],
             left: 0;
             right: 0;
             width: 100%;
-            z-index: 1060 !important;
+            z-index: 1030 !important;
         }
         .main-content {
             padding-top: 6rem;

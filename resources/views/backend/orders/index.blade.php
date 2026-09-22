@@ -172,6 +172,53 @@
 
     /* ─── Hide DataTable's own search box ─── */
     .dataTables_wrapper .dataTables_filter { display: none; }
+
+    /* ─── Top customer month filter (matches pill styling) ─── */
+    .top-customer-btn {
+        background: #fff;
+        border: 1.5px solid #d0d7df !important;
+        border-radius: 5px;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #344054;
+        line-height: 1.4;
+        transition: border-color .2s, box-shadow .2s;
+    }
+    .top-customer-btn:hover,
+    .top-customer-btn:focus,
+    .top-customer-btn.show {
+        border-color: #4a90d9 !important;
+        box-shadow: 0 0 0 3px rgba(74,144,217,.12);
+        color: #344054 !important;
+    }
+    .top-customer-menu {
+        min-width: 230px;
+        border: 1.5px solid #e4e9ef;
+        border-radius: 8px;
+    }
+    .top-customer-menu .dropdown-item {
+        font-size: 0.82rem;
+        border-radius: 6px;
+    }
+    .top-customer-menu .dropdown-item.active {
+        background: #e8f4fd;
+        color: #0a58ca;
+    }
+
+    /* ─── Top customers leaderboard panel ─── */
+    .top-customers-card {
+        border-top: 3px solid #4a90d9 !important;
+    }
+    .top-customers-card .top-rank {
+        padding: 0.3em 0.55em;
+        font-size: 0.72rem;
+        font-weight: 700;
+        border-radius: 50px;
+    }
+    .top-customers-card .rank-1 { background: #ffd700 !important; color: #221f0e !important; }
+    .top-customers-card .rank-2 { background: #c0c7cf !important; color: #1f2937 !important; }
+    .top-customers-card .rank-3 { background: #cd7f32 !important; color: #fff !important; }
 </style>
 @endpush
 
@@ -211,8 +258,40 @@
                             </button>
                         </div>
 
-                        {{-- Right: Date picker + Search (same pill height) --}}
+                        {{-- Right: Top Customer month filter + Date picker + Search (same pill height) --}}
                         <div class="d-flex flex-wrap align-items-center gap-2">
+
+                            {{-- Top Customers leaderboard: pick a month to see who bought the most --}}
+                            <div class="dropdown position-relative">
+                                <button class="btn top-customer-btn dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-trophy me-1"></i>
+                                    <span id="topCustomerBtnLabel">Top Customer</span>
+                                </button>
+                                <div class="dropdown-menu top-customer-menu shadow dropdown-menu-end">
+                                    <h6 class="dropdown-header">
+                                        <i class="fas fa-calendar-alt me-1"></i>Select Month
+                                    </h6>
+                                    <button class="dropdown-item top-customer-month" type="button" data-month="">
+                                        <i class="fas fa-times-circle me-1 text-muted"></i> All Customers
+                                    </button>
+                                    <div class="dropdown-divider"></div>
+                                    @php($monthOptions = collect(range(0, 11))->map(fn ($i) => now()->copy()->subMonths($i)))
+                                    @foreach($monthOptions as $i => $m)
+                                        <button class="dropdown-item top-customer-month" type="button"
+                                                data-month="{{ $m->format('Y-m') }}">
+                                            @if($i === 0)
+                                                <i class="fas fa-bolt me-1 text-warning"></i>
+                                            @elseif($i === 1)
+                                                <i class="fas fa-clock me-1 text-info"></i>
+                                            @else
+                                                <i class="fas fa-calendar-day me-1 text-muted"></i>
+                                            @endif
+                                            {{ $m->format('F Y') }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
 
                             <div class="drp-wrapper">
                                 <i class="fas fa-calendar-alt drp-icon"></i>
@@ -234,6 +313,9 @@
 
                 {{-- ══ Table ══ --}}
                 <div class="card-body">
+                    {{-- Top customers leaderboard (rendered by AJAX when a month is picked) --}}
+                    <div id="topCustomersPanel" class="d-none mb-3"></div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered yajra-datatable w-100 align-middle">
                             <thead>
@@ -493,11 +575,58 @@ $(function () {
     window.refreshCounts = refreshCounts;
 
     /* ══════════════════════════════════════════════════
-       7. REFRESH ON GLOBAL NEW-ORDER ALERT
+        8. REFRESH ON GLOBAL NEW-ORDER ALERT
     ══════════════════════════════════════════════════ */
     window.addEventListener('dd:new-order', function () {
         table.draw(false);
         refreshCounts();
+    });
+
+    /* ══════════════════════════════════════════════════
+        9. TOP CUSTOMERS — month filter leaderboard
+    ══════════════════════════════════════════════════ */
+    let selectedTopMonth = '';
+
+    $(document).on('click', '.top-customer-month', function () {
+        selectedTopMonth = String($(this).data('month') || '');
+
+        $('#topCustomerBtnLabel').text(
+            selectedTopMonth ? moment(selectedTopMonth, 'YYYY-MM').format('MMM YYYY') : 'Top Customer'
+        );
+
+        $('.top-customer-menu .top-customer-month').removeClass('active');
+        if (selectedTopMonth) {
+            $('.top-customer-menu .top-customer-month[data-month="' + selectedTopMonth + '"]').addClass('active');
+        }
+
+        loadTopCustomers();
+    });
+
+    function loadTopCustomers() {
+        const $panel = $('#topCustomersPanel');
+
+        if (!selectedTopMonth) {
+            $panel.addClass('d-none').empty();
+            return;
+        }
+
+        $panel.removeClass('d-none').html(
+            '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div>' +
+            '<p class="mt-2 mb-0 text-muted small">Loading top customers…</p></div>'
+        );
+
+        $.get('{{ route('orders.index') }}', { top_customers: 1, month: selectedTopMonth }, function (res) {
+            $panel.html(res.html || '');
+        }).fail(function () {
+            $panel.html('<div class="alert alert-danger m-0">Failed to load top customers.</div>');
+        });
+    }
+
+    $(document).on('click', '#topCustomersClose', function () {
+        selectedTopMonth = '';
+        $('#topCustomerBtnLabel').text('Top Customer');
+        $('.top-customer-menu .top-customer-month').removeClass('active');
+        $('#topCustomersPanel').addClass('d-none').empty();
     });
 
 });

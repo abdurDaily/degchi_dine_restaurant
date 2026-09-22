@@ -8,6 +8,7 @@ use App\Models\MenuVariation;
 use App\Models\Order;
 use App\Services\OrderPricingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -34,6 +35,37 @@ class OrderController extends Controller
                 ->toArray();
             $counts['all'] = Order::count();
             return response()->json(['counts' => $counts]);
+        }
+
+        // Top customers leaderboard for a selected month (AJAX)
+        if ($request->ajax() && $request->filled('top_customers')) {
+            $month = $request->input('month');
+
+            if (preg_match('/^\d{4}-\d{2}$/', (string) $month) !== 1) {
+                return response()->json(['html' => '']);
+            }
+
+            $start = Carbon::parse($month)->startOfMonth();
+            $end   = Carbon::parse($month)->endOfMonth();
+
+            $topCustomers = Order::query()
+                ->whereBetween('created_at', [$start, $end])
+                ->where('status', '!=', 'canceled')
+                ->selectRaw('COALESCE(NULLIF(NULLIF(customer_phone, ""), NULL), CONCAT("walkin:", customer_name)) as identity')
+                ->selectRaw('MAX(customer_name) as customer_name')
+                ->selectRaw('MAX(NULLIF(customer_phone, "")) as customer_phone')
+                ->selectRaw('COUNT(*) as orders_count')
+                ->selectRaw('SUM(final_amount) as total_spent')
+                ->groupBy('identity')
+                ->orderByDesc('total_spent')
+                ->limit(10)
+                ->get();
+
+            $monthLabel = $start->format('F Y');
+
+            $html = view('backend.orders.partials.top-customers', compact('topCustomers', 'monthLabel'))->render();
+
+            return response()->json(['html' => $html]);
         }
 
         if ($request->ajax()) {
