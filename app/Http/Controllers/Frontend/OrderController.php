@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
@@ -27,7 +28,9 @@ class OrderController extends Controller
             abort(403);
         }
 
-        return view('frontend.invoice', compact('order'));
+        $contact = Setting::where('setting_group', 'contact_section')->pluck('value', 'key')->all();
+
+        return view('frontend.invoice', compact('order', 'contact'));
     }
 
     public function downloadInvoice(Request $request, Order $order)
@@ -36,7 +39,9 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $pdf = PDF::loadView('frontend.invoice', ['order' => $order]);
+        $contact = Setting::where('setting_group', 'contact_section')->pluck('value', 'key')->all();
+
+        $pdf = PDF::loadView('frontend.partials.invoice-sheet', ['order' => $order, 'contact' => $contact]);
         $filename = 'invoice-' . $order->id . '.pdf';
         return $pdf->download($filename);
     }

@@ -223,6 +223,7 @@ Route::name('frontend.')->group(function () {
     Route::get('/member/reset-password/{token}', [MemberPasswordController::class, 'showResetForm'])->name('member.password.reset');
     Route::post('/member/reset-password', [MemberPasswordController::class, 'reset'])->name('member.password.update');
     Route::get('/order-confirmation/{order}', [MemberAuthController::class, 'orderConfirmation'])->name('order.confirmation');
+    Route::get('/order-confirmation/{order}/download', [MemberAuthController::class, 'downloadInvoice'])->name('order.invoice.download');
     Route::get('/track-order', [MemberAuthController::class, 'showTrackOrder'])->name('order.track');
     Route::post('/track-order', [MemberAuthController::class, 'trackOrder'])->name('order.track.submit');
 

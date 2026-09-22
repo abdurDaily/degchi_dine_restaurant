@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\Order;
 use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -242,6 +243,27 @@ class MemberAuthController extends Controller
             'member',
             'needsPhoneVerification'
         ));
+    }
+
+    public function downloadInvoice(Request $request, Order $order)
+    {
+        $member = Auth::guard('member')->user();
+        $member = $member instanceof Member ? $member : null;
+
+        if ($member) {
+            if (! $this->memberCanViewOrder($order, $member)) {
+                abort(403, 'You do not have access to view this order.');
+            }
+        } elseif (! $this->guestCanViewOrder($order)) {
+            abort(403, 'You do not have access to view this order.');
+        }
+
+        $contact = Setting::where('setting_group', 'contact_section')->pluck('value', 'key')->all();
+
+        $pdf = PDF::loadView('frontend.partials.invoice-sheet', ['order' => $order, 'contact' => $contact]);
+        $filename = 'invoice-' . $order->id . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     private function memberCanViewOrder(Order $order, Member $member): bool

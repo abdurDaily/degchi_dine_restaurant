@@ -325,6 +325,9 @@
                         <iconify-icon icon="solar:widget-5-linear"></iconify-icon> My Dashboard
                     </a>
                     @endauth
+                    <a href="{{ route('frontend.order.invoice.download', $order->id) }}" class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
+                        <iconify-icon icon="solar:download-linear"></iconify-icon> Download Invoice
+                    </a>
                     <a href="{{ route('frontend.completeMenu') }}" class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
                         <iconify-icon icon="solar:chef-hat-linear"></iconify-icon> Order Again
                     </a>
