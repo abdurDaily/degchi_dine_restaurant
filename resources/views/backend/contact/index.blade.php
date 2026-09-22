@@ -27,7 +27,7 @@
                         $val = fn($key) => $settings[$key]->value ?? '';
                     @endphp
 
-                    <form id="contactForm">
+                    <form id="contactForm" novalidate>
                         @csrf
 
                         <div class="row">
@@ -115,15 +115,18 @@ $(document).ready(function () {
             method: 'POST',
             data: $(this).serialize(),
             success: function (res) {
-                Command: toastr[res.status](res.message);
+                toastr[res.status](res.message);
             },
             error: function (xhr) {
                 if (xhr.status === 422) {
                     $.each(xhr.responseJSON.errors, function (key, val) {
-                        Command: toastr['error'](val[0]);
+                        toastr['error'](val[0]);
                     });
+                } else if (xhr.status === 500) {
+                    const errorMsg = xhr.responseJSON?.message || 'Server error occurred';
+                    toastr['error']('Error: ' + errorMsg);
                 } else {
-                    Command: toastr['error']('Something went wrong.');
+                    toastr['error']('Something went wrong. Status: ' + xhr.status);
                 }
             },
             complete: function () {

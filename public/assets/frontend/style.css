@@ -635,7 +635,6 @@ h6,
 
 /* --- Mobile Topbar --- */
 .mobile-topbar {
-    background: #1a6674;
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(26, 102, 116, 0.3);
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
@@ -14909,10 +14908,10 @@ body {
 .order-confirm .oc-action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding: 12px 24px;
     border-radius: 50px;
-    font-size: 0.9rem;
+    font-size: 12px;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);

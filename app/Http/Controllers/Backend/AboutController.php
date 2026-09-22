@@ -57,7 +57,7 @@ class AboutController extends Controller
                     ['key' => $key],
                     [
                         'setting_group' => 'about_section',
-                        'value'         => $request->input($key, ''),
+                        'value'         => $request->input($key) ?? '',
                         'user_id'       => Auth::id(),
                     ]
                 );

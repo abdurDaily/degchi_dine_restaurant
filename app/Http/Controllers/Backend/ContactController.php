@@ -44,10 +44,17 @@ class ContactController extends Controller
         DB::beginTransaction();
         try {
             $fields = [
-                'contact_section_title', 'contact_section_subtitle',
-                'contact_restaurant_name', 'contact_address', 'contact_hours',
-                'contact_phone', 'contact_email', 'contact_map_embed',
-                'contact_map_link', 'contact_facebook_url', 'contact_instagram_url',
+                'contact_section_title',
+                'contact_section_subtitle',
+                'contact_restaurant_name',
+                'contact_address',
+                'contact_hours',
+                'contact_phone',
+                'contact_email',
+                'contact_map_embed',
+                'contact_map_link',
+                'contact_facebook_url',
+                'contact_instagram_url',
             ];
 
             foreach ($fields as $key) {
@@ -55,7 +62,7 @@ class ContactController extends Controller
                     ['key' => $key],
                     [
                         'setting_group' => 'contact_section',
-                        'value'         => $request->input($key, ''),
+                        'value'         => $request->input($key) ?? '',
                         'user_id'       => Auth::id(),
                     ]
                 );

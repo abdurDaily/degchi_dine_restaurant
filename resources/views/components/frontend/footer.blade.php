@@ -1,4 +1,17 @@
 {{-- Footer --}}
+@php
+    $myContactSettings = cache()->remember('home_contact_settings', 1800, function () {
+        return \App\Models\Setting::where('setting_group', 'contact_section')->get()->keyBy('key');
+    });
+    $cVal = fn ($key, $default = '') => optional($myContactSettings->get($key))->value ?? $default;
+    $myPhone = $cVal('contact_phone', '01898-795400');
+    $myPhoneDigits = preg_replace('/\D+/', '', $myPhone);
+    $myEmail = $cVal('contact_email', 'degchidine@gmail.com');
+    $myAddress = $cVal('contact_address', 'Boropool Circle, Kaptan Villa, Halishahar, Chittagong');
+    $myHours = $cVal('contact_hours', 'Daily · 5:00 PM – 11:30 PM');
+    $myFacebookUrl = $cVal('contact_facebook_url', '#');
+    $myInstagramUrl = $cVal('contact_instagram_url', '#');
+@endphp
 <footer id="contact" class="site-footer">
   <div class="footer-accent-bar"></div>
 
@@ -12,8 +25,8 @@
             A refined dining destination in Halishahar, Chittagong — warm hospitality, signature flavors, and memorable evenings.
           </p>
           <div class="footer-socials">
-            <a href="https://www.facebook.com/DegchiDine" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="{{ $myFacebookUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="{{ $myInstagramUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
             <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
             <a href="#" aria-label="TripAdvisor"><i class="bi bi-star"></i></a>
           </div>
@@ -47,19 +60,19 @@
           <ul class="footer-contact-list">
             <li class="footer-contact-item">
               <span class="footer-contact-icon"><i class="bi bi-geo-alt"></i></span>
-              <span>Boropool Circle, Kaptan Villa, Halishahar, Chittagong</span>
+              <span>{{ $myAddress }}</span>
             </li>
             <li class="footer-contact-item">
               <span class="footer-contact-icon"><i class="bi bi-telephone"></i></span>
-              <a href="tel:01898795400">01898-795400</a>
+              <a href="tel:{{ $myPhoneDigits }}">{{ $myPhone }}</a>
             </li>
             <li class="footer-contact-item">
               <span class="footer-contact-icon"><i class="bi bi-envelope"></i></span>
-              <a href="mailto:degchidine@gmail.com">degchidine@gmail.com</a>
+              <a href="mailto:{{ $myEmail }}">{{ $myEmail }}</a>
             </li>
             <li class="footer-contact-item">
               <span class="footer-contact-icon"><i class="bi bi-clock"></i></span>
-              <span>Daily · 5:00 PM – 11:30 PM</span>
+              <span>{{ $myHours }}</span>
             </li>
           </ul>
         </div>

@@ -128,6 +128,14 @@
         flex: 1;
         min-width: 140px;
     }
+    @media (max-width: 576px) {
+        .order-confirm .oc-action-btn {
+            flex: 1 1 100%;
+            min-width: 100%;
+            font-size: 0.98rem;
+            padding: 0.95rem 1rem;
+        }
+    }
     .order-confirm .oc-action-btn-outline {
         background: transparent;
         border: 1.5px solid var(--brand-secondary);
