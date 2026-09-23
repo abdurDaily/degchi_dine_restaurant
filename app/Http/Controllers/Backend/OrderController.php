@@ -71,7 +71,7 @@ class OrderController extends Controller
 
             $topCustomers = Order::forUserBranch()
                 ->whereBetween('created_at', [$start, $end])
-                ->where('status', '!=', 'canceled')
+                ->where('status', 'completed')
                 ->selectRaw('COALESCE(NULLIF(NULLIF(customer_phone, ""), NULL), CONCAT("walkin:", customer_name)) as identity')
                 ->selectRaw('MAX(customer_name) as customer_name')
                 ->selectRaw('MAX(NULLIF(customer_phone, "")) as customer_phone')
