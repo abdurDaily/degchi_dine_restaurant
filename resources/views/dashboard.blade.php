@@ -101,6 +101,17 @@
                 </form>
 
                 <div class="mt-3 d-flex flex-wrap gap-2">
+                    @if ($userBranch)
+                        <span class="dd-metric-chip">
+                            <i class="ri-store-2-line text-primary"></i>
+                            <span>Branch: <strong>{{ $userBranch->name }}</strong></span>
+                        </span>
+                    @else
+                        <span class="dd-metric-chip">
+                            <i class="ri-store-2-line"></i>
+                            <span>All branches</span>
+                        </span>
+                    @endif
                     @if ($isFiltered)
                         <span class="dd-metric-chip">
                             <i class="ri-calendar-check-line text-primary"></i>

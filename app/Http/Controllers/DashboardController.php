@@ -61,8 +61,8 @@ class DashboardController extends Controller
         $monthlyRevenue = collect();
 
         if ($user->can('orders-show')) {
-            // Base order query — filtered হলে date range apply হবে, নাহলে সব order
-            $orderBase = Order::query();
+            // Base order query — scoped to the user's branch, filtered হলে date range apply হবে, নাহলে সব order
+            $orderBase = Order::forUserBranch();
             if ($isFiltered) {
                 $orderBase->whereBetween('created_at', [$rangeFrom, $rangeTo]);
             }
@@ -81,13 +81,13 @@ class DashboardController extends Controller
 
             // "আজকের" মেট্রিক শুধু তখনই দেখানো হবে যখন কোনো ফিল্টার সিলেক্ট করা নেই
             if (! $isFiltered) {
-                $stats['orders_today']  = Order::whereDate('created_at', today())->count();
-                $stats['revenue_today'] = (float) Order::whereIn('status', ['confirmed', 'completed'])
+                $stats['orders_today']  = Order::forUserBranch()->whereDate('created_at', today())->count();
+                $stats['revenue_today'] = (float) Order::forUserBranch()->whereIn('status', ['confirmed', 'completed'])
                     ->whereDate('created_at', today())
                     ->sum('final_amount');
             }
 
-            $recentOrdersQuery = Order::query();
+            $recentOrdersQuery = Order::forUserBranch();
             if ($isFiltered) {
                 $recentOrdersQuery->whereBetween('created_at', [$rangeFrom, $rangeTo]);
             }
@@ -98,7 +98,7 @@ class DashboardController extends Controller
 
             // মাসিক রেভিনিউ চার্ট — শুধু unfiltered (default) view-তে দেখানো হবে
             if (! $isFiltered) {
-                $monthlyRevenue = Order::query()
+                $monthlyRevenue = Order::forUserBranch()
                     ->whereIn('status', ['confirmed', 'completed'])
                     ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
                     ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(final_amount) as total")
@@ -153,6 +153,8 @@ class DashboardController extends Controller
 
         $hasDashboardWidgets = $user->hasDashboardWidgets();
 
+        $userBranch = $user->hasAllBranchAccess() ? null : $user->branch;
+
         return view('dashboard', compact(
             'stats',
             'recentOrders',
@@ -160,6 +162,7 @@ class DashboardController extends Controller
             'orderStatusCounts',
             'monthlyRevenue',
             'hasDashboardWidgets',
+            'userBranch',
             'isFiltered',
             'from',
             'to',
