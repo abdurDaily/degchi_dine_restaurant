@@ -29,6 +29,7 @@ class UserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user,
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'branch_id' => 'nullable|string',
             'roles' => 'nullable|array|min:1',
             'roles.*' => 'nullable|string|exists:roles,name',
             'status' => 'nullable|boolean',
@@ -52,6 +53,8 @@ class UserRequest extends FormRequest
             'image.image' => 'The profile image must be an image file.',
             'image.mimes' => 'The profile image must be a file of type: jpeg, png, jpg, gif.',
             'image.max' => 'The profile image may not be greater than 2MB.',
+            'branch_id.required' => 'Must select a branch.',
+            'branch_id.exists' => 'The selected branch does not exist.',
         ];
     }
 }

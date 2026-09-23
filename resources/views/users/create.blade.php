@@ -65,6 +65,19 @@
                                             </div>
                                         </div>
                                     @endif
+
+                                    <div class="mt-4 col-md-4">
+                                        <div class="form-group">
+                                            <label for="select-branch">{{ __('Branch') }}</label>
+                                            <select name="branch_id" class="form-control select2" id="select-branch">
+                                                <option value="all" selected>{{ __('All Branch') }}</option>
+                                                @foreach ($branches as $branch)
+                                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <small class="text-muted">{{ __('Optional for Super Admin users.') }}</small>
+                                        </div>
+                                    </div>
                                     {{-- checkbox --}}
                                     <div class="mt-4 col-md-4">
                                         <div class="form-check">

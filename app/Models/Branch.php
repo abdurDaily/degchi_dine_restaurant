@@ -25,6 +25,11 @@ class Branch extends Model
         'updated_at' => 'datetime',
     ];
 
+    public function users()
+    {
+        return $this->hasMany(User::class, 'branch_id');
+    }
+
     /**
      * Boot method to automatically generate slug
      */

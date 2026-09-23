@@ -21,6 +21,7 @@
                                         <th>{{ __('Name') }}</th>
                                         <th>{{ __('Email') }}</th>
                                         <th>{{ __('User Number') }}</th>
+                                        <th>{{ __('Branch') }}</th>
                                         <th>{{ __('Status') }}</th>
                                         <th>{{ __('Action') }}</th>
                                     </tr>
@@ -64,6 +65,11 @@
                     },
                     {
                         data: 'user_number',
+                    },
+                    {
+                        data: 'branch',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'status',

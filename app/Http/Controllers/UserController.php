@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Services\UploadService;
 use App\Http\Requests\UserRequest;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -24,6 +26,43 @@ class UserController extends Controller
         $this->middleware('permission:users-delete')->only('destroy');
     }
 
+    /**
+     * Resolve the branch for the user being saved.
+     *
+     * Super Admin users are not restricted to a branch (branch_id = null => all branches).
+     * Every other role MUST select a branch or "All Branch".
+     */
+    private function resolveBranchId(Request $request, array $roleNames): ?int
+    {
+        if (in_array('Super Admin', $roleNames))
+        {
+            return null;
+        }
+
+        $branchId = trim((string) $request->input('branch_id'));
+
+        if ($branchId === '')
+        {
+            throw ValidationException::withMessages([
+                'branch_id' => ['Must select a branch.'],
+            ]);
+        }
+
+        if ($branchId === 'all')
+        {
+            return null;
+        }
+
+        if (!Branch::where('id', $branchId)->exists())
+        {
+            throw ValidationException::withMessages([
+                'branch_id' => ['The selected branch does not exist.'],
+            ]);
+        }
+
+        return (int) $branchId;
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -32,7 +71,7 @@ class UserController extends Controller
     {
         if ($request->ajax())
         {
-            $query = User::query()->latest();
+            $query = User::query()->with('branch')->latest();
 
             return datatables()->of($query)
                 ->addIndexColumn()
@@ -46,6 +85,15 @@ class UserController extends Controller
                     {
                         return '<img src="' . asset('assets/images/no-image.svg') . '" class="img-fluid" alt="image" style="height:90px; width:90px;">';
                     }
+                })
+                ->addColumn('branch', function ($row)
+                {
+                    if ($row->branch_id === null)
+                    {
+                        return '<span class="badge bg-info">All Branch</span>';
+                    }
+
+                    return e($row->branch->name ?? 'N/A');
                 })
                 ->addColumn('status', function ($row)
                 {
@@ -83,7 +131,7 @@ class UserController extends Controller
                     }
                     return $html;
                 })
-                ->rawColumns(['image', 'status', 'actions'])
+                ->rawColumns(['image', 'branch', 'status', 'actions'])
                 ->make(true);
         }
 
@@ -97,7 +145,8 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('users.create', compact('roles'));
+        $branches = Branch::orderBy('name')->get();
+        return view('users.create', compact('roles', 'branches'));
     }
 
     /**
@@ -106,6 +155,14 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $validatedData = $request->validated();
+
+        $roleNames = [];
+        if (auth()->user()->hasRole('Super Admin') && isset($validatedData['roles']))
+        {
+            $roleNames = $validatedData['roles'];
+        }
+
+        $branchId = $this->resolveBranchId($request, $roleNames);
 
         DB::beginTransaction();
         try
@@ -117,6 +174,7 @@ class UserController extends Controller
             $user->email = $validatedData['email'];
             # make unique user number
             $user->user_number = mt_rand(10000000, 99999999);
+            $user->branch_id = $branchId;
             $user->password = Hash::make($validatedData['password']);
             $user->status = true;
 
@@ -173,7 +231,8 @@ class UserController extends Controller
         $roleNames = $user->roles->pluck('name');
 
         $roles = Role::all();
-        return view('users.edit', compact('user', 'roles', 'roleNames'));
+        $branches = Branch::orderBy('name')->get();
+        return view('users.edit', compact('user', 'roles', 'roleNames', 'branches'));
     }
 
     /**
@@ -183,6 +242,14 @@ class UserController extends Controller
     {
         $validatedData = $request->validated();
 
+        $roleNames = $user->roles->pluck('name')->all();
+        if (auth()->user()->hasRole('Super Admin') && isset($validatedData['roles']))
+        {
+            $roleNames = $validatedData['roles'];
+        }
+
+        $branchId = $this->resolveBranchId($request, $roleNames);
+
         DB::beginTransaction();
         try
         {
@@ -190,6 +257,7 @@ class UserController extends Controller
             $oldImage = $user->image;
 
             $user->name = $validatedData['name'];
+            $user->branch_id = $branchId;
 
             if (isset($validatedData['email']))
             {

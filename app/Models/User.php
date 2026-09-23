@@ -22,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'user_number',
+        'branch_id',
         'image',
         'status',
         'name',
@@ -102,6 +103,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function posts()
     {
         return $this->hasMany(Post::class, 'author_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function hasAllBranchAccess(): bool
+    {
+        return $this->branch_id === null;
     }
 
     public function receivesBroadcastNotificationsOn(): string
