@@ -112,7 +112,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasAllBranchAccess(): bool
     {
-        return $this->branch_id === null;
+        return $this->branch_id === null || $this->hasRole('Super Admin');
     }
 
     public function receivesBroadcastNotificationsOn(): string

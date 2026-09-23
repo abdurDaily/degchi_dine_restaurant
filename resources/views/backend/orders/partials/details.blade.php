@@ -67,6 +67,22 @@
             <div class="card-body">
                 <form id="updateOrderStatusForm" data-action-url="{{ route('orders.updateStatus', $order->id) }}">
                     @csrf
+                    @php($canAssignBranch = auth()->user()->hasAllBranchAccess())
+                    <div class="mb-3">
+                        <label for="order_branch_id" class="form-label fw-semibold">Assign Branch</label>
+                        @if ($canAssignBranch)
+                            <select name="branch_id" id="order_branch_id" class="form-select" required>
+                                <option value="" disabled {{ $order->branch_id === null ? 'selected' : '' }}>Select branch…</option>
+                                @foreach ($branches as $branch)
+                                    <option value="{{ $branch->id }}" {{ $order->branch_id == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted">Assign this order to a branch. Branch staff can then manage this order.</small>
+                        @else
+                            <input type="text" id="order_branch_id" class="form-control" value="{{ $order->branch?->name ?? '—' }}" disabled readonly>
+                            <small class="text-muted">This order is assigned to your branch only.</small>
+                        @endif
+                    </div>
                     <div class="mb-3">
                         <label for="order_status" class="form-label fw-semibold">Order Status</label>
                         <select name="status" id="order_status" class="form-select">

@@ -8,6 +8,7 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id',
+        'branch_id',
         'member_id',
         'unique_card_number',
         'customer_name',
@@ -53,6 +54,27 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Restrict visible orders to the current user's branch.
+     * All-branch users (branch_id null or Super Admin) see every order;
+     * branch-restricted users only see orders assigned to their branch.
+     */
+    public function scopeForUserBranch($query)
+    {
+        $user = auth()->user();
+
+        if (!$user || $user->hasAllBranchAccess()) {
+            return $query;
+        }
+
+        return $query->where('branch_id', $user->branch_id);
     }
 
     /**

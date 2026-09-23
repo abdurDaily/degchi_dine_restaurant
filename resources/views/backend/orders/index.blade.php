@@ -169,6 +169,16 @@
         background: #d1e7dd !important;
         color: #0f5132 !important;
     }
+    .order-branch-badge {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 0.35em 0.65em;
+    }
+    .order-branch-assigned {
+        background: #0d5566 !important;
+        color: #fff !important;
+    }
 
     /* ─── Hide DataTable's own search box ─── */
     .dataTables_wrapper .dataTables_filter { display: none; }
@@ -329,6 +339,7 @@
                                     <th>Discount</th>
                                     <th>Final</th>
                                     <th>Status</th>
+                                    <th>Branch</th>
                                     <th>Date</th>
                                     <th>Action</th>
                                 </tr>
@@ -461,6 +472,7 @@ $(function () {
             { data: 'discount',       name: 'discount_amount' },
             { data: 'final',          name: 'final_amount' },
             { data: 'status_name',    name: 'status' },
+            { data: 'branch_name',     orderable: false, searchable: false },
             { data: 'date',           name: 'created_at' },
             { data: 'action',         name: 'action',             orderable: false, searchable: false }
         ],

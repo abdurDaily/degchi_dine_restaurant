@@ -15,7 +15,7 @@
         </a>
     </div>
 
-    @include('backend.orders.partials.details')
+    @include('backend.orders.partials.details', ['order' => $order, 'branches' => $branches])
     </div>
 @endsection
 

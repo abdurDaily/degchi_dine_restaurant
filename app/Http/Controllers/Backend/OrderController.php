@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\Menu;
 use App\Models\MenuVariation;
 use App\Models\Order;
@@ -25,15 +26,35 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * Abort access unless the current user is allowed to manage this order.
+     * All-branch users (Super Admin / branch_id null) manage every order;
+     * branch-restricted users only manage orders assigned to their branch.
+     */
+    private function canManageOrder(Order $order): void
+    {
+        $user = auth()->user();
+
+        if ($user->hasAllBranchAccess()) {
+            return;
+        }
+
+        abort_unless(
+            (int) $order->branch_id === (int) $user->branch_id,
+            403,
+            'You can only manage orders assigned to your branch.'
+        );
+    }
+
     public function index(Request $request)
     {
         // AJAX counts-only refresh (called by JS polling & after status update)
         if ($request->ajax() && $request->boolean('counts_only')) {
-            $counts = Order::selectRaw('status, count(*) as total')
+            $counts = Order::forUserBranch()->selectRaw('status, count(*) as total')
                 ->groupBy('status')
                 ->pluck('total', 'status')
                 ->toArray();
-            $counts['all'] = Order::count();
+            $counts['all'] = Order::forUserBranch()->count();
             return response()->json(['counts' => $counts]);
         }
 
@@ -48,7 +69,7 @@ class OrderController extends Controller
             $start = Carbon::parse($month)->startOfMonth();
             $end   = Carbon::parse($month)->endOfMonth();
 
-            $topCustomers = Order::query()
+            $topCustomers = Order::forUserBranch()
                 ->whereBetween('created_at', [$start, $end])
                 ->where('status', '!=', 'canceled')
                 ->selectRaw('COALESCE(NULLIF(NULLIF(customer_phone, ""), NULL), CONCAT("walkin:", customer_name)) as identity')
@@ -69,7 +90,7 @@ class OrderController extends Controller
         }
 
         if ($request->ajax()) {
-            $query = Order::with('member')->select(['id', 'member_id', 'unique_card_number', 'customer_name', 'customer_phone', 'total_amount', 'discount_amount', 'final_amount', 'status', 'created_at', 'viewed_at']);
+            $query = Order::forUserBranch()->with(['member', 'branch'])->select(['id', 'branch_id', 'member_id', 'unique_card_number', 'customer_name', 'customer_phone', 'total_amount', 'discount_amount', 'final_amount', 'status', 'created_at', 'viewed_at']);
 
             // Filter by status
             if ($request->filled('status_filter')) {
@@ -105,21 +126,28 @@ class OrderController extends Controller
                         default => $label,
                     };
                 })
+                ->addColumn('branch_name', function ($order) {
+                    if ($order->branch_id === null) {
+                        return '<span class="badge order-branch-badge bg-secondary">Unassigned</span>';
+                    }
+
+                    return '<span class="badge order-branch-badge order-branch-assigned">' . e($order->branch->name ?? 'Unknown') . '</span>';
+                })
                 ->addColumn('date', fn($order) => $order->created_at->format('Y-m-d H:i'))
                 ->addColumn('is_new', fn($order) => is_null($order->viewed_at) ? 1 : 0)
                 ->addColumn('action', function($order) {
                     return '<button class="btn btn-sm btn-info view-order-btn" data-id="' . $order->id . '" data-url="' . route('orders.show', $order->id) . '"><i class="fas fa-eye"></i> View</button>';
                 })
-                ->rawColumns(['member', 'card_number', 'total', 'discount', 'final', 'status_name', 'date', 'action'])
+                ->rawColumns(['member', 'card_number', 'total', 'discount', 'final', 'status_name', 'branch_name', 'date', 'action'])
                 ->make(true);
         }
 
         // Status counts for filter buttons
-        $counts = Order::selectRaw('status, count(*) as total')
+        $counts = Order::forUserBranch()->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
-        $counts['all'] = Order::count();
+        $counts['all'] = Order::forUserBranch()->count();
 
         return view('backend.orders.index', compact('counts'));
     }
@@ -129,12 +157,14 @@ class OrderController extends Controller
      */
     public function latestOrderId()
     {
-        $latest = Order::latest('id')->value('id');
+        $latest = Order::forUserBranch()->latest('id')->value('id');
         return response()->json(['latest_id' => $latest ?? 0]);
     }
 
     public function show(Order $order)
     {
+        $this->canManageOrder($order);
+
         // Mark as viewed the first time an admin opens it
         if (is_null($order->viewed_at)) {
             $order->update(['viewed_at' => now()]);
@@ -142,28 +172,49 @@ class OrderController extends Controller
 
         $order->load('member');
 
+        $branches = Branch::orderBy('name')->get();
+
         if (request()->ajax()) {
-            return view('backend.orders.partials.details', compact('order'));
+            return view('backend.orders.partials.details', compact('order', 'branches'));
         }
 
-        return view('backend.orders.show', compact('order'));
+        return view('backend.orders.show', compact('order', 'branches'));
     }
 
     public function updateStatus(Request $request, Order $order)
     {
-        $request->validate([
+        $this->canManageOrder($order);
+
+        $user = auth()->user();
+
+        $rules = [
             'status' => 'required|in:pending,confirmed,completed,canceled',
             'payment_status' => 'required|in:unpaid,paid,failed,cancelled',
             'status_remarks' => 'nullable|string|max:1000',
-        ]);
+        ];
 
-        $order->update([
-            'status' => $request->status,
-            'payment_status' => $request->payment_status,
-            'status_remarks' => $request->status === 'canceled'
+        // Only all-branch users (Super Admin / branch_id null) can assign or
+        // re-assign an order to a branch. Every order must be assigned to a
+        // branch before its status can be saved.
+        if ($user->hasAllBranchAccess()) {
+            $rules['branch_id'] = 'required|integer|exists:branches,id';
+        }
+
+        $validated = $request->validate($rules);
+
+        $data = [
+            'status' => $validated['status'],
+            'payment_status' => $validated['payment_status'],
+            'status_remarks' => $validated['status'] === 'canceled'
                 ? $request->status_remarks
                 : null,
-        ]);
+        ];
+
+        if ($user->hasAllBranchAccess()) {
+            $data['branch_id'] = (int) $validated['branch_id'];
+        }
+
+        $order->update($data);
 
         if ($order->status === 'completed' || $order->payment_status === 'paid') {
             $order->creditMemberPurchase();
@@ -182,6 +233,8 @@ class OrderController extends Controller
      */
     public function menuPicker(Request $request, Order $order, OrderPricingService $pricing)
     {
+        $this->canManageOrder($order);
+
         $search = trim((string) $request->get('q', ''));
 
         $query = Menu::query()
@@ -189,6 +242,14 @@ class OrderController extends Controller
             ->with(['category', 'variations' => function ($q) {
                 $q->orderBy('price');
             }]);
+
+        // Show only menus that belong to the order's assigned branch (plus
+        // global menus). Unassigned orders (null branch) show the whole catalog.
+        if ($order->branch_id) {
+            $query->whereHas('category', function ($q) use ($order) {
+                $q->where('branch_id', $order->branch_id)->orWhereNull('branch_id');
+            });
+        }
 
         if ($search !== '') {
             $query->where('name', 'like', '%'.$search.'%');
@@ -225,6 +286,8 @@ class OrderController extends Controller
      */
     public function updateItemQuantity(Request $request, Order $order, OrderPricingService $pricing)
     {
+        $this->canManageOrder($order);
+
         $request->validate([
             'index' => 'required|integer|min:0',
             'quantity' => 'required|integer|min:0|max:999',
@@ -266,6 +329,8 @@ class OrderController extends Controller
      */
     public function addItem(Request $request, Order $order, OrderPricingService $pricing)
     {
+        $this->canManageOrder($order);
+
         $request->validate([
             'variation_id' => 'required|integer|exists:menu_variations,id',
             'quantity' => 'nullable|integer|min:1|max:50',
