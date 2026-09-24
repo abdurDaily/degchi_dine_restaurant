@@ -761,6 +761,7 @@ class HomeController extends Controller
         // Fresh visit কিনা চেক করা হচ্ছে (কোনো filter param URL-এ আছে কিনা)
         $hasAnyFilterParam = $request->has('categories')
             || $request->has('category')
+            || $request->has('offer')
             || $request->has('offerFilter')
             || $request->has('popularFilter')
             || $request->has('min_price')

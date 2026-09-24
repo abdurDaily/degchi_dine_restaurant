@@ -16,34 +16,6 @@
             </x-slot:eyebrowIcon>
         </x-frontend.page-header>
 
-        @if (isset($activeOfferDetails) && $activeOfferDetails)
-            <section class="menu-hero-section pt-0 pb-4">
-                <div class="container px-4 px-lg-5">
-                    <div class="alert alert-dismissible fade show"
-                        style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); border: none; border-radius: 15px; box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);">
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
-                            aria-label="Close"></button>
-                        <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 py-2">
-                            <div class="text-white">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="bi bi-megaphone-fill fs-4"></i>
-                                    <span class="fs-5 fw-bold">{{ $activeOfferDetails->name }}</span>
-                                </div>
-                                @if ($activeOfferDetails->description)
-                                    <p class="mb-0 small opacity-90">{{ $activeOfferDetails->description }}</p>
-                                @endif
-                            </div>
-                            <div class="offer-badge-big"
-                                style="background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 50px; backdrop-filter: blur(10px);">
-                                <span class="text-white fs-3 fw-bold">{{ $activeOfferDetails->discount_percent }}%
-                                    OFF</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-
         <section class="menu-grid-section py-4 py-lg-5" style="background: linear-gradient(160deg, #1a3a4a 0%, #0f2a38 50%, #162e3c 100%);">
             <div class="container px-4 px-lg-5">
                 <div class="row g-4 menu-layout-row">
@@ -183,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             url.searchParams.set('offerFilter', 1);
         } else {
             url.searchParams.delete('offerFilter');
+            url.searchParams.delete('offer');
         }
 
         if (popularChecked) {

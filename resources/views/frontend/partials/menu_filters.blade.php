@@ -5,12 +5,15 @@
     $hasAnyFilterParam =
         request()->has('categories') ||
         request()->has('category') ||
+        request()->has('offer') ||
         request()->has('offerFilter') ||
         request()->has('popularFilter') ||
         request()->has('min_price') ||
         request()->has('max_price');
 
-    $isOfferSelected = filter_var(request()->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
+    // Offer popup থেকে redirect (?offer=<id>) এলে Offer checkbox auto-select হবে
+    $isOfferSelected = request()->has('offer')
+        || filter_var(request()->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
 
     // Fresh visit হলে Popular ডিফল্ট checked, নাহলে normal query value নেওয়া হবে
     $isPopularSelected = $hasAnyFilterParam
