@@ -37,6 +37,20 @@ class Offer extends Model
     ];
 
     /**
+     * Normalize the popup image path for the "public" disk.
+     * New uploads store "offers/{file}.webp"; legacy records only stored
+     * "{file}.webp" — prefix the folder so the existing data keeps working.
+     */
+    public function getPopupImageAttribute(?string $value): ?string
+    {
+        if (! $value || str_contains($value, '/')) {
+            return $value;
+        }
+
+        return 'offers/' . $value;
+    }
+
+    /**
      * Get the menu variations that have this offer.
      */
     public function menuVariations(): BelongsToMany
