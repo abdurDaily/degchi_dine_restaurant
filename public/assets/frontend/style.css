@@ -14559,177 +14559,319 @@ body {
 }
 
 /* ==========================================================================
-   PARTY BOOKING PAGE
+   PARTY BOOKING PAGE — uses the same dark-glass design language as the
+   Contact page (card-dark tokens, cp-field inputs, btn-dine CTAs).
    ========================================================================== */
 
-.booking-section {
-    background-color: var(--bg-main);
-    padding: 80px 0;
-    min-height: 80vh;
-    overflow: hidden;
+.party-booking-main-box {
+    padding: 2rem 0 3.5rem;
 }
 
-.booking-info-content {
-    padding-right: 30px;
+.party-booking-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 1.5rem;
+    align-items: start;
 }
 
-.booking-info-title {
-    font-family: "Poppins", sans-serif;
+.party-booking-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.party-booking-info-panel {
+    background: var(--card-dark-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid var(--shine-edge);
+    box-shadow: var(--card-dark-shadow);
+    padding: 1rem;
+}
+
+.party-booking-info-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--shine-edge);
+}
+
+.party-booking-info-title {
+    font-family: var(--section-title-font, "Poppins", sans-serif);
+    font-size: 1.55rem;
     font-weight: 700;
-    font-size: 2.8rem;
-    color: var(--brand);
-    margin-bottom: 15px;
+    color: var(--text-on-dark);
+    margin: 0 0 0.25rem;
     line-height: 1.2;
 }
 
-.booking-info-subtitle {
-    font-family: "Manrope", sans-serif;
-    font-size: 1.1rem;
-    color: var(--text-muted);
-    margin-bottom: 30px;
+.party-booking-info-tagline {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-on-dark-muted);
 }
 
-.media-gallery {
+.party-booking-open-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--brand-secondary);
+    background: var(--secondary-10);
+    border: 1px solid var(--secondary-25);
+}
+
+/* --- Media (video) highlight --- */
+.party-booking-media {
     position: relative;
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    margin-bottom: 40px;
-    height: 450px;
-    background-color: #000;
+    border: 1px solid var(--shine-edge);
+    box-shadow: var(--card-dark-shadow);
+    aspect-ratio: 16 / 9;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.media-gallery video {
+.party-booking-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
-.media-overlay {
+.party-booking-media-overlay {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(10, 69, 84, 0.8) 0%, rgba(10, 69, 84, 0.2) 50%, rgba(10, 69, 84, 0) 100%);
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    backdrop-filter: blur(8px);
+}
+
+/* --- Features --- */
+.party-booking-features {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding: 25px;
-    color: white;
-    pointer-events: none;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
 }
 
-.feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.feature-item {
+.party-booking-feature {
     display: flex;
+    gap: 0.85rem;
     align-items: flex-start;
-    margin-bottom: 20px;
-    background: #ffffff;
-    padding: 15px 20px;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--shine-edge);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.party-booking-feature:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-dark-shadow-hover);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.party-booking-feature-icon {
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-    transition: transform 0.3s ease;
-}
-
-.feature-item:hover {
-    transform: translateY(-5px);
-    border-color: var(--brand-gold);
-}
-
-.feature-icon {
-    width: 50px;
-    height: 50px;
-    background-color: var(--brand-teal-light);
-    color: var(--brand);
-    border-radius: 50%;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    margin-right: 15px;
+    flex-shrink: 0;
+    background: var(--secondary-10);
+    color: var(--brand-secondary);
+    font-size: 1.05rem;
+}
+
+.party-booking-feature-icon-gold {
+    background: var(--gold-10);
+    color: var(--brand-gold);
+}
+
+.party-booking-feature-body h3 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-on-dark);
+    margin: 0 0 0.35rem;
+}
+
+.party-booking-feature-body p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-on-dark-muted);
+}
+
+/* --- Actions --- */
+.party-booking-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+    margin-top: 1.35rem;
+}
+
+/* --- Form column --- */
+.party-booking-forms {
+    min-width: 0;
+}
+
+@media (min-width: 992px) {
+    .party-booking-form-sticky {
+        position: sticky;
+        top: 100px;
+        z-index: 5;
+    }
+}
+
+.party-booking-card {
+    border-top: 4px solid var(--brand-secondary);
+}
+
+.party-booking-card .cp-input {
+    color-scheme: dark;
+}
+
+.party-booking-card select.party-booking-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23ff6b35' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.6rem;
+    cursor: pointer;
+}
+
+.party-booking-card select.party-booking-select option {
+    color: #0d3d4a;
+    background: #fff;
+}
+
+/* --- Success alert --- */
+.party-booking-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    background: var(--secondary-10);
+    border: 1px solid var(--secondary-25);
+    margin-bottom: 1.5rem;
+}
+
+.party-booking-alert > i {
+    font-size: 1.35rem;
+    color: var(--brand-secondary);
     flex-shrink: 0;
 }
 
-.feature-text h4 {
-    margin: 0 0 5px 0;
-    font-family: "Poppins", sans-serif;
+.party-booking-alert strong {
+    display: block;
+    font-size: 0.92rem;
+    color: var(--text-on-dark);
+}
+
+.party-booking-alert span {
+    font-size: 0.85rem;
+    color: var(--text-on-dark-muted);
+}
+
+/* --- Booking intel --- */
+.party-booking-intel {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    margin-top: 1.5rem;
+    padding: 1.15rem;
+    border-radius: 14px;
+    background: var(--gold-10);
+    border: 1px dashed var(--gold-25);
+}
+
+.party-booking-intel-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--gold-25);
+    color: var(--brand-gold);
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-dark);
 }
 
-.feature-text p {
-    margin: 0;
+.party-booking-intel h4 {
+    font-family: var(--section-title-font, "Poppins", sans-serif);
     font-size: 0.95rem;
-    color: var(--text-muted);
+    font-weight: 700;
+    color: var(--brand-gold);
+    margin: 0 0 0.5rem;
 }
 
-.booking-card {
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: var(--card-shadow);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
+.party-booking-intel p {
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--text-on-dark-muted);
+    margin-bottom: 0.6rem;
 }
 
-.booking-header {
-    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-    color: #ffffff;
-    padding: 30px;
-    text-align: center;
-    position: relative;
+.party-booking-intel p strong {
+    color: var(--text-on-dark);
 }
 
-.booking-header h3 {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
-    font-weight: 600;
-    font-size: 1.8rem;
-}
-
-.booking-header p {
-    margin-top: 5px;
-    margin-bottom: 0;
-    opacity: 0.9;
-    font-size: 0.95rem;
-}
-
-.booking-body {
-    padding: 35px;
-}
-
-.btn-submit {
-    background-color: var(--brand);
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    padding: 15px 20px;
-    font-size: 1.05rem;
-    font-weight: 600;
-    width: 100%;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 10px;
-}
-
-.btn-submit:hover {
-    background-color: var(--brand-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
+/* --- Responsive --- */
 @media (max-width: 991.98px) {
-    .booking-info-content {
-        padding-right: 0;
-        margin-bottom: 50px;
+    .party-booking-grid {
+        grid-template-columns: 1fr;
     }
-    .booking-info-title {
-        font-size: 2.2rem;
+    .party-booking-info {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .party-booking-actions {
+        grid-template-columns: 1fr;
+    }
+    .party-booking-info-top {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .party-booking-feature,
+    .party-booking-intel,
+    .party-booking-alert {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .party-booking-feature-icon,
+    .party-booking-intel-icon,
+    .party-booking-alert > i {
+        margin: 0 auto;
+    }
+    .party-booking-feature {
+        align-items: center;
     }
 }
 
