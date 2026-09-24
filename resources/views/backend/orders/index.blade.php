@@ -476,7 +476,7 @@ $(function () {
             { data: 'date',           name: 'created_at' },
             { data: 'action',         name: 'action',             orderable: false, searchable: false }
         ],
-        order: [[9, 'desc']],
+        order: [[10, 'desc']],
 
         rowCallback: function (row, data) {
             // Prefer the raw status field; never parse status_name HTML.
