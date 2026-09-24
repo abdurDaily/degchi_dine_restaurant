@@ -80,7 +80,7 @@ class UploadService
             $imageName = Str::random(25) . '.webp';
             \Illuminate\Support\Facades\Storage::disk($disk)->put($dir . '/' . $imageName, (string) $image->toWebp($this->webpQuality));
 
-            return $dir . '/' . $imageName;
+            return $imageName;
         } catch (\Exception $e) {
             return $this->storeOriginalToDisk($file, $dir, $disk);
         }
@@ -125,7 +125,7 @@ class UploadService
         $extension = $file->getClientOriginalExtension() ?: 'bin';
         $imageName = Str::random(25) . '.' . $extension;
         \Illuminate\Support\Facades\Storage::disk($disk)->putFileAs($dir, $file, $imageName);
-        return $dir . '/' . $imageName;
+        return $imageName;
     }
 
     protected function isAnimatedGif(\Illuminate\Http\UploadedFile $file): bool

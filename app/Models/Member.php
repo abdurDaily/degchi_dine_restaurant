@@ -53,6 +53,21 @@ class Member extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Normalize the profile image path for the "public" disk.
+     * Uploads store "{file}.png" inside the "profile_images/" folder, but the
+     * stored value only keeps the bare filename — prefix the folder so every
+     * display site (asset('storage/' . $member->profile_image_path)) works.
+     */
+    public function getProfileImagePathAttribute(?string $value): ?string
+    {
+        if (! $value || str_contains($value, '/')) {
+            return $value;
+        }
+
+        return 'profile_images/' . $value;
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);
