@@ -111,8 +111,14 @@
                             <label class="form-label fw-semibold">Min Order Total (৳)</label>
                             <input type="number" name="min_total" min="0" step="0.01"
                                    class="form-control @error('min_total') is-invalid @enderror"
-                                   value="{{ old('min_total', $offer->min_total) }}"
+                                   value="{{ old('min_total', $offer->minimumTotal()) }}"
                                    placeholder="Leave blank for no minimum">
+                            <div class="form-text">
+                                <i class="ri-information-line me-1"></i>
+                                Whole-cart threshold. The discount stays locked until the order
+                                <strong>subtotal (before discounts)</strong> reaches this amount — then it applies
+                                automatically. <strong>0 or blank = no minimum.</strong>
+                            </div>
                             @error('min_total')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>

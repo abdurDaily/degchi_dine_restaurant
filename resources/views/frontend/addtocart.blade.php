@@ -56,46 +56,14 @@
                 <div class="col-lg-8">
                     <div class="d-flex align-items-center justify-content-between mb-4 gap-2">
                         <h6 class="cart-section-label mb-0 d-flex align-items-center" style="color: #fff;">
-                            <i class="bi bi-list-check me-2 fs-5"></i> 2 Items in your cart
+                            <i class="bi bi-list-check me-2 fs-5"></i> <span id="cartPageHeading">Loading your cart…</span>
                         </h6>
-                        <button class="btn-dine btn-dine-outline btn-dine-sm" type="button">
+                        <button class="btn-dine btn-dine-outline btn-dine-sm cart-clear-btn" type="button">
                             <i class="bi bi-trash"></i> Clear All
                         </button>
                     </div>
 
                     <div id="cartPageItems" class="cart-items-list"></div>
-
-                    {{-- Cart item card template — JS clones and fills data --}}
-                    <template id="cartItemTemplate">
-                        <div class="cart-product-card" data-item-id="">
-                            <button class="cart-remove-btn" type="button" aria-label="Remove item">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                            <div class="cart-product-img-wrap">
-                                <img src="" alt="" class="cart-product-img" />
-                            </div>
-                            <div class="cart-product-body">
-                                <h6 class="cart-product-name"></h6>
-                                <span class="cart-product-tag"></span>
-                                <div class="cart-product-bottom">
-                                    <div class="cart-product-qty">
-                                        <button class="btn cart-qty-btn" type="button" data-change="-1">
-                                            <i class="bi bi-dash"></i>
-                                        </button>
-                                        <span class="cart-qty-val"></span>
-                                        <button class="btn cart-qty-btn" type="button" data-change="1">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
-                                    </div>
-                                    <div class="cart-product-price-wrap">
-                                        <span class="cart-product-unit"></span>
-                                        <strong class="cart-product-total"></strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                    <!-- /cart-items-list -->
 
                     <div class="mt-4">
                         <a href="{{ route('frontend.home') }}#menu" class="btn-dine btn-dine-ghost btn-dine-sm">
@@ -108,19 +76,20 @@
                 <div class="col-lg-4">
                     <div class="cart-summary-card">
                         <div class="cart-summary-header">
-                            <i class="bi bi-receipt me-2 text-muted"></i> Order Summary
+                            <i class="bi bi-receipt me-2 text-white"></i> Order Summary
                         </div>
 
                         <div class="cart-summary-body">
                             <div class="cart-summary-row">
-                                <span>Subtotal <small class="text-muted ms-1">(2 items)</small></span>
-                                <span id="cartPageSubtotal">৳ 1,140</span>
+                                <span>Subtotal <small class="ms-1 text-white" id="cartPageItemCount">(0 items)</small></span>
+                                <span id="cartPageSubtotal">৳ 0.00</span>
                             </div>
                             <div class="cart-summary-divider"></div>
                             <div class="cart-summary-total-row">
                                 <span>Total</span>
-                                <strong id="cartPageTotal" class="cart-summary-total-val">৳ 1,140</strong>
+                                <strong id="cartPageTotal" class="cart-summary-total-val">৳ 0.00</strong>
                             </div>
+                            <p class="checkout-offer-notice" id="cartPageOfferNotice" hidden></p>
                         </div>
 
                         <div class="cart-summary-footer">

@@ -366,6 +366,80 @@
   font-weight: 600;
 }
 
+/* ── Offer locked behind Min Order Total ──
+   The offer exists but only unlocks once the whole order subtotal reaches its
+   min_total, so the item shows this pill instead of a discounted price. */
+.checkout-order-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.15rem 0 0.1rem;
+}
+
+.checkout-order-flags:empty {
+  display: none;
+}
+
+.cart-min-order-badge,
+.checkout-min-order-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(15, 42, 56, 0.55);
+  border: 1px dashed rgba(231, 174, 7, 0.5);
+  color: var(--brand-gold);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  line-height: 1.35;
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-min-order-badge i,
+.checkout-min-order-badge i {
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.checkout-order-flags .checkout-min-order-badge {
+  margin-top: 0;
+}
+
+/* ── "Add ৳X more to unlock" notice (cart + checkout summaries) ── */
+.checkout-offer-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.6rem;
+  background: rgba(231, 174, 7, 0.1);
+  border: 1px dashed rgba(231, 174, 7, 0.45);
+  color: var(--brand-gold);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.checkout-offer-notice[hidden] {
+  display: none;
+}
+
+.checkout-offer-notice i {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.checkout-offer-notice strong {
+  font-weight: 700;
+}
+
 .checkout-order-bottom {
   display: flex;
   align-items: center;

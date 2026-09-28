@@ -1,16 +1,30 @@
 <?php
 
 /**
+ * Offer helpers.
+ *
+ * All of these accept an OPTIONAL $subtotal (the whole cart/order subtotal).
+ *
+ * - Pass it when the current cart is known: an offer whose `min_total` is not
+ *   met is then excluded, so no discount/badged price is produced for a cart
+ *   that cannot use the offer.
+ * - Omit it when there is no cart context (e.g. plain menu rendering). The
+ *   helpers then behave exactly as before and the offer is only informational;
+ *   `min_total` is enforced for real during pricing/checkout via
+ *   OrderPricingService. No fake subtotal is ever invented.
+ */
+
+/**
  * Get the best offer for a menu variation
  */
 if (!function_exists('getVariationOffer')) {
-    function getVariationOffer($variationId)
+    function getVariationOffer($variationId, ?float $subtotal = null)
     {
         $variation = \App\Models\MenuVariation::find($variationId);
         if (!$variation) {
             return null;
         }
-        return $variation->bestOffer();
+        return $variation->bestOffer($subtotal);
     }
 }
 
@@ -18,13 +32,13 @@ if (!function_exists('getVariationOffer')) {
  * Check if a menu variation has active offers
  */
 if (!function_exists('hasVariationOffer')) {
-    function hasVariationOffer($variationId)
+    function hasVariationOffer($variationId, ?float $subtotal = null)
     {
         $variation = \App\Models\MenuVariation::find($variationId);
         if (!$variation) {
             return false;
         }
-        return $variation->hasActiveOffer();
+        return $variation->resolveApplicableOffers(null, false, $subtotal)->isNotEmpty();
     }
 }
 
@@ -32,13 +46,13 @@ if (!function_exists('hasVariationOffer')) {
  * Get all active offers for a menu variation (specific + all_items)
  */
 if (!function_exists('getVariationOffers')) {
-    function getVariationOffers($variationId)
+    function getVariationOffers($variationId, ?float $subtotal = null)
     {
         $variation = \App\Models\MenuVariation::find($variationId);
         if (!$variation) {
             return collect();
         }
-        return $variation->resolveApplicableOffers(null, false);
+        return $variation->resolveApplicableOffers(null, false, $subtotal);
     }
 }
 
@@ -46,9 +60,9 @@ if (!function_exists('getVariationOffers')) {
  * Get the best discount percentage for a variation
  */
 if (!function_exists('getBestOfferDiscount')) {
-    function getBestOfferDiscount($variationId)
+    function getBestOfferDiscount($variationId, ?float $subtotal = null)
     {
-        $offer = getVariationOffer($variationId);
+        $offer = getVariationOffer($variationId, $subtotal);
         return $offer ? $offer->discount_percent : 0;
     }
 }
@@ -57,9 +71,9 @@ if (!function_exists('getBestOfferDiscount')) {
  * Generate HTML for offer badge
  */
 if (!function_exists('renderOfferBadge')) {
-    function renderOfferBadge($variationId, $badgeClass = 'offer-badge')
+    function renderOfferBadge($variationId, $badgeClass = 'offer-badge', ?float $subtotal = null)
     {
-        $offer = getVariationOffer($variationId);
+        $offer = getVariationOffer($variationId, $subtotal);
 
         if (!$offer) {
             return '';
@@ -78,11 +92,15 @@ if (!function_exists('renderOfferBadge')) {
 
 /**
  * Calculate discounted price for a menu variation
+ *
+ * Pass $subtotal so an offer with a minimum order total is only applied when the
+ * current cart actually reaches it. Without $subtotal the previous behaviour is
+ * kept (used by contexts with no cart, where the price shown is informational).
  */
 if (!function_exists('getDiscountedPrice')) {
-    function getDiscountedPrice($variationId, $price)
+    function getDiscountedPrice($variationId, $price, ?float $subtotal = null)
     {
-        $offer = getVariationOffer($variationId);
+        $offer = getVariationOffer($variationId, $subtotal);
 
         if (!$offer) {
             return $price;

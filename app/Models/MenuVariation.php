@@ -56,10 +56,18 @@ class MenuVariation extends Model
      * Membership / Student / Golden tier offers are excluded — they apply at checkout via member card.
      * Highest discount % wins when both all-items and specific-items apply.
      *
+     * $subtotal is the whole cart/order subtotal. When supplied, offers whose
+     * `min_total` is not met are dropped from the result regardless of
+     * $forMenuDisplay, so a cart-level minimum is never treated as an
+     * item-level one. When null (browsing the menu with no cart context) the
+     * minimum is not enforced here — badges stay informational and the gate is
+     * applied for real at pricing/checkout time.
+     *
      * @param  Member|null  $member
      * @param  bool  $forMenuDisplay  Hide first-order food offers from members who already ordered.
+     * @param  float|null  $subtotal  Whole cart/order subtotal used to honour min_total.
      */
-    public function resolveApplicableOffers(?Member $member = null, bool $forMenuDisplay = false): Collection
+    public function resolveApplicableOffers(?Member $member = null, bool $forMenuDisplay = false, ?float $subtotal = null): Collection
     {
         $specific = $this->relationLoaded('offers')
             ? $this->offers
@@ -68,7 +76,7 @@ class MenuVariation extends Model
         $merged = $specific
             ->concat(Offer::activeAllItemOffers())
             ->unique('id')
-            ->filter(function ($offer) {
+            ->filter(function ($offer) use ($subtotal) {
                 if (! $offer instanceof Offer) {
                     return false;
                 }
@@ -79,13 +87,16 @@ class MenuVariation extends Model
                 if ($offer->is_active === false) {
                     return false;
                 }
-
-                return $offer->isValid();
+                if (! $offer->isValid()) {
+                    return false;
+                }
+                // Cart-level minimum order total (no-op when no subtotal is known)
+                return $offer->meetsMinimumTotal($subtotal);
             });
 
         if ($forMenuDisplay) {
             $merged = $merged->filter(
-                fn (Offer $offer) => $offer->isVisibleOnMenuFor($member)
+                fn (Offer $offer) => $offer->isVisibleOnMenuFor($member, $subtotal)
             );
         }
 
@@ -95,17 +106,20 @@ class MenuVariation extends Model
     /**
      * Best food-menu offer for product cards (highest %).
      */
-    public function bestDisplayOffer(?Member $member = null): ?Offer
+    public function bestDisplayOffer(?Member $member = null, ?float $subtotal = null): ?Offer
     {
-        return $this->resolveApplicableOffers($member, true)->first();
+        return $this->resolveApplicableOffers($member, true, $subtotal)->first();
     }
 
     /**
      * Best food-menu offer for helpers.
+     *
+     * Pass $subtotal when the current cart is known so an offer that does not
+     * meet its minimum order total is not returned.
      */
-    public function bestOffer()
+    public function bestOffer(?float $subtotal = null)
     {
-        return $this->resolveApplicableOffers(null, false)->first();
+        return $this->resolveApplicableOffers(null, false, $subtotal)->first();
     }
 
     /**

@@ -29,6 +29,10 @@
                                 </li>
                                 <li>Checkout takes the <strong>higher of</strong> food-item offer vs member-card benefit
                                     (not stacked).</li>
+                                <li><strong>Min Order Total</strong> is a <em>whole-cart</em> threshold, not a per-item one.
+                                    An offer only applies once the order subtotal (before discounts) reaches that amount.
+                                    Below it the discount is not applied, and the item is billed at full price. A blank
+                                    value means no minimum.</li>
                             </ul>
                         </div>
                         @if ($offers->isEmpty())
@@ -46,6 +50,7 @@
                                             <th>Name</th>
                                             <th class="text-center">Discount</th>
                                             <th>Applies To</th>
+                                            <th class="text-center">Min Order</th>
                                             <th class="text-center">Popup</th>
                                             <th>Expires</th>
                                             <th class="text-center">Status</th>
@@ -84,6 +89,14 @@
                                                 </td>
                                                 <td><span
                                                         class="badge bg-secondary-subtle text-secondary text-capitalize">{{ $offer->applicable_to }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    @php $minTotal = $offer->minimumTotal(); @endphp
+                                                    @if ($minTotal !== null)
+                                                        <span class="fw-semibold" title="Applies only when the order subtotal reaches this amount">৳{{ number_format($minTotal, 2) }}</span>
+                                                    @else
+                                                        <span class="text-muted">—</span>
+                                                    @endif
                                                 </td>
                                                 <td class="text-center">
                                                     @if ($offer->show_as_popup)

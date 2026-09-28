@@ -121,6 +121,13 @@
 
   @php
     $degchiMember = Auth::guard('member')->user();
+    $degchiOfferMinTotals = \App\Models\Offer::query()
+        ->active()
+        ->valid()
+        ->where('applicable_to', 'all')
+        ->where('discount_percent', '>', 0)
+        ->get(['id', 'min_total'])
+        ->mapWithKeys(fn ($offer) => [(string) $offer->id => $offer->minimumTotal()]);
   @endphp
   <script>
     window.DEGCHI_MEMBER = {
@@ -131,6 +138,7 @@
       loginUrl: @json(route('frontend.member.login')),
       registerUrl: @json(route('frontend.card.apply')),
     };
+    window.DEGCHI_OFFER_MIN_TOTALS = @json($degchiOfferMinTotals);
   </script>
   <script src="{{ asset('assets/frontend/js/cart.js') }}?v={{ filemtime(public_path('assets/frontend/js/cart.js')) }}" defer></script>
   <script src="{{ asset('assets/frontend/app.js') }}?v={{ filemtime(public_path('assets/frontend/app.js')) }}" defer></script>

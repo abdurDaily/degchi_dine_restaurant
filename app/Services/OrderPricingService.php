@@ -30,13 +30,17 @@ class OrderPricingService
     public const DEFAULT_DELIVERY_CHARGE = 60.0;
     /**
      * Best currently-active, member-eligible offer for a menu variation, or null.
+     *
+     * $subtotal is the whole cart/order subtotal. Pass it to enforce the offer's
+     * `min_total` (a cart-level minimum). Omit it only when no cart context is
+     * available; the minimum is then left to the caller.
      */
-    public function resolveBestOffer(MenuVariation $variation, ?Member $member): ?Offer
+    public function resolveBestOffer(MenuVariation $variation, ?Member $member, ?float $subtotal = null): ?Offer
     {
-        $applicable = $variation->resolveApplicableOffers($member, false);
+        $applicable = $variation->resolveApplicableOffers($member, false, $subtotal);
 
         return $applicable->isNotEmpty()
-            ? Offer::bestEligibleForMember($applicable, $member)
+            ? Offer::bestEligibleForMember($applicable, $member, $subtotal)
             : null;
     }
 
@@ -44,12 +48,15 @@ class OrderPricingService
      * Live pricing preview for a variation — used by the "Add Extra Item" picker
      * to show both the real price and the current discounted price/badge.
      *
+     * $subtotal is the subtotal of the order being priced, so a minimum-order
+     * offer only shows as discounted when the order qualifies.
+     *
      * @return array{variation_id:int, name:string, image:?string, price:float, discounted_price:float, offer_id:?int, offer_percent:int, offer_name:?string}
      */
-    public function previewVariationPricing(MenuVariation $variation, ?Member $member): array
+    public function previewVariationPricing(MenuVariation $variation, ?Member $member, ?float $subtotal = null): array
     {
         $unitPrice = (float) $variation->price;
-        $offer = $this->resolveBestOffer($variation, $member);
+        $offer = $this->resolveBestOffer($variation, $member, $subtotal);
 
         return [
             'variation_id' => $variation->id,
@@ -65,6 +72,7 @@ class OrderPricingService
             'offer_id' => $offer?->id,
             'offer_percent' => $offer ? (int) $offer->discount_percent : 0,
             'offer_name' => $offer?->name,
+            'offer_min_total' => $offer?->minimumTotal(),
         ];
     }
 
@@ -73,11 +81,14 @@ class OrderPricingService
      * catalog price and today's best eligible offer for the order's member.
      * Keeps the same field shape used everywhere else (title/name/price/
      * original_price/quantity/image/variation_id/offer_id/offer_percent/offer_discount).
+     *
+     * $subtotal is the whole order subtotal including the line being added, so a
+     * minimum-order offer is only applied when the resulting order qualifies.
      */
-    public function buildLineItem(MenuVariation $variation, int $quantity, ?Member $member): array
+    public function buildLineItem(MenuVariation $variation, int $quantity, ?Member $member, ?float $subtotal = null): array
     {
         $quantity = max(1, $quantity);
-        $preview = $this->previewVariationPricing($variation, $member);
+        $preview = $this->previewVariationPricing($variation, $member, $subtotal);
 
         $item = [
             'variation_id' => $variation->id,
@@ -155,7 +166,9 @@ class OrderPricingService
 
         $memberDiscount = 0.0;
         if ($member) {
-            $memberDiscount = (float) ($member->resolveMemberDiscount($subtotalAfterOffers, true)['amount'] ?? 0);
+            // $totalAmount is the whole cart subtotal (undiscounted), which is the
+            // basis every offer's min_total is compared against.
+            $memberDiscount = (float) ($member->resolveMemberDiscount($subtotalAfterOffers, true, $totalAmount)['amount'] ?? 0);
         }
         $memberDiscount = round($memberDiscount, 2);
 

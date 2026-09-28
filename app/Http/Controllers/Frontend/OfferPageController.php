@@ -33,6 +33,7 @@ class OfferPageController extends Controller
                                 'offers.id',
                                 'offers.name',
                                 'offers.discount_percent',
+                                'offers.min_total',
                                 'offers.is_first_order',
                                 'offers.applicable_to',
                                 'offers.offer_type',

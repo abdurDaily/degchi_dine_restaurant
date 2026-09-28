@@ -55,6 +55,7 @@ class HomeController extends Controller
                                                         'offers.name',
                                                         'offers.discount_percent',
                                                         'offers.popup_badge',
+                                                        'offers.min_total',
                                                         'offers.is_first_order',
                                                         'offers.applicable_to',
                                                         'offers.offer_type',
@@ -480,8 +481,14 @@ class HomeController extends Controller
         $items = json_decode($request->items, true);
         $itemDiscountDetails = [];
 
+        // Resolve every line from the DB first so the cart subtotal is known BEFORE
+        // any offer is applied: min_total is a whole-cart threshold, so the offer
+        // gate needs the subtotal up front. Unit prices always come from the DB.
+        $lines = [];
+        $cartSubtotal = 0.0;
+
         if (is_array($items) && ! empty($items)) {
-            foreach ($items as &$item) {
+            foreach ($items as $index => $item) {
                 $menuVariationId = $item['variation_id'] ?? null;
                 if (! $menuVariationId && isset($item['id']) && is_numeric($item['id'])) {
                     $menuVariationId = $item['id'];
@@ -496,18 +503,32 @@ class HomeController extends Controller
                 }
 
                 $qty = max(1, (int) ($item['quantity'] ?? 1));
+
+                $lines[$index] = ['variation' => $variation, 'qty' => $qty];
+                $cartSubtotal += (float) $variation->price * $qty;
+            }
+        }
+
+        $cartSubtotal = round($cartSubtotal, 2);
+
+        if (! empty($lines)) {
+            foreach ($lines as $index => $line) {
+                $variation = $line['variation'];
+                $qty = $line['qty'];
                 $unitPrice = (float) $variation->price;
+
+                $item = $items[$index];
                 $item['price'] = $unitPrice;
                 $item['original_price'] = $unitPrice;
                 $item['quantity'] = $qty;
 
-                $bestOffer = $pricing->resolveBestOffer($variation, $member);
+                $bestOffer = $pricing->resolveBestOffer($variation, $member, $cartSubtotal);
 
                 if ($bestOffer) {
                     $itemDiscount = round($unitPrice * $qty * ($bestOffer->discount_percent / 100), 2);
 
                     $itemDiscountDetails[] = [
-                        'variation_id' => $menuVariationId,
+                        'variation_id' => $variation->id,
                         'offer_id' => $bestOffer->id,
                         'offer_name' => $bestOffer->name,
                         'discount_percent' => $bestOffer->discount_percent,
@@ -518,8 +539,9 @@ class HomeController extends Controller
                     $item['offer_discount'] = $itemDiscount;
                     $item['offer_percent'] = $bestOffer->discount_percent;
                 }
+
+                $items[$index] = $item;
             }
-            unset($item);
         }
 
         $validItems = is_array($items) ? $items : [];
@@ -705,7 +727,12 @@ class HomeController extends Controller
         }
 
         $orderTotal = (float) $request->query('order_total', 0);
-        $discount = $member->resolveMemberDiscount($orderTotal > 0 ? $orderTotal : 1);
+        // order_total is the real cart subtotal, so it also gates any offer min_total.
+        $discount = $member->resolveMemberDiscount(
+            $orderTotal > 0 ? $orderTotal : 1,
+            false,
+            $orderTotal > 0 ? $orderTotal : null
+        );
 
         $response = [
             'eligible' => $discount['eligible'],
@@ -792,6 +819,7 @@ class HomeController extends Controller
                                     'offers.id',
                                     'offers.name',
                                     'offers.discount_percent',
+                                    'offers.min_total',
                                     'offers.is_first_order',
                                     'offers.applicable_to',
                                     'offers.offer_type',

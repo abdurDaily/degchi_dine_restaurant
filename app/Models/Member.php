@@ -205,21 +205,52 @@ class Member extends Authenticatable
      */
     public function memberTierOffer(): ?Offer
     {
-        $applicable = $this->is_student ? 'student' : 'membership';
+        return $this->tierOfferFor($this->is_student ? 'student' : 'membership');
+    }
 
+    /**
+     * Active Golden-tier offer row from the offers table, if one is configured.
+     * The golden 10% benefit itself is a built-in rate; this row is only used to
+     * carry a `min_total` threshold for the golden tier.
+     */
+    public function goldenTierOffer(): ?Offer
+    {
+        return $this->tierOfferFor('golden');
+    }
+
+    /**
+     * Highest-percentage active, in-date offer row for a member tier.
+     */
+    private function tierOfferFor(string $applicableTo): ?Offer
+    {
         return Offer::query()
             ->active()
             ->valid()
-            ->where('applicable_to', $applicable)
+            ->where('applicable_to', $applicableTo)
             ->where('discount_percent', '>', 0)
             ->orderByDesc('discount_percent')
             ->first();
     }
 
     /**
-     * Membership/Student discount % for this order, respecting First Order Only on the offer.
+     * Whether the golden tier's configured offer row allows the current cart
+     * (honouring its `min_total`). With no golden offer row configured the
+     * built-in golden benefit is always available, as before.
      */
-    public function firstOrderDiscountPercent(): ?int
+    private function goldenTierAllowsOrder(?float $subtotal): bool
+    {
+        $offer = $this->goldenTierOffer();
+
+        return $offer ? $offer->meetsMinimumTotal($subtotal) : true;
+    }
+
+    /**
+     * Membership/Student discount % for this order, respecting First Order Only on the offer.
+     *
+     * $subtotal is the whole cart/order subtotal used to honour the tier offer's
+     * `min_total`. Pass null when no cart context is available.
+     */
+    public function firstOrderDiscountPercent(?float $subtotal = null): ?int
     {
         if ($this->isGolden() || $this->isExpired()) {
             return null;
@@ -240,6 +271,11 @@ class Member extends Authenticatable
             return $this->is_student
                 ? (int) (self::FIRST_ORDER_RATE_STUDENT * 100)
                 : (int) (self::FIRST_ORDER_RATE_STANDARD * 100);
+        }
+
+        // Cart-level minimum order total: below it the tier offer cannot apply.
+        if (!$offer->meetsMinimumTotal($subtotal)) {
+            return null;
         }
 
         // First Order Only ON → only while member has never ordered
@@ -264,9 +300,14 @@ class Member extends Authenticatable
     /**
      * Resolve membership discount for checkout / order placement.
      *
+     * $subtotal is the whole cart/order subtotal (undiscounted) used to enforce
+     * the tier offer's `min_total`. $orderTotal is the money basis the discount
+     * is computed on. They differ because item-level offers are subtracted first.
+     * Pass $subtotal as null when no cart context is available.
+     *
      * @return array{eligible: bool, amount: float, rate: int, member_type: string, message: string, first_order_discount_used: bool}
      */
-    public function resolveMemberDiscount(float $orderTotal, bool $autoUpgrade = false): array
+    public function resolveMemberDiscount(float $orderTotal, bool $autoUpgrade = false, ?float $subtotal = null): array
     {
         $this->syncFirstOrderDiscountFlag();
 
@@ -288,6 +329,18 @@ class Member extends Authenticatable
 
         // Golden = every order (not limited by First Order Only on Membership/Student offers)
         if ($this->isGolden()) {
+            // A configured golden offer row may carry a cart-level min_total.
+            if (!$this->goldenTierAllowsOrder($subtotal)) {
+                $minimum = $this->goldenTierOffer()->minimumTotal();
+
+                $base['message'] = sprintf(
+                    'Golden Card discount applies when your order total reaches ৳%s. Add more items to unlock it.',
+                    number_format((float) $minimum, 2)
+                );
+
+                return $base;
+            }
+
             $msg = 'Golden Card Holder: 10% discount on every order.';
             if ($firstOrderAlreadyUsed) {
                 $msg .= ' (Your Membership/Student first-order discount was already used.)';
@@ -302,7 +355,7 @@ class Member extends Authenticatable
             ]);
         }
 
-        $tierPercent = $this->firstOrderDiscountPercent();
+        $tierPercent = $this->firstOrderDiscountPercent($subtotal);
         if ($tierPercent !== null) {
             $offer = $this->memberTierOffer();
             $isFirstOrderOffer = $offer ? (bool) $offer->is_first_order : true;

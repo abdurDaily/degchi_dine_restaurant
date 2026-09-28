@@ -211,8 +211,8 @@
 /* Top-left offer count badge (homepage) */
 .pcard-offer-count {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    bottom: 12px;
+    right: 16px;
     background: linear-gradient(135deg, var(--brand-gold), #d4a00a);
     color: #fff;
     font-size: 0.6rem;
@@ -285,6 +285,38 @@
     padding: 0.25rem 0.55rem;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
+}
+
+/* Min Order Total pill — the offer is locked until the whole order subtotal
+   reaches min_total, so the card says so instead of showing a live discount. */
+.pcard-min-order {
+    position: absolute;
+    top: 58px;
+    left: 14px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: calc(100% - 28px);
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(15, 42, 56, 0.92);
+    border: 1px solid rgba(231, 174, 7, 0.45);
+    color: var(--brand-gold);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.pcard-min-order i {
+    font-size: 0.7rem;
+    flex-shrink: 0;
 }
 
 /* First order badge */
@@ -6392,6 +6424,53 @@ footer[id],
     border-radius: 999px;
     padding: 0.18rem 0.6rem;
     width: fit-content;
+}
+
+/* Offer "locked until min order total" badge — cart drawer, cart page, checkout */
+.cart-min-order-badge,
+.checkout-min-order-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.28rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(15, 42, 56, 0.55);
+    border: 1px dashed rgba(231, 174, 7, 0.5);
+    color: var(--brand-gold);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    line-height: 1.35;
+    width: fit-content;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: none;
+}
+
+.cart-min-order-badge i,
+.checkout-min-order-badge i {
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+/* Row that holds the per-item flag on the checkout summary line */
+.checkout-order-flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0.15rem 0 0.1rem;
+}
+
+.checkout-order-flags:empty {
+    display: none;
+}
+
+.checkout-order-flags .checkout-min-order-badge {
+    margin-top: 0;
 }
 
 .cart-product-bottom {

@@ -130,7 +130,7 @@ class OfferController extends Controller
             'offer_type'        => 'required|in:all_items,specific_items',
             'menu_variations'   => 'nullable|array',
             'menu_variations.*' => 'integer|exists:menu_variations,id',
-            'min_total'         => 'nullable|numeric|min:0',
+            'min_total'         => 'nullable|numeric|min:0|max:99999999.99',
             'is_first_order'    => 'sometimes|boolean',
             'is_active'         => 'sometimes|boolean',
             'show_as_popup'     => 'sometimes|boolean',
@@ -144,6 +144,12 @@ class OfferController extends Controller
         $data['is_first_order'] = $request->boolean('is_first_order');
         $data['is_active'] = $request->boolean('is_active');
         $data['show_as_popup'] = $request->boolean('show_as_popup');
+
+        // "0" and "" both mean "no minimum" — store NULL so every reader
+        // (cards, cart, checkout, listing) sees one consistent state.
+        if (! $request->filled('min_total') || (float) $request->input('min_total') <= 0) {
+            $data['min_total'] = null;
+        }
 
         return $data;
     }

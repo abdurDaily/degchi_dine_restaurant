@@ -98,6 +98,51 @@ class Offer extends Model
     }
 
     /**
+     * Whether the whole cart/order subtotal satisfies this offer's minimum order total.
+     *
+     * `min_total` is a CART-level threshold, not a per-item one: it is compared
+     * against the full order subtotal (sum of undiscounted line totals).
+     *
+     * - `min_total` NULL / empty / 0 → no minimum, always satisfied.
+     * - `$subtotal` NULL  → no cart context is available (e.g. browsing the menu
+     *   grid). We never invent a fake subtotal, so the offer stays visible as
+     *   informational display; the real gate is applied at pricing/checkout time.
+     * - Otherwise the subtotal must reach the minimum (inclusive).
+     */
+    public function meetsMinimumTotal(?float $subtotal): bool
+    {
+        $minimum = $this->minimumTotal();
+
+        // No minimum configured (NULL / empty / 0) → always satisfied.
+        if ($minimum === null) {
+            return true;
+        }
+
+        if ($subtotal === null) {
+            return true;
+        }
+
+        return $subtotal + 0.005 >= $minimum;
+    }
+
+    /**
+     * The minimum order total as a float, or null when the offer has no minimum.
+     *
+     * A stored 0 is normalised to null so "0" and "blank" behave identically
+     * everywhere (eligibility, product cards, cart, checkout, admin listing).
+     */
+    public function minimumTotal(): ?float
+    {
+        if ($this->min_total === null || $this->min_total === '') {
+            return null;
+        }
+
+        $minimum = (float) $this->min_total;
+
+        return $minimum > 0 ? $minimum : null;
+    }
+
+    /**
      * Check if a menu variation has this offer
      */
     public function hasMenuItem(MenuVariation $variation): bool
@@ -162,10 +207,18 @@ class Offer extends Model
      * Whether this food offer should appear on menu cards for the current viewer.
      * Guests still see first-order food offers (login required on add).
      * Members who already ordered must not see any first-order food offer.
+     *
+     * Pass $subtotal when cart context is available so a minimum-order offer is
+     * hidden from a cart that cannot use it yet. Without a subtotal the offer
+     * stays visible (informational display only).
      */
-    public function isVisibleOnMenuFor(?Member $member): bool
+    public function isVisibleOnMenuFor(?Member $member, ?float $subtotal = null): bool
     {
         if (! $this->isFoodMenuOffer() || $this->is_active === false || ! $this->isValid()) {
+            return false;
+        }
+
+        if (! $this->meetsMinimumTotal($subtotal)) {
             return false;
         }
 
@@ -174,7 +227,7 @@ class Offer extends Model
                 return true;
             }
 
-            return $this->isEligibleForMember($member);
+            return $this->isEligibleForMember($member, $subtotal);
         }
 
         return true;
@@ -183,20 +236,26 @@ class Offer extends Model
     /**
      * All-items food offers currently visible on the menu for this viewer.
      */
-    public static function visibleAllItemOffersFor(?Member $member = null): Collection
+    public static function visibleAllItemOffersFor(?Member $member = null, ?float $subtotal = null): Collection
     {
         return static::activeAllItemOffers()
-            ->filter(fn (self $offer) => $offer->isVisibleOnMenuFor($member))
+            ->filter(fn (self $offer) => $offer->isVisibleOnMenuFor($member, $subtotal))
             ->values();
     }
 
     /**
      * Whether this offer may apply for the given member (checkout / order).
      * Student first-order offers require admin approval; membership vs student are mutually exclusive.
+     *
+     * $subtotal is the whole cart/order subtotal and gates `min_total`.
      */
-    public function isEligibleForMember(?Member $member): bool
+    public function isEligibleForMember(?Member $member, ?float $subtotal = null): bool
     {
         if (!$this->isValid()) {
+            return false;
+        }
+
+        if (!$this->meetsMinimumTotal($subtotal)) {
             return false;
         }
 
@@ -233,12 +292,15 @@ class Offer extends Model
 
     /**
      * Pick the best eligible offer for a member from a collection (highest discount wins among eligible only).
+     *
+     * $subtotal is forwarded to the eligibility check so an offer that is still
+     * below its minimum order total can never win over one that qualifies.
      */
-    public static function bestEligibleForMember(iterable $offers, ?Member $member): ?self
+    public static function bestEligibleForMember(iterable $offers, ?Member $member, ?float $subtotal = null): ?self
     {
         $best = null;
         foreach ($offers as $offer) {
-            if (!$offer instanceof self || !$offer->isEligibleForMember($member)) {
+            if (!$offer instanceof self || !$offer->isEligibleForMember($member, $subtotal)) {
                 continue;
             }
             if (!$best || $offer->discount_percent > $best->discount_percent) {

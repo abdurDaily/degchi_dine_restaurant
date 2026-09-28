@@ -10,11 +10,16 @@ class OfferCheckController extends Controller
 {
     /**
      * Get active offers for a specific menu variation
-     * 
+     *
+     * An optional `subtotal` query param lets the caller supply the real cart
+     * subtotal. When present, offers whose `min_total` is not met are filtered
+     * out. When absent there is no cart context, so the offers are returned as
+     * informational (including their `min_total`) and nothing is filtered.
+     *
      * @param int $variationId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getOffersForVariation($variationId)
+    public function getOffersForVariation(Request $request, $variationId)
     {
         $variation = MenuVariation::find($variationId);
 
@@ -22,9 +27,13 @@ class OfferCheckController extends Controller
             return response()->json(['error' => 'Variation not found'], 404);
         }
 
-        $offers = $variation->resolveApplicableOffers(null, false)
+        $subtotal = $request->filled('subtotal')
+            ? max(0.0, (float) $request->query('subtotal'))
+            : null;
+
+        $offers = $variation->resolveApplicableOffers(null, false, $subtotal)
             ->map(fn ($offer) => $offer->only([
-                'id', 'name', 'description', 'discount_percent', 'popup_badge', 'offer_type', 'is_first_order', 'applicable_to',
+                'id', 'name', 'description', 'discount_percent', 'popup_badge', 'offer_type', 'is_first_order', 'applicable_to', 'min_total',
             ]))
             ->values();
 
@@ -32,6 +41,7 @@ class OfferCheckController extends Controller
             'has_offers' => $offers->isNotEmpty(),
             'offers' => $offers,
             'best_discount' => $offers->max('discount_percent') ?? 0,
+            'subtotal' => $subtotal,
         ]);
     }
 

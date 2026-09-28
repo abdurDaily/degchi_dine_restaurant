@@ -18,19 +18,29 @@
                             ->take(10);
                     @endphp
 
+                    @php
+                        $viewerMember = Auth::guard('member')->user();
+                    @endphp
+
                     @forelse($sliderMenus as $menu)
                         @php
                             $firstVariation = $menu->variations->sortBy('price')->first();
-                            $activeOffers = $firstVariation?->offers->sortByDesc('discount_percent') ?? collect();
+                            // Same resolver the menu grid uses: only active, in-date food
+                            // promos (specific + all_items), biggest % first. Reading the
+                            // raw `offers` relation here would surface inactive/expired and
+                            // membership-tier rows and miss all_items promos entirely.
+                            $activeOffers = $firstVariation
+                                ? $firstVariation->resolveApplicableOffers($viewerMember, true)
+                                : collect();
                             $bestOffer = $activeOffers->first();
                             $rating = round(4.5 + rand(0, 5) / 10, 1);
                             $reviewCount = rand(40, 150);
                         @endphp
                         <div class="menu-slide-item">
                             <x-frontend.product.product-card :menu="$menu" :firstVariation="$firstVariation" :bestOffer="$bestOffer" :activeOffers="$activeOffers"
-                                :rating="$rating" :reviewCount="$reviewCount" showRating simpleCart badgeStyle="home"
+                                :rating="$rating" :reviewCount="$reviewCount" showRating badgeStyle="home"
                                 cartIcon="bi-cart-plus" />
-                           
+                            
                         </div>
                     @empty
                         <div class="menu-slide-item">

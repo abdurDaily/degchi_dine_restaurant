@@ -216,6 +216,7 @@
                                         <p class="checkout-order-name"></p>
                                         <span class="checkout-order-tag"></span>
                                     </div>
+                                    <div class="checkout-order-flags"></div>
                                     <div class="checkout-order-bottom">
                                         <span class="checkout-order-price text-white"></span>
                                         <strong class="checkout-order-subtotal"></strong>
@@ -267,6 +268,7 @@
                             <span>Total</span>
                             <strong id="checkoutTotal" class="checkout-summary-total-val">৳ 0.00</strong>
                         </div>
+                        <p class="checkout-offer-notice" id="checkoutOfferNotice" hidden></p>
                     </div>
 
                     <div class="checkout-summary-footer">
@@ -374,8 +376,12 @@
                     } catch (e) { return { cart: [], original: 0, effective: 0 }; }
                 }
                 function getCurrentSubtotal() {
-                    const { effective } = getCartMoneyTotals();
-                    if (effective > 0) return effective;
+                    const { cart, original, effective } = getCartMoneyTotals();
+                    const offerInfo = calculateOfferDiscount(cart);
+                    if ((offerInfo.discount || 0) > 0) {
+                        return effective > 0 ? effective : original;
+                    }
+                    if (original > 0) return original;
                     const displayed = parseCurrencyText(subtotalDisplay?.textContent);
                     if (displayed > 0) return displayed;
                     return parseFloat(orderTotalInput?.value) || 0;
@@ -396,8 +402,13 @@
                     try {
                         const { cart, original, effective } = getCartMoneyTotals();
                         const offerInfo = calculateOfferDiscount(cart);
-                        const foodOfferDiscount = Math.max(offerInfo.discount || 0, Math.max(0, parseFloat((original - effective).toFixed(2))));
-                        const displaySubtotal = effective > 0 ? effective : original;
+                        const eligibleOfferDiscount = Math.max(0, offerInfo.discount || 0);
+                        const bakedDiscount = Math.max(0, parseFloat((original - effective).toFixed(2)));
+                        // min_total gate wins: never keep a baked-in cart discount that is not eligible.
+                        const foodOfferDiscount = eligibleOfferDiscount;
+                        const displaySubtotal = foodOfferDiscount > 0
+                            ? (bakedDiscount > 0 ? effective : Math.max(0, parseFloat((original - foodOfferDiscount).toFixed(2))))
+                            : original;
                         const memberDiscount = calculateMemberDiscount(displaySubtotal);
                         const displayOfferInfo = foodOfferDiscount > 0
                             ? { discount: 0, offerName: offerInfo.offerName, offerPercent: offerInfo.offerPercent }
@@ -433,13 +444,29 @@
                     }
                     return true;
                 }
+                function offerMeetsMinimum(offer, subtotal) {
+                    const min = parseFloat(offer?.min_total);
+                    if (!isFinite(min) || min <= 0) return true;
+                    return (parseFloat(subtotal) || 0) + 0.005 >= min;
+                }
+                function cartSubtotalFrom(cartItems) {
+                    let total = 0;
+                    (Array.isArray(cartItems) ? cartItems : []).forEach(item => {
+                        const qty = parseInt(item.quantity, 10) || 1;
+                        total += (parseFloat(item.original_price ?? item.price) || 0) * qty;
+                    });
+                    return parseFloat(total.toFixed(2));
+                }
                 function calculateOfferDiscount(cartItems) {
                     let totalOfferDiscount = 0, bestOfferName = '', bestOfferPercent = 0;
                     if (!Array.isArray(cartItems) || cartItems.length === 0) return { discount: 0, offerName: '', offerPercent: 0 };
                     const hasMembershipCard = memberCardInput && memberCardInput.value.trim() !== '';
                     const memberLoggedIn = !!(window.DEGCHI_MEMBER && window.DEGCHI_MEMBER.loggedIn);
+                    // min_total is a whole-cart threshold, measured on the undiscounted subtotal.
+                    const cartSubtotal = cartSubtotalFrom(cartItems);
                     const applicableOffers = (activeOffers || []).filter(offer => {
                         if (offer.applicable_to !== 'all' || !(offer.discount_percent > 0)) return false;
+                        if (!offerMeetsMinimum(offer, cartSubtotal)) return false;
                         if (offer.is_first_order) {
                             if (!hasMembershipCard && !memberLoggedIn) return false;
                             return offerEligibleForVerifiedMember(offer);
@@ -451,16 +478,25 @@
                         if (!variationId) return;
                         const basePrice = parseFloat(item.original_price ?? item.price) || 0;
                         const qty = parseInt(item.quantity, 10) || 1;
+                        const storedMin = parseFloat(item.offer_min_total);
+                        const rawStored = item.offer_id ? (activeOffers || []).find(o => o.id == item.offer_id) : null;
+                        const pendingMin = (Number.isFinite(storedMin) && storedMin > 0 && cartSubtotal + 0.005 < storedMin)
+                            || (rawStored && !offerMeetsMinimum(rawStored, cartSubtotal));
+                        if (pendingMin) {
+                            return;
+                        }
                         if (item.offer_applied && item.offer_percent > 0) {
                             const linked = applicableOffers.find(o => o.id == item.offer_id);
                             const raw = (activeOffers || []).find(o => o.id == item.offer_id);
-                            if (raw && (raw.is_first_order || ['student', 'membership', 'golden'].includes(raw.applicable_to))) {
-                                if (!linked && !offerEligibleForVerifiedMember(raw)) return;
+                            const minOk = !raw || offerMeetsMinimum(raw, cartSubtotal);
+                            const memberRestricted = raw && (raw.is_first_order || ['student', 'membership', 'golden'].includes(raw.applicable_to));
+                            const memberOk = !memberRestricted || linked || offerEligibleForVerifiedMember(raw);
+                            if (minOk && memberOk) {
+                                const itemDiscount = basePrice * qty * (item.offer_percent / 100);
+                                totalOfferDiscount += itemDiscount;
+                                if (item.offer_percent > bestOfferPercent) { bestOfferPercent = item.offer_percent; bestOfferName = linked?.name || raw?.name || 'Offer Discount'; }
+                                return;
                             }
-                            const itemDiscount = basePrice * qty * (item.offer_percent / 100);
-                            totalOfferDiscount += itemDiscount;
-                            if (item.offer_percent > bestOfferPercent) { bestOfferPercent = item.offer_percent; bestOfferName = linked?.name || raw?.name || 'Offer Discount'; }
-                            return;
                         }
                         let bestItemOffer = null;
                         applicableOffers.forEach(offer => {

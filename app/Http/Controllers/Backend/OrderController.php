@@ -257,10 +257,14 @@ class OrderController extends Controller
 
         $member = $order->member;
 
+        // Cart context for this order, so an offer with a min_total only shows as
+        // discounted when the order being edited actually reaches it.
+        $orderSubtotal = $this->subtotalForItems($order->normalizedItems());
+
         $menus = $query->orderBy('name')->get()
-            ->map(function (Menu $menu) use ($member, $pricing) {
+            ->map(function (Menu $menu) use ($member, $pricing, $orderSubtotal) {
                 $variations = $menu->variations->map(
-                    fn (MenuVariation $variation) => $pricing->previewVariationPricing($variation, $member)
+                    fn (MenuVariation $variation) => $pricing->previewVariationPricing($variation, $member, $orderSubtotal)
                 )->values();
 
                 return [
@@ -354,9 +358,15 @@ class OrderController extends Controller
             $quantity = max(1, (int) $request->input('quantity', 1));
             $member = $order->member;
 
-            $newLine = $pricing->buildLineItem($variation, $quantity, $member);
-
             $items = $order->normalizedItems();
+
+            // min_total is a whole-order threshold: measure it against the subtotal
+            // the order will have once this line is included.
+            $newSubtotal = $this->subtotalForItems($items)
+                + ((float) $variation->price * $quantity);
+
+            $newLine = $pricing->buildLineItem($variation, $quantity, $member, round($newSubtotal, 2));
+
             $merged = false;
 
             foreach ($items as $i => $existing) {
@@ -379,6 +389,23 @@ class OrderController extends Controller
 
             return $this->persistItemsAndRespond($order, array_values($items), $pricing);
         });
+    }
+
+    /**
+     * Undiscounted subtotal of a set of order line items (sum of unit price x qty).
+     * This is the basis an offer's min_total is compared against.
+     */
+    private function subtotalForItems(array $items): float
+    {
+        $subtotal = 0.0;
+
+        foreach ($items as $item) {
+            $unitPrice = (float) ($item['original_price'] ?? $item['price'] ?? 0);
+            $qty = max(1, (int) ($item['quantity'] ?? $item['qty'] ?? 1));
+            $subtotal += $unitPrice * $qty;
+        }
+
+        return round($subtotal, 2);
     }
 
     /**

@@ -43,9 +43,16 @@ const saveCartData = (cart) => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
 };
 
-const formatCurrency = (value) => {
-    return `\u09F3 ${Number(value || 0).toFixed(2)}`;
+const formatAmount = (value, decimals = 2) => {
+    const amount = Number(value || 0);
+    const [whole, fraction] = Math.abs(amount).toFixed(decimals).split(".");
+    const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${amount < 0 ? "-" : ""}${grouped}${fraction ? "." + fraction : ""}`;
 };
+
+const formatCurrency = (value, decimals = 2) => `\u09F3 ${formatAmount(value, decimals)}`;
+
+const roundMoney = (value) => Math.round((Number(value) || 0) * 100) / 100;
 
 const getItemUnitPrice = (item) => Number(item.price || 0);
 const getItemOriginalPrice = (item) => Number(item.original_price ?? item.price ?? 0);
@@ -55,6 +62,100 @@ const getCartTotal = (cart) =>
 
 const getCartOriginalTotal = (cart) =>
     cart.reduce((t, item) => t + getItemOriginalPrice(item) * Number(item.quantity || 0), 0);
+
+const resolveOfferMinTotal = (item) => {
+    const map = window.DEGCHI_OFFER_MIN_TOTALS || {};
+    const offerId = item?.offer_id;
+
+    // The server snapshot is authoritative whenever this offer appears in it, so
+    // an admin edit (minimum raised, lowered or removed) always wins over a
+    // value that is still cached on the cart line.
+    if (offerId != null && Object.prototype.hasOwnProperty.call(map, String(offerId))) {
+        const fromMap = parseFloat(map[String(offerId)]);
+        return Number.isFinite(fromMap) && fromMap > 0 ? fromMap : 0;
+    }
+
+    const stored = parseFloat(item?.offer_min_total);
+    return Number.isFinite(stored) && stored > 0 ? stored : 0;
+};
+
+/**
+ * `min_total` is a whole-CART threshold measured on the undiscounted subtotal.
+ * Returns the minimum when the offer is locked because the order is still
+ * short of it, otherwise 0 (= unlocked / no minimum configured).
+ */
+const offerLockedByMinimum = (item, originalSubtotal) => {
+    const min = resolveOfferMinTotal(item);
+    if (!(min > 0)) return 0;
+    if (originalSubtotal + 0.005 >= min) return 0;
+    return min;
+};
+
+const discountedUnitFromItem = (item) => {
+    const original = getItemOriginalPrice(item);
+    const offerPrice = parseFloat(item.offer_price);
+    if (Number.isFinite(offerPrice) && offerPrice > 0) return roundMoney(offerPrice);
+    const percent = parseFloat(item.offer_percent) || 0;
+    if (percent <= 0) return original;
+    return roundMoney(original * (1 - percent / 100));
+};
+
+const canApplyItemOffer = (item, originalSubtotal, member) => {
+    const percent = parseFloat(item.offer_percent) || 0;
+    if (percent <= 0) return false;
+    if (offerRequiresMemberLogin(item.is_first_order) && !(member?.loggedIn && member.canUseFirstOrder !== false)) {
+        return false;
+    }
+    // The offer's min_total is a cart-level gate, never an item-level one.
+    if (offerLockedByMinimum(item, originalSubtotal) > 0) return false;
+    return true;
+};
+
+const applyCartOffers = (cart) => {
+    const originalSubtotal = getCartOriginalTotal(cart);
+    const member = getMemberState();
+    return cart.map((item) => {
+        const original = getItemOriginalPrice(item);
+        const apply = canApplyItemOffer(item, originalSubtotal, member);
+        return {
+            ...item,
+            original_price: original,
+            offer_min_total: resolveOfferMinTotal(item) || item.offer_min_total || null,
+            price: apply ? discountedUnitFromItem(item) : original,
+            offer_applied: apply,
+        };
+    });
+};
+
+const persistCart = (cart) => {
+    const priced = applyCartOffers(cart);
+    saveCartData(priced);
+    renderCartDrawer();
+    renderCartPage();
+    renderCheckoutSummary();
+    return priced;
+};
+
+/**
+ * Shown instead of the discounted price while the order is still short of the
+ * offer's min_total: the item keeps its regular price and the badge explains
+ * how much more is needed to unlock the discount.
+ */
+const renderCartMinOrderBadge = (item, originalSubtotal) => {
+    const min = offerLockedByMinimum(item, originalSubtotal);
+    const percent = parseFloat(item.offer_percent) || 0;
+    if (!(min > 0) || percent <= 0) return "";
+
+    const missing = roundMoney(min - originalSubtotal);
+    const title = `${percent}% off unlocks at a ${formatCurrency(min)} order subtotal — add ${formatCurrency(missing)} more`;
+
+    return `<span class="cart-min-order-badge" title="${title}"><i class="bi bi-cart-check" aria-hidden="true"></i> Min ৳${formatAmount(min, 0)} order</span>`;
+};
+
+const renderCartOfferSuffix = (item) => {
+    if (item.offer_applied && item.offer_percent) return ` · ${item.offer_percent}% OFF`;
+    return "";
+};
 
 const buildCartItemId = (item) => {
     if (item.variation_id) return `variation-${item.variation_id}`;
@@ -94,6 +195,7 @@ const createMenuItemFromCard = (card) => {
     const offerId = cartBtn.getAttribute("data-offer-id") || cartBtn.dataset.offerId || null;
     const isFirstOrder = (cartBtn.getAttribute("data-is-first-order") || cartBtn.dataset.isFirstOrder || "0") === "1";
     const applicableTo = (cartBtn.getAttribute("data-applicable-to") || cartBtn.dataset.applicableTo || "all").toLowerCase();
+    const offerMinTotal = parseFloat(cartBtn.getAttribute("data-offer-min-total") || cartBtn.dataset.offerMinTotal || "0") || 0;
 
     const member = getMemberState();
     if (offerRequiresMemberLogin(isFirstOrder, applicableTo) && !member.loggedIn) {
@@ -102,29 +204,25 @@ const createMenuItemFromCard = (card) => {
     }
 
     let offerPriceAttr = parseFloat(cartBtn.getAttribute("data-offer-price") || cartBtn.dataset.offerPrice || "0") || 0;
-    let price = originalPrice;
-    let offerApplied = false;
-    let appliedOfferPercent = 0;
-
-    const canApplyOffer = offerPercent > 0 && (!offerRequiresMemberLogin(isFirstOrder) || (member.loggedIn && (!isFirstOrder || member.canUseFirstOrder !== false)));
-
-    if (canApplyOffer) {
-        price = offerPriceAttr > 0 ? offerPriceAttr : Math.round(originalPrice * (1 - offerPercent / 100) * 100) / 100;
-        offerApplied = true;
-        appliedOfferPercent = offerPercent;
+    if (offerPercent > 0 && !(offerPriceAttr > 0)) {
+        offerPriceAttr = roundMoney(originalPrice * (1 - offerPercent / 100));
     }
 
     const item = {
         title: title || "Menu item",
-        price,
+        price: originalPrice,
         original_price: originalPrice,
         quantity: 1,
         image,
         note: quantityText.trim() || "1 person",
         variation_id: variationId ? parseInt(variationId, 10) : null,
         offer_id: offerId ? parseInt(offerId, 10) : null,
-        offer_percent: appliedOfferPercent,
-        offer_applied: offerApplied,
+        offer_percent: offerPercent > 0 ? offerPercent : 0,
+        offer_price: offerPriceAttr > 0 ? offerPriceAttr : null,
+        offer_min_total: offerMinTotal > 0 ? offerMinTotal : null,
+        offer_applied: false,
+        is_first_order: isFirstOrder,
+        applicable_to: applicableTo,
     };
     item.id = buildCartItemId(item);
     return item;
@@ -160,6 +258,8 @@ const renderCartDrawer = () => {
         cartDrawerCount.textContent = itemCount === 0 ? "No items yet" : `${itemCount} item${itemCount === 1 ? "" : "s"}`;
     }
 
+    const cartSubtotal = getCartOriginalTotal(cart);
+
     if (!cart.length) {
         cartDrawerItems.innerHTML = `
       <div class="cart-drawer-empty">
@@ -177,7 +277,8 @@ const renderCartDrawer = () => {
             <div class="cart-item-header-row">
               <div class="cart-item-info">
                 <h6 class="cart-item-title">${item.title}</h6>
-                <span class="cart-item-unit">${renderCartItemPriceLabel(item)} each${item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : ""}</span>
+                <span class="cart-item-unit">${renderCartItemPriceLabel(item)} each${renderCartOfferSuffix(item)}</span>
+                ${renderCartMinOrderBadge(item, cartSubtotal)}
               </div>
               <button class="cart-item-remove-btn" type="button" aria-label="Remove ${item.title}">
                 <i class="bi bi-trash3"></i>
@@ -217,11 +318,19 @@ const renderCartPage = () => {
         cartPageItems.innerHTML = "";
         cartPageSubtotal.textContent = formatCurrency(0);
         cartPageTotal.textContent = formatCurrency(0);
+        const emptyHeading = document.getElementById("cartPageHeading");
+        if (emptyHeading) emptyHeading.textContent = "0 items in your cart";
+        const emptyCount = document.getElementById("cartPageItemCount");
+        if (emptyCount) emptyCount.textContent = "(0 items)";
+        renderOfferUnlockNotice(document.getElementById("cartPageOfferNotice"), cart);
         if (cartCountBadge) cartCountBadge.textContent = "0 Items";
         return;
     }
 
     if (cartPageEmpty) cartPageEmpty.style.display = "none";
+    const cartSubtotal = getCartOriginalTotal(cart);
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
     cartPageItems.innerHTML = cart.map((item) => `
       <div class="cart-product-card" data-item-id="${item.id}">
         <div class="cart-product-img-wrap">
@@ -231,7 +340,8 @@ const renderCartPage = () => {
           <div class="cart-product-top">
             <div>
               <h6 class="cart-product-name">${item.title}</h6>
-              <span class="cart-product-tag">${item.note}${item.offer_applied && item.offer_percent ? ` · ${item.offer_percent}% OFF` : ""}</span>
+              <span class="cart-product-tag">${item.note}${renderCartOfferSuffix(item)}</span>
+              ${renderCartMinOrderBadge(item, cartSubtotal)}
             </div>
             <button class="btn cart-remove-btn" type="button" aria-label="Remove item"><i class="bi bi-x-lg"></i></button>
           </div>
@@ -252,12 +362,46 @@ const renderCartPage = () => {
     cartPageSubtotal.textContent = formatCurrency(getCartTotal(cart));
     cartPageTotal.textContent = formatCurrency(getCartTotal(cart));
 
-    const cartSectionLabel = document.querySelector(".cart-section-label");
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartSectionLabel = document.getElementById("cartPageHeading");
     if (cartSectionLabel) {
-        cartSectionLabel.innerHTML = `<i class="bi bi-list-check me-2"></i>${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
+        cartSectionLabel.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
+    } else {
+        const legacyLabel = document.querySelector(".cart-section-label");
+        if (legacyLabel) legacyLabel.innerHTML = `<i class="bi bi-list-check me-2"></i>${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
     }
+    const cartPageItemCount = document.getElementById("cartPageItemCount");
+    if (cartPageItemCount) cartPageItemCount.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
     if (cartCountBadge) cartCountBadge.textContent = `${itemCount} Items`;
+
+    renderOfferUnlockNotice(document.getElementById("cartPageOfferNotice"), cart);
+};
+
+/**
+ * A single line under the cart totals: tells the customer how much more is
+ * needed to switch the locked offer(s) on, so the "Min ৳X order" pills on the
+ * items are not a dead end. Hidden when nothing is locked.
+ */
+const renderOfferUnlockNotice = (node, cart) => {
+    if (!node) return;
+
+    const subtotal = getCartOriginalTotal(cart);
+    const locked = cart
+        .map((item) => ({ item, min: offerLockedByMinimum(item, subtotal) }))
+        .filter(({ item, min }) => min > 0 && (parseFloat(item.offer_percent) || 0) > 0);
+
+    if (!locked.length) {
+        node.innerHTML = "";
+        node.hidden = true;
+        return;
+    }
+
+    // One notice for the whole cart: the smallest minimum is the first to unlock.
+    const best = locked.reduce((a, b) => (b.min < a.min ? b : a));
+    const missing = roundMoney(best.min - subtotal);
+    const percent = parseFloat(best.item.offer_percent) || 0;
+
+    node.innerHTML = `<i class="bi bi-info-circle-fill" aria-hidden="true"></i> Add <strong>${formatCurrency(missing)}</strong> more to unlock ${percent}% off on ${locked.length > 1 ? "these items" : "this item"} (min ৳${formatAmount(best.min, 0)} order).`;
+    node.hidden = false;
 };
 
 const renderCheckoutSummary = () => {
@@ -282,11 +426,16 @@ const renderCheckoutSummary = () => {
         if (orderTotalInput) orderTotalInput.value = "0";
         if (itemsInput) itemsInput.value = JSON.stringify([]);
         if (itemCountEl) itemCountEl.textContent = "(0 items)";
+        renderOfferUnlockNotice(document.getElementById("checkoutOfferNotice"), cart);
         return;
     }
 
     if (emptyState) emptyState.style.display = "none";
     checkoutItemsWrap.querySelectorAll(".checkout-order-item").forEach(el => el.remove());
+
+    // min_total is measured against the undiscounted cart subtotal, so it is
+    // resolved once here and shared by every line in the summary.
+    const originalTotal = getCartOriginalTotal(cart);
 
     cart.forEach((item) => {
         let row;
@@ -294,7 +443,7 @@ const renderCheckoutSummary = () => {
             row = tpl.content.cloneNode(true);
         } else {
             row = document.createElement("div");
-            row.innerHTML = `<div class="checkout-order-item"><div class="checkout-order-img-wrap"><img class="checkout-order-img" /></div><div class="checkout-order-body"><div class="checkout-order-top"><p class="checkout-order-name"></p><span class="checkout-order-tag text-white"></span></div><div class="checkout-order-bottom"><span class="checkout-order-price"></span><strong class="checkout-order-subtotal"></strong></div></div></div>`;
+            row.innerHTML = `<div class="checkout-order-item"><div class="checkout-order-img-wrap"><img class="checkout-order-img" /></div><div class="checkout-order-body"><div class="checkout-order-top"><p class="checkout-order-name"></p><span class="checkout-order-tag text-white"></span></div><div class="checkout-order-flags"></div><div class="checkout-order-bottom"><span class="checkout-order-price"></span><strong class="checkout-order-subtotal"></strong></div></div></div>`;
             row = row.firstElementChild;
         }
 
@@ -304,6 +453,7 @@ const renderCheckoutSummary = () => {
         const tag = root.querySelector(".checkout-order-tag");
         const price = root.querySelector(".checkout-order-price");
         const subtotal = root.querySelector(".checkout-order-subtotal");
+        const flags = root.querySelector(".checkout-order-flags");
         const itemWrap = root.querySelector(".checkout-order-item") || root;
 
         if (itemWrap.dataset) itemWrap.dataset.itemId = item.id;
@@ -314,6 +464,15 @@ const renderCheckoutSummary = () => {
             if (item.offer_applied && item.offer_percent) parts.push(`${item.offer_percent}% OFF`);
             tag.textContent = parts.filter(Boolean).join(" · ");
         }
+        // Offer locked behind its min_total: badge only, price stays at list price.
+        const minBadge = renderCartMinOrderBadge(item, originalTotal)
+            .replace("cart-min-order-badge", "cart-min-order-badge checkout-min-order-badge");
+        if (flags) {
+            flags.innerHTML = minBadge;
+        } else if (minBadge) {
+            const orderTop = root.querySelector(".checkout-order-top");
+            if (orderTop) orderTop.insertAdjacentHTML("afterend", minBadge);
+        }
         if (price) price.innerHTML = renderCartItemPriceLabel(item) + ` &times; ${item.quantity}`;
         if (subtotal) subtotal.textContent = formatCurrency(getItemUnitPrice(item) * item.quantity);
 
@@ -321,13 +480,13 @@ const renderCheckoutSummary = () => {
     });
 
     const discountedTotal = getCartTotal(cart);
-    const originalTotal = getCartOriginalTotal(cart);
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
     checkoutSubtotal.textContent = formatCurrency(discountedTotal);
     checkoutTotal.textContent = formatCurrency(discountedTotal);
     if (orderTotalInput) orderTotalInput.value = originalTotal.toFixed(2);
     if (itemsInput) itemsInput.value = JSON.stringify(cart);
     if (itemCountEl) itemCountEl.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
+    renderOfferUnlockNotice(document.getElementById("checkoutOfferNotice"), cart);
     document.dispatchEvent(new CustomEvent("cartSummaryRendered", { detail: { total: discountedTotal, originalTotal } }));
 };
 
@@ -336,21 +495,19 @@ const addToCart = (item) => {
     const existing = cart.find((entry) => entry.id === item.id);
     if (existing) {
         existing.quantity += 1;
+        if (item.offer_min_total && !existing.offer_min_total) existing.offer_min_total = item.offer_min_total;
+        if (item.offer_percent && !existing.offer_percent) existing.offer_percent = item.offer_percent;
+        if (item.offer_id && !existing.offer_id) existing.offer_id = item.offer_id;
+        if (item.offer_price && !existing.offer_price) existing.offer_price = item.offer_price;
+        if (item.is_first_order != null && existing.is_first_order == null) existing.is_first_order = item.is_first_order;
     } else {
         cart.push(item);
     }
-    saveCartData(cart);
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
+    persistCart(cart);
 };
 
 const removeFromCart = (itemId) => {
-    const cart = getCartData().filter((item) => item.id !== itemId);
-    saveCartData(cart);
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
+    persistCart(getCartData().filter((item) => item.id !== itemId));
 };
 
 const changeCartQuantity = (itemId, delta) => {
@@ -358,17 +515,11 @@ const changeCartQuantity = (itemId, delta) => {
         if (item.id !== itemId) return item;
         return { ...item, quantity: Math.max(1, item.quantity + delta) };
     });
-    saveCartData(cart.filter((item) => item.quantity > 0));
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
+    persistCart(cart.filter((item) => item.quantity > 0));
 };
 
 const clearCart = () => {
-    saveCartData([]);
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
+    persistCart([]);
 };
 
 const openCartDrawer = () => {
@@ -416,9 +567,7 @@ const initCartPages = () => {
     if (new URLSearchParams(window.location.search).get("clear_cart") === "1") {
         localStorage.removeItem(CART_STORAGE_KEY);
     }
-    renderCartDrawer();
-    renderCartPage();
-    renderCheckoutSummary();
+    persistCart(getCartData());
     initCartEvents();
 };
 

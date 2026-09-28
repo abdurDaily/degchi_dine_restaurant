@@ -29,6 +29,8 @@
     $isFirstOrder = $bestOffer?->is_first_order ?? false;
     $offerApplicableTo = $bestOffer?->applicable_to ?? 'all';
     $offerCount = $activeOffers?->count() ?? 0;
+    // min_total is a whole-CART threshold: null means the offer has no minimum.
+    $offerMinTotal = $bestOffer?->minimumTotal();
 @endphp
 
 @if($linked)
@@ -52,6 +54,17 @@
             <div class="pcard-flash" title="{{ $bestOffer->name ?? 'Special Offer' }}">
                 <i class="bi bi-lightning-charge-fill"></i>
             </div>
+
+            @if($offerMinTotal !== null)
+                {{-- The offer exists but is locked until the whole order subtotal
+                     reaches min_total, so say so instead of implying the discount
+                     is already applied. --}}
+                <div class="pcard-min-order"
+                     title="{{ $bestOffer->name }} — {{ $offerPercent }}% off applies when your order subtotal reaches ৳{{ number_format($offerMinTotal, 2) }}">
+                    <i class="bi bi-cart-check" aria-hidden="true"></i>
+                    <span>Min ৳{{ number_format($offerMinTotal, 0) }} order</span>
+                </div>
+            @endif
 
             @if($badgeStyle === 'home' && $offerCount > 1)
                 <div class="pcard-badge pcard-badge-multi">
@@ -95,6 +108,7 @@
                         data-offer-price="{{ $offerPrice }}"
                         data-offer-id="{{ $bestOffer->id }}"
                         data-offer-percent="{{ $offerPercent }}"
+                        data-offer-min-total="{{ $offerMinTotal ?? '' }}"
                         data-is-first-order="{{ $isFirstOrder ? '1' : '0' }}"
                         data-applicable-to="{{ $offerApplicableTo }}"
                     @endif
