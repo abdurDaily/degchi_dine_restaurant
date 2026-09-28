@@ -50,18 +50,27 @@ const formatAmount = (value, decimals = 2) => {
     return `${amount < 0 ? "-" : ""}${grouped}${fraction ? "." + fraction : ""}`;
 };
 
-const formatCurrency = (value, decimals = 2) => `\u09F3 ${formatAmount(value, decimals)}`;
+const formatCurrency = (value, decimals = 2) =>
+    `\u09F3 ${formatAmount(value, decimals)}`;
 
 const roundMoney = (value) => Math.round((Number(value) || 0) * 100) / 100;
 
 const getItemUnitPrice = (item) => Number(item.price || 0);
-const getItemOriginalPrice = (item) => Number(item.original_price ?? item.price ?? 0);
+const getItemOriginalPrice = (item) =>
+    Number(item.original_price ?? item.price ?? 0);
 
 const getCartTotal = (cart) =>
-    cart.reduce((t, item) => t + getItemUnitPrice(item) * Number(item.quantity || 0), 0);
+    cart.reduce(
+        (t, item) => t + getItemUnitPrice(item) * Number(item.quantity || 0),
+        0,
+    );
 
 const getCartOriginalTotal = (cart) =>
-    cart.reduce((t, item) => t + getItemOriginalPrice(item) * Number(item.quantity || 0), 0);
+    cart.reduce(
+        (t, item) =>
+            t + getItemOriginalPrice(item) * Number(item.quantity || 0),
+        0,
+    );
 
 const resolveOfferMinTotal = (item) => {
     const map = window.DEGCHI_OFFER_MIN_TOTALS || {};
@@ -70,7 +79,10 @@ const resolveOfferMinTotal = (item) => {
     // The server snapshot is authoritative whenever this offer appears in it, so
     // an admin edit (minimum raised, lowered or removed) always wins over a
     // value that is still cached on the cart line.
-    if (offerId != null && Object.prototype.hasOwnProperty.call(map, String(offerId))) {
+    if (
+        offerId != null &&
+        Object.prototype.hasOwnProperty.call(map, String(offerId))
+    ) {
         const fromMap = parseFloat(map[String(offerId)]);
         return Number.isFinite(fromMap) && fromMap > 0 ? fromMap : 0;
     }
@@ -94,7 +106,8 @@ const offerLockedByMinimum = (item, originalSubtotal) => {
 const discountedUnitFromItem = (item) => {
     const original = getItemOriginalPrice(item);
     const offerPrice = parseFloat(item.offer_price);
-    if (Number.isFinite(offerPrice) && offerPrice > 0) return roundMoney(offerPrice);
+    if (Number.isFinite(offerPrice) && offerPrice > 0)
+        return roundMoney(offerPrice);
     const percent = parseFloat(item.offer_percent) || 0;
     if (percent <= 0) return original;
     return roundMoney(original * (1 - percent / 100));
@@ -103,7 +116,10 @@ const discountedUnitFromItem = (item) => {
 const canApplyItemOffer = (item, originalSubtotal, member) => {
     const percent = parseFloat(item.offer_percent) || 0;
     if (percent <= 0) return false;
-    if (offerRequiresMemberLogin(item.is_first_order) && !(member?.loggedIn && member.canUseFirstOrder !== false)) {
+    if (
+        offerRequiresMemberLogin(item.is_first_order) &&
+        !(member?.loggedIn && member.canUseFirstOrder !== false)
+    ) {
         return false;
     }
     // The offer's min_total is a cart-level gate, never an item-level one.
@@ -120,7 +136,8 @@ const applyCartOffers = (cart) => {
         return {
             ...item,
             original_price: original,
-            offer_min_total: resolveOfferMinTotal(item) || item.offer_min_total || null,
+            offer_min_total:
+                resolveOfferMinTotal(item) || item.offer_min_total || null,
             price: apply ? discountedUnitFromItem(item) : original,
             offer_applied: apply,
         };
@@ -153,57 +170,116 @@ const renderCartMinOrderBadge = (item, originalSubtotal) => {
 };
 
 const renderCartOfferSuffix = (item) => {
-    if (item.offer_applied && item.offer_percent) return ` · ${item.offer_percent}% OFF`;
+    if (item.offer_applied && item.offer_percent)
+        return ` · ${item.offer_percent}% OFF`;
     return "";
 };
 
 const buildCartItemId = (item) => {
     if (item.variation_id) return `variation-${item.variation_id}`;
-    return `${item.title}`.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    return `${item.title}`
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-");
 };
 
 const createMenuItemFromCard = (card) => {
     const menuCard = card?.closest?.(".pcard, .menu-offer-card") || card;
-    if (!menuCard?.classList?.contains("pcard") && !menuCard?.classList?.contains("menu-offer-card")) return null;
+    if (
+        !menuCard?.classList?.contains("pcard") &&
+        !menuCard?.classList?.contains("menu-offer-card")
+    )
+        return null;
 
-    const cartBtn = menuCard.querySelector(".pcard-cart-btn, .menu-offer-cart-btn");
+    const cartBtn = menuCard.querySelector(
+        ".pcard-cart-btn, .menu-offer-cart-btn",
+    );
     if (!cartBtn) return null;
 
-    const title = menuCard.querySelector(".pcard-title, .menu-offer-title")?.textContent.trim();
-    const image = menuCard.querySelector(".pcard-img, .menu-offer-image")?.getAttribute("src") || "";
-    const quantityText = menuCard.querySelector(".pcard-serve, .menu-offer-serve")?.textContent || "1 person";
+    const title = menuCard
+        .querySelector(".pcard-title, .menu-offer-title")
+        ?.textContent.trim();
+    const image =
+        menuCard
+            .querySelector(".pcard-img, .menu-offer-image")
+            ?.getAttribute("src") || "";
+    const quantityText =
+        menuCard.querySelector(".pcard-serve, .menu-offer-serve")
+            ?.textContent || "1 person";
 
-    const variationId = cartBtn.getAttribute("data-variation-id") || cartBtn.dataset.variationId;
+    const variationId =
+        cartBtn.getAttribute("data-variation-id") ||
+        cartBtn.dataset.variationId;
 
-    let originalPrice = parseFloat(
-        cartBtn.getAttribute("data-original-price") || cartBtn.dataset.originalPrice
-    ) || 0;
+    let originalPrice =
+        parseFloat(
+            cartBtn.getAttribute("data-original-price") ||
+                cartBtn.dataset.originalPrice,
+        ) || 0;
 
     if (originalPrice === 0) {
-        const allPrices = menuCard.querySelectorAll(".pcard-price, .menu-offer-price");
+        const allPrices = menuCard.querySelectorAll(
+            ".pcard-price, .menu-offer-price",
+        );
         if (allPrices.length > 1) {
-            const oldPrice = menuCard.querySelector(".pcard-price-old, .menu-offer-price-old");
-            const priceText = (oldPrice || allPrices[0]).textContent.replace(/,/g, "").replace(/[^\d.]/g, "").trim();
+            const oldPrice = menuCard.querySelector(
+                ".pcard-price-old, .menu-offer-price-old",
+            );
+            const priceText = (oldPrice || allPrices[0]).textContent
+                .replace(/,/g, "")
+                .replace(/[^\d.]/g, "")
+                .trim();
             originalPrice = parseFloat(priceText) || 0;
         } else if (allPrices.length === 1) {
-            const priceText = allPrices[0].textContent.replace(/,/g, "").replace(/[^\d.]/g, "").trim();
+            const priceText = allPrices[0].textContent
+                .replace(/,/g, "")
+                .replace(/[^\d.]/g, "")
+                .trim();
             originalPrice = parseFloat(priceText) || 0;
         }
     }
 
-    const offerPercent = parseFloat(cartBtn.getAttribute("data-offer-percent") || cartBtn.dataset.offerPercent || "0") || 0;
-    const offerId = cartBtn.getAttribute("data-offer-id") || cartBtn.dataset.offerId || null;
-    const isFirstOrder = (cartBtn.getAttribute("data-is-first-order") || cartBtn.dataset.isFirstOrder || "0") === "1";
-    const applicableTo = (cartBtn.getAttribute("data-applicable-to") || cartBtn.dataset.applicableTo || "all").toLowerCase();
-    const offerMinTotal = parseFloat(cartBtn.getAttribute("data-offer-min-total") || cartBtn.dataset.offerMinTotal || "0") || 0;
+    const offerPercent =
+        parseFloat(
+            cartBtn.getAttribute("data-offer-percent") ||
+                cartBtn.dataset.offerPercent ||
+                "0",
+        ) || 0;
+    const offerId =
+        cartBtn.getAttribute("data-offer-id") ||
+        cartBtn.dataset.offerId ||
+        null;
+    const isFirstOrder =
+        (cartBtn.getAttribute("data-is-first-order") ||
+            cartBtn.dataset.isFirstOrder ||
+            "0") === "1";
+    const applicableTo = (
+        cartBtn.getAttribute("data-applicable-to") ||
+        cartBtn.dataset.applicableTo ||
+        "all"
+    ).toLowerCase();
+    const offerMinTotal =
+        parseFloat(
+            cartBtn.getAttribute("data-offer-min-total") ||
+                cartBtn.dataset.offerMinTotal ||
+                "0",
+        ) || 0;
 
     const member = getMemberState();
-    if (offerRequiresMemberLogin(isFirstOrder, applicableTo) && !member.loggedIn) {
+    if (
+        offerRequiresMemberLogin(isFirstOrder, applicableTo) &&
+        !member.loggedIn
+    ) {
         showOfferMemberLoginModal();
         return null;
     }
 
-    let offerPriceAttr = parseFloat(cartBtn.getAttribute("data-offer-price") || cartBtn.dataset.offerPrice || "0") || 0;
+    let offerPriceAttr =
+        parseFloat(
+            cartBtn.getAttribute("data-offer-price") ||
+                cartBtn.dataset.offerPrice ||
+                "0",
+        ) || 0;
     if (offerPercent > 0 && !(offerPriceAttr > 0)) {
         offerPriceAttr = roundMoney(originalPrice * (1 - offerPercent / 100));
     }
@@ -230,10 +306,12 @@ const createMenuItemFromCard = (card) => {
 
 const updateCartBadges = (cart) => {
     const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.querySelectorAll(".desktop-order-qty, .mobile-order-qty").forEach((node) => {
-        node.textContent = totalCount;
-        node.setAttribute("aria-label", `${totalCount} items`);
-    });
+    document
+        .querySelectorAll(".desktop-order-qty, .mobile-order-qty")
+        .forEach((node) => {
+            node.textContent = totalCount;
+            node.setAttribute("aria-label", `${totalCount} items`);
+        });
 };
 
 const renderCartItemPriceLabel = (item) => {
@@ -255,7 +333,10 @@ const renderCartDrawer = () => {
 
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
     if (cartDrawerCount) {
-        cartDrawerCount.textContent = itemCount === 0 ? "No items yet" : `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+        cartDrawerCount.textContent =
+            itemCount === 0
+                ? "No items yet"
+                : `${itemCount} item${itemCount === 1 ? "" : "s"}`;
     }
 
     const cartSubtotal = getCartOriginalTotal(cart);
@@ -268,7 +349,9 @@ const renderCartDrawer = () => {
         <p class="cart-drawer-empty-text">Add dishes from the menu to get started.</p>
       </div>`;
     } else {
-        cartDrawerItems.innerHTML = cart.map((item) => `
+        cartDrawerItems.innerHTML = cart
+            .map(
+                (item) => `
         <article class="cart-item" data-item-id="${item.id}">
           <div class="cart-item-image-wrap">
             <img src="${item.image}" alt="${item.title}" class="cart-item-image" />
@@ -293,14 +376,19 @@ const renderCartDrawer = () => {
               <div class="cart-item-meta">${formatCurrency(getItemUnitPrice(item) * item.quantity)}</div>
             </div>
           </div>
-        </article>`).join("");
+        </article>`,
+            )
+            .join("");
     }
 
     subtotalNode.textContent = formatCurrency(getCartTotal(cart));
     updateCartBadges(cart);
 
-    const checkoutBtn = document.querySelector(".cart-drawer .cart-checkout-btn");
-    if (checkoutBtn) checkoutBtn.classList.toggle("is-cart-empty", !cart.length);
+    const checkoutBtn = document.querySelector(
+        ".cart-drawer .cart-checkout-btn",
+    );
+    if (checkoutBtn)
+        checkoutBtn.classList.toggle("is-cart-empty", !cart.length);
 };
 
 const renderCartPage = () => {
@@ -322,7 +410,10 @@ const renderCartPage = () => {
         if (emptyHeading) emptyHeading.textContent = "0 items in your cart";
         const emptyCount = document.getElementById("cartPageItemCount");
         if (emptyCount) emptyCount.textContent = "(0 items)";
-        renderOfferUnlockNotice(document.getElementById("cartPageOfferNotice"), cart);
+        renderOfferUnlockNotice(
+            document.getElementById("cartPageOfferNotice"),
+            cart,
+        );
         if (cartCountBadge) cartCountBadge.textContent = "0 Items";
         return;
     }
@@ -331,7 +422,9 @@ const renderCartPage = () => {
     const cartSubtotal = getCartOriginalTotal(cart);
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-    cartPageItems.innerHTML = cart.map((item) => `
+    cartPageItems.innerHTML = cart
+        .map(
+            (item) => `
       <div class="cart-product-card" data-item-id="${item.id}">
         <div class="cart-product-img-wrap">
           <img src="${item.image}" alt="${item.title}" class="cart-product-img" />
@@ -357,7 +450,9 @@ const renderCartPage = () => {
             </div>
           </div>
         </div>
-      </div>`).join("");
+      </div>`,
+        )
+        .join("");
 
     cartPageSubtotal.textContent = formatCurrency(getCartTotal(cart));
     cartPageTotal.textContent = formatCurrency(getCartTotal(cart));
@@ -367,13 +462,18 @@ const renderCartPage = () => {
         cartSectionLabel.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
     } else {
         const legacyLabel = document.querySelector(".cart-section-label");
-        if (legacyLabel) legacyLabel.innerHTML = `<i class="bi bi-list-check me-2"></i>${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
+        if (legacyLabel)
+            legacyLabel.innerHTML = `<i class="bi bi-list-check me-2"></i>${itemCount} item${itemCount === 1 ? "" : "s"} in your cart`;
     }
     const cartPageItemCount = document.getElementById("cartPageItemCount");
-    if (cartPageItemCount) cartPageItemCount.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
+    if (cartPageItemCount)
+        cartPageItemCount.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
     if (cartCountBadge) cartCountBadge.textContent = `${itemCount} Items`;
 
-    renderOfferUnlockNotice(document.getElementById("cartPageOfferNotice"), cart);
+    renderOfferUnlockNotice(
+        document.getElementById("cartPageOfferNotice"),
+        cart,
+    );
 };
 
 /**
@@ -387,7 +487,10 @@ const renderOfferUnlockNotice = (node, cart) => {
     const subtotal = getCartOriginalTotal(cart);
     const locked = cart
         .map((item) => ({ item, min: offerLockedByMinimum(item, subtotal) }))
-        .filter(({ item, min }) => min > 0 && (parseFloat(item.offer_percent) || 0) > 0);
+        .filter(
+            ({ item, min }) =>
+                min > 0 && (parseFloat(item.offer_percent) || 0) > 0,
+        );
 
     if (!locked.length) {
         node.innerHTML = "";
@@ -400,7 +503,7 @@ const renderOfferUnlockNotice = (node, cart) => {
     const missing = roundMoney(best.min - subtotal);
     const percent = parseFloat(best.item.offer_percent) || 0;
 
-    node.innerHTML = `<i class="bi bi-info-circle-fill" aria-hidden="true"></i> Add <strong>${formatCurrency(missing)}</strong> more to unlock ${percent}% off on ${locked.length > 1 ? "these items" : "this item"} (min ৳${formatAmount(best.min, 0)} order).`;
+    node.innerHTML = `<i class="bi bi-info-circle-fill" aria-hidden="true"></i> আরও ${formatCurrency(missing)} মূল্যের খাবার অর্ডার করুন, তাহলে ${locked.length > 1 ? "অফারের খাবারে" : "অফারের খাবারে"} ${percent}% ছাড় পাবেন (ন্যূনতম অর্ডার ৳${formatAmount(best.min, 0)})।`;
     node.hidden = false;
 };
 
@@ -416,22 +519,31 @@ const renderCheckoutSummary = () => {
 
     if (!checkoutItemsWrap || !checkoutSubtotal || !checkoutTotal) return;
 
-    const emptyState = checkoutItemsWrap.querySelector(".checkout-summary-empty");
+    const emptyState = checkoutItemsWrap.querySelector(
+        ".checkout-summary-empty",
+    );
 
     if (!cart.length) {
-        checkoutItemsWrap.querySelectorAll(".checkout-order-item").forEach(el => el.remove());
+        checkoutItemsWrap
+            .querySelectorAll(".checkout-order-item")
+            .forEach((el) => el.remove());
         if (emptyState) emptyState.style.display = "";
         checkoutSubtotal.textContent = formatCurrency(0);
         checkoutTotal.textContent = formatCurrency(0);
         if (orderTotalInput) orderTotalInput.value = "0";
         if (itemsInput) itemsInput.value = JSON.stringify([]);
         if (itemCountEl) itemCountEl.textContent = "(0 items)";
-        renderOfferUnlockNotice(document.getElementById("checkoutOfferNotice"), cart);
+        renderOfferUnlockNotice(
+            document.getElementById("checkoutOfferNotice"),
+            cart,
+        );
         return;
     }
 
     if (emptyState) emptyState.style.display = "none";
-    checkoutItemsWrap.querySelectorAll(".checkout-order-item").forEach(el => el.remove());
+    checkoutItemsWrap
+        .querySelectorAll(".checkout-order-item")
+        .forEach((el) => el.remove());
 
     // min_total is measured against the undiscounted cart subtotal, so it is
     // resolved once here and shared by every line in the summary.
@@ -457,24 +569,35 @@ const renderCheckoutSummary = () => {
         const itemWrap = root.querySelector(".checkout-order-item") || root;
 
         if (itemWrap.dataset) itemWrap.dataset.itemId = item.id;
-        if (img) { img.src = item.image; img.alt = item.title; }
+        if (img) {
+            img.src = item.image;
+            img.alt = item.title;
+        }
         if (name) name.textContent = item.title;
         if (tag) {
             const parts = [item.note || ""];
-            if (item.offer_applied && item.offer_percent) parts.push(`${item.offer_percent}% OFF`);
+            if (item.offer_applied && item.offer_percent)
+                parts.push(`${item.offer_percent}% OFF`);
             tag.textContent = parts.filter(Boolean).join(" · ");
         }
         // Offer locked behind its min_total: badge only, price stays at list price.
-        const minBadge = renderCartMinOrderBadge(item, originalTotal)
-            .replace("cart-min-order-badge", "cart-min-order-badge checkout-min-order-badge");
+        const minBadge = renderCartMinOrderBadge(item, originalTotal).replace(
+            "cart-min-order-badge",
+            "cart-min-order-badge checkout-min-order-badge",
+        );
         if (flags) {
             flags.innerHTML = minBadge;
         } else if (minBadge) {
             const orderTop = root.querySelector(".checkout-order-top");
             if (orderTop) orderTop.insertAdjacentHTML("afterend", minBadge);
         }
-        if (price) price.innerHTML = renderCartItemPriceLabel(item) + ` &times; ${item.quantity}`;
-        if (subtotal) subtotal.textContent = formatCurrency(getItemUnitPrice(item) * item.quantity);
+        if (price)
+            price.innerHTML =
+                renderCartItemPriceLabel(item) + ` &times; ${item.quantity}`;
+        if (subtotal)
+            subtotal.textContent = formatCurrency(
+                getItemUnitPrice(item) * item.quantity,
+            );
 
         checkoutItemsWrap.appendChild(row);
     });
@@ -485,9 +608,17 @@ const renderCheckoutSummary = () => {
     checkoutTotal.textContent = formatCurrency(discountedTotal);
     if (orderTotalInput) orderTotalInput.value = originalTotal.toFixed(2);
     if (itemsInput) itemsInput.value = JSON.stringify(cart);
-    if (itemCountEl) itemCountEl.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
-    renderOfferUnlockNotice(document.getElementById("checkoutOfferNotice"), cart);
-    document.dispatchEvent(new CustomEvent("cartSummaryRendered", { detail: { total: discountedTotal, originalTotal } }));
+    if (itemCountEl)
+        itemCountEl.textContent = `(${itemCount} item${itemCount === 1 ? "" : "s"})`;
+    renderOfferUnlockNotice(
+        document.getElementById("checkoutOfferNotice"),
+        cart,
+    );
+    document.dispatchEvent(
+        new CustomEvent("cartSummaryRendered", {
+            detail: { total: discountedTotal, originalTotal },
+        }),
+    );
 };
 
 const addToCart = (item) => {
@@ -495,11 +626,16 @@ const addToCart = (item) => {
     const existing = cart.find((entry) => entry.id === item.id);
     if (existing) {
         existing.quantity += 1;
-        if (item.offer_min_total && !existing.offer_min_total) existing.offer_min_total = item.offer_min_total;
-        if (item.offer_percent && !existing.offer_percent) existing.offer_percent = item.offer_percent;
-        if (item.offer_id && !existing.offer_id) existing.offer_id = item.offer_id;
-        if (item.offer_price && !existing.offer_price) existing.offer_price = item.offer_price;
-        if (item.is_first_order != null && existing.is_first_order == null) existing.is_first_order = item.is_first_order;
+        if (item.offer_min_total && !existing.offer_min_total)
+            existing.offer_min_total = item.offer_min_total;
+        if (item.offer_percent && !existing.offer_percent)
+            existing.offer_percent = item.offer_percent;
+        if (item.offer_id && !existing.offer_id)
+            existing.offer_id = item.offer_id;
+        if (item.offer_price && !existing.offer_price)
+            existing.offer_price = item.offer_price;
+        if (item.is_first_order != null && existing.is_first_order == null)
+            existing.is_first_order = item.is_first_order;
     } else {
         cart.push(item);
     }
@@ -541,18 +677,27 @@ const initCartEvents = () => {
             return;
         }
 
-        const removeButton = event.target.closest(".cart-item-remove-btn, .cart-remove-btn");
+        const removeButton = event.target.closest(
+            ".cart-item-remove-btn, .cart-remove-btn",
+        );
         if (removeButton) {
             const card = removeButton.closest("[data-item-id]");
             if (card) removeFromCart(card.getAttribute("data-item-id"));
             return;
         }
 
-        const qtyButton = event.target.closest(".qty-adjust-btn, .cart-qty-btn");
+        const qtyButton = event.target.closest(
+            ".qty-adjust-btn, .cart-qty-btn",
+        );
         if (qtyButton) {
-            const change = Number(qtyButton.dataset.change || qtyButton.getAttribute("data-change") || 0);
+            const change = Number(
+                qtyButton.dataset.change ||
+                    qtyButton.getAttribute("data-change") ||
+                    0,
+            );
             const card = qtyButton.closest("[data-item-id]");
-            if (card && change !== 0) changeCartQuantity(card.getAttribute("data-item-id"), change);
+            if (card && change !== 0)
+                changeCartQuantity(card.getAttribute("data-item-id"), change);
             return;
         }
 

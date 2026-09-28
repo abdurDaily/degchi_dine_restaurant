@@ -406,17 +406,18 @@ class Member extends Authenticatable
         }
 
         $remaining = max(0, self::GOLDEN_UPGRADE_THRESHOLD - $this->liveTotalPurchase());
-
         return array_merge($base, [
             'message' => $firstOrderAlreadyUsed
                 ? ($remaining > 0
-                    ? 'First-order membership/student discount already used — no membership discount on this order. Spend ৳'
-                        .number_format($remaining, 2)
-                        .' more to unlock Golden Card (10% on every order).'
-                    : 'First-order membership/student discount already used — no membership discount on this order.')
+                    ? 'প্রথম অর্ডারের মেম্বারশিপ/শিক্ষার্থী ছাড় ইতোমধ্যে ব্যবহার করা হয়েছে — এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়। গোল্ডেন কার্ড আনলক করতে আরও ৳'
+                    . number_format($remaining, 2)
+                    . ' মূল্যের খাবার অর্ডার করুন। এরপর প্রতিটি অর্ডারে ১০% ছাড় পাবেন।'
+                    : 'প্রথম অর্ডারের মেম্বারশিপ/শিক্ষার্থী ছাড় ইতোমধ্যে ব্যবহার করা হয়েছে — এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়।')
                 : ($remaining > 0
-                    ? 'No membership discount on this order. Spend ৳'.number_format($remaining, 2).' more to unlock Golden Card (10% on every order).'
-                    : 'No membership discount on this order.'),
+                    ? 'এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়। গোল্ডেন কার্ড আনলক করতে আরও ৳'
+                    . number_format($remaining, 2)
+                    . ' মূল্যের খাবার অর্ডার করুন। এরপর প্রতিটি অর্ডারে ১০% ছাড় পাবেন।'
+                    : 'এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়।'),
         ]);
     }
 
