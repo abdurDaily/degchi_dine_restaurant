@@ -37,8 +37,11 @@ class ContactController extends Controller
             'contact_email'            => 'nullable|email|max:100',
             'contact_map_embed'        => 'nullable|string',
             'contact_map_link'         => 'nullable|url|max:500',
-            'contact_facebook_url'     => 'nullable|url|max:500',
-            'contact_instagram_url'    => 'nullable|url|max:500',
+            'contact_facebook_url'      => 'nullable|url|max:500',
+            'contact_facebook_group_url' => 'nullable|url|max:500',
+            'contact_instagram_url'     => 'nullable|url|max:500',
+            'contact_twitter_url'       => 'nullable|url|max:500',
+            'contact_tripadvisor_url'   => 'nullable|url|max:500',
         ]);
 
         DB::beginTransaction();
@@ -54,7 +57,10 @@ class ContactController extends Controller
                 'contact_map_embed',
                 'contact_map_link',
                 'contact_facebook_url',
+                'contact_facebook_group_url',
                 'contact_instagram_url',
+                'contact_twitter_url',
+                'contact_tripadvisor_url',
             ];
 
             foreach ($fields as $key) {

@@ -9,8 +9,6 @@
     $myEmail = $cVal('contact_email', 'degchidine@gmail.com');
     $myAddress = $cVal('contact_address', 'Boropool Circle, Kaptan Villa, Halishahar, Chittagong');
     $myHours = $cVal('contact_hours', 'Daily · 5:00 PM – 11:30 PM');
-    $myFacebookUrl = $cVal('contact_facebook_url', '#');
-    $myInstagramUrl = $cVal('contact_instagram_url', '#');
 @endphp
 <footer id="contact" class="site-footer">
   <div class="footer-accent-bar"></div>
@@ -25,10 +23,7 @@
             A refined dining destination in Halishahar, Chittagong — warm hospitality, signature flavors, and memorable evenings.
           </p>
           <div class="footer-socials">
-            <a href="{{ $myFacebookUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-            <a href="{{ $myInstagramUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
-            <a href="#" aria-label="TripAdvisor"><i class="bi bi-star"></i></a>
+            <x-frontend.social-links :settings="$myContactSettings" />
           </div>
         </div>
 

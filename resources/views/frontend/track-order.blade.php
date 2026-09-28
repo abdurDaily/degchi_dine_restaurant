@@ -68,12 +68,12 @@
                                     <h3>উদাহরণ</h3>
                                     <p>
                                         অর্ডার:
-                                        <code
-                                            style="background: var(--secondary-10); padding: 2px 6px; border-radius: 4px;">6</code>
+                                        <span
+                                            style="background: var(--secondary-30); color: #fff; padding: 2px 6px; border-radius: 4px;">6</span>
                                         &nbsp;
                                         ফোন:
-                                        <code
-                                            style="background: var(--secondary-10); padding: 2px 6px; border-radius: 4px;">01712345678</code>
+                                        <span
+                                            style="background: var(--secondary-30); color: #fff; padding: 2px 6px; border-radius: 4px;">017123**678</span>
                                     </p>
                                 </div>
                             </article>

@@ -14,9 +14,6 @@
             $contactMapEmbed =
                 optional($contactSettings->get('contact_map_embed'))->value ?:
                 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3690.669527376662!2d91.7766299!3d22.3283281!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE5JzQyLjAiTiA5McKwNDYnMzUuOSJF!5e0!3m2!1sen!2sbd!4v1620000000000!5m2!1sen!2sbd';
-            $contactFacebookUrl =
-                optional($contactSettings->get('contact_facebook_url'))->value ?? 'https://www.facebook.com/DegchiDine';
-            $contactInstagramUrl = optional($contactSettings->get('contact_instagram_url'))->value ?? '#';
             $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
         @endphp
 
@@ -75,10 +72,7 @@
 
                 <div class="visit-us-socials">
                     <span>আমাদের অনুসরণ করুন</span>
-                    <a href="{{ $contactFacebookUrl }}" target="_blank" rel="noopener noreferrer"
-                        aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                    <a href="{{ $contactInstagramUrl }}" target="_blank" rel="noopener noreferrer"
-                        aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <x-frontend.social-links :settings="$contactSettings" />
                 </div>
             </div>
 

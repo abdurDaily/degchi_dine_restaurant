@@ -63,13 +63,31 @@
                                 <input type="email" name="contact_email" class="form-control" value="{{ $val('contact_email') }}" placeholder="info@example.com">
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Facebook Page URL</label>
-                                <input type="url" name="contact_facebook_url" class="form-control" value="{{ $val('contact_facebook_url') }}" placeholder="https://www.facebook.com/DegchiDine">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Instagram Page URL</label>
-                                <input type="url" name="contact_instagram_url" class="form-control" value="{{ $val('contact_instagram_url') }}" placeholder="https://www.instagram.com/...">
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-semibold">Social Links</label>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Facebook Page URL</label>
+                                        <input type="url" name="contact_facebook_url" class="form-control" value="{{ $val('contact_facebook_url') }}" placeholder="https://www.facebook.com/DegchiDine">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Facebook Group URL</label>
+                                        <input type="url" name="contact_facebook_group_url" class="form-control" value="{{ $val('contact_facebook_group_url') }}" placeholder="https://www.facebook.com/groups/1347645484217487">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Instagram Page URL</label>
+                                        <input type="url" name="contact_instagram_url" class="form-control" value="{{ $val('contact_instagram_url') }}" placeholder="https://www.instagram.com/...">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Twitter / X URL</label>
+                                        <input type="url" name="contact_twitter_url" class="form-control" value="{{ $val('contact_twitter_url') }}" placeholder="https://x.com/...">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">TripAdvisor URL</label>
+                                        <input type="url" name="contact_tripadvisor_url" class="form-control" value="{{ $val('contact_tripadvisor_url') }}" placeholder="https://www.tripadvisor.com/...">
+                                    </div>
+                                </div>
+                                <small class="text-muted">Leave a field empty to hide that social icon on the frontend.</small>
                             </div>
 
                             <div class="col-md-12 mb-3">
