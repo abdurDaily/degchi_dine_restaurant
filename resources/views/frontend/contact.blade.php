@@ -1,311 +1,352 @@
 @extends('frontend.layout')
 
 @section('meta_title', 'Contact Us')
-@section('meta_description', 'Contact Degchi Dine for reservations, membership reviews, directions and opening hours in Halishahar, Chittagong.')
+@section('meta_description', 'Contact Degchi Dine for reservations, membership reviews, directions and opening hours in
+    Halishahar, Chittagong.')
 
 @section('frontend_content')
-@php
-    $contactName = optional($contactSettings->get('contact_restaurant_name'))->value ?? 'Degchi Dine';
-    $contactAddress = optional($contactSettings->get('contact_address'))->value ?? "Boropool Circle, Kaptan Villa,\nHalishahar, Chittagong, Bangladesh";
-    $contactHours = optional($contactSettings->get('contact_hours'))->value ?? 'Mon - Sun: 5:00 PM - 11:30 PM';
-    $contactPhone = optional($contactSettings->get('contact_phone'))->value ?? '01898-795400';
-    $contactEmail = optional($contactSettings->get('contact_email'))->value ?? 'degchidine@gmail.com';
-    $contactMapLink = optional($contactSettings->get('contact_map_link'))->value ?: 'https://maps.google.com';
-    $contactMapEmbed = optional($contactSettings->get('contact_map_embed'))->value ?: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3690.669527376662!2d91.7766299!3d22.3283281!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE5JzQyLjAiTiA5McKwNDYnMzUuOSJF!5e0!3m2!1sen!2sbd!4v1620000000000!5m2!1sen!2sbd';
-    $contactFacebookUrl = optional($contactSettings->get('contact_facebook_url'))->value ?? 'https://www.facebook.com/DegchiDine';
-    $contactInstagramUrl = optional($contactSettings->get('contact_instagram_url'))->value ?? '#';
-    $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
-@endphp
+    @php
+        $contactName = optional($contactSettings->get('contact_restaurant_name'))->value ?? 'Degchi Dine';
+        $contactAddress =
+            optional($contactSettings->get('contact_address'))->value ??
+            "Boropool Circle, Kaptan Villa,\nHalishahar, Chittagong, Bangladesh";
+        $contactHours = optional($contactSettings->get('contact_hours'))->value ?? 'Mon - Sun: 5:00 PM - 11:30 PM';
+        $contactPhone = optional($contactSettings->get('contact_phone'))->value ?? '01898-795400';
+        $contactEmail = optional($contactSettings->get('contact_email'))->value ?? 'degchidine@gmail.com';
+        $contactMapLink = optional($contactSettings->get('contact_map_link'))->value ?: 'https://maps.google.com';
+        $contactMapEmbed =
+            optional($contactSettings->get('contact_map_embed'))->value ?:
+            'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3690.669527376662!2d91.7766299!3d22.3283281!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE5JzQyLjAiTiA5McKwNDYnMzUuOSJF!5e0!3m2!1sen!2sbd!4v1620000000000!5m2!1sen!2sbd';
+        $contactFacebookUrl =
+            optional($contactSettings->get('contact_facebook_url'))->value ?? 'https://www.facebook.com/DegchiDine';
+        $contactInstagramUrl = optional($contactSettings->get('contact_instagram_url'))->value ?? '#';
+        $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
+    @endphp
 
-<x-frontend.page-header
-    title="Get In Touch"
-    eyebrow="Connect With Us"
-    subtitle="Reach out for reservations, feedback, or membership reviews. We would love to hear from you."
-    :backLink="route('frontend.home')"
-    backText="Back to Home"
->
-    <x-slot:eyebrowIcon>
-        <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
-    </x-slot:eyebrowIcon>
-</x-frontend.page-header>
+    <x-frontend.page-header title="যোগাযোগ করুন" eyebrow="আমাদের সাথে যোগাযোগ"
+        subtitle="রিজার্ভেশন, মতামত বা সদস্যপদ সম্পর্কে জানতে আমাদের সাথে যোগাযোগ করুন।" :backLink="route('frontend.home')"
+        backText="হোমে ফিরে যান">
+        <x-slot:eyebrowIcon>
+            <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
+        </x-slot:eyebrowIcon>
+    </x-frontend.page-header>
 
-<section class="contact-page" style="background: var(--brand-gredient); min-height: 60vh;">
-    <div class="container px-4 px-lg-5 contact-page-main-box">
-        <div class="contact-page-grid">
-            <aside class="contact-page-info order-2 order-lg-1">
-                <div class="contact-page-info-panel">
-                    <div class="contact-page-info-top">
-                        <div>
-                            <h2 class="contact-page-info-title">{{ $contactName }}</h2>
-                            <p class="contact-page-info-tagline">Warm hospitality · Authentic flavors</p>
-                        </div>
-                        <span class="contact-page-open-badge"><i class="bi bi-clock me-1"></i> Open Daily</span>
-                    </div>
-
-                    <div class="contact-page-cards">
-                        <article class="contact-page-card">
-                            <div class="contact-page-card-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                            <div class="contact-page-card-body">
-                                <h3>Address</h3>
-                                <p>{!! nl2br(e($contactAddress)) !!}</p>
-                            </div>
-                        </article>
-
-                        <article class="contact-page-card">
-                            <div class="contact-page-card-icon"><i class="bi bi-telephone-fill"></i></div>
-                            <div class="contact-page-card-body">
-                                <h3>Phone</h3>
-                                <p><a href="tel:{{ $contactPhoneDigits }}">{{ $contactPhone }}</a></p>
-                            </div>
-                        </article>
-
-                        <article class="contact-page-card">
-                            <div class="contact-page-card-icon"><i class="bi bi-envelope-fill"></i></div>
-                            <div class="contact-page-card-body">
-                                <h3>Email</h3>
-                                <p><a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a></p>
-                            </div>
-                        </article>
-
-                        <article class="contact-page-card contact-page-card-accent">
-                            <div class="contact-page-card-icon contact-page-card-icon-gold"><i class="bi bi-clock-fill"></i></div>
-                            <div class="contact-page-card-body">
-                                <h3>Business Hours</h3>
-                                <p>{{ $contactHours }}</p>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div class="contact-page-actions">
-                        <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer" class="btn-dine btn-dine-primary btn-dine-sm">
-                            <i class="bi bi-signpost-split-fill"></i>
-                            Get Directions
-                        </a>
-                        <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-sm" style="background: var(--brand-gradient); color: #fff;">
-                            <i class="bi bi-telephone-fill"></i>
-                            Call Now
-                        </a>
-                    </div>
-
-                    <div class="contact-page-socials">
-                        <span>Follow us</span>
-                        <a href="{{ $contactFacebookUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="{{ $contactInstagramUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                    </div>
-                </div>
-
-                <div class="contact-page-map">
-                    <div class="contact-page-map-label">
-                        <i class="bi bi-pin-map-fill"></i>
-                        <span>Halishahar, Chittagong</span>
-                    </div>
-                    <iframe
-                        src="{{ $contactMapEmbed }}"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="{{ $contactName }} location map"></iframe>
-                </div>
-            </aside>
-
-            <div class="contact-page-forms order-1 order-lg-2">
-                <div class="contact-form-sticky">
-                    <div id="memberCheckCard" class="cp-form-card cp-form-card-verify">
-                        <div class="cp-form-card-head">
-                            <span class="cp-form-step">Step 1</span>
-                            <h3>Share Your Experience</h3>
-                            <p>Exclusive for our valued members. Verify your membership card to post your review.</p>
-                        </div>
-
-                        <form id="memberVerificationForm" class="member-check-form">
-                            @csrf
-
-                            <div class="cp-field cp-field-highlight">
-                                <label for="cardNumberCheck" class="cp-label">Membership Card Number</label>
-                                <input type="text" class="cp-input" id="cardNumberCheck" name="card_number" required placeholder="Ex: DD-XXXX-XXXX">
-                            </div>
-
-                            <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm w-100" id="verifyBtn">
-                                <span id="verifyBtnText">Verify Membership Identity</span>
-                                <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                            </button>
-
-                            <p class="cp-form-footnote text-center mb-0">
-                                Not a member yet?
-                                <a href="{{ route('frontend.card.apply') }}" class="cp-link-gold">
-                                    Apply for Membership <i class="bi bi-arrow-right ms-1"></i>
-                                </a>
-                            </p>
-                        </form>
-
-                    <div id="reviewFormCard" class="cp-form-card cp-form-card-review d-none">
-                        <div class="cp-alert-success mb-4" role="alert">
-                            <i class="bi bi-shield-check"></i>
+    <section class="contact-page" style="background: var(--brand-gredient); min-height: 60vh;">
+        <div class="container px-4 px-lg-5 contact-page-main-box">
+            <div class="contact-page-grid">
+                <aside class="contact-page-info order-2 order-lg-1">
+                    <div class="contact-page-info-panel">
+                        <div class="contact-page-info-top">
                             <div>
-                                <strong>Access Granted</strong>
-                                <span>Membership verified successfully. We look forward to your valuable insights.</span>
+                                <h2 class="contact-page-info-title">{{ $contactName }}</h2>
+                                <p class="contact-page-info-tagline">আন্তরিক আতিথেয়তা · খাঁটি স্বাদ</p>
                             </div>
+                            <span class="contact-page-open-badge">
+                                <i class="bi bi-clock me-1"></i> প্রতিদিন খোলা
+                            </span>
                         </div>
 
-                        <form id="contactReviewForm" class="review-form">
-                            @csrf
-                            <input type="hidden" name="member_card_number" id="hiddenCardNumber">
-
-                            <div class="cp-field mb-4">
-                                <label class="cp-label">Your Rating *</label>
-                                <div class="cp-rating d-flex gap-2 mt-1">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                    <label class="cp-rating-option">
-                                        <input type="radio" name="rating" value="{{ $i }}" required>
-                                        <i class="bi bi-star-fill"></i>
-                                    </label>
-                                    @endfor
+                        <div class="contact-page-cards">
+                            <article class="contact-page-card">
+                                <div class="contact-page-card-icon">
+                                    <i class="bi bi-geo-alt-fill"></i>
                                 </div>
+                                <div class="contact-page-card-body">
+                                    <h3>ঠিকানা</h3>
+                                    <p>{!! nl2br(e($contactAddress)) !!}</p>
+                                </div>
+                            </article>
+
+                            <article class="contact-page-card">
+                                <div class="contact-page-card-icon">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
+                                <div class="contact-page-card-body">
+                                    <h3>ফোন</h3>
+                                    <p><a href="tel:{{ $contactPhoneDigits }}">{{ $contactPhone }}</a></p>
+                                </div>
+                            </article>
+
+                            <article class="contact-page-card">
+                                <div class="contact-page-card-icon">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </div>
+                                <div class="contact-page-card-body">
+                                    <h3>ইমেইল</h3>
+                                    <p><a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a></p>
+                                </div>
+                            </article>
+
+                            <article class="contact-page-card contact-page-card-accent">
+                                <div class="contact-page-card-icon contact-page-card-icon-gold">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div class="contact-page-card-body">
+                                    <h3>খোলার সময়</h3>
+                                    <p>{{ $contactHours }}</p>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="contact-page-actions">
+                            <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer"
+                                class="btn-dine btn-dine-primary btn-dine-sm">
+                                <i class="bi bi-signpost-split-fill"></i>
+                                পথনির্দেশ দেখুন
+                            </a>
+
+                            <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-sm"
+                                style="background: var(--brand-gradient); color: #fff;">
+                                <i class="bi bi-telephone-fill"></i>
+                                এখনই কল করুন
+                            </a>
+                        </div>
+
+                        <div class="contact-page-socials">
+                            <span>আমাদের অনুসরণ করুন</span>
+                            <a href="{{ $contactFacebookUrl }}" target="_blank" rel="noopener noreferrer"
+                                aria-label="Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="{{ $contactInstagramUrl }}" target="_blank" rel="noopener noreferrer"
+                                aria-label="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-page-map">
+                        <div class="contact-page-map-label">
+                            <i class="bi bi-pin-map-fill"></i>
+                            <span>হালিশহর, চট্টগ্রাম</span>
+                        </div>
+
+                        <iframe src="{{ $contactMapEmbed }}" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade" title="{{ $contactName }} location map"></iframe>
+                    </div>
+                </aside>
+
+                <div class="contact-page-forms order-1 order-lg-2">
+                    <div class="contact-form-sticky">
+                        <div id="memberCheckCard" class="cp-form-card cp-form-card-verify">
+                            <div class="cp-form-card-head">
+                                <span class="cp-form-step">ধাপ ১</span>
+                                <h3>আপনার অভিজ্ঞতা শেয়ার করুন</h3>
+                                <p>আমাদের সম্মানিত সদস্যদের জন্য। রিভিউ দিতে প্রথমে আপনার মেম্বারশিপ যাচাই করুন।</p>
                             </div>
 
-                            <div class="cp-field mb-4">
-                                <label for="title" class="cp-label">Review Title (Optional)</label>
-                                <input type="text" class="cp-input" id="title" name="title" placeholder="e.g., An Absolute Culinary Delight">
-                            </div>
+                            <form id="memberVerificationForm" class="member-check-form">
+                                @csrf
 
-                            <div class="cp-field mb-4">
-                                <label for="comment" class="cp-label">Your Review *</label>
-                                <textarea class="cp-input cp-textarea" id="comment" name="comment" rows="5" required placeholder="Share details of your experience with our dishes and ambiance..."></textarea>
-                                <small class="cp-field-hint">Minimum 10 characters required.</small>
-                            </div>
+                                <div class="cp-field cp-field-highlight">
+                                    <label for="cardNumberCheck" class="cp-label">মেম্বারশিপ কার্ড নম্বর</label>
+                                    <input type="text" class="cp-input" id="cardNumberCheck" name="card_number" required
+                                        placeholder="যেমন: DD-XXXX-XXXX">
+                                </div>
 
-                            <div class="cp-form-actions">
-                                <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm flex-grow-1" id="submitReviewBtn">
-                                    <span id="submitBtnText">
-                                        <i class="bi bi-send me-2"></i>Publish Review
-                                    </span>
-                                    <span id="submitBtnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                                <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm w-100" id="verifyBtn">
+                                    <span id="verifyBtnText">মেম্বারশিপ যাচাই করুন</span>
+                                    <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm ms-2 d-none"
+                                        role="status" aria-hidden="true"></span>
                                 </button>
-                                <button type="button" class="btn-dine btn-dine-outline btn-dine-sm" id="backBtn" onclick="goBackToVerification()">
-                                    <i class="bi bi-chevron-left"></i> Change ID
-                                </button>
+
+                                <p class="cp-form-footnote text-center mb-0">
+                                    এখনও সদস্য হননি?
+                                    <a href="{{ route('frontend.card.apply') }}" class="cp-link-gold">
+                                        মেম্বারশিপের জন্য আবেদন করুন
+                                        <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </p>
+                            </form>
+
+                            <div id="reviewFormCard" class="cp-form-card cp-form-card-review d-none">
+                                <div class="cp-alert-success mb-4" role="alert">
+                                    <i class="bi bi-shield-check"></i>
+                                    <div>
+                                        <strong>অ্যাক্সেস পাওয়া গেছে</strong>
+                                        <span>আপনার মেম্বারশিপ সফলভাবে যাচাই হয়েছে। আপনার মূল্যবান মতামত জানতে আমরা
+                                            আগ্রহী।</span>
+                                    </div>
+                                </div>
+
+                                <form id="contactReviewForm" class="review-form">
+                                    @csrf
+                                    <input type="hidden" name="member_card_number" id="hiddenCardNumber">
+
+                                    <div class="cp-field mb-4">
+                                        <label class="cp-label">আপনার রেটিং *</label>
+                                        <div class="cp-rating d-flex gap-2 mt-1">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <label class="cp-rating-option">
+                                                    <input type="radio" name="rating" value="{{ $i }}"
+                                                        required>
+                                                    <i class="bi bi-star-fill"></i>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                    </div>
+
+                                    <div class="cp-field mb-4">
+                                        <label for="title" class="cp-label">রিভিউয়ের শিরোনাম (ঐচ্ছিক)</label>
+                                        <input type="text" class="cp-input" id="title" name="title"
+                                            placeholder="যেমন: অসাধারণ স্বাদের অভিজ্ঞতা">
+                                    </div>
+
+                                    <div class="cp-field mb-4">
+                                        <label for="comment" class="cp-label">আপনার রিভিউ *</label>
+                                        <textarea class="cp-input cp-textarea" id="comment" name="comment" rows="5" required
+                                            placeholder="আমাদের খাবার, পরিবেশ এবং আপনার অভিজ্ঞতা সম্পর্কে বিস্তারিত জানান..."></textarea>
+                                        <small class="cp-field-hint">কমপক্ষে ১০টি অক্ষর লিখুন।</small>
+                                    </div>
+
+                                    <div class="cp-form-actions">
+                                        <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm flex-grow-1"
+                                            id="submitReviewBtn">
+                                            <span id="submitBtnText">
+                                                <i class="bi bi-send me-2"></i>রিভিউ প্রকাশ করুন
+                                            </span>
+                                            <span id="submitBtnSpinner"
+                                                class="spinner-border spinner-border-sm ms-2 d-none" role="status"
+                                                aria-hidden="true"></span>
+                                        </button>
+
+                                        <button type="button" class="btn-dine btn-dine-outline btn-dine-sm"
+                                            id="backBtn" onclick="goBackToVerification()">
+                                            <i class="bi bi-chevron-left"></i> পরিবর্তন করুন
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<script>
-    document.getElementById('memberVerificationForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    <script>
+        document.getElementById('memberVerificationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        const verifyBtn = document.getElementById('verifyBtn');
-        const verifyBtnText = document.getElementById('verifyBtnText');
-        const verifyBtnSpinner = document.getElementById('verifyBtnSpinner');
-        const cardNumber = document.getElementById('cardNumberCheck').value;
+            const verifyBtn = document.getElementById('verifyBtn');
+            const verifyBtnText = document.getElementById('verifyBtnText');
+            const verifyBtnSpinner = document.getElementById('verifyBtnSpinner');
+            const cardNumber = document.getElementById('cardNumberCheck').value;
 
-        verifyBtn.disabled = true;
-        verifyBtnText.textContent = 'Verifying Credentials...';
-        verifyBtnSpinner.classList.remove('d-none');
+            verifyBtn.disabled = true;
+            verifyBtnText.textContent = 'Verifying Credentials...';
+            verifyBtnSpinner.classList.remove('d-none');
 
-        try {
-            const response = await fetch('{{ route("frontend.reviews.verify-member") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ card_number: cardNumber }),
-            });
+            try {
+                const response = await fetch('{{ route('frontend.reviews.verify-member') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        card_number: cardNumber
+                    }),
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (data.success) {
-                document.getElementById('hiddenCardNumber').value = cardNumber;
+                if (data.success) {
+                    document.getElementById('hiddenCardNumber').value = cardNumber;
 
-                document.getElementById('memberCheckCard').classList.add('d-none');
-                document.getElementById('reviewFormCard').classList.remove('d-none');
+                    document.getElementById('memberCheckCard').classList.add('d-none');
+                    document.getElementById('reviewFormCard').classList.remove('d-none');
 
-                toastr.success(data.message, 'Member Verified');
-                document.getElementById('reviewFormCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                toastr.error(data.message || 'Verification failed', 'Error');
-            }
-        } catch (error) {
-            toastr.error('An error occurred. Please try again.', 'Error');
-            console.error('Error:', error);
-        } finally {
-            verifyBtn.disabled = false;
-            verifyBtnText.textContent = 'Verify Membership Identity';
-            verifyBtnSpinner.classList.add('d-none');
-        }
-    });
-
-    function goBackToVerification() {
-        document.getElementById('memberCheckCard').classList.remove('d-none');
-        document.getElementById('reviewFormCard').classList.add('d-none');
-        document.getElementById('memberVerificationForm').reset();
-        document.getElementById('contactReviewForm').reset();
-        document.querySelectorAll('.cp-rating-option').forEach((opt) => opt.classList.remove('checked'));
-        document.getElementById('memberCheckCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    document.getElementById('contactReviewForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const submitBtn = document.getElementById('submitReviewBtn');
-        const submitBtnText = document.getElementById('submitBtnText');
-        const submitBtnSpinner = document.getElementById('submitBtnSpinner');
-
-        submitBtn.disabled = true;
-        submitBtnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Publishing...';
-        submitBtnSpinner.classList.remove('d-none');
-
-        const formData = new FormData(document.getElementById('contactReviewForm'));
-
-        try {
-            const response = await fetch('{{ route("frontend.reviews.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                },
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                toastr.success(data.message, 'Success');
-                document.getElementById('contactReviewForm').reset();
-                document.getElementById('memberVerificationForm').reset();
-                document.querySelectorAll('.cp-rating-option').forEach((opt) => opt.classList.remove('checked'));
-
-                setTimeout(() => {
-                    window.location.href = '{{ route("frontend.reviews.index") }}';
-                }, 2000);
-            } else {
-                toastr.error(data.message || 'Failed to submit review', 'Error');
-            }
-        } catch (error) {
-            console.error('Fetch error:', error);
-            toastr.error('An error occurred. Please try again.', 'Error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtnText.innerHTML = '<i class="bi bi-send me-2"></i>Publish Review';
-            submitBtnSpinner.classList.add('d-none');
-        }
-    });
-
-    const ratingOptions = document.querySelectorAll('.cp-rating-option');
-    ratingOptions.forEach((option, index) => {
-        option.addEventListener('click', () => {
-            ratingOptions.forEach((opt, optIndex) => {
-                if (optIndex <= index) {
-                    opt.classList.add('checked');
+                    toastr.success(data.message, 'Member Verified');
+                    document.getElementById('reviewFormCard').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
                 } else {
-                    opt.classList.remove('checked');
+                    toastr.error(data.message || 'Verification failed', 'Error');
                 }
+            } catch (error) {
+                toastr.error('An error occurred. Please try again.', 'Error');
+                console.error('Error:', error);
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtnText.textContent = 'Verify Membership Identity';
+                verifyBtnSpinner.classList.add('d-none');
+            }
+        });
+
+        function goBackToVerification() {
+            document.getElementById('memberCheckCard').classList.remove('d-none');
+            document.getElementById('reviewFormCard').classList.add('d-none');
+            document.getElementById('memberVerificationForm').reset();
+            document.getElementById('contactReviewForm').reset();
+            document.querySelectorAll('.cp-rating-option').forEach((opt) => opt.classList.remove('checked'));
+            document.getElementById('memberCheckCard').scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        document.getElementById('contactReviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitReviewBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+
+            submitBtn.disabled = true;
+            submitBtnText.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Publishing...';
+            submitBtnSpinner.classList.remove('d-none');
+
+            const formData = new FormData(document.getElementById('contactReviewForm'));
+
+            try {
+                const response = await fetch('{{ route('frontend.reviews.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    toastr.success(data.message, 'Success');
+                    document.getElementById('contactReviewForm').reset();
+                    document.getElementById('memberVerificationForm').reset();
+                    document.querySelectorAll('.cp-rating-option').forEach((opt) => opt.classList.remove(
+                        'checked'));
+
+                    setTimeout(() => {
+                        window.location.href = '{{ route('frontend.reviews.index') }}';
+                    }, 2000);
+                } else {
+                    toastr.error(data.message || 'Failed to submit review', 'Error');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                toastr.error('An error occurred. Please try again.', 'Error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtnText.innerHTML = '<i class="bi bi-send me-2"></i>Publish Review';
+                submitBtnSpinner.classList.add('d-none');
+            }
+        });
+
+        const ratingOptions = document.querySelectorAll('.cp-rating-option');
+        ratingOptions.forEach((option, index) => {
+            option.addEventListener('click', () => {
+                ratingOptions.forEach((opt, optIndex) => {
+                    if (optIndex <= index) {
+                        opt.classList.add('checked');
+                    } else {
+                        opt.classList.remove('checked');
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 @endsection

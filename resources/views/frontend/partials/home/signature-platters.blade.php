@@ -1,7 +1,7 @@
 <!-- SIGNATURE PLATTERS -->
 <section class="section-block platter-section" id="platters">
     <div class="container px-4 px-lg-5">
-        <x-frontend.section-heading title="Our Signature Platters" subtitle="Carefully crafted selections perfect for sharing"
+        <x-frontend.section-heading title="আমাদের বিশেষ প্ল্যাটারসমূহ" subtitle="যত্নসহকারে বাছাই করা, সবার সাথে ভাগ করে নেওয়ার জন্য উপযুক্ত সব আয়োজন।"
             icon="fa-solid fa-concierge-bell" class="platter-section-header" />
 
         <div class="platter-card-wrapper reveal">

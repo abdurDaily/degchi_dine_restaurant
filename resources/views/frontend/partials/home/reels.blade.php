@@ -4,14 +4,14 @@
         <div class="reels-header-shell reveal mb-5 reels-section-header-block">
             <div class="reels-section-header">
                 <div class="reels-header-left">
-                    <x-frontend.section-heading title="Watch Us on facebook"
-                        subtitle="Kitchen energy, chef moments, and guest vibes from Degchi Dine. Fresh reels every week."
-                        icon="line" align="start" :showDivider="false" />
+                    <x-frontend.section-heading title="ফেসবুকে আমাদের দেখুন"
+                        subtitle="ডেগচি ডাইন এর অতিথিদের প্রাণবন্ত পরিবেশ—প্রতি সপ্তাহে নতুন নতুন রিলস।" icon="line"
+                        align="start" :showDivider="false" />
                     <div class="reels-header-cta-mobile d-md-none mt-3">
                         <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"
                             class="btn-dine btn-dine-primary w-100 justify-content-center" target="_blank"
                             rel="noopener noreferrer">
-                            <i class="bi bi-facebook" aria-hidden="true"></i><span>Follow on Facebook</span>
+                            <i class="bi bi-facebook" aria-hidden="true"></i><span>ফেসবুকে অনুসরণ করুন</span>
                         </a>
                     </div>
                 </div>
@@ -19,7 +19,7 @@
                 <div class="reels-header-right d-none d-md-flex align-items-center">
                     <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"
                         class="btn-dine btn-dine-primary" target="_blank" rel="noopener noreferrer">
-                        <i class="bi bi-facebook" aria-hidden="true"></i><span>Follow on Facebook</span>
+                        <i class="bi bi-facebook" aria-hidden="true"></i><span>ফেসবুকে অনুসরণ করুন</span>
                     </a>
                 </div>
             </div>
@@ -41,9 +41,10 @@
                             <div class="reel-card-thumb">
                                 <div class="reel-progress-indicator"></div>
                                 <img src="{{ $reel->thumbnail ? (strpos($reel->thumbnail, 'http') === 0 ? $reel->thumbnail : asset('uploads/reels/' . $reel->thumbnail)) : asset('assets/placeholder/placeholder.png') }}"
-                                    alt="{{ $reel->title ?? 'Degchi Dine Facebook Reel' }}" width="360" height="640" loading="lazy" />
+                                    alt="{{ $reel->title ?? 'Degchi Dine Facebook Reel' }}" width="360"
+                                    height="640" loading="lazy" />
                                 <div class="reel-card-overlay">
-                                    @if($reel->title)
+                                    @if ($reel->title)
                                         <span class="reel-card-title">{{ $reel->title }}</span>
                                     @endif
                                     <span class="reel-play-icon"><i class="bi bi-play-fill"></i></span>

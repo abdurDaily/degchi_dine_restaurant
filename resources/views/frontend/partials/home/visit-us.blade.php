@@ -27,16 +27,16 @@
                 <div class="visit-us-panel-top">
                     <div>
                         <h3 class="visit-us-name">{{ $contactName }}</h3>
-                        <p class="visit-us-tagline">Signature flavors · Warm hospitality</p>
+                        <p class="visit-us-tagline">স্বতন্ত্র স্বাদ · আন্তরিক আতিথেয়তা</p>
                     </div>
-                    <span class="visit-us-badge"><i class="bi bi-clock me-1"></i> Open Daily</span>
+                    <span class="visit-us-badge"><i class="bi bi-clock me-1"></i> প্রতিদিন খোলা</span>
                 </div>
 
                 <div class="visit-us-cards">
                     <article class="visit-us-card">
                         <div class="visit-us-card-icon"><i class="fa-solid fa-location-dot"></i></div>
                         <div class="visit-us-card-content">
-                            <h4>Address</h4>
+                            <h4>ঠিকানা</h4>
                             <p>{!! nl2br(e($contactAddress)) !!}</p>
                         </div>
                     </article>
@@ -44,7 +44,7 @@
                     <article class="visit-us-card">
                         <div class="visit-us-card-icon"><i class="fa-regular fa-clock"></i></div>
                         <div class="visit-us-card-content">
-                            <h4>Opening Hours</h4>
+                            <h4>খোলার সময়</h4>
                             <p>{{ $contactHours }}</p>
                         </div>
                     </article>
@@ -53,27 +53,28 @@
                         <div class="visit-us-card-icon visit-us-card-icon-gold"><i class="fa-solid fa-phone"></i>
                         </div>
                         <div class="visit-us-card-content">
-                            <h4>Reservations</h4>
+                            <h4>রিজার্ভেশন</h4>
                             <p><a href="tel:{{ $contactPhoneDigits }}">{{ $contactPhone }}</a></p>
-                            <span class="visit-us-card-note">Call ahead to secure your table</span>
+                            <span class="visit-us-card-note">টেবিল নিশ্চিত করতে আগে থেকেই কল করুন</span>
                         </div>
                     </article>
                 </div>
 
-                <div class="visit-us-actions" >
+                <div class="visit-us-actions">
                     <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer"
                         class="btn-dine btn-dine-ghost btn-dine-sm" style="font-size: 12px;">
                         <i class="fa-solid fa-diamond-turn-right"></i>
-                        Get Directions
+                        পথনির্দেশ দেখুন
                     </a>
-                    <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-primary btn-dine-sm" style="font-size: 12px;">
+                    <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-primary btn-dine-sm"
+                        style="font-size: 12px;">
                         <i class="fa-solid fa-phone"></i>
-                        Call Now
+                        এখনই কল করুন
                     </a>
                 </div>
 
                 <div class="visit-us-socials">
-                    <span>Follow us</span>
+                    <span>আমাদের অনুসরণ করুন</span>
                     <a href="{{ $contactFacebookUrl }}" target="_blank" rel="noopener noreferrer"
                         aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                     <a href="{{ $contactInstagramUrl }}" target="_blank" rel="noopener noreferrer"
@@ -84,7 +85,7 @@
             <div class="visit-us-map">
                 <div class="visit-us-map-label">
                     <i class="bi bi-pin-map-fill"></i>
-                    <span>Halishahar, Chittagong</span>
+                    <span>হালিশহর, চট্টগ্রাম</span>
                 </div>
                 <iframe src="{{ $contactMapEmbed }}" allowfullscreen="" loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade" title="{{ $contactName }} location map"></iframe>
