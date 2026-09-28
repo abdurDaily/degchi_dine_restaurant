@@ -42,9 +42,9 @@
     @empty
         <div class="col-12 text-center py-5">
             <div class="empty-state-wrap p-5">
-                <iconify-icon icon="solar:sad-smiley-outline" width="64" height="64" class="text-muted mb-3"></iconify-icon>
-                <h4 class="text-muted">No items found matching your criteria.</h4>
-                <p class="text-muted">Try choosing a different category or adjusting the price range.</p>
+                <iconify-icon icon="solar:sad-smiley-outline" width="64" height="64" class="text-white mb-3"></iconify-icon>
+                <h4 class="text-white">No items found matching your criteria.</h4>
+                <p class="text-white">Try choosing a different category or adjusting the price range.</p>
             </div>
         </div>
     @endforelse
