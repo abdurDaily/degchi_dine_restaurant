@@ -4131,7 +4131,7 @@ h6,
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: rgba(250, 245, 235, 0.5);
+    color: #fff;
     margin-right: 0.25rem;
 }
 
@@ -13211,7 +13211,7 @@ body {
     display: block;
     font-size: 0.82rem;
     font-weight: 700;
-    color: var(--brand-secondary);
+    color: #fff;
     margin-bottom: 0.45rem;
     letter-spacing: 0.02em;
 }

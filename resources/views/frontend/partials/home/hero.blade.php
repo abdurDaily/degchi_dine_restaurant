@@ -9,8 +9,7 @@
     <div class="hero-side-rail hero-side-right d-none d-lg-flex">
         <a href="https://www.facebook.com/DegchiDine" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
                 class="bi bi-facebook"></i></a>
-        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+        <a href="https://www.instagram.com/degchi.dine/" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
     </div>
 
     {{-- Desktop hero content --}}
@@ -41,8 +40,10 @@
                 Generations of tradition, rich spices, and unforgettable aromas in every bite.
             </p>
             <div class="hero-cta-group d-flex flex-column gap-2">
-                <a href="{{ route('frontend.home') }}#menu" class="btn-dine btn-dine-primary btn-dine-sm w-100">Order Now</a>
-                <a href="{{ route('frontend.partyBooking') }}" class="btn-dine btn-dine-outline btn-dine-sm w-100">Party Booking</a>
+                <a href="{{ route('frontend.home') }}#menu" class="btn-dine btn-dine-primary btn-dine-sm w-100">Order
+                    Now</a>
+                <a href="{{ route('frontend.partyBooking') }}" class="btn-dine btn-dine-outline btn-dine-sm w-100">Party
+                    Booking</a>
             </div>
         </div>
     </div>
