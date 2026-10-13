@@ -6,6 +6,13 @@
     'robots' => null,
     'type' => null,
     'canonical' => null,
+    'ogTitle' => null,
+    'ogDescription' => null,
+    'ogImage' => null,
+    'twitterTitle' => null,
+    'twitterDescription' => null,
+    'twitterImage' => null,
+    'twitterCard' => null,
 ])
 
 @php
@@ -17,6 +24,13 @@
     $metaType = $seo->ogType($type ?: null);
     $metaImage = $seo->ogImage($image ?: null);
     $metaCanonical = $seo->canonical($canonical ?: null);
+    $metaOgTitle = trim($ogTitle ?: '') !== '' ? $ogTitle : $metaTitle;
+    $metaOgDescription = trim($ogDescription ?: '') !== '' ? $ogDescription : $metaDescription;
+    $metaOgImage = trim($ogImage ?: '') !== '' ? $ogImage : $metaImage;
+    $metaTwitterTitle = trim($twitterTitle ?: '') !== '' ? $twitterTitle : $metaOgTitle;
+    $metaTwitterDescription = trim($twitterDescription ?: '') !== '' ? $twitterDescription : $metaOgDescription;
+    $metaTwitterImage = trim($twitterImage ?: '') !== '' ? $twitterImage : $metaOgImage;
+    $metaTwitterCard = trim($twitterCard ?: '') !== '' ? $twitterCard : $seo->twitterCard();
     $twitterHandle = $seo->twitterHandle();
     $gaId = $seo->googleAnalyticsId();
     $gtmId = $seo->googleTagManagerId();
@@ -33,17 +47,17 @@
 <link rel="canonical" href="{{ $metaCanonical }}">
 
 <meta property="og:site_name" content="{{ $seo->siteName() }}">
-<meta property="og:title" content="{{ $metaTitle }}">
-<meta property="og:description" content="{{ $metaDescription }}">
+<meta property="og:title" content="{{ $metaOgTitle }}">
+<meta property="og:description" content="{{ $metaOgDescription }}">
 <meta property="og:type" content="{{ $metaType }}">
 <meta property="og:url" content="{{ $metaCanonical }}">
-<meta property="og:image" content="{{ $metaImage }}">
+<meta property="og:image" content="{{ $metaOgImage }}">
 <meta property="og:image:alt" content="{{ $seo->siteName() }}">
 
-<meta name="twitter:card" content="{{ $seo->twitterCard() }}">
-<meta name="twitter:title" content="{{ $metaTitle }}">
-<meta name="twitter:description" content="{{ $metaDescription }}">
-<meta name="twitter:image" content="{{ $metaImage }}">
+<meta name="twitter:card" content="{{ $metaTwitterCard }}">
+<meta name="twitter:title" content="{{ $metaTwitterTitle }}">
+<meta name="twitter:description" content="{{ $metaTwitterDescription }}">
+<meta name="twitter:image" content="{{ $metaTwitterImage }}">
 @if($twitterHandle)
 <meta name="twitter:site" content="{{ '@' . $twitterHandle }}">
 @endif

@@ -237,6 +237,112 @@
                                     <label class="form-check-label" for="postCommentsEnabled">Allow Comments</label>
                                 </div>
                             </div>
+                            <div class="col-12">
+                                <div class="accordion" id="postSeoAccordion">
+                                    <div class="accordion-item border rounded">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed fw-semibold" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#postSeoCollapse"
+                                                aria-expanded="false" aria-controls="postSeoCollapse">
+                                                <i class="ri-search-2-line me-2"></i> SEO &amp; Social Sharing (Open Graph)
+                                            </button>
+                                        </h2>
+                                        <div id="postSeoCollapse" class="accordion-collapse collapse"
+                                            data-bs-parent="#postSeoAccordion">
+                                            <div class="accordion-body">
+                                                <p class="text-muted mb-3" style="font-size: 0.85rem;">
+                                                    These fields control how the post appears on search results and when
+                                                    shared on Facebook, Messenger, WhatsApp, LinkedIn, X (Twitter) etc.
+                                                    Anything left empty falls back to the post title, excerpt, and
+                                                    featured image.
+                                                </p>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Meta Title</label>
+                                                        <input type="text" name="meta_title" class="form-control"
+                                                            maxlength="255" placeholder="Best 50–60 characters">
+                                                        <span class="text-danger error-text meta_title_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Meta Keywords</label>
+                                                        <input type="text" name="meta_keywords" class="form-control"
+                                                            maxlength="255" placeholder="kacchi, biryani, chittagong">
+                                                        <span class="text-danger error-text meta_keywords_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label class="form-label">Meta Description</label>
+                                                        <textarea name="meta_description" rows="2" class="form-control"
+                                                            maxlength="500" placeholder="Best 150–160 characters"></textarea>
+                                                        <span class="text-danger error-text meta_description_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-12"><hr class="my-1"></div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Open Graph Title</label>
+                                                        <input type="text" name="og_title" class="form-control"
+                                                            maxlength="255" placeholder="Shown as the share headline">
+                                                        <span class="text-danger error-text og_title_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Open Graph Image</label>
+                                                        <input type="hidden" name="remove_og_image" value="0">
+                                                        <input type="file" name="og_image" id="postOgImageInput" class="form-control"
+                                                            accept="image/jpeg,image/png,image/webp,image/gif">
+                                                        <span class="text-danger error-text og_image_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                        <small class="text-muted d-block mt-1">Recommended 1200×630px. Empty = featured image.</small>
+                                                        <div id="currentOgImagePreview" style="display:none;" class="mt-2">
+                                                            <div class="image-preview-container">
+                                                                <img id="currentOgImage" src="" alt="Open Graph image">
+                                                                <button type="button" class="remove-image-btn" id="removeOgImageBtn" title="Remove image">×</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label class="form-label">Open Graph Description</label>
+                                                        <textarea name="og_description" rows="2" class="form-control"
+                                                            maxlength="500" placeholder="Shown as the share snippet"></textarea>
+                                                        <span class="text-danger error-text og_description_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-12"><hr class="my-1"></div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Twitter Card Type</label>
+                                                        <select name="twitter_card" class="form-select">
+                                                            <option value="summary_large_image">Summary with large image</option>
+                                                            <option value="summary">Summary</option>
+                                                        </select>
+                                                        <span class="text-danger error-text twitter_card_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Twitter Image</label>
+                                                        <input type="hidden" name="remove_twitter_image" value="0">
+                                                        <input type="file" name="twitter_image" id="postTwitterImageInput" class="form-control"
+                                                            accept="image/jpeg,image/png,image/webp,image/gif">
+                                                        <span class="text-danger error-text twitter_image_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                        <small class="text-muted d-block mt-1">Empty = Open Graph image.</small>
+                                                        <div id="currentTwitterImagePreview" style="display:none;" class="mt-2">
+                                                            <div class="image-preview-container">
+                                                                <img id="currentTwitterImage" src="" alt="Twitter image">
+                                                                <button type="button" class="remove-image-btn" id="removeTwitterImageBtn" title="Remove image">×</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Twitter Title</label>
+                                                        <input type="text" name="twitter_title" class="form-control"
+                                                            maxlength="255" placeholder="Empty = Open Graph title">
+                                                        <span class="text-danger error-text twitter_title_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Twitter Description</label>
+                                                        <textarea name="twitter_description" rows="2" class="form-control"
+                                                            maxlength="500" placeholder="Empty = Open Graph description"></textarea>
+                                                        <span class="text-danger error-text twitter_description_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -405,6 +511,16 @@
                 $('textarea[name="content"]').val(data.content);
                 $('#postIsActive').prop('checked', !!data.is_active);
                 $('#postCommentsEnabled').prop('checked', !!data.comments_enabled);
+                $('input[name="meta_title"]').val(data.meta_title || '');
+                $('textarea[name="meta_description"]').val(data.meta_description || '');
+                $('input[name="meta_keywords"]').val(data.meta_keywords || '');
+                $('input[name="og_title"]').val(data.og_title || '');
+                $('textarea[name="og_description"]').val(data.og_description || '');
+                setSeoImagePreview('og', data.og_image);
+                $('select[name="twitter_card"]').val(data.twitter_card || 'summary_large_image');
+                $('input[name="twitter_title"]').val(data.twitter_title || '');
+                $('textarea[name="twitter_description"]').val(data.twitter_description || '');
+                setSeoImagePreview('twitter', data.twitter_image);
                 $('input[name="remove_image"]').val('0');
                 $('#postImageInput').val('');
 
@@ -428,6 +544,19 @@
             $('#currentImage').attr('src', '');
             $('input[name="remove_image"]').val('1');
             $('#postImageInput').val('');
+        });
+
+        $(document).on('click', '#removeOgImageBtn, #removeTwitterImageBtn', function() {
+            const kind = this.id === 'removeOgImageBtn' ? 'og' : 'twitter';
+            seoImagePreviewEl(kind, 'preview').hide();
+            seoImagePreviewEl(kind, 'img').attr('src', '');
+            $('input[name="remove_' + kind + '_image"]').val('1');
+            seoImagePreviewEl(kind, 'input').val('');
+        });
+
+        $(document).on('change', '#postOgImageInput, #postTwitterImageInput', function() {
+            const kind = this.id === 'postOgImageInput' ? 'og' : 'twitter';
+            $('input[name="remove_' + kind + '_image"]').val('0');
         });
 
         $(document).on('click', '.toggle-comments-btn', function() {
@@ -765,12 +894,46 @@
         });
     }
 
+    function seoImagePreviewEl(kind, part) {
+        if (part === 'preview') {
+            return kind === 'og' ? $('#currentOgImagePreview') : $('#currentTwitterImagePreview');
+        }
+        if (part === 'img') {
+            return kind === 'og' ? $('#currentOgImage') : $('#currentTwitterImage');
+        }
+        return kind === 'og' ? $('#postOgImageInput') : $('#postTwitterImageInput');
+    }
+
+    function resolvePostImageUrl(path) {
+        if (!path) return '';
+        return String(path).startsWith('http')
+            ? path
+            : (postImageBaseUrl + '/' + String(path).replace(/^uploads\/posts\//, ''));
+    }
+
+    function setSeoImagePreview(kind, path) {
+        const url = resolvePostImageUrl(path);
+
+        if (url) {
+            seoImagePreviewEl(kind, 'preview').show();
+            seoImagePreviewEl(kind, 'img').attr('src', url);
+        } else {
+            seoImagePreviewEl(kind, 'preview').hide();
+            seoImagePreviewEl(kind, 'img').attr('src', '');
+        }
+
+        $('input[name="remove_' + kind + '_image"]').val('0');
+        seoImagePreviewEl(kind, 'input').val('');
+    }
+
     function resetPostForm() {
         $('#postForm')[0].reset();
         $('input[name="remove_image"]').val('0');
         $('#postImageInput').val('');
         $('#currentImagePreview').hide();
         $('#currentImage').attr('src', '');
+        setSeoImagePreview('og', null);
+        setSeoImagePreview('twitter', null);
         $('.error-text').text('');
         currentPostId = null;
         $('#postModalTitle').text('Create New Post');
@@ -778,6 +941,8 @@
         $('#postIsActive').prop('checked', true);
         $('#postCommentsEnabled').prop('checked', true);
         $('#postAuthorSelect').val(authUserId);
+        $('#postSeoCollapse').removeClass('show');
+        $('#postSeoAccordion .accordion-button').addClass('collapsed').attr('aria-expanded', 'false');
     }
 
     function resetCategoryForm() {

@@ -60,7 +60,7 @@ class PostController extends Controller
             ->select('id', 'name')
             ->get();
 
-        return view('backend.post.index', compact('categories', 'authors'));
+        return view('backend.blog.post.index', compact('categories', 'authors'));
     }
 
     // Store — same simple pattern as MenuController@store
@@ -72,6 +72,16 @@ class PostController extends Controller
             'author_id' => 'nullable|integer|exists:users,id',
             'content' => 'required|string|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
+            'twitter_card' => 'nullable|string|in:summary,summary_large_image',
+            'twitter_title' => 'nullable|string|max:255',
+            'twitter_description' => 'nullable|string|max:500',
+            'twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
         ]);
 
         try {
@@ -89,6 +99,9 @@ class PostController extends Controller
                     'author_id' => $request->author_id ?? Auth::id(),
                     'content' => $request->input('content'),
                     'image' => $imagePath,
+                    ...$this->seoPayload($request),
+                    'og_image' => $this->resolveSeoImage($request, 'og_image', 'remove_og_image'),
+                    'twitter_image' => $this->resolveSeoImage($request, 'twitter_image', 'remove_twitter_image'),
                     'is_active' => $request->has('is_active') ? $request->boolean('is_active') : true,
                     'comments_enabled' => $request->has('comments_enabled') ? $request->boolean('comments_enabled') : true,
                 ]);
@@ -120,6 +133,16 @@ class PostController extends Controller
             'author_id' => 'nullable|integer|exists:users,id',
             'content' => 'required|string|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
+            'twitter_card' => 'nullable|string|in:summary,summary_large_image',
+            'twitter_title' => 'nullable|string|max:255',
+            'twitter_description' => 'nullable|string|max:500',
+            'twitter_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072',
         ]);
 
         try {
@@ -148,6 +171,9 @@ class PostController extends Controller
                     'author_id' => $request->author_id ?? Auth::id(),
                     'content' => $request->input('content'),
                     'image' => $imagePath,
+                    ...$this->seoPayload($request),
+                    'og_image' => $this->resolveSeoImage($request, 'og_image', 'remove_og_image', $post->og_image),
+                    'twitter_image' => $this->resolveSeoImage($request, 'twitter_image', 'remove_twitter_image', $post->twitter_image),
                     'is_active' => $request->has('is_active') ? $request->boolean('is_active') : false,
                     'comments_enabled' => $request->has('comments_enabled') ? $request->boolean('comments_enabled') : true,
                 ]);
@@ -165,9 +191,9 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        if ($post->image && file_exists(public_path('uploads/posts/'.$post->image))) {
-            unlink(public_path('uploads/posts/'.$post->image));
-        }
+        $this->deleteUploadedImage($post->image);
+        $this->deleteUploadedImage($post->og_image);
+        $this->deleteUploadedImage($post->twitter_image);
 
         $post->delete();
 
@@ -186,6 +212,61 @@ class PostController extends Controller
             'success' => true,
             'message' => 'Comments '.($post->comments_enabled ? 'enabled' : 'disabled'),
         ]);
+    }
+
+    private function seoPayload(Request $request): array
+    {
+        $fields = [
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'og_title',
+            'og_description',
+            'twitter_card',
+            'twitter_title',
+            'twitter_description',
+        ];
+
+        $payload = [];
+
+        foreach ($fields as $field) {
+            $value = $request->input($field);
+            $payload[$field] = is_string($value) && trim($value) !== '' ? trim($value) : null;
+        }
+
+        return $payload;
+    }
+
+    private function resolveSeoImage(Request $request, string $field, string $removeField, ?string $current = null): ?string
+    {
+        if ($request->hasFile($field)) {
+            $this->deleteUploadedImage($current);
+
+            return $this->uploadService->uploadTo($request->file($field), public_path('uploads/posts'));
+        }
+
+        if ($request->boolean($removeField)) {
+            $this->deleteUploadedImage($current);
+
+            return null;
+        }
+
+        return $current;
+    }
+
+    private function deleteUploadedImage(?string $path): void
+    {
+        if (! $path || str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return;
+        }
+
+        $fullPath = str_contains($path, '/')
+            ? public_path($path)
+            : public_path('uploads/posts/'.$path);
+
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+        }
     }
 
     private function uniqueSlug(string $slug, ?int $ignoreId = null): string

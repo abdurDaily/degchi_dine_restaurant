@@ -35,13 +35,13 @@ class BlogCategoryController extends Controller
                     return '<span class="status-badge ' . $class . '">' . $label . '</span>';
                 })
                 ->addColumn('action', function (BlogCategory $category) {
-                    return view('backend.blogCategory.partials.action', compact('category'))->render();
+                    return view('backend.blog.blogCategory.partials.action', compact('category'))->render();
                 })
                 ->rawColumns(['status', 'action'])
                 ->make(true);
         }
 
-        return view('backend.blogCategory.index');
+        return view('backend.blog.blogCategory.index');
     }
 
     public function store(Request $request)

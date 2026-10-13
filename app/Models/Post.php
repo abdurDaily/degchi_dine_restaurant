@@ -20,6 +20,16 @@ class Post extends Model
         'slug',
         'content',
         'image',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'og_title',
+        'og_description',
+        'og_image',
+        'twitter_card',
+        'twitter_title',
+        'twitter_description',
+        'twitter_image',
         'is_active',
         'comments_enabled',
         'view_count',
@@ -65,23 +75,78 @@ class Post extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (! $this->image) {
-            return null;
-        }
-
-        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
-            return $this->image;
-        }
-
-        if (str_contains($this->image, '/')) {
-            return asset($this->image);
-        }
-
-        return asset('uploads/posts/' . $this->image);
+        return $this->absoluteUrl($this->image);
     }
 
     public function scopePublished($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function seoTitle(): string
+    {
+        return $this->meta_title ?: $this->title;
+    }
+
+    public function seoDescription(): string
+    {
+        return $this->meta_description ?: $this->excerpt;
+    }
+
+    public function seoKeywords(): ?string
+    {
+        return $this->meta_keywords ?: null;
+    }
+
+    public function ogTitle(): string
+    {
+        return $this->og_title ?: $this->seoTitle();
+    }
+
+    public function ogDescription(): string
+    {
+        return $this->og_description ?: $this->seoDescription();
+    }
+
+    public function ogImageUrl(): ?string
+    {
+        return $this->absoluteUrl($this->og_image) ?: $this->image_url;
+    }
+
+    public function twitterTitle(): string
+    {
+        return $this->twitter_title ?: $this->ogTitle();
+    }
+
+    public function twitterDescription(): string
+    {
+        return $this->twitter_description ?: $this->ogDescription();
+    }
+
+    public function twitterImageUrl(): ?string
+    {
+        return $this->absoluteUrl($this->twitter_image) ?: $this->ogImageUrl();
+    }
+
+    public function twitterCardType(): string
+    {
+        return $this->twitter_card ?: 'summary_large_image';
+    }
+
+    protected function absoluteUrl(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+
+        if (str_contains($value, '/')) {
+            return asset($value);
+        }
+
+        return asset('uploads/posts/' . $value);
     }
 }

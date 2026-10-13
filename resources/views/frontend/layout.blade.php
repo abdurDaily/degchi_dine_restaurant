@@ -13,6 +13,13 @@
     $pageMetaRobots = trim($__env->yieldContent('meta_robots'));
     $pageMetaType = trim($__env->yieldContent('meta_type'));
     $pageMetaCanonical = trim($__env->yieldContent('meta_canonical'));
+    $pageOgTitle = trim($__env->yieldContent('meta_og_title'));
+    $pageOgDescription = trim($__env->yieldContent('meta_og_description'));
+    $pageOgImage = trim($__env->yieldContent('meta_og_image'));
+    $pageTwitterTitle = trim($__env->yieldContent('meta_twitter_title'));
+    $pageTwitterDescription = trim($__env->yieldContent('meta_twitter_description'));
+    $pageTwitterImage = trim($__env->yieldContent('meta_twitter_image'));
+    $pageTwitterCard = trim($__env->yieldContent('meta_twitter_card'));
   @endphp
   <x-seo-meta
     :title="$pageMetaTitle ?: null"
@@ -22,6 +29,13 @@
     :robots="$pageMetaRobots ?: null"
     :type="$pageMetaType ?: null"
     :canonical="$pageMetaCanonical ?: null"
+    :ogTitle="$pageOgTitle ?: null"
+    :ogDescription="$pageOgDescription ?: null"
+    :ogImage="$pageOgImage ?: null"
+    :twitterTitle="$pageTwitterTitle ?: null"
+    :twitterDescription="$pageTwitterDescription ?: null"
+    :twitterImage="$pageTwitterImage ?: null"
+    :twitterCard="$pageTwitterCard ?: null"
   />
 
   <!-- Favicon -->
