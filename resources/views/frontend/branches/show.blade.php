@@ -3,6 +3,32 @@
 @section('meta_title', $branch->name . ' — Branch Menu')
 @section('meta_description', 'Browse the Degchi Dine menu at ' . $branch->name . '. Order for quick delivery via FoodPanda, Pathao, or Foodi.')
 
+@push('json_ld')
+@php
+    $branchJsonLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Restaurant',
+        'name' => $branch->name,
+        'url' => route('frontend.branches.show', $branch->slug),
+        'image' => asset('assets/frontend/images/degchi-dine-logo.webp'),
+        'servesCuisine' => ['Bangladeshi', 'Biryani', 'Kacchi', 'Mezban'],
+        'priceRange' => '$$',
+    ];
+    if ($branch->phone) {
+        $branchJsonLd['telephone'] = $branch->phone;
+    }
+    if ($branch->location) {
+        $branchJsonLd['address'] = [
+            '@type' => 'PostalAddress',
+            'streetAddress' => $branch->location,
+            'addressLocality' => 'Chittagong',
+            'addressCountry' => 'BD',
+        ];
+    }
+@endphp
+<script type="application/ld+json">{!! json_encode($branchJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
+
 @section('frontend_content')
 @php
     $phoneDigits = preg_replace('/\D+/', '', $branch->phone ?? '');

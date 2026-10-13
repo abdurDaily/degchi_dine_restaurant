@@ -97,14 +97,23 @@ class SeoSettings
             return $override;
         }
 
-        $base = rtrim($this->get('seo_canonical_url', config('app.url')), '/');
+        // Admin-pinned base wins (forces e.g. https://www), otherwise derive from the live request host.
+        $base = rtrim($this->get('seo_canonical_url') ?: url('/'), '/');
         $path = request()->getPathInfo();
 
         if ($path === '' || $path === '/') {
             return $base . '/';
         }
 
-        return $base . $path;
+        $canonical = $base . $path;
+
+        // Paginated pages must self-reference; tracking params are dropped.
+        $page = request()->query('page');
+        if ($page !== null && $page !== '' && (string) $page !== '1') {
+            $canonical .= '?page=' . urlencode((string) $page);
+        }
+
+        return $canonical;
     }
 
     public function googleAnalyticsId(): ?string

@@ -86,6 +86,7 @@ Route::middleware(['auth', 'setLocale', 'user.active'])->group(function () {
     Route::get('seo-setting', [SettingController::class, 'seoSetting'])->name('seo-setting')->middleware('can:general-setting');
     Route::post('seo-setting', [SettingController::class, 'seoSettingStore'])->name('seo-setting.store')->middleware('can:general-setting');
     Route::post('seo-og-image-upload', [SettingController::class, 'seoOgImageUpload'])->name('seo-setting-og-image.store')->middleware('can:general-setting');
+    Route::post('seo-og-image-delete', [SettingController::class, 'seoOgImageDestroy'])->name('seo-setting-og-image.delete')->middleware('can:general-setting');
 
 
     Route::middleware('role:Super Admin')->group(function () {

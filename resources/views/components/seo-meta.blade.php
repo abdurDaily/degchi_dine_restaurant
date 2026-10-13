@@ -36,6 +36,8 @@
     $gtmId = $seo->googleTagManagerId();
     $pixelId = $seo->facebookPixelId();
     $headScripts = $seo->headScripts();
+    $seoLocale = str_replace('-', '_', config('app.locale', 'en'));
+    $seoLocaleTag = str_replace('_', '-', $seoLocale);
 @endphp
 
 <title>{{ $metaTitle }}</title>
@@ -47,12 +49,13 @@
 <link rel="canonical" href="{{ $metaCanonical }}">
 
 <meta property="og:site_name" content="{{ $seo->siteName() }}">
+<meta property="og:locale" content="{{ $seoLocale }}">
 <meta property="og:title" content="{{ $metaOgTitle }}">
 <meta property="og:description" content="{{ $metaOgDescription }}">
 <meta property="og:type" content="{{ $metaType }}">
 <meta property="og:url" content="{{ $metaCanonical }}">
 <meta property="og:image" content="{{ $metaOgImage }}">
-<meta property="og:image:alt" content="{{ $seo->siteName() }}">
+<meta property="og:image:alt" content="{{ $metaOgTitle }}">
 
 <meta name="twitter:card" content="{{ $metaTwitterCard }}">
 <meta name="twitter:title" content="{{ $metaTwitterTitle }}">
@@ -106,6 +109,30 @@
 @endif
 
 @once
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": @json($seo->siteName()),
+    "url": @json(url('/')),
+    "inLanguage": @json($seoLocaleTag)
+}
+</script>
+@if(!request()->routeIs('frontend.home'))
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": @json($seo->siteName()),
+    "url": @json(url('/')),
+    "logo": @json(asset('assets/frontend/images/degchi-dine-logo.webp')),
+    "sameAs": [
+        "https://www.facebook.com/DegchiDine",
+        "https://www.instagram.com/degchi.dine/"
+    ]
+}
+</script>
+@endif
 @if(request()->routeIs('frontend.home'))
 @php
     $contactSettings = cache()->remember('home_contact_settings', 1800, function () {
@@ -151,3 +178,5 @@
 </script>
 @endif
 @endonce
+
+@stack('json_ld')

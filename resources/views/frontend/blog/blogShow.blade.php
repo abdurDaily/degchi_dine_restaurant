@@ -7,7 +7,6 @@
 @section('meta_image', $post->ogImageUrl() ?: '')
 @section('meta_robots', 'index, follow')
 @section('meta_type', 'article')
-@section('meta_canonical', route('frontend.blog.show', $post->slug))
 @section('meta_og_title', $post->ogTitle())
 @section('meta_og_description', $post->ogDescription())
 @section('meta_og_image', $post->ogImageUrl() ?: '')
@@ -16,34 +15,38 @@
 @section('meta_twitter_image', $post->twitterImageUrl() ?: '')
 @section('meta_twitter_card', $post->twitterCardType())
 
+@push('json_ld')
+@php
+    $blogJsonLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BlogPosting',
+        'mainEntityOfPage' => [
+            '@type' => 'WebPage',
+            'id' => route('frontend.blog.show', $post->slug),
+        ],
+        'headline' => $post->title,
+        'description' => $post->seoDescription(),
+        'image' => $post->ogImageUrl() ?: asset('assets/frontend/images/degchi-dine-logo.webp'),
+        'datePublished' => $post->created_at->toIso8601String(),
+        'dateModified' => $post->updated_at->toIso8601String(),
+        'author' => [
+            '@type' => 'Person',
+            'name' => $post->author?->name ?? config('app.name'),
+        ],
+        'publisher' => [
+            '@type' => 'Organization',
+            'name' => app(\App\Support\SeoSettings::class)->siteName(),
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => asset('assets/frontend/images/degchi-dine-logo.webp'),
+            ],
+        ],
+    ];
+@endphp
+<script type="application/ld+json">{!! json_encode($blogJsonLd) !!}</script>
+@endpush
+
 @section('frontend_content')
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": @json(route('frontend.blog.show', $post->slug))
-    },
-    "headline": @json($post->title),
-    "description": @json($post->seoDescription()),
-    "image": @json($post->ogImageUrl() ?: asset('assets/frontend/images/degchi-dine-logo.webp')),
-    "datePublished": @json($post->created_at->toIso8601String()),
-    "dateModified": @json($post->updated_at->toIso8601String()),
-    "author": {
-        "@type": "Person",
-        "name": @json($post->author?->name ?? config('app.name'))
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": @json(app(\App\Support\SeoSettings::class)->siteName()),
-        "logo": {
-            "@type": "ImageObject",
-            "url": @json(asset('assets/frontend/images/degchi-dine-logo.webp'))
-        }
-    }
-}
-</script>
 @php
     $heroLead = \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($post->content))), 140);
 @endphp

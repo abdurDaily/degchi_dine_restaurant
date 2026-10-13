@@ -1,6 +1,6 @@
 @extends('frontend.layout')
 
-@section('meta_title', 'Add to card')
+@section('meta_title', 'Add to Cart')
 @section('meta_robots', 'noindex, nofollow')
 
 @section('frontend_content')

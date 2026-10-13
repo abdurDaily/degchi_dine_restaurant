@@ -1,6 +1,6 @@
 @extends('frontend.layout')
 
-@section('meta_title', 'About Us — Degchi Dine')
+@section('meta_title', 'About Us')
 @section('meta_description', 'Learn about Degchi Dine — our heritage, story, authentic Dum-style cooking and the passion
     behind every clay-pot meal.')
 

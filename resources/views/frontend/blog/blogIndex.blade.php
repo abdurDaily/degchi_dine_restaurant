@@ -4,7 +4,6 @@
 @section('meta_description', 'Read the Degchi Dine blog — stories from our kitchen, recipes, offers and dining news from Chittagong.')
 @section('meta_keywords', 'degchi dine blog, bangladeshi food blog, kacchi recipe, biryani recipe, restaurant news chittagong')
 @section('meta_robots', 'index, follow')
-@section('meta_canonical', route('frontend.blog.index'))
 
 @section('frontend_content')
 

@@ -15,9 +15,9 @@
     {{-- Desktop hero content --}}
     <div class="container hero-content px-4 px-lg-5 d-none d-lg-flex align-items-center justify-content-center">
         <div class="text-center w-100">
-            <h2 class="hero-title">
-                Home Of Traditional Mezban, Kacchi & Bangla Food
-            </h2>
+            <h1 class="hero-title">
+                Home Of Traditional Mezban, Kacchi &amp; Bangla Food
+            </h1>
             <p class="hero-copy mt-3 mb-4 mx-auto">
                 From slow-cooked Kacchi to flavorful Biriyani, we bring generations of tradition, rich spices, and
                 unforgettable aromas together to create a dining experience that feels like a celebration in every bite.
@@ -33,9 +33,9 @@
     {{-- Mobile hero content --}}
     <div class="hero-mobile-stack d-flex d-lg-none align-items-center justify-content-center">
         <div class="hero-mobile-inner text-center px-3">
-            <h2 class="hero-mobile-title">
+            <h1 class="hero-mobile-title">
                 Home Of Traditional Mezban, Kacchi &amp; Bangla Food
-            </h2>
+            </h1>
             <p class="hero-mobile-copy mx-auto mb-3">
                 Generations of tradition, rich spices, and unforgettable aromas in every bite.
             </p>

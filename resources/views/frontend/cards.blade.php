@@ -13,7 +13,7 @@
                 <!-- Title Panel -->
                 <div class="text-center my-5 reveal visible">
                     <span class="luxury-meta-label mb-2">ডেগচি রিওয়ার্ডস</span>
-                    <h2 class="luxury-title">আপনার ডাইনিং অভিজ্ঞতাকে আরও বিশেষ করে তুলুন</h2>
+                    <h1 class="luxury-title">আপনার ডাইনিং অভিজ্ঞতাকে আরও বিশেষ করে তুলুন</h1>
                     <div class="luxury-accent-line mx-auto"></div>
                 </div>
 

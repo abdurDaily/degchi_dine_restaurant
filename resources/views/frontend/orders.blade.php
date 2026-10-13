@@ -1,4 +1,9 @@
 @extends('frontend.layout')
+
+@section('meta_title', 'My Orders')
+@section('meta_description', 'View your Degchi Dine order history, invoices and order status.')
+@section('meta_robots', 'noindex, nofollow')
+
 @section('frontend_content')
 <div class="container px-4 px-lg-5 my-5">
     <h2>Your Orders</h2>

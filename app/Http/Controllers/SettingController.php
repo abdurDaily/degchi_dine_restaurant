@@ -494,7 +494,7 @@ class SettingController extends Controller
                     ['key' => $key],
                     [
                         'setting_group' => 'seo_setting',
-                        'value' => $request->input($key, ''),
+                        'value' => $request->input($key) ?? '',
                         'user_id' => Auth::id(),
                     ]
                 );
@@ -509,6 +509,7 @@ class SettingController extends Controller
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
+            report($th);
 
             return response()->json([
                 'status' => 'error',
@@ -553,6 +554,28 @@ class SettingController extends Controller
             'status' => 'success',
             'message' => 'Open Graph image uploaded successfully.',
             'url' => asset('storage/seo/' . $images['seo_og_image']),
+            'file' => $images['seo_og_image'],
+        ]);
+    }
+
+    public function seoOgImageDestroy(Request $request)
+    {
+        $setting = Setting::where('key', 'seo_og_image')->first();
+
+        if ($setting && $setting->value) {
+            $filePath = 'seo/' . basename($setting->value);
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+
+            $setting->delete();
+            SeoSettings::clearCache();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Open Graph image removed.',
         ]);
     }
 }

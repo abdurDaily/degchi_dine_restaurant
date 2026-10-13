@@ -6,20 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   @php
-    $pageMetaTitle = trim($__env->yieldContent('meta_title'));
-    $pageMetaDescription = trim($__env->yieldContent('meta_description'));
-    $pageMetaKeywords = trim($__env->yieldContent('meta_keywords'));
-    $pageMetaImage = trim($__env->yieldContent('meta_image'));
-    $pageMetaRobots = trim($__env->yieldContent('meta_robots'));
-    $pageMetaType = trim($__env->yieldContent('meta_type'));
-    $pageMetaCanonical = trim($__env->yieldContent('meta_canonical'));
-    $pageOgTitle = trim($__env->yieldContent('meta_og_title'));
-    $pageOgDescription = trim($__env->yieldContent('meta_og_description'));
-    $pageOgImage = trim($__env->yieldContent('meta_og_image'));
-    $pageTwitterTitle = trim($__env->yieldContent('meta_twitter_title'));
-    $pageTwitterDescription = trim($__env->yieldContent('meta_twitter_description'));
-    $pageTwitterImage = trim($__env->yieldContent('meta_twitter_image'));
-    $pageTwitterCard = trim($__env->yieldContent('meta_twitter_card'));
+    $pageMetaTitle = trim((string) $__env->yieldContent('meta_title'));
+    $pageMetaDescription = trim((string) $__env->yieldContent('meta_description'));
+    $pageMetaKeywords = trim((string) $__env->yieldContent('meta_keywords'));
+    $pageMetaImage = trim((string) $__env->yieldContent('meta_image'));
+    $pageMetaRobots = trim((string) $__env->yieldContent('meta_robots'));
+    $pageMetaType = trim((string) $__env->yieldContent('meta_type'));
+    $pageMetaCanonical = trim((string) $__env->yieldContent('meta_canonical'));
+    $pageOgTitle = trim((string) $__env->yieldContent('meta_og_title'));
+    $pageOgDescription = trim((string) $__env->yieldContent('meta_og_description'));
+    $pageOgImage = trim((string) $__env->yieldContent('meta_og_image'));
+    $pageTwitterTitle = trim((string) $__env->yieldContent('meta_twitter_title'));
+    $pageTwitterDescription = trim((string) $__env->yieldContent('meta_twitter_description'));
+    $pageTwitterImage = trim((string) $__env->yieldContent('meta_twitter_image'));
+    $pageTwitterCard = trim((string) $__env->yieldContent('meta_twitter_card'));
   @endphp
   <x-seo-meta
     :title="$pageMetaTitle ?: null"

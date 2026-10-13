@@ -1,9 +1,6 @@
 @extends('frontend.layout')
 
-@section('meta_title', 'Home')
-@section('meta_description',
-    'Degchi Dine — authentic kacchi, biriyani and clay-pot dining in Halishahar, Chittagong.
-    Order online or book your table today.')
+@section('meta_description', 'Degchi Dine — authentic kacchi, biriyani and clay-pot dining in Halishahar, Chittagong. Order online or book your table today.')
 
 @section('frontend_content')
     @include('frontend.partials.home.hero')
