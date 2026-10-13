@@ -5,7 +5,7 @@
             <div class="reels-section-header">
                 <div class="reels-header-left">
                     <x-frontend.section-heading title="ফেসবুকে আমাদের দেখুন"
-                        subtitle="ডেগচি ডাইন এর অতিথিদের প্রাণবন্ত পরিবেশ—প্রতি সপ্তাহে নতুন নতুন রিলস।" icon="line"
+                        subtitle="ডেক্সিডাইন এর অতিথিদের প্রাণবন্ত পরিবেশ—প্রতি সপ্তাহে নতুন নতুন রিলস।" icon="line"
                         align="start" :showDivider="false" />
                     <div class="reels-header-cta-mobile d-md-none mt-3">
                         <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"

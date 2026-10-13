@@ -61,7 +61,7 @@
                     <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer"
                         class="btn-dine btn-dine-ghost btn-dine-sm" style="font-size: 12px;">
                         <i class="fa-solid fa-diamond-turn-right"></i>
-                        পথনির্দেশ দেখুন
+                        ম্যাপ দেখুন
                     </a>
                     <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-primary btn-dine-sm"
                         style="font-size: 12px;">

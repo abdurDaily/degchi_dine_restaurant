@@ -25,7 +25,7 @@
             $offerPercent = (int) ($bestOffer->discount_percent ?? 0);
             $offerPrice = $bestOffer ? round($unitPrice * (1 - $offerPercent / 100), 2) : $unitPrice;
         @endphp
-        <div class="col-12 col-sm-6 col-lg-4 d-flex reveal-scale visible">
+        <div class="col-12 col-sm-4 col-lg-3 d-flex reveal-scale visible">
             <x-frontend.product.product-card :menu="$menu" :firstVariation="$firstVariation" :activeOffers="$activeOffers" :bestOffer="$bestOffer"
                 :unitPrice="$unitPrice" :offerPrice="$offerPrice" cartIcon="bi-cart-plus" />
         </div>

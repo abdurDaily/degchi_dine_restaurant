@@ -13429,7 +13429,7 @@ body {
    BRANCH SHOW PAGE (single branch menu + delivery)
    ========================================================================== */
 .branch-show-page {
-    padding-bottom: 4rem;
+    padding-bottom: 0;
 }
 
 .branch-show-hero .dd-apply-headline {
@@ -13667,8 +13667,14 @@ body {
     transform: translateY(-1px);
 }
 
+.branch-show-menu-band {
+    background: linear-gradient(160deg, #1a3a4a 0%, #0f2a38 50%, #162e3c 100%);
+    padding-top: 1.75rem;
+    padding-bottom: 1rem;
+}
+
 .branch-show-toolbar-wrap {
-    margin-top: 1.75rem;
+    margin-top: 0;
 }
 
 .branch-show-toolbar {
@@ -13846,6 +13852,15 @@ body {
     color: #116b83;
     opacity: 0.5;
     margin-bottom: 0.75rem;
+}
+
+.branch-show-menu-band .branch-show-empty {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.branch-show-menu-band .branch-show-empty iconify-icon {
+    color: var(--brand-gold);
+    opacity: 0.85;
 }
 
 @media (max-width: 991.98px) {
@@ -14720,7 +14735,7 @@ body {
 }
 
 .party-booking-open-badge {
-    flex-shrink: 0;
+   flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     padding: 0.35rem 0.75rem;
@@ -14729,9 +14744,10 @@ body {
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--brand-secondary);
-    background: var(--secondary-10);
+    color: #fff;
+    background: var(--brand-secondary);
     border: 1px solid var(--secondary-25);
+    margin-bottom: 26px;
 }
 
 /* --- Media (video) highlight --- */

@@ -94,65 +94,68 @@
         </div>
     </div>
 
-    <div class="container px-4 px-lg-5 branch-show-toolbar-wrap">
-        <div class="branch-show-toolbar">
-            <div class="branch-show-search-wrap">
-                <i class="bi bi-search branch-show-search-icon" aria-hidden="true"></i>
-                <input type="text" class="branch-show-search" id="menuSearch" placeholder="Search menu items…" autocomplete="off">
-                <div class="branch-show-search-results" id="searchResults"></div>
-            </div>
+    <div class="branch-show-menu-band">
+        <div class="container px-4 px-lg-5 branch-show-toolbar-wrap">
+            <div class="branch-show-toolbar">
+                <div class="branch-show-search-wrap">
+                    <i class="bi bi-search branch-show-search-icon" aria-hidden="true"></i>
+                    <input type="text" class="branch-show-search" id="menuSearch" placeholder="Search menu items…" autocomplete="off">
+                    <div class="branch-show-search-results" id="searchResults"></div>
+                </div>
 
-            <div class="branch-show-categories" id="categoryNav">
-                <button type="button" class="branch-show-category-btn active" data-category="all">All Items</button>
-                @foreach($categories as $category)
-                    <button type="button" class="branch-show-category-btn" data-category="{{ $category->id }}">{{ $category->name }}</button>
-                @endforeach
+                <div class="branch-show-categories" id="categoryNav">
+                    <button type="button" class="branch-show-category-btn active" data-category="all">All Items</button>
+                    @foreach($categories as $category)
+                        <button type="button" class="branch-show-category-btn" data-category="{{ $category->id }}">{{ $category->name }}</button>
+                    @endforeach
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="container px-4 px-lg-5 pb-5 branch-show-menu-wrap">
-        @if($categories->isEmpty() || $categories->every(fn($c) => $c->menus->isEmpty()))
-            <div class="branch-show-empty">
-                <iconify-icon icon="solar:chef-hat-outline" width="56" height="56"></iconify-icon>
-                <p>No menu items available for this branch yet.</p>
-            </div>
-        @else
-            <div class="row g-4" id="menuGrid">
-                    @foreach($categories as $category)
-                    @foreach($category->menus as $menu)
-                        @php
-                            $viewerMember = Auth::guard('member')->user();
-                            $firstVariation = $menu->variations->sortBy('price')->first();
-                            $minPrice = (float) ($menu->variations->min('price') ?? 0);
-                            $activeOffers = $firstVariation
-                                ? $firstVariation->resolveApplicableOffers($viewerMember, true)
-                                : collect();
-                            $bestOffer = $activeOffers->first();
-                            $offerPercent = (int) ($bestOffer->discount_percent ?? 0);
-                            $offerPrice = $bestOffer
-                                ? round($minPrice * (1 - $offerPercent / 100), 2)
-                                : $minPrice;
-                        @endphp
-                        <div class="col-12 col-sm-6 col-lg-4 d-flex branch-show-menu-item"
-                            data-category="{{ $category->id }}"
-                            data-menu-id="{{ $menu->id }}"
-                            data-menu-name="{{ $menu->name }}"
-                            data-menu-price="{{ $minPrice }}">
-                            <x-frontend.product.product-card
-                                :menu="$menu"
-                                :firstVariation="$firstVariation"
-                                :bestOffer="$bestOffer"
-                                :unitPrice="$minPrice"
-                                :offerPrice="$offerPrice"
-                                :linked="false"
-                                cartIcon="bi-plus-lg"
-                            />
-                        </div>
+        <div class="container px-4 px-lg-5 pb-5 branch-show-menu-wrap">
+            @if($categories->isEmpty() || $categories->every(fn($c) => $c->menus->isEmpty()))
+                <div class="branch-show-empty">
+                    <iconify-icon icon="solar:chef-hat-outline" width="56" height="56"></iconify-icon>
+                    <p>No menu items available for this branch yet.</p>
+                </div>
+            @else
+                <div class="row g-4" id="menuGrid">
+                        @foreach($categories as $category)
+                        @foreach($category->menus as $menu)
+                            @php
+                                $viewerMember = Auth::guard('member')->user();
+                                $firstVariation = $menu->variations->sortBy('price')->first();
+                                $minPrice = (float) ($menu->variations->min('price') ?? 0);
+                                $activeOffers = $firstVariation
+                                    ? $firstVariation->resolveApplicableOffers($viewerMember, true)
+                                    : collect();
+                                $bestOffer = $activeOffers->first();
+                                $offerPercent = (int) ($bestOffer->discount_percent ?? 0);
+                                $offerPrice = $bestOffer
+                                    ? round($minPrice * (1 - $offerPercent / 100), 2)
+                                    : $minPrice;
+                            @endphp
+                            <div class="col-12 col-sm-6 col-lg-4 d-flex branch-show-menu-item"
+                                data-category="{{ $category->id }}"
+                                data-menu-id="{{ $menu->id }}"
+                                data-menu-name="{{ $menu->name }}"
+                                data-menu-price="{{ $minPrice }}">
+                                <x-frontend.product.product-card
+                                    :menu="$menu"
+                                    :firstVariation="$firstVariation"
+                                    :activeOffers="$activeOffers"
+                                    :bestOffer="$bestOffer"
+                                    :unitPrice="$minPrice"
+                                    :offerPrice="$offerPrice"
+                                    :linked="false"
+                                    cartIcon="bi-plus-lg"
+                                />
+                            </div>
+                        @endforeach
                     @endforeach
-                @endforeach
-            </div>
-        @endif
+                </div>
+            @endif
+        </div>
     </div>
 </section>
 

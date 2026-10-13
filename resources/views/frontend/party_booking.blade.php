@@ -1,13 +1,13 @@
 @extends('frontend.layout')
 
 @section('meta_title', 'Party Booking')
-@section('meta_description', 'Reserve Degchi Dine for birthdays, anniversaries, corporate events and family
+@section('meta_description',
+    'Reserve Degchi Dine for birthdays, anniversaries, corporate events and family
     get-togethers. Spacious venues, customized platters and premium hospitality.')
 
 @section('frontend_content')
     <x-frontend.page-header title="পার্টি আয়োজনের জন্য বুকিং করুন" eyebrow="পার্টি বুকিং"
-        subtitle="আপনার বিশেষ আয়োজনের জন্য উপভোগ করুন ঐতিহ্যবাহী স্বাদ ও প্রিমিয়াম আতিথেয়তার চমৎকার সমন্বয়।"
-        :backLink="route('frontend.home')" backText="হোমে ফিরে যান">
+        subtitle="আপনার বিশেষ আয়োজনের জন্য উপভোগ করুন ঐতিহ্যবাহী স্বাদ ও প্রিমিয়াম আতিথেয়তার চমৎকার সমন্বয়।">
         <x-slot:eyebrowIcon>
             <iconify-icon icon="solar:birthday-cake-bold"></iconify-icon>
         </x-slot:eyebrowIcon>
@@ -25,7 +25,7 @@
                                 <h2 class="party-booking-info-title">আমাদের সঙ্গে উদযাপন করুন</h2>
                                 <p class="party-booking-info-tagline">প্রশস্ত আয়োজন · পছন্দমতো মেনু · প্রিমিয়াম সেবা</p>
                             </div>
-                            <span class="party-booking-open-badge"><i class="bi bi-people-fill me-1"></i> ২০+ অতিথি</span>
+                            <span class="party-booking-open-badge"><i class="bi bi-people-fill me-1"></i> ৩০০+ অতিথি</span>
                         </div>
 
                         {{-- Media Highlight --}}
