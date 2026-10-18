@@ -15919,6 +15919,25 @@ body {
     border-color: var(--brand-secondary);
 }
 
+.blog-sidebar-card .category-badge.active {
+    background: var(--brand-secondary);
+    color: #fff;
+    border-color: var(--brand-secondary);
+}
+
+.blog-sidebar-card .category-badge .category-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
 /* ── Blog Sidebar ── */
 .blog-sidebar-card {
     background: var(--card-dark-bg);
@@ -16810,4 +16829,16 @@ body {
 
 .font-bn-display {
     font-family: var(--font-bn-display);
+}
+
+/* ==========================================================================
+   100. PAGE HERO — clear fixed mobile topbar (padding-only offset)
+   At ≤767.98px .mobile-topbar is position:fixed, so <x-frontend.page-header>
+   content (eyebrow/title) was hiding under the navbar. Added last in the
+   cascade so it overrides the duplicate .page-hero-inner definitions above.
+   ========================================================================== */
+@media (max-width: 767.98px) {
+    .page-hero-inner {
+        padding-top: 6rem;
+    }
 }

@@ -17,7 +17,7 @@
             <div class="row g-4">
                 <div class="col-lg-9">
                     <div class="blog-index-header">
-                        <h2 class="h4 mb-0">Published Posts</h2>
+                        <h2 class="h4 mb-0">{{ $activeCategory?->name ?? 'Published Posts' }}</h2>
                         <span class="post-count">{{ $posts->total() }} {{ Str::plural('post', $posts->total()) }}</span>
                     </div>
 
@@ -88,10 +88,15 @@
                     <aside class="blog-sidebar-card">
                         <h5 class="blog-sidebar-title">Categories</h5>
                         <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ route('frontend.blog.index') }}"
+                                class="category-badge text-decoration-none {{ $activeCategory ? '' : 'active' }}">
+                                All <span class="category-count">{{ $totalPosts }}</span>
+                            </a>
                             @forelse($categories as $category)
                                 <a href="{{ route('frontend.blog.index', ['category' => $category->slug]) }}"
-                                    class="category-badge text-decoration-none">
+                                    class="category-badge text-decoration-none {{ $activeCategory?->is($category) ? 'active' : '' }}">
                                     {{ $category->name }}
+                                    <span class="category-count">{{ $category->posts_count }}</span>
                                 </a>
                             @empty
                                 <span style="color: var(--text-on-dark-faint);" class="small">No categories yet.</span>

@@ -12,20 +12,27 @@ use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::query()
-            ->with(['blogCategory', 'author'])
-            ->published()
-            ->latest()
-            ->paginate(12);
-
         $categories = BlogCategory::query()
             ->where('is_active', true)
+            ->withCount(['posts' => fn ($q) => $q->published()])
             ->orderBy('name', 'asc')
             ->get();
 
-        return view('frontend.blog.blogIndex', compact('posts', 'categories'));
+        $activeCategory = $categories->firstWhere('slug', $request->query('category'));
+
+        $posts = Post::query()
+            ->with(['blogCategory', 'author'])
+            ->published()
+            ->when($activeCategory, fn ($q) => $q->where('blog_category_id', $activeCategory->id))
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        $totalPosts = Post::query()->published()->count();
+
+        return view('frontend.blog.blogIndex', compact('posts', 'categories', 'activeCategory', 'totalPosts'));
     }
 
     public function show(string $slug)
