@@ -15782,6 +15782,7 @@ body {
 
 .blog-card-image {
     width: 100%;
+    aspect-ratio: 16 / 9;
     height: auto;
     object-fit: cover;
     object-position: center;
@@ -15795,7 +15796,7 @@ body {
 
 .blog-card-placeholder {
     width: 100%;
-    height: 220px;
+    aspect-ratio: 16 / 9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16034,8 +16035,7 @@ body {
 
 .blog-image-placeholder {
     width: 100%;
-    min-height: 320px;
-    max-height: 500px;
+    aspect-ratio: 16 / 9;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -16511,16 +16511,8 @@ body {
 
 /* ── Blog Index Responsive ── */
 @media (max-width: 768px) {
-    .blog-card-placeholder {
-        height: 180px;
-    }
-
     .blog-detail-lead {
         font-size: 0.95rem;
-    }
-
-    .blog-image-placeholder {
-        min-height: 220px;
     }
 
     .comments-panel {
