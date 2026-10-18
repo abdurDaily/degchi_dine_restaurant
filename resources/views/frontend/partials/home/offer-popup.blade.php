@@ -203,7 +203,7 @@
             display: flex;
             align-items: baseline;
             gap: 8px;
-            font-family: "Poppins", sans-serif;
+            font-family: var(--font-body);
             font-size: 2.8rem;
             font-weight: 800;
             line-height: 1;
@@ -221,7 +221,7 @@
 
         #offerPopupOverlay .op-title {
             margin: .6rem 0 .5rem;
-            font-family: "Poppins", sans-serif;
+            font-family: var(--font-body);
             font-size: 1.25rem;
             font-weight: 700;
             color: #fff;
@@ -248,7 +248,7 @@
             gap: .5rem;
             border: none;
             border-radius: 999px;
-            font-family: "Poppins", sans-serif;
+            font-family: var(--font-body);
             font-weight: 700;
             font-size: .92rem;
             letter-spacing: .06em;

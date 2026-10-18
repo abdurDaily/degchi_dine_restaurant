@@ -8,7 +8,7 @@
     Expects: $order, optional $contact (key/value map from contact_section settings).
 --}}
 <style>
-    .invoice-sheet { max-width: 760px; margin: 0 auto; font-family: "DejaVu Sans", "Segoe UI", Arial, sans-serif; color: #1c2b33; font-size: 12px; line-height: 1.5; }
+    .invoice-sheet { max-width: 760px; margin: 0 auto; font-family: "DejaVu Sans", "Segoe UI", "Hind Siliguri", Arial, sans-serif; color: #1c2b33; font-size: 12px; line-height: 1.5; }
     .invoice-sheet * { box-sizing: border-box; }
     .invoice-sheet .inv-top { width: 100%; border-bottom: 3px solid #0d5a6e; padding-bottom: 16px; margin-bottom: 18px; }
     .invoice-sheet .inv-brand { font-size: 24px; font-weight: 800; color: #0d5a6e; letter-spacing: 1px; }

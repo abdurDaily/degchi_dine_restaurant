@@ -32,7 +32,7 @@
         }
 
         .member-login .md-login-help h3 {
-            font-family: var(--section-title-font, "Poppins", sans-serif);
+            font-family: var(--section-title-font, var(--font-body));
             font-size: 1.35rem;
             font-weight: 700;
             margin-bottom: 8px;
@@ -131,7 +131,7 @@
         }
 
         .member-login .md-form-header h2 {
-            font-family: var(--section-title-font, "Poppins", sans-serif);
+            font-family: var(--section-title-font, var(--font-body));
             font-size: 1.55rem;
             font-weight: 700;
             color: var(--dd-text-main);

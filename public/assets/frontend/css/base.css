@@ -3,6 +3,20 @@
    All CSS variables consolidated here. No other file should define :root.
    ========================================================================== */
 
+/* ==========================================================================
+   TYPOGRAPHY — Local Bangla Font (secondary)
+   Primary Bangla font is "Hind Siliguri" (Google Fonts, loaded in layout).
+   Required file: public/assets/frontend/fonts/LiShamimNoorUnicode.ttf
+   ========================================================================== */
+
+@font-face {
+    font-family: "Li Shamim Noor Unicode";
+    src: local("Li Shamim Noor Unicode"),
+        local("LiShamimNoorUnicode"),
+        url("../fonts/LiShamimNoorUnicode.ttf") format("truetype");
+    font-display: swap;
+}
+
 :root {
     /* ── Brand Primary — Deep Teal ── */
     --brand: #0F6A8B;
@@ -116,14 +130,30 @@
     --mobile-nav-height: 60px;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
 
+    /* ── Typography — Font Stacks (single source of truth) ──
+       Stacked per-glyph fallback: Latin display fonts first (unchanged
+       English design), then "Hind Siliguri" (primary Bangla, Google Fonts),
+       then "Li Shamim Noor Unicode" (secondary Bangla, local @font-face),
+       then Arial/sans-serif. */
+    --font-body: "Poppins", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-body-alt: "Manrope", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-display: "Fraunces", "Playfair Display", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-serif: "Fraunces", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-display-alt: "Playfair Display", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-accent: "Lato", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-elegant: "Marcellus", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-ui: "Segoe UI", "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-bn: "Hind Siliguri", "Li Shamim Noor Unicode", Arial, sans-serif;
+    --font-bn-display: "Li Shamim Noor Unicode", "Hind Siliguri", Arial, sans-serif;
+
     /* ── Section Headings ── */
-    --section-title-font: "Poppins", sans-serif;
+    --section-title-font: var(--font-body);
     --section-title-size: clamp(1.75rem, 3.2vw, 2.35rem);
     --section-title-weight: 700;
     --section-title-color: #1a6674;
     --section-title-spacing: -0.02em;
     --section-title-line-height: 1.25;
-    --section-subtitle-font: "Manrope", sans-serif;
+    --section-subtitle-font: var(--font-body-alt);
     --section-subtitle-size: clamp(0.9rem, 1.8vw, 1.05rem);
     --section-subtitle-color: #5a7a85;
     --section-kicker-size: 0.72rem;

@@ -6,9 +6,12 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Invoice #{{ $order->id }} &mdash; {{ $contact['contact_restaurant_name'] ?? 'Degchi Dine' }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
     <style>
         *, *::before, *::after { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; background: #eef2f4; font-family: "Segoe UI", Arial, sans-serif; }
+        html, body { margin: 0; padding: 0; background: #eef2f4; font-family: "Segoe UI", "Hind Siliguri", Arial, sans-serif; }
         .invoice-toolbar { position: sticky; top: 0; z-index: 20; background: #062a33; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .invoice-toolbar .tb-title { color: #cfe3e8; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
         .invoice-toolbar .tb-title strong { color: #fff; }
