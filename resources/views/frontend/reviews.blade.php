@@ -9,7 +9,7 @@
 @section('frontend_content')
 
     <x-frontend.page-header title="অতিথিদের অভিজ্ঞতা" eyebrow="আপনাদের ভালোবাসা"
-        subtitle="ডেগচি ডাইনে কাটানো সুন্দর মুহূর্ত ও খাবারের অভিজ্ঞতা শেয়ার করেছেন আমাদের প্রিয় অতিথিরা।" />
+        subtitle="ডেক্সি ডাইনে কাটানো সুন্দর মুহূর্ত ও খাবারের অভিজ্ঞতা শেয়ার করেছেন আমাদের প্রিয় অতিথিরা।" />
 
     <section class="blog-content-section">
         <div class="container">
@@ -51,8 +51,8 @@
                                             alt="{{ $review->name }} - Degchi Dine Guest Review"
                                             onerror="this.src='{{ asset('assets/images/defult_image/degchi_dine_avater.jpg') }}'" />
                                         <div class="author-info">
-                                            <strong class="d-block">{{ $review->name }}</strong>
-                                            <span class="text-muted small">{{ $review->title ?? 'Guest' }}</span>
+                                            <strong class="d-block text-black">{{ $review->name }}</strong>
+                                            <span class="text-muted small ">{{ $review->title ?? 'Guest' }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@
                                         <img src="{{ asset('assets/images/defult_image/degchi_dine_avater.jpg') }}"
                                             class="review-avatar" alt="Degchi Dine" />
                                         <div class="author-info">
-                                            <strong class="d-block">Degchi Dine</strong>
+                                            <strong class="d-block text-black">Degchi Dine</strong>
                                             <span class="text-muted small">Coming Soon</span>
                                         </div>
                                     </div>

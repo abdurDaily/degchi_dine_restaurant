@@ -1,12 +1,13 @@
 @extends('frontend.layout')
 
 @section('meta_title', 'About Us')
-@section('meta_description', 'Learn about Degchi Dine — our heritage, story, authentic Dum-style cooking and the passion
+@section('meta_description',
+    'Learn about Degchi Dine — our heritage, story, authentic Dum-style cooking and the passion
     behind every clay-pot meal.')
 
 @section('frontend_content')
 
-    <x-frontend.page-header title="ডেগচি ডাইন সম্পর্কে" eyebrow="আমাদের গল্প"
+    <x-frontend.page-header title="ডেক্সি ডাইন সম্পর্কে" eyebrow="আমাদের গল্প"
         subtitle="আসল স্বাদ, ঐতিহ্যবাহী রান্না এবং অবিস্মরণীয় মুহূর্তের প্রতি ভালোবাসা।" />
 
     {{-- ─── About Content Section (shared partial) ─── --}}

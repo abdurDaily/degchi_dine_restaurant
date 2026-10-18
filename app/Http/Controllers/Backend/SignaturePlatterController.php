@@ -80,7 +80,13 @@ class SignaturePlatterController extends Controller
 
             // Handle features array
             if ($request->has('features')) {
-                $features = array_values(array_filter($request->features));
+                $features = array_values(array_filter((array) $request->features, function ($feature) {
+                    if (is_array($feature)) {
+                        return collect($feature)->filter(fn ($value) => filled($value))->isNotEmpty();
+                    }
+
+                    return filled($feature);
+                }));
                 $data['features'] = $features ?: null;
             }
 
@@ -126,7 +132,13 @@ class SignaturePlatterController extends Controller
 
             // Handle features
             if ($request->has('features')) {
-                $features = array_values(array_filter($request->features));
+                $features = array_values(array_filter((array) $request->features, function ($feature) {
+                    if (is_array($feature)) {
+                        return collect($feature)->filter(fn ($value) => filled($value))->isNotEmpty();
+                    }
+
+                    return filled($feature);
+                }));
                 $data['features'] = $features ?: null;
             }
 

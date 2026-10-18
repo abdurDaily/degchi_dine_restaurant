@@ -54,7 +54,7 @@
                     <div class="contact-page-info-panel">
                         <div class="contact-page-info-top">
                             <div>
-                                <h2 class="contact-page-info-title">ডেগচি ডাইন</h2>
+                                <h2 class="contact-page-info-title">ডেক্সি ডাইন</h2>
                                 <p class="contact-page-info-tagline">আন্তরিক আতিথেয়তা · খাঁটি স্বাদ</p>
                             </div>
                             <span class="contact-page-open-badge"><i class="bi bi-shield-lock-fill me-1"></i> নিরাপদ

@@ -49,6 +49,20 @@
                                 <textarea name="description" class="form-control" rows="3" placeholder="Enter description"></textarea>
                                 <span class="text-danger error-text description_error" style="font-size: 13px;"></span>
                             </div>
+                            <div class="mb-3">
+                                <hr class="my-2">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <label class="form-label mb-0 fw-bold">Features</label>
+                                        <small class="text-muted d-block">Highlighted points shown on the homepage (first 2)</small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm admin-add-feature-btn add-feature" data-target="#featureList">
+                                        <i class="ri-add-line me-1"></i>Add Feature
+                                    </button>
+                                </div>
+                                <div id="featureList" class="feature-list"></div>
+                                <span class="text-danger error-text features_error d-block mt-1" style="font-size: 0.85rem;"></span>
+                            </div>
                             <div class="admin-file-field mb-3">
                                 <label class="form-label fw-bold">Thumbnail Image <i class="ri-image-add-line"></i></label>
                                 <input type="file" name="thumbnail_image" class="form-control" accept="image/*">
@@ -107,7 +121,7 @@
 
     <!-- Edit Modal -->
     <div class="modal fade" id="editPlatterModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content border-0">
                 <form id="editPlatterForm" enctype="multipart/form-data">
                     @csrf
@@ -128,6 +142,19 @@
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea id="edit_description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <label class="form-label mb-0">Features</label>
+                                    <small class="text-muted d-block">Highlighted points shown on the homepage (first 2)</small>
+                                </div>
+                                <button type="button" class="btn btn-sm admin-add-feature-btn add-feature" data-target="#editFeatureList">
+                                    <i class="ri-add-line me-1"></i>Add Feature
+                                </button>
+                            </div>
+                            <div id="editFeatureList" class="feature-list"></div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -182,6 +209,108 @@
                 }
             });
 
+            function featureRowHtml(i) {
+                i = i || 0;
+                return `
+                    <div class="admin-feature-row" data-f-index="${i}">
+                        <button type="button" class="btn btn-sm btn-danger remove-feature" title="Remove feature">
+                            <i class="ri-close-line"></i>
+                        </button>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <small class="text-muted d-flex align-items-center">
+                                    <span class="admin-feature-index">${i + 1}</span>
+                                    <strong>Feature <span class="feature-num">${i + 1}</span></strong>
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small">Label <span class="text-muted fw-normal">(optional)</span></label>
+                                <input type="text" class="form-control form-control-sm feature-label"
+                                    placeholder="e.g. Veg Lunch Special">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small">Icon <span class="text-muted fw-normal">(optional)</span></label>
+                                <input type="text" class="form-control form-control-sm feature-icon"
+                                    placeholder="e.g. fa-leaf" title="Font Awesome icon class (without fa-solid)">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small">Text <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-sm feature-text" rows="2"
+                                    placeholder="e.g. Paneer Butter Masala, Dal Tadka served with Basmati Rice &amp; Naan"></textarea>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            function syncFeatureRows(container) {
+                const $rows = container.find('.admin-feature-row');
+
+                $rows.each(function(i) {
+                    const $row = $(this);
+                    const $label = $row.find('.feature-label');
+                    const $text = $row.find('.feature-text');
+                    const $icon = $row.find('.feature-icon');
+                    const label = String($label.val() || '').trim();
+                    const icon = String($icon.val() || '').trim();
+
+                    $row.attr('data-f-index', i);
+                    $row.find('.admin-feature-index, .feature-num').text(i + 1);
+
+                    if (label || icon) {
+                        label ? $label.attr('name', 'features[' + i + '][label]') : $label.removeAttr('name');
+                        $text.attr('name', 'features[' + i + '][text]');
+                        icon ? $icon.attr('name', 'features[' + i + '][icon]') : $icon.removeAttr('name');
+                    } else {
+                        $label.removeAttr('name');
+                        $text.attr('name', 'features[' + i + ']');
+                        $icon.removeAttr('name');
+                    }
+                });
+
+                $rows.removeClass('first').first().addClass('first');
+                $rows.find('.remove-feature').toggle($rows.length > 1);
+            }
+
+            function populateFeatureRows(container, features) {
+                container.empty();
+                const list = (Array.isArray(features) && features.length) ? features : [null];
+
+                list.forEach(function(feature, i) {
+                    const $row = $(featureRowHtml(i));
+
+                    if (feature && typeof feature === 'object') {
+                        $row.find('.feature-label').val(feature.label || '');
+                        $row.find('.feature-text').val(feature.text || '');
+                        $row.find('.feature-icon').val(feature.icon || '');
+                    } else if (feature) {
+                        $row.find('.feature-text').val(String(feature));
+                    }
+
+                    container.append($row);
+                });
+
+                syncFeatureRows(container);
+            }
+
+            $(document).on('click', '.add-feature', function() {
+                const $container = $($(this).data('target'));
+                $container.append(featureRowHtml($container.children('.admin-feature-row').length));
+                syncFeatureRows($container);
+            });
+
+            $(document).on('click', '.remove-feature', function() {
+                const $container = $(this).closest('.feature-list');
+                $(this).closest('.admin-feature-row').remove();
+
+                if (!$container.children('.admin-feature-row').length) {
+                    $container.append(featureRowHtml(0));
+                }
+
+                syncFeatureRows($container);
+            });
+
+            populateFeatureRows($('#featureList'), []);
+
             const table = $('.platter-datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -234,6 +363,7 @@
             $('#plateForm').on('submit', function(e) {
                 e.preventDefault();
                 $('.error-text').text('');
+                syncFeatureRows($('#featureList'));
                 let formData = new FormData(this);
 
                 $.ajax({
@@ -248,6 +378,7 @@
                     success: function(res) {
                         toastr.success(res.message);
                         $('#plateForm')[0].reset();
+                        populateFeatureRows($('#featureList'), []);
                         table.ajax.reload();
                     },
                     error: function(xhr) {
@@ -274,6 +405,7 @@
                     $('#edit_description').val(data.description);
                     $('#edit_status').val(data.status);
                     $('#edit_sort_order').val(data.sort_order);
+                    populateFeatureRows($('#editFeatureList'), data.features);
                     $('#editPlatterModal').modal('show');
                 });
             });
@@ -283,6 +415,7 @@
                 e.preventDefault();
                 let id = $('#edit_id').val();
                 let url = "{{ route('admin.signature-platters.update', ':id') }}".replace(':id', id);
+                syncFeatureRows($('#editFeatureList'));
                 $.ajax({
                     url: url,
                     method: 'POST',

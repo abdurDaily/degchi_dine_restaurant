@@ -1,7 +1,8 @@
 @extends('frontend.layout')
 
 @section('meta_title', 'Membership Cards')
-@section('meta_description', 'Explore Degchi Dine Golden Card and Membership Card benefits. Apply for exclusive dining
+@section('meta_description',
+    'Explore Degchi Dine Golden Card and Membership Card benefits. Apply for exclusive dining
     privileges and rewards.')
 
 @section('frontend_content')
@@ -12,7 +13,7 @@
 
                 <!-- Title Panel -->
                 <div class="text-center my-5 reveal visible">
-                    <span class="luxury-meta-label mb-2">ডেগচি রিওয়ার্ডস</span>
+                    <span class="luxury-meta-label mb-2">ডেক্সি রিওয়ার্ডস</span>
                     <h1 class="luxury-title">আপনার ডাইনিং অভিজ্ঞতাকে আরও বিশেষ করে তুলুন</h1>
                     <div class="luxury-accent-line mx-auto"></div>
                 </div>
@@ -29,7 +30,7 @@
                                 <!-- Clean Image Wrapper -->
                                 <div class="card-image-wrapper">
                                     <img src="{{ asset('assets/frontend/images/membership.svg') }}"
-                                        alt="ডেগচি মেম্বারশিপ কার্ড" class="card-img-fit" />
+                                        alt="ডেক্সি মেম্বারশিপ কার্ড" class="card-img-fit" />
                                 </div>
 
                                 <!-- Text Details -->
@@ -59,7 +60,7 @@
                                 <!-- Clean Image Wrapper -->
                                 <div class="card-image-wrapper">
                                     <img src="{{ asset('assets/frontend/images/privilege_card.svg') }}"
-                                        alt="ডেগচি গোল্ডেন কার্ড" class="card-img-fit" />
+                                        alt="ডেক্সি গোল্ডেন কার্ড" class="card-img-fit" />
                                 </div>
 
                                 <!-- Text Details -->
@@ -72,7 +73,7 @@
                                     </div>
                                     <p class="card-summary-text">
                                         অগ্রাধিকার ভিত্তিতে টেবিল রিজার্ভেশন, বিশেষ রিওয়ার্ড এবং
-                                        ডেগচি ডাইনে প্রতিবার ডাইনিংয়ে উপভোগ করুন অতিরিক্ত বিশেষ সুবিধা।
+                                        ডেক্সি ডাইনে প্রতিবার ডাইনিংয়ে উপভোগ করুন অতিরিক্ত বিশেষ সুবিধা।
                                     </p>
                                 </div>
 

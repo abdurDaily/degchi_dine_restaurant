@@ -869,7 +869,7 @@ h6,
     color: #faf5eb;
     border-radius: 5px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 16px;
     padding: 0.5rem 1rem;
     position: relative;
     transition: all 0.4s linear;
@@ -4074,7 +4074,7 @@ h6,
 
 .visit-us-card-content h4 {
     margin: 0 0 0.35rem;
-    font-size: 0.72rem;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 1.8px;
     text-transform: uppercase;
@@ -13029,11 +13029,11 @@ body {
 }
 
 .contact-page-card-body h3 {
-    font-size: 0.72rem;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--text-on-dark-muted);
+    color: #fff;
     margin: 0 0 0.35rem;
 }
 
@@ -14831,7 +14831,7 @@ body {
 }
 
 .party-booking-feature-body h3 {
-    font-size: 0.82rem;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.04em;
     color: var(--text-on-dark);
@@ -14945,16 +14945,16 @@ body {
 
 .party-booking-intel h4 {
     font-family: var(--section-title-font, var(--font-body));
-    font-size: 0.95rem;
+    font-size: 16px;
     font-weight: 700;
     color: var(--brand-gold);
     margin: 0 0 0.5rem;
 }
 
 .party-booking-intel p {
-    font-size: 0.86rem;
+    font-size: 14px;
     line-height: 1.6;
-    color: var(--text-on-dark-muted);
+    color: #fff;
     margin-bottom: 0.6rem;
 }
 

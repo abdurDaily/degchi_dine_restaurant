@@ -935,7 +935,7 @@
 
                 <span class="dd-apply-badge">মেম্বার পোর্টাল</span>
                 <h1 class="dd-apply-headline">আবারও স্বাগতম, {{ explode(' ', $member->name)[0] }}</h1>
-                <p class="dd-apply-subhead">আপনার অর্ডার ট্র্যাক করুন, মেম্বারশিপের সুবিধাগুলো দেখুন এবং ডেগচি ডাইনের
+                <p class="dd-apply-subhead">আপনার অর্ডার ট্র্যাক করুন, মেম্বারশিপের সুবিধাগুলো দেখুন এবং ডেক্সি ডাইনের
                     রিওয়ার্ড পরিচালনা করুন।</p>
 
                 <div class="md-hero-actions">

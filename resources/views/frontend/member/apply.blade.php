@@ -28,7 +28,7 @@
                     <div class="contact-page-info-panel">
                         <div class="contact-page-info-top">
                             <div>
-                                <h2 class="contact-page-info-title">ডেগচি ডাইন</h2>
+                                <h2 class="contact-page-info-title">ডেক্সি ডাইন</h2>
                                 <p class="contact-page-info-tagline">আন্তরিক আতিথেয়তা · খাঁটি স্বাদ</p>
                             </div>
                             <span class="contact-page-open-badge"><i class="bi bi-star-fill me-1"></i> প্রিমিয়াম</span>
@@ -37,7 +37,7 @@
                         <div class="dd-apply-stage-wrap">
                             <div class="dd-apply-card-stage">
                                 <div class="dd-apply-glow"></div>
-                                <img src="{{ asset('assets/frontend/images/membership.svg') }}" alt="ডেগচি প্রিমিয়াম কার্ড"
+                                <img src="{{ asset('assets/frontend/images/membership.svg') }}" alt="ডেক্সি প্রিমিয়াম কার্ড"
                                     class="dd-apply-card-img" />
                             </div>
                         </div>
@@ -518,7 +518,8 @@
                 var email = $('#dd_email').val().trim();
                 if (!email || email.indexOf('@') === -1) {
                     showErrorPopup(
-                        'অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা দিন। পাসওয়ার্ড পুনরুদ্ধারের জন্য ইমেইল প্রয়োজন।');
+                        'অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা দিন। পাসওয়ার্ড পুনরুদ্ধারের জন্য ইমেইল প্রয়োজন।'
+                        );
                     return;
                 }
 
@@ -581,12 +582,14 @@
                         setProcessing(false);
                         var msg = xhr.responseJSON?.errors ?
                             Object.values(xhr.responseJSON.errors)[0][0] :
-                            (xhr.responseJSON?.message || 'রেজিস্ট্রেশন করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                            (xhr.responseJSON?.message ||
+                                'রেজিস্ট্রেশন করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
                         if (xhr.responseJSON?.errors?.phone) {
                             phoneAvailable = false;
                             setPhoneFeedback('invalid',
                                 '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' +
-                                msg + ' <a href="{{ route('frontend.member.login') }}">লগইন করুন</a>'
+                                msg +
+                                ' <a href="{{ route('frontend.member.login') }}">লগইন করুন</a>'
                             );
                         }
                         showErrorPopup(msg);

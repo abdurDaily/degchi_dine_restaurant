@@ -462,8 +462,9 @@
   margin-bottom: 0.15rem;
 }
 
-/* Menu variations */
-.admin-variation-row {
+/* Menu variations + platter features (shared repeatable card row) */
+.admin-variation-row,
+.admin-feature-row {
   background: rgba(17, 107, 131, 0.03);
   border: 1px solid var(--dd-border);
   border-radius: 12px;
@@ -473,24 +474,28 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.admin-variation-row:hover {
+.admin-variation-row:hover,
+.admin-feature-row:hover {
   border-color: var(--dd-border-strong);
   box-shadow: 0 4px 12px rgba(17, 107, 131, 0.06);
 }
 
-.admin-variation-row.first {
+.admin-variation-row.first,
+.admin-feature-row.first {
   border-color: rgba(17, 107, 131, 0.28);
   background: linear-gradient(135deg, rgba(17, 107, 131, 0.06) 0%, var(--dd-gold-soft) 100%);
 }
 
-.admin-variation-row .remove-variation {
+.admin-variation-row .remove-variation,
+.admin-feature-row .remove-feature {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   z-index: 2;
 }
 
-.admin-variation-index {
+.admin-variation-index,
+.admin-feature-index {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -504,7 +509,8 @@
   margin-right: 0.4rem;
 }
 
-.admin-add-variation-btn {
+.admin-add-variation-btn,
+.admin-add-feature-btn {
   background: linear-gradient(135deg, var(--dd-teal-deep) 0%, var(--dd-teal) 100%);
   border: none;
   color: #fff;
@@ -513,7 +519,8 @@
   font-size: 0.82rem;
 }
 
-.admin-add-variation-btn:hover {
+.admin-add-variation-btn:hover,
+.admin-add-feature-btn:hover {
   color: #fff;
   opacity: 0.92;
 }

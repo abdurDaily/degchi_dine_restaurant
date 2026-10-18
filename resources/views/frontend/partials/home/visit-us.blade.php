@@ -59,12 +59,11 @@
 
                 <div class="visit-us-actions">
                     <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer"
-                        class="btn-dine btn-dine-ghost btn-dine-sm" style="font-size: 12px;">
+                        class="btn-dine btn-dine-ghost btn-dine-sm">
                         <i class="fa-solid fa-diamond-turn-right"></i>
                         ম্যাপ দেখুন
                     </a>
-                    <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-primary btn-dine-sm"
-                        style="font-size: 12px;">
+                    <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-primary btn-dine-sm">
                         <i class="fa-solid fa-phone"></i>
                         এখনই কল করুন
                     </a>

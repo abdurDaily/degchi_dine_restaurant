@@ -75,8 +75,10 @@
                                         @foreach ($features->take(2) as $feature)
                                             <li>
                                                 @if (is_array($feature))
-                                                    <i class="fa-solid {{ $feature['icon'] ?? 'fa-check' }}"></i>
-                                                    <strong>{{ $feature['label'] ?? '' }}:</strong>
+                                                    <i class="fa-solid {{ ($feature['icon'] ?? '') ?: 'fa-leaf' }}"></i>
+                                                    @if (!empty($feature['label']))
+                                                        <strong>{{ $feature['label'] }}:</strong>
+                                                    @endif
                                                     {{ $feature['text'] ?? '' }}
                                                 @else
                                                     <i class="fa-solid fa-leaf text-success"></i>

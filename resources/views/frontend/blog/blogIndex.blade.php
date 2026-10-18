@@ -1,14 +1,16 @@
 @extends('frontend.layout')
 
 @section('meta_title', 'Blog')
-@section('meta_description', 'Read the Degchi Dine blog — stories from our kitchen, recipes, offers and dining news from Chittagong.')
-@section('meta_keywords', 'degchi dine blog, bangladeshi food blog, kacchi recipe, biryani recipe, restaurant news chittagong')
+@section('meta_description', 'Read the Degchi Dine blog — stories from our kitchen, recipes, offers and dining news from
+    Chittagong.')
+@section('meta_keywords', 'degchi dine blog, bangladeshi food blog, kacchi recipe, biryani recipe, restaurant news
+    chittagong')
 @section('meta_robots', 'index, follow')
 
 @section('frontend_content')
 
     <x-frontend.page-header title="আমাদের ব্লগ" eyebrow="আমাদের গল্প"
-        subtitle="ডেগচি ডাইনের গল্প, আয়োজন ও খাবারের নানা খবর একসাথে।" />
+        subtitle="ডেক্সি ডাইনের গল্প, আয়োজন ও খাবারের নানা খবর একসাথে।" />
 
     <section class="blog-content-section">
         <div class="container">
