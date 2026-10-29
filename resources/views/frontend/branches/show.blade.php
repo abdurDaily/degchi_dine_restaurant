@@ -146,6 +146,9 @@
                 </div>
             @else
                 <div class="row g-4" id="menuGrid">
+                        @php
+                            $memberCardOffers = \App\Models\Offer::activeMemberCardOffers();
+                        @endphp
                         @foreach($categories as $category)
                         @foreach($category->menus as $menu)
                             @php
@@ -171,6 +174,7 @@
                                     :firstVariation="$firstVariation"
                                     :activeOffers="$activeOffers"
                                     :bestOffer="$bestOffer"
+                                    :memberCardOffers="$memberCardOffers"
                                     :unitPrice="$minPrice"
                                     :offerPrice="$offerPrice"
                                     :linked="false"

@@ -1145,11 +1145,28 @@
                             </div>
                             <div class="md-stat-card">
                                 <div class="md-stat-icon"><iconify-icon icon="solar:star-linear"></iconify-icon></div>
+                                @php
+                                    $welcomeOffer = $member->welcomeTierOffer();
+                                    $welcomeActive = $welcomeOffer
+                                        && ! $member->isExpired()
+                                        && $member->withinWelcomePeriod($welcomeOffer)
+                                        && (! $member->is_student || $member->approval_status === 'approved');
+                                    $tierRate = (int) ($member->is_student ? 35 : 30);
+                                    $firstOrderPending = ! $member->first_order_discount_used;
+                                    // Same precedence as Member::resolveMemberDiscount():
+                                    // the tier rate wins ties, welcome only when strictly higher.
+                                    $tierShown = $firstOrderPending
+                                        && (! $welcomeActive || $tierRate >= (int) $welcomeOffer->discount_percent);
+                                    $welcomeShown = $welcomeActive
+                                        && (! $firstOrderPending || (int) $welcomeOffer->discount_percent > $tierRate);
+                                @endphp
                                 <div class="md-stat-value">
                                     @if ($member->type === 'golden')
                                         10%
-                                    @elseif (!$member->first_order_discount_used)
-                                        {{ $member->is_student ? '35%' : '30%' }}
+                                    @elseif ($tierShown)
+                                        {{ $tierRate }}%
+                                    @elseif ($welcomeShown)
+                                        {{ $welcomeOffer->discount_percent }}%
                                     @else
                                         —
                                     @endif
@@ -1157,8 +1174,10 @@
                                 <div class="md-stat-label">
                                     @if ($member->type === 'golden')
                                         গোল্ডেন ছাড়
-                                    @elseif (!$member->first_order_discount_used)
+                                    @elseif ($tierShown)
                                         প্রথম অর্ডারের ছাড়
+                                    @elseif ($welcomeShown)
+                                        নতুন সদস্য ছাড়
                                     @else
                                         পরবর্তী রিওয়ার্ড
                                     @endif

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Notifications\MemberResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 class Member extends Authenticatable
 {
@@ -17,6 +18,9 @@ class Member extends Authenticatable
     public const FIRST_ORDER_RATE_STUDENT = 0.35;
 
     public const GOLDEN_DISCOUNT_RATE = 0.10;
+
+    /** Fallback welcome window (months) when a welcome offer row has no duration set. */
+    public const WELCOME_DEFAULT_DURATION_MONTHS = 6;
     protected $fillable = [
         'name',
         'phone',
@@ -232,6 +236,97 @@ class Member extends Authenticatable
             ->first();
     }
 
+    protected function tierOfferIsConfigured(): bool
+    {
+        $applicableTo = $this->is_student ? 'student' : 'membership';
+
+        return Offer::query()->where('applicable_to', $applicableTo)->exists();
+    }
+
+    /**
+     * Active, in-date welcome (new-member) offer row, if one is configured.
+     * Welcome offers carry applicable_to = 'welcome', so this query can never
+     * return a membership / student / golden tier row or a food-menu promo.
+     */
+    public function welcomeTierOffer(): ?Offer
+    {
+        return Offer::query()
+            ->active()
+            ->valid()
+            ->where('applicable_to', 'welcome')
+            ->where('discount_percent', '>', 0)
+            ->orderByDesc('discount_percent')
+            ->first();
+    }
+
+    /**
+     * The moment this member's welcome window ends: registration date plus the
+     * offer's welcome_duration_months.
+     *
+     * Month arithmetic never overflows the target month (31 Mar + 6 months =
+     * 30 Sep, never 1 Oct; 31 Aug + 6 months = 28/29 Feb). created_at and
+     * now() are both in the application timezone (UTC), so the comparison is
+     * consistent everywhere.
+     */
+    public function welcomeDeadline(?Offer $offer = null): ?Carbon
+    {
+        $offer = $offer ?? $this->welcomeTierOffer();
+
+        if (! $offer || ! $this->created_at) {
+            return null;
+        }
+
+        $months = max(1, (int) ($offer->welcome_duration_months ?: self::WELCOME_DEFAULT_DURATION_MONTHS));
+
+        return $this->created_at->copy()->addMonthsNoOverflow($months);
+    }
+
+    /**
+     * Whether the member is still inside their personal welcome window.
+     * The window is [registration, registration + N months) — the discount
+     * stops the exact moment the deadline is reached.
+     */
+    public function withinWelcomePeriod(?Offer $offer = null): bool
+    {
+        $deadline = $this->welcomeDeadline($offer);
+
+        return $deadline !== null && now()->lt($deadline);
+    }
+
+    /**
+     * Welcome discount % for this order, or null when it does not apply.
+     *
+     * Follows the same gating style as the existing first-order offers: the
+     * campaign must be active and currently valid (offer is_active +
+     * valid_from/valid_until), the member must be inside their personal
+     * registration-based window, students must be admin-approved (pending
+     * students cannot order until approval — the same rule first-order offers
+     * already follow; their window still counts from registration), and the
+     * cart must satisfy the offer's min_total.
+     */
+    public function welcomeDiscountPercent(?float $subtotal = null): ?int
+    {
+        if ($this->is_student && $this->approval_status !== 'approved') {
+            return null;
+        }
+
+        $offer = $this->welcomeTierOffer();
+
+        if (! $offer || ! $offer->isValid()) {
+            return null;
+        }
+
+        if (! $this->withinWelcomePeriod($offer)) {
+            return null;
+        }
+
+        if (! $offer->meetsMinimumTotal($subtotal)) {
+            return null;
+        }
+
+        return (int) $offer->discount_percent;
+    }
+
     /**
      * Whether the golden tier's configured offer row allows the current cart
      * (honouring its `min_total`). With no golden offer row configured the
@@ -262,8 +357,14 @@ class Member extends Authenticatable
 
         $offer = $this->memberTierOffer();
 
-        // Fallback to built-in rates when system offer rows are missing (always first-order only)
+        // Keep legacy defaults only when this tier has never been configured.
+        // An inactive or expired row is an intentional admin disable, not a
+        // missing configuration.
         if (! $offer) {
+            if ($this->tierOfferIsConfigured()) {
+                return null;
+            }
+
             if (! $this->canUseFirstOrderDiscount()) {
                 return null;
             }
@@ -305,7 +406,7 @@ class Member extends Authenticatable
      * is computed on. They differ because item-level offers are subtracted first.
      * Pass $subtotal as null when no cart context is available.
      *
-     * @return array{eligible: bool, amount: float, rate: int, member_type: string, message: string, first_order_discount_used: bool}
+     * @return array{eligible: bool, amount: float, rate: int, member_type: string, message: string, first_order_discount_used: bool, welcome_discount_applicable: bool}
      */
     public function resolveMemberDiscount(float $orderTotal, bool $autoUpgrade = false, ?float $subtotal = null): array
     {
@@ -319,6 +420,7 @@ class Member extends Authenticatable
             'rate' => 0,
             'member_type' => $this->type,
             'first_order_discount_used' => $firstOrderAlreadyUsed,
+            'welcome_discount_applicable' => false,
         ];
 
         if ($this->isExpired()) {
@@ -356,7 +458,14 @@ class Member extends Authenticatable
         }
 
         $tierPercent = $this->firstOrderDiscountPercent($subtotal);
-        if ($tierPercent !== null) {
+        $welcomePercent = $this->welcomeDiscountPercent($subtotal);
+
+        // Existing tier benefit wins ties — the welcome offer only takes over
+        // here when a tier rate exists and the welcome rate is strictly higher.
+        // When no tier rate applies at all, the welcome discount is handled by
+        // the final fallback BELOW, so the pending-student and Golden-upgrade
+        // branches in between keep their existing behaviour untouched.
+        if ($tierPercent !== null && $tierPercent >= (int) ($welcomePercent ?? 0)) {
             $offer = $this->memberTierOffer();
             $isFirstOrderOffer = $offer ? (bool) $offer->is_first_order : true;
 
@@ -369,6 +478,10 @@ class Member extends Authenticatable
                     ? sprintf('%d%% first-order %s discount applied (one time only).', $tierPercent, $this->is_student ? 'student' : 'membership')
                     : sprintf('%d%% %s discount applied to all food items.', $tierPercent, $this->is_student ? 'student' : 'membership'),
             ]);
+        }
+
+        if ($tierPercent !== null && $welcomePercent !== null && $welcomePercent > $tierPercent) {
+            return $this->welcomeDiscountResult($base, $welcomePercent, $orderTotal);
         }
 
         if ($this->is_student && $this->approval_status !== 'approved' && ! $firstOrderAlreadyUsed) {
@@ -405,6 +518,14 @@ class Member extends Authenticatable
             return $base;
         }
 
+        // Welcome offer fills the remaining gap: a member inside their window
+        // who received no other benefit (e.g. first-order discount already
+        // used) still gets the welcome rate. The Golden upgrade paths above
+        // keep their existing behaviour untouched — they win over welcome.
+        if ($welcomePercent !== null) {
+            return $this->welcomeDiscountResult($base, $welcomePercent, $orderTotal);
+        }
+
         $remaining = max(0, self::GOLDEN_UPGRADE_THRESHOLD - $this->liveTotalPurchase());
         return array_merge($base, [
             'message' => $firstOrderAlreadyUsed
@@ -418,6 +539,35 @@ class Member extends Authenticatable
                     . number_format($remaining, 2)
                     . ' মূল্যের খাবার অর্ডার করুন। এরপর প্রতিটি অর্ডারে ১০% ছাড় পাবেন।'
                     : 'এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়।'),
+        ]);
+    }
+
+    /**
+     * Successful resolveMemberDiscount result for an active welcome offer.
+     *
+     * Reports the member's REAL first_order_discount_used flag (instead of the
+     * forced false the tier branch uses) so checkout can never re-enable
+     * first-order-only food promos for a member who already used them, while
+     * still allowing the welcome discount itself through.
+     *
+     * @param array<string, mixed> $base
+     * @return array<string, mixed>
+     */
+    private function welcomeDiscountResult(array $base, int $percent, float $orderTotal): array
+    {
+        $deadline = $this->welcomeDeadline();
+
+        return array_merge($base, [
+            'eligible' => true,
+            'amount' => round($orderTotal * ($percent / 100), 2),
+            'rate' => $percent,
+            'first_order_discount_used' => (bool) $this->first_order_discount_used,
+            'welcome_discount_applicable' => true,
+            'message' => sprintf(
+                '%d%% new-member welcome discount applied on every order until %s.',
+                $percent,
+                $deadline ? $deadline->format('M d, Y') : 'the offer ends'
+            ),
         ]);
     }
 

@@ -20,6 +20,7 @@
 
                     @php
                         $viewerMember = Auth::guard('member')->user();
+                        $memberCardOffers = \App\Models\Offer::activeMemberCardOffers();
                     @endphp
 
                     @forelse($sliderMenus as $menu)
@@ -37,7 +38,7 @@
                             $reviewCount = rand(40, 150);
                         @endphp
                         <div class="menu-slide-item">
-                            <x-frontend.product.product-card :menu="$menu" :firstVariation="$firstVariation" :bestOffer="$bestOffer" :activeOffers="$activeOffers"
+                            <x-frontend.product.product-card :menu="$menu" :firstVariation="$firstVariation" :bestOffer="$bestOffer" :activeOffers="$activeOffers" :memberCardOffers="$memberCardOffers"
                                 :rating="$rating" :reviewCount="$reviewCount" showRating badgeStyle="home"
                                 cartIcon="bi-cart-plus" />
                             

@@ -171,7 +171,26 @@ class HomeController extends Controller
 
     public function cardApply()
     {
-        return view('frontend.member.apply');
+        // Membership / student benefit rows are admin-editable, so the apply page
+        // must read the live percentages instead of hardcoding 30% / 35%.
+        $tierOffers = Offer::query()
+            ->active()
+            ->valid()
+            ->whereIn('applicable_to', ['membership', 'student'])
+            ->where('discount_percent', '>', 0)
+            ->orderByDesc('discount_percent')
+            ->get();
+
+        $studentPercent = $tierOffers->firstWhere('applicable_to', 'student')->discount_percent
+            ?? (Offer::query()->where('applicable_to', 'student')->exists()
+                ? null
+                : (int) (Member::FIRST_ORDER_RATE_STUDENT * 100));
+        $membershipPercent = $tierOffers->firstWhere('applicable_to', 'membership')->discount_percent
+            ?? (Offer::query()->where('applicable_to', 'membership')->exists()
+                ? null
+                : (int) (Member::FIRST_ORDER_RATE_STANDARD * 100));
+
+        return view('frontend.member.apply', compact('studentPercent', 'membershipPercent'));
     }
 
     public function checkout()
@@ -203,9 +222,7 @@ class HomeController extends Controller
 
     public function cards()
     {
-        $offers = Offer::active()->orderBy('created_at', 'desc')->get();
-
-        return view('frontend.cards', compact('offers'));
+        return view('frontend.cards');
     }
 
     public function registerMember(Request $request)
@@ -741,6 +758,7 @@ class HomeController extends Controller
             'total_purchase' => $member->liveTotalPurchase(),
             'discount_rate' => $discount['rate'],
             'first_order_discount_used' => $discount['first_order_discount_used'],
+            'welcome_discount_applicable' => (bool) ($discount['welcome_discount_applicable'] ?? false),
             'message' => $discount['message'],
         ];
 

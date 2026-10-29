@@ -84,6 +84,7 @@
                 </div>
             </div>
         </section>
+
     </main>
 
     <!-- Golden Card Terms & Upgrade Modal -->

@@ -15,8 +15,9 @@ use App\Models\Order;
  *
  * Discount order (matches checkout.blade.php):
  *   1. Item-level promo offers subtract first (baked into each line's offer_discount).
- *   2. Membership / Student / Golden discount stacks on top of that already
- *      offer-discounted subtotal.
+ *   2. Membership / Student / Golden discount (including the new-member
+ *      welcome discount) stacks on top of that already offer-discounted
+ *      subtotal.
  *   3. Coupon discount (a fixed ৳ amount set once when the coupon was applied)
  *      is subtracted last, re-capped so the combined discount never exceeds
  *      the food subtotal.

@@ -93,17 +93,24 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Applicable To</label>
-                            <select name="applicable_to" class="form-select @error('applicable_to') is-invalid @enderror">
-                                @foreach(['all','membership','student','golden'] as $opt)
+                            <select name="applicable_to" id="applicableTo" class="form-select @error('applicable_to') is-invalid @enderror">
+                                @foreach([
+                                    'all' => 'All customers (public promo)',
+                                    'membership' => 'Membership',
+                                    'student' => 'Student',
+                                    'golden' => 'Golden',
+                                    'welcome' => 'New Member Welcome',
+                                ] as $opt => $optLabel)
                                     <option value="{{ $opt }}" {{ old('applicable_to', $offer->applicable_to ?? 'all') === $opt ? 'selected' : '' }}>
-                                        {{ $opt === 'all' ? 'All customers (public promo)' : ucfirst($opt) }}
+                                        {{ $optLabel }}
                                     </option>
                                 @endforeach
                             </select>
                             <div class="form-text">
-                                <strong>All</strong> = food menu promo (menu badges). 
-                                <strong>Membership / Student</strong> = checkout member-card discount (use the built-in First Order rows). 
+                                <strong>All</strong> = food menu promo (menu badges).
+                                <strong>Membership / Student</strong> = checkout member-card discount (use the built-in First Order rows).
                                 <strong>Golden</strong> = golden card benefit / threshold.
+                                <strong>New Member Welcome</strong> = every order gets this % for N months after the member's registration date.
                             </div>
                             @error('applicable_to')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
@@ -121,6 +128,25 @@
                             </div>
                             @error('min_total')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
+                    </div>
+
+                    {{-- Welcome window (only for "New Member Welcome" offers) --}}
+                    <div class="mb-3" id="welcomeDurationSection"
+                         style="display: {{ old('applicable_to', $offer->applicable_to ?? 'all') === 'welcome' ? 'block' : 'none' }}">
+                        <label class="form-label fw-semibold">Welcome Period (months) <span class="text-danger">*</span></label>
+                        <input type="number" name="welcome_duration_months" id="welcomeDurationMonths" min="1" max="60"
+                               class="form-control @error('welcome_duration_months') is-invalid @enderror"
+                               value="{{ old('welcome_duration_months', $offer->welcome_duration_months) }}"
+                               placeholder="e.g. 6">
+                        <div class="form-text">
+                            <i class="ri-information-line me-1"></i>
+                            Each member gets this offer's <strong>Discount %</strong> on <strong>every order</strong>
+                            from their own registration date until this many months later (e.g. 6 → expires on their
+                            6-month anniversary). Members who registered earlier only keep it for their remaining time.
+                            Leave the campaign dates empty to run it permanently; setting <em>valid_until</em> anywhere
+                            stops the discount for everyone on that date.
+                        </div>
+                        @error('welcome_duration_months')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <hr class="my-4">
@@ -249,6 +275,15 @@ $(function(){
             $('#menuItemsSection').show();
         } else {
             $('#menuItemsSection').hide();
+        }
+    });
+
+    // Toggle welcome window field based on "Applicable To"
+    $('#applicableTo').on('change', function() {
+        if ($(this).val() === 'welcome') {
+            $('#welcomeDurationSection').show();
+        } else {
+            $('#welcomeDurationSection').hide();
         }
     });
 

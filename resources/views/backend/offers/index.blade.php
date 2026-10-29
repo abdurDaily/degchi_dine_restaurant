@@ -27,6 +27,9 @@
                                     student’s <em>first order only</em>. After that order: no student discount.</li>
                                 <li><strong>Golden</strong> — 10% on every order after upgrade (not first-order limited).
                                 </li>
+                                <li><strong>New Member Welcome</strong> — every order gets the discount % for N months
+                                    after that member's own registration date, then it expires automatically. If the
+                                    first-order discount has a higher %, the first order still uses that one.</li>
                                 <li>Checkout takes the <strong>higher of</strong> food-item offer vs member-card benefit
                                     (not stacked).</li>
                                 <li><strong>Min Order Total</strong> is a <em>whole-cart</em> threshold, not a per-item one.
@@ -87,9 +90,16 @@
                                                         <span class="text-muted">—</span>
                                                     @endif
                                                 </td>
-                                                <td><span
-                                                        class="badge bg-secondary-subtle text-secondary text-capitalize">{{ $offer->applicable_to }}</span>
-                                                </td>
+                                                <td>
+                            @if ($offer->applicable_to === 'welcome')
+                                <span class="badge bg-success-subtle text-success"
+                                      title="Every order gets this discount until each member's own registration anniversary">
+                                    Welcome {{ (int) ($offer->welcome_duration_months ?: \App\Models\Member::WELCOME_DEFAULT_DURATION_MONTHS) }} mo
+                                </span>
+                            @else
+                                <span class="badge bg-secondary-subtle text-secondary text-capitalize">{{ $offer->applicable_to }}</span>
+                            @endif
+                        </td>
                                                 <td class="text-center">
                                                     @php $minTotal = $offer->minimumTotal(); @endphp
                                                     @if ($minTotal !== null)

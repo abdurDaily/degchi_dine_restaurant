@@ -356,21 +356,28 @@
 
                 let appliedCoupon = null;
                 let memberDiscountRate = 0;
+                // New-member welcome discount survives the first-order flag:
+                // the server keeps applying it inside the member's welcome
+                // window, so the checkout mirror must too.
+                let welcomeDiscountApplicable = false;
                 let verifiedMember = {
                     verified: false,
                     eligible: false,
                     is_student: false,
                     approval_status: 'approved',
                     member_type: 'standard',
-                    first_order_discount_used: false
+                    first_order_discount_used: false,
+                    welcome_discount_applicable: false
                 };
 
                 @if ($loggedInMemberDiscount ?? null)
+                    welcomeDiscountApplicable = {{ ($loggedInMemberDiscount['welcome_discount_applicable'] ?? false) ? 'true' : 'false' }};
                     memberDiscountRate =
                         {{ ($loggedInMemberDiscount['eligible'] ?? false) &&
                         !(
                             ($loggedInMemberDiscount['first_order_discount_used'] ?? false) &&
-                            ($loggedInMemberDiscount['member_type'] ?? '') !== 'golden'
+                            ($loggedInMemberDiscount['member_type'] ?? '') !== 'golden' &&
+                            !($loggedInMemberDiscount['welcome_discount_applicable'] ?? false)
                         )
                             ? (int) ($loggedInMemberDiscount['rate'] ?? 0)
                             : 0 }};
@@ -379,7 +386,8 @@
                         eligible: {{ ($loggedInMemberDiscount['eligible'] ?? false) &&
                         !(
                             ($loggedInMemberDiscount['first_order_discount_used'] ?? false) &&
-                            ($loggedInMemberDiscount['member_type'] ?? '') !== 'golden'
+                            ($loggedInMemberDiscount['member_type'] ?? '') !== 'golden' &&
+                            !($loggedInMemberDiscount['welcome_discount_applicable'] ?? false)
                         )
                             ? 'true'
                             : 'false' }},
@@ -387,11 +395,12 @@
                         approval_status: @json($loggedInMember->approval_status ?? 'approved'),
                         member_type: @json($loggedInMemberDiscount['member_type'] ?? ($loggedInMember->type ?? 'membership')),
                         first_order_discount_used: {{ $loggedInMemberDiscount['first_order_discount_used'] ?? false ? 'true' : 'false' }},
+                        welcome_discount_applicable: {{ ($loggedInMemberDiscount['welcome_discount_applicable'] ?? false) ? 'true' : 'false' }},
                     };
                 @endif
 
                 function calculateMemberDiscount(subtotal) {
-                    if (verifiedMember.first_order_discount_used && verifiedMember.member_type !== 'golden') return 0;
+                    if (verifiedMember.first_order_discount_used && verifiedMember.member_type !== 'golden' && !verifiedMember.welcome_discount_applicable) return 0;
                     if (!verifiedMember.eligible || memberDiscountRate <= 0) return 0;
                     return parseFloat((subtotal * (memberDiscountRate / 100)).toFixed(2));
                 }
@@ -675,8 +684,10 @@
                     }
                     const usedFirstOrder = !!result.first_order_discount_used;
                     const isGolden = (result.member_type || '') === 'golden';
-                    const allowRate = responseOk && result.eligible && (isGolden || !usedFirstOrder);
+                    const welcomeActive = !!result.welcome_discount_applicable;
+                    const allowRate = responseOk && result.eligible && (isGolden || !usedFirstOrder || welcomeActive);
                     memberDiscountRate = allowRate ? (result.discount_rate || 0) : 0;
+                    welcomeDiscountApplicable = welcomeActive;
                     verifiedMember = {
                         verified: true,
                         eligible: !!allowRate,
@@ -684,6 +695,7 @@
                         approval_status: result.approval_status || 'approved',
                         member_type: result.member_type || 'standard',
                         first_order_discount_used: usedFirstOrder,
+                        welcome_discount_applicable: welcomeActive,
                         account_restricted: false
                     };
                     membershipFeedback.textContent = result.message || 'Unable to verify membership card.';

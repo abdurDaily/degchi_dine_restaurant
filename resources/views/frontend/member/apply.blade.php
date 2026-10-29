@@ -227,10 +227,20 @@
                                             <div class="cp-student-info-inner">
                                                 <iconify-icon icon="solar:graduation-cap-bold"></iconify-icon>
                                                 <div>
-                                                    <strong>শিক্ষার্থী সুবিধা — প্রথম অর্ডারে ৩৫% ছাড়!</strong>
+                                                    @if ($studentPercent)
+                                                        <strong>শিক্ষার্থী সুবিধা — প্রথম অর্ডারে {{ $studentPercent }}% ছাড়!</strong>
+                                                    @else
+                                                        <strong>শিক্ষার্থী সুবিধা</strong>
+                                                    @endif
                                                     <p>
-                                                        শিক্ষার্থীরা প্রথম অর্ডারে <strong>৩৫%</strong> ছাড় পাবেন
-                                                        (অন্যান্য সদস্যদের জন্য <strong>৩০%</strong>)।
+                                                        @if ($studentPercent)
+                                                            শিক্ষার্থীরা প্রথম অর্ডারে <strong>{{ $studentPercent }}%</strong> ছাড় পাবেন।
+                                                        @else
+                                                            শিক্ষার্থীদের প্রথম-অর্ডার ছাড় বর্তমানে চালু নেই।
+                                                        @endif
+                                                        @if ($membershipPercent)
+                                                            অন্যান্য সদস্যদের জন্য প্রথম অর্ডারে <strong>{{ $membershipPercent }}%</strong> ছাড়।
+                                                        @endif
                                                         যাচাইয়ের জন্য আপনার স্টুডেন্ট আইডি আপলোড করুন।
                                                     </p>
                                                 </div>

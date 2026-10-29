@@ -16,6 +16,7 @@ class Offer extends Model
         'offer_type',
         'min_total',
         'is_first_order',
+        'welcome_duration_months',
         'is_active',
         'show_as_popup',
         'popup_image',
@@ -29,6 +30,7 @@ class Offer extends Model
         'discount_percent'  => 'integer',
         'min_total'         => 'decimal:2',
         'is_first_order'    => 'boolean',
+        'welcome_duration_months' => 'integer',
         'is_active'         => 'boolean',
         'show_as_popup'     => 'boolean',
         'popup_expires_at'  => 'date',
@@ -168,6 +170,21 @@ class Offer extends Model
                 ->orderByDesc('discount_percent')
                 ->get();
         });
+    }
+
+    /**
+     * Active member benefits shown as informational badges on food product cards.
+     * These are not item-level discounts and must not affect card prices or cart data.
+     */
+    public static function activeMemberCardOffers(): Collection
+    {
+        return static::query()
+            ->active()
+            ->valid()
+            ->whereIn('applicable_to', ['welcome', 'membership', 'student', 'golden'])
+            ->where('discount_percent', '>', 0)
+            ->orderByDesc('discount_percent')
+            ->get();
     }
 
     /**

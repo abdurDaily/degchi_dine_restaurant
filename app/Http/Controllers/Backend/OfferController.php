@@ -126,11 +126,12 @@ class OfferController extends Controller
             'name'              => 'required|string|max:255',
             'description'       => 'nullable|string|max:1000',
             'discount_percent'  => 'required|integer|min:0|max:100',
-            'applicable_to'     => 'required|in:all,membership,student,golden',
+            'applicable_to'     => 'required|in:all,membership,student,golden,welcome',
             'offer_type'        => 'required|in:all_items,specific_items',
             'menu_variations'   => 'nullable|array',
             'menu_variations.*' => 'integer|exists:menu_variations,id',
             'min_total'         => 'nullable|numeric|min:0|max:99999999.99',
+            'welcome_duration_months' => 'nullable|integer|min:1|max:60',
             'is_first_order'    => 'sometimes|boolean',
             'is_active'         => 'sometimes|boolean',
             'show_as_popup'     => 'sometimes|boolean',
@@ -149,6 +150,14 @@ class OfferController extends Controller
         // (cards, cart, checkout, listing) sees one consistent state.
         if (! $request->filled('min_total') || (float) $request->input('min_total') <= 0) {
             $data['min_total'] = null;
+        }
+
+        // Welcome window only makes sense for welcome offers; blank falls back
+        // to the default 6-month window.
+        if (($data['applicable_to'] ?? null) === 'welcome') {
+            $data['welcome_duration_months'] = (int) ($request->input('welcome_duration_months') ?: \App\Models\Member::WELCOME_DEFAULT_DURATION_MONTHS);
+        } else {
+            $data['welcome_duration_months'] = null;
         }
 
         return $data;
