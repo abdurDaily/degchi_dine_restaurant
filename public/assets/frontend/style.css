@@ -4834,11 +4834,11 @@ h6,
 .footer-bottom {
     padding: 1.4rem 0;
     font-size: 0.84rem;
-    color: rgba(250, 245, 235, 0.35);
+    color: rgba(250, 250, 250, 0.35);
 }
 
 .footer-bottom a {
-    color: rgba(250, 245, 235, 0.35);
+    color: rgba(255, 255, 255, 0.35);
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -7703,7 +7703,7 @@ footer[id],
 .reveal-left,
 .reveal-right,
 .reveal-scale,
-.reveal-fade {
+.reveal-fade 
     .reveal {
         transform: translateY(28px);
     }
@@ -8759,7 +8759,7 @@ footer[id],
             transform: none;
         }
     }
-}
+
 
 .menu-slider-section {
     position: relative;

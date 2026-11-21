@@ -33,6 +33,7 @@
             <li><a href="{{ route('frontend.home') }}#home">Home</a></li>
             <li><a href="{{ route('frontend.home') }}#about">About Us</a></li>
             <li><a href="{{ route('frontend.completeMenu') }}">Full Menu</a></li>
+            <li><a href="{{ route('frontend.blog.index') }}">Blog</a></li>
             <li><a href="{{ route('frontend.cards') }}">Privilege Card</a></li>
             <li><a href="{{ route('frontend.reviews.index') }}">Reviews</a></li>
             <li><a href="{{ route('frontend.contact') }}">Contact</a></li>
