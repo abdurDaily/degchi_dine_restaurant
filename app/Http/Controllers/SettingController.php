@@ -128,7 +128,7 @@ class SettingController extends Controller
     public function logoUpload(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1500',
+            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
         if ($validator->fails())
@@ -143,10 +143,10 @@ class SettingController extends Controller
         if ($logo != NULL)
         {
 
-            $path = $path . $logo->value;
-            if (Storage::disk('public')->exists($path))
+            $oldPath = $path . $logo->value;
+            if (Storage::disk('public')->exists($oldPath))
             {
-                Storage::disk('public')->delete($path . $logo->value);
+                Storage::disk('public')->delete($oldPath);
             }
 
             $logo->value = $images['logo'];
@@ -174,7 +174,7 @@ class SettingController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'favicon' => 'required|image|mimes:png,jpg,jpeg,ico|dimensions:min_width=16,min_height=16,max_width=48,max_height=48',
+            'favicon' => 'required|image|mimes:png,jpg,jpeg|max:5120|dimensions:min_width=16,min_height=16,max_width=48,max_height=48',
         ]);
 
         if ($validator->fails())
@@ -189,10 +189,10 @@ class SettingController extends Controller
         if ($favicon != NULL)
         {
 
-            $path = $path . $favicon->value;
-            if (Storage::disk('public')->exists($path))
+            $oldPath = $path . $favicon->value;
+            if (Storage::disk('public')->exists($oldPath))
             {
-                Storage::disk('public')->delete($path . $favicon->value);
+                Storage::disk('public')->delete($oldPath);
             }
 
             $favicon->value = $images['favicon'];

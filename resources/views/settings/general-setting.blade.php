@@ -37,9 +37,9 @@
                     <div class="text-center card-body">
                         <div class="mx-auto avatar-xl col-sm-9">
                             <input type="file" class="filepond logo-upload" name="logo"
-                                accept="image/png, image/jpeg, image/gif" />
+                                accept="image/png, image/jpeg, image/gif, image/svg+xml" />
                         </div>
-                        <span class="text-danger">Must be within 200KB</span>
+                        <span class="text-danger">Max upload size: 5MB</span>
                     </div>
                 </div>
             </div>
@@ -51,9 +51,9 @@
                     <div class="text-center card-body">
                         <div class="mx-auto avatar-xl col-sm-9">
                             <input type="file" class="filepond favicon-upload" name="favicon"
-                                accept="image/png, image/jpeg, image/gif" />
+                                accept="image/png, image/jpeg" />
                         </div>
-                        <span class="text-danger">Must be within 100KB. dont upload .ico file</span>
+                        <span class="text-danger">Max upload size: 5MB. Use PNG or JPG (16x16 - 48x48), no .ico files.</span>
                     </div>
                 </div>
             </div>
@@ -122,55 +122,59 @@
                     FilePondPluginFileValidateSize
                 );
 
-                // Create a FilePond instance
-                let logoPond = FilePond.create(document.querySelector(".logo-upload"), {
-                    labelIdle: 'Drag & Drop logo or <span class="filepond--label-action">Browse</span>',
-                    server: {
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        process: {
-                            url: '{{ route('general-setting-logo.store') }}',
-                            onload: (res) => {
-                                let response = JSON.parse(res);
-                                if (response.status == 'success') {
-                                    Command: toastr["success"]('Logo uploaded successfully');
-                                }
-                                else {
-                                    Command: toastr["error"](response.message ?? 'Something went wrong');
-                                }
-                            },
-                            onerror: (response) => {
-                                let errorResponse = JSON.parse(response);
-                                Command: toastr["error"](errorResponse.message ?? 'Invalid file upload');
-                            }
-                        }
+                // FilePond passes the XHR object to onerror, so read the JSON from responseText.
+                const getErrorMessage = (xhr, fallback) => {
+                    try {
+                        const body = JSON.parse(xhr.responseText || xhr);
+                        return body.message ?? fallback;
+                    } catch (e) {
+                        return fallback;
+                    }
+                };
+
+                const buildServerConfig = (url, successMessage) => ({
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
+                    process: {
+                        url: url,
+                        onload: (res) => {
+                            try {
+                                const response = JSON.parse(res);
+                                if (response.status === 'success') {
+                                    toastr.success(successMessage);
+                                    return res;
+                                }
+                                toastr.error(response.message ?? 'Something went wrong');
+                            } catch (e) {
+                                toastr.error('Upload failed. Please try again.');
+                            }
+                        },
+                        onerror: (xhr) => {
+                            toastr.error(getErrorMessage(xhr, 'Invalid file upload'));
+                        }
+                    }
                 });
 
-                let faviconPond = FilePond.create(document.querySelector(".favicon-upload"), {
+                const uploadOptions = {
+                    maxFileSize: '5MB',
+                    fileSizeBase: 1024,
+                    labelMaxFileSizeExceeded: 'File is too large',
+                    labelMaxFileSize: 'Maximum file size is {filesize}'
+                };
+
+                FilePond.create(document.querySelector(".logo-upload"), {
+                    ...uploadOptions,
+                    name: 'logo',
+                    labelIdle: 'Drag & Drop logo or <span class="filepond--label-action">Browse</span>',
+                    server: buildServerConfig('{{ route('general-setting-logo.store') }}', 'Logo uploaded successfully')
+                });
+
+                FilePond.create(document.querySelector(".favicon-upload"), {
+                    ...uploadOptions,
+                    name: 'favicon',
                     labelIdle: 'Drag & Drop favicon or <span class="filepond--label-action">Browse</span>',
-                    server: {
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        process: {
-                            url: '{{ route('general-setting-favicon.store') }}',
-                            onload: (res) => {
-                                let response = JSON.parse(res);
-                                if (response.status == 'success') {
-                                    Command: toastr["success"]('Favicon uploaded successfully');
-                                }
-                                else {
-                                    Command: toastr["error"](response.message ?? 'Something went wrong');
-                                }
-                            },
-                            onerror: (response) => {
-                                let errorResponse = JSON.parse(response);
-                                Command: toastr["error"](errorResponse.message ?? 'Invalid file upload');
-                            }
-                        }
-                    },
+                    server: buildServerConfig('{{ route('general-setting-favicon.store') }}', 'Favicon uploaded successfully')
                 });
 
 
