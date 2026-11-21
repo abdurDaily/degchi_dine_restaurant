@@ -1,0 +1,306 @@
+/* ==========================================================================
+   Degchi backend — dark mode contrast fixes.
+   Loaded after page-level @stack('styles') in admin-master.blade.php.
+   Every rule is scoped to html[data-bs-theme="dark"] so light mode is untouched.
+   ========================================================================== */
+
+/* Page-local tokens used by reviews/stat cards must follow the admin palette. */
+html[data-bs-theme="dark"] .admin-ui {
+    --card-bg: var(--admin-card, #1a2332);
+    --light-bg: var(--admin-bg, #0f1720);
+    --text-dark: var(--admin-text, #e5e7eb);
+    --text-muted: var(--admin-muted, #9ca3af);
+    --border: var(--admin-border, rgba(255, 255, 255, 0.09));
+}
+
+/* Base surfaces ---------------------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .main-content .card,
+html[data-bs-theme="dark"] .admin-ui .main-content .modal-content,
+html[data-bs-theme="dark"] .admin-ui .offcanvas,
+html[data-bs-theme="dark"] .admin-ui .dropdown-menu {
+    background-color: var(--admin-card, #1a2332);
+    color: var(--admin-text, #e5e7eb);
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+}
+
+/* Plain card headers (skip deliberately coloured headers). */
+html[data-bs-theme="dark"] .admin-ui .main-content .card-header:not(.bg-primary):not(.bg-dark):not(.bg-gradient):not(.text-white),
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-crud-card__head {
+    background-color: var(--admin-card, #1a2332) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+    border-bottom-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-crud-card__head h5 {
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+/* Tables ----------------------------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .main-content .table thead th,
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-datatable thead th {
+    background-color: var(--admin-card, #1a2332) !important;
+    color: var(--admin-muted, #9ca3af) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .main-content .table tbody td,
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-datatable tbody td {
+    color: var(--admin-text, #e5e7eb) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .main-content .table tbody tr:hover,
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-datatable tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.035) !important;
+}
+
+/* Forms, labels and detail blocks --------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .main-content .form-label,
+html[data-bs-theme="dark"] .admin-crud-page .form-label,
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-detail-value,
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-delivery-service-value,
+html[data-bs-theme="dark"] .admin-ui .main-content h4[style*="color:#0d5566"] {
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-crud-page .form-control,
+html[data-bs-theme="dark"] .admin-crud-page .form-select,
+html[data-bs-theme="dark"] .admin-crud-page .dataTables_wrapper .dataTables_filter input,
+html[data-bs-theme="dark"] .admin-crud-page .dataTables_wrapper .dataTables_length select {
+    background-color: var(--admin-card, #1a2332) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-detail-section {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+}
+
+html[data-bs-theme="dark"] .admin-ui .main-content .admin-delivery-service {
+    background: var(--admin-card, #1a2332);
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+}
+
+html[data-bs-theme="dark"] .admin-file-field,
+html[data-bs-theme="dark"] .admin-file-field input[type="file"] {
+    background: var(--admin-card, #1a2332) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+/* Modals ----------------------------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .modal-footer,
+html[data-bs-theme="dark"] .admin-crud-page .modal-footer {
+    background: var(--admin-bg, #0f1720) !important;
+    border-top-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+}
+
+/* Pagination ------------------------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .main-content .pagination {
+    --bs-pagination-bg: var(--admin-card, #1a2332);
+    --bs-pagination-border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+    --bs-pagination-disabled-bg: var(--admin-card, #1a2332);
+    --bs-pagination-disabled-border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+    --bs-pagination-disabled-color: var(--admin-muted, #9ca3af);
+}
+
+html[data-bs-theme="dark"] .admin-crud-page .page-item .page-link,
+html[data-bs-theme="dark"] .admin-crud-page .dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: var(--admin-card, #1a2332) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-crud-page .page-item.active .page-link,
+html[data-bs-theme="dark"] .admin-crud-page .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(135deg, var(--admin-primary-deep, #083844), var(--admin-primary, #116b83)) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+}
+
+html[data-bs-theme="dark"] .admin-crud-page .page-item .page-link:hover,
+html[data-bs-theme="dark"] .admin-crud-page .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
+    background: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.18) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+/* Dashboard quick links / progress bars ---------------------------------- */
+html[data-bs-theme="dark"] .dd-bar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .dd-quick-link {
+    background: var(--admin-card, #1a2332);
+    color: var(--admin-text, #e5e7eb);
+}
+
+html[data-bs-theme="dark"] .dd-quick-link:hover {
+    background: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.18);
+    color: var(--admin-text, #e5e7eb);
+}
+
+/* Global order alert panel ----------------------------------------------- */
+html[data-bs-theme="dark"] #ddOrderAlertPanel {
+    background: var(--admin-card, #1a2332);
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    color: var(--admin-text, #e5e7eb);
+}
+
+html[data-bs-theme="dark"] #ddOrderAlertPanel h6 {
+    color: var(--admin-text, #e5e7eb);
+}
+
+html[data-bs-theme="dark"] #ddOrderAlertPanel label {
+    color: var(--admin-muted, #9ca3af);
+}
+
+html[data-bs-theme="dark"] #ddOrderAlertVolumeVal {
+    color: var(--admin-primary, #116b83);
+}
+
+/* Orders page ------------------------------------------------------------ */
+html[data-bs-theme="dark"] .admin-ui #dateRangePickerBtn,
+html[data-bs-theme="dark"] .admin-ui #ordersSearch,
+html[data-bs-theme="dark"] .admin-ui .top-customer-btn {
+    background: var(--admin-card, #1a2332) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui #dateRangePickerBtn:hover,
+html[data-bs-theme="dark"] .admin-ui #dateRangePickerBtn:focus,
+html[data-bs-theme="dark"] .admin-ui #ordersSearch:focus,
+html[data-bs-theme="dark"] .admin-ui .top-customer-btn:hover,
+html[data-bs-theme="dark"] .admin-ui .top-customer-btn:focus,
+html[data-bs-theme="dark"] .admin-ui .top-customer-btn.show {
+    border-color: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.55) !important;
+    box-shadow: 0 0 0 3px rgba(var(--admin-primary-rgb, 17, 107, 131), 0.18) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .drp-wrapper .drp-icon,
+html[data-bs-theme="dark"] .admin-ui .orders-search-wrap .search-icon {
+    color: var(--admin-muted, #9ca3af) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui tr.row-new-order td {
+    background: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.12) !important;
+    border-top-color: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.28) !important;
+    border-bottom-color: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.28) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui tr.row-new-order td:first-child {
+    border-left-color: var(--admin-primary, #116b83) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui tr.row-canceled-order td,
+html[data-bs-theme="dark"] .admin-ui tr.row-canceled-order:hover td {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-top-color: rgba(239, 68, 68, 0.25) !important;
+    border-bottom-color: rgba(239, 68, 68, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui tr.row-canceled-order td:first-child {
+    border-left-color: #ef4444 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .order-status-canceled {
+    background: rgba(239, 68, 68, 0.18) !important;
+    color: #fca5a5 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .order-status-pending {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fcd34d !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .order-status-confirmed {
+    background: rgba(6, 182, 212, 0.18) !important;
+    color: #67e8f9 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .order-status-completed {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .order-branch-assigned {
+    background: var(--admin-primary, #116b83) !important;
+    color: #fff !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .top-customer-menu {
+    background: var(--admin-card, #1a2332);
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+}
+
+html[data-bs-theme="dark"] .admin-ui .top-customer-menu .dropdown-item {
+    color: var(--admin-text, #e5e7eb);
+}
+
+html[data-bs-theme="dark"] .admin-ui .top-customer-menu .dropdown-item.active,
+html[data-bs-theme="dark"] .admin-ui .top-customer-menu .dropdown-item:hover {
+    background: rgba(var(--admin-primary-rgb, 17, 107, 131), 0.18) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .top-customers-card {
+    border-top-color: var(--admin-primary, #116b83) !important;
+}
+
+/* Order detail badges ---------------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .badge.bg-light.text-dark {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09)) !important;
+    color: var(--admin-text, #e5e7eb) !important;
+}
+
+/* Blog status badges / tabs ---------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .nav-tabs .nav-link {
+    color: var(--admin-muted, #9ca3af) !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .nav-tabs .nav-link.active {
+    background: var(--admin-primary, #116b83) !important;
+    color: #fff !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .status-badge.active,
+html[data-bs-theme="dark"] .admin-ui .status-badge.enabled {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .status-badge.inactive {
+    background: rgba(239, 68, 68, 0.18) !important;
+    color: #fca5a5 !important;
+}
+
+html[data-bs-theme="dark"] .admin-ui .status-badge.disabled,
+html[data-bs-theme="dark"] .admin-crud-actions__btn--hide {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fcd34d !important;
+}
+
+html[data-bs-theme="dark"] .admin-crud-actions__btn--show {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+}
+
+/* Star toggle buttons ---------------------------------------------------- */
+html[data-bs-theme="dark"] .admin-ui .btn-star-toggle {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--admin-border, rgba(255, 255, 255, 0.09));
+    color: var(--admin-muted, #9ca3af);
+}
+
+html[data-bs-theme="dark"] .admin-ui .btn-star-toggle:hover,
+html[data-bs-theme="dark"] .admin-ui .btn-star-toggle.is-active {
+    background: rgba(245, 197, 24, 0.16);
+    border-color: rgba(245, 197, 24, 0.45);
+    color: #fcd34d;
+}

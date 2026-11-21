@@ -14,7 +14,7 @@
                         $sliderMenus = $categories
                             ->pluck('menus')
                             ->flatten()
-                            ->filter(fn($menu) => $menu->variations->isNotEmpty())
+                            ->filter(fn($menu) => $menu->is_popular && $menu->variations->isNotEmpty())
                             ->take(10);
                     @endphp
 

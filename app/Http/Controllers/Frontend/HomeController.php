@@ -32,12 +32,12 @@ class HomeController extends Controller
     public function home()
     {
         // Cache categories for 5 minutes to improve performance
-        $categories = cache()->remember('home_categories', 300, function () {
+        $categories = cache()->remember('home_categories_v2', 300, function () {
             return Category::where('status', 1)
                 ->with([
                     'menus' => function ($query) {
                         $query->where('is_available', 1)
-                            ->select(['id', 'category_id', 'name', 'slug', 'description', 'is_available'])
+                            ->select(['id', 'category_id', 'name', 'slug', 'description', 'is_available', 'is_popular'])
                             ->with([
                                 'variations' => function ($query) {
                                     $query->select(['id', 'menu_id', 'name', 'price', 'image'])

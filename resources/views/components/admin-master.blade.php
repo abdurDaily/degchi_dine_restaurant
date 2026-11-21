@@ -65,20 +65,29 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ Session::get('favicon') }}">
     <script>
-        /* Seed Velzon localStorage from saved theme so customizer + layout.js stay in sync */
+        /*
+         * Seed missing Velzon localStorage keys from the saved server theme,
+         * but never overwrite a choice the user made with the header toggle.
+         * Apply the client theme immediately to avoid a light-mode flash.
+         */
         (function () {
             try {
                 var theme = @json($adminTheme);
                 Object.keys(theme).forEach(function (key) {
-                    if (theme[key] != null && theme[key] !== '') {
+                    if (theme[key] != null && theme[key] !== '' && localStorage.getItem(key) === null) {
                         localStorage.setItem(key, theme[key]);
                     }
                 });
+
+                var clientTheme = localStorage.getItem('data-bs-theme');
+                if (clientTheme === 'dark' || clientTheme === 'light') {
+                    document.documentElement.setAttribute('data-bs-theme', clientTheme);
+                }
             } catch (e) {}
         })();
     </script>
     <!-- Layout config Js -->
-    <script src="{{ asset('assets/js/layout.js') }}"></script>
+    <script src="{{ asset('assets/js/layout.js?v=darkmode-1') }}"></script>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('assets/frontend/images/logo.webp') }}">
     <!-- Bootstrap Css -->
@@ -137,6 +146,9 @@
 
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     @stack('styles')
+
+    <!-- Backend dark-mode contrast fixes — loaded last so it wins over page-level styles -->
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-dark-fixes.css?v=darkmode-1') }}">
 
 </head>
 
@@ -369,7 +381,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
     <script src="{{ asset('assets/js/jquery.keyboard.extension-autocomplete.js') }}"></script>
     <!-- App js -->
-    <script src="{{ asset('assets/js/app.js') }}"></script>
+    <script src="{{ asset('assets/js/app.js?v=darkmode-1') }}"></script>
 
     <script>
         $(document).ready(function() {

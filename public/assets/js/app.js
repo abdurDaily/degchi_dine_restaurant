@@ -482,8 +482,10 @@
     }
 
     function C(e, t, a, n) {
-        var o = document.getElementById(a);
-        n.setAttribute(e, t), o && document.getElementById(a).click()
+        var o = document.getElementById(a), r;
+        n.setAttribute(e, t), localStorage.setItem(e, t), o && document.getElementById(a).click(), r = {}, Array.from(document.documentElement.attributes).forEach(function(a) {
+            a && a.nodeName && "undefined" != a.nodeName && (r[a.nodeName] = a.nodeValue)
+        }), localStorage.setItem("defaultAttribute", JSON.stringify(r))
     }
 
     function N() {

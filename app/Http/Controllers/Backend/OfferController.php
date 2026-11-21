@@ -50,6 +50,7 @@ class OfferController extends Controller
         }
 
         cache()->forget('home_categories');
+        cache()->forget('home_categories_v2');
         cache()->forget('home_popup_offer');
         cache()->forget('active_all_item_offers');
 
@@ -90,6 +91,7 @@ class OfferController extends Controller
         }
 
         cache()->forget('home_categories');
+        cache()->forget('home_categories_v2');
         cache()->forget('home_popup_offer');
         cache()->forget('active_all_item_offers');
 
@@ -105,6 +107,7 @@ class OfferController extends Controller
         $offer->delete();
 
         cache()->forget('home_categories');
+        cache()->forget('home_categories_v2');
         cache()->forget('home_popup_offer');
         cache()->forget('active_all_item_offers');
 
@@ -115,6 +118,7 @@ class OfferController extends Controller
     {
         $offer->update(['is_active' => !$offer->is_active]);
         cache()->forget('home_categories');
+        cache()->forget('home_categories_v2');
         cache()->forget('home_popup_offer');
         cache()->forget('active_all_item_offers');
         return response()->json(['success' => true, 'is_active' => $offer->is_active]);
