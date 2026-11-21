@@ -31,7 +31,7 @@
                                 <th>SL</th>
                                 <th>Name</th>
                                 <th>Permissions</th>
-                                <th style="min-width: 162px;">Actions</th>
+                                <th style="min-width: 140px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -44,6 +44,37 @@
         @include('roles.create')
         @include('roles.edit')
     @endsection
+
+    @push('styles')
+        <style>
+            /* Compact, evenly spaced icon actions in the Roles table */
+            #dataRole td:last-child {
+                white-space: nowrap;
+                text-align: center;
+            }
+
+            #dataRole td:last-child .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 30px;
+                height: 30px;
+                padding: 0;
+                font-size: 0.8rem;
+                line-height: 1;
+                margin-right: 0.4rem !important;
+            }
+
+            /* Extra room for the user-count badge on the second button */
+            #dataRole td:last-child .btn:nth-child(2) {
+                margin-right: 0.7rem !important;
+            }
+
+            #dataRole td:last-child .btn:last-child {
+                margin-right: 0 !important;
+            }
+        </style>
+    @endpush
 
     @push('scripts')
         <script>

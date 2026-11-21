@@ -1,7 +1,8 @@
 @extends('frontend.layout')
 
 @section('meta_title', 'Contact Us')
-@section('meta_description', 'Contact Degchi Dine for reservations, membership reviews, directions and opening hours in
+@section('meta_description',
+    'Contact Degchi Dine for reservations, membership reviews, directions and opening hours in
     Halishahar, Chittagong.')
 
 @section('frontend_content')
@@ -20,9 +21,9 @@
         $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
     @endphp
 
-    <x-frontend.page-header title="যোগাযোগ করুন" eyebrow="আমাদের সাথে যোগাযোগ"
-        subtitle="রিজার্ভেশন, মতামত বা সদস্যপদ সম্পর্কে জানতে আমাদের সাথে যোগাযোগ করুন।" :backLink="route('frontend.home')"
-        backText="হোমে ফিরে যান">
+    <x-frontend.page-header title="Contact Us" eyebrow="Get in Touch With Us"
+        subtitle="Contact us for reservations, feedback, or membership information." :backLink="route('frontend.home')"
+        backText="Back to Home">
         <x-slot:eyebrowIcon>
             <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
         </x-slot:eyebrowIcon>
@@ -36,10 +37,10 @@
                         <div class="contact-page-info-top">
                             <div>
                                 <h2 class="contact-page-info-title">{{ $contactName }}</h2>
-                                <p class="contact-page-info-tagline">আন্তরিক আতিথেয়তা · খাঁটি স্বাদ</p>
+                                <p class="contact-page-info-tagline">Sincere Hospitality · Authentic Flavour</p>
                             </div>
                             <span class="contact-page-open-badge">
-                                <i class="bi bi-clock me-1"></i> প্রতিদিন খোলা
+                                <i class="bi bi-clock me-1"></i> Open Daily
                             </span>
                         </div>
 
@@ -49,7 +50,7 @@
                                     <i class="bi bi-geo-alt-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>ঠিকানা</h3>
+                                    <h3>Address</h3>
                                     <p>{!! nl2br(e($contactAddress)) !!}</p>
                                 </div>
                             </article>
@@ -59,7 +60,7 @@
                                     <i class="bi bi-telephone-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>ফোন</h3>
+                                    <h3>Phone</h3>
                                     <p><a href="tel:{{ $contactPhoneDigits }}">{{ $contactPhone }}</a></p>
                                 </div>
                             </article>
@@ -69,7 +70,7 @@
                                     <i class="bi bi-envelope-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>ইমেইল</h3>
+                                    <h3>Email</h3>
                                     <p><a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a></p>
                                 </div>
                             </article>
@@ -79,7 +80,7 @@
                                     <i class="bi bi-clock-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>খোলার সময়</h3>
+                                    <h3>Opening Hours</h3>
                                     <p>{{ $contactHours }}</p>
                                 </div>
                             </article>
@@ -89,18 +90,18 @@
                             <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer"
                                 class="btn-dine btn-dine-primary btn-dine-sm">
                                 <i class="bi bi-signpost-split-fill"></i>
-                                পথনির্দেশ দেখুন
+                                View location
                             </a>
 
                             <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-sm"
                                 style="background: var(--brand-gradient); color: #fff;">
                                 <i class="bi bi-telephone-fill"></i>
-                                এখনই কল করুন
+                                Call Now
                             </a>
                         </div>
 
                         <div class="contact-page-socials">
-                            <span>আমাদের অনুসরণ করুন</span>
+                            <span>Follow Us</span>
                             <x-frontend.social-links :settings="$contactSettings" />
                         </div>
                     </div>
@@ -108,7 +109,7 @@
                     <div class="contact-page-map">
                         <div class="contact-page-map-label">
                             <i class="bi bi-pin-map-fill"></i>
-                            <span>হালিশহর, চট্টগ্রাম</span>
+                            <span>Halishahar, Chittagong</span>
                         </div>
 
                         <iframe src="{{ $contactMapEmbed }}" allowfullscreen="" loading="lazy"
@@ -120,30 +121,30 @@
                     <div class="contact-form-sticky">
                         <div id="memberCheckCard" class="cp-form-card cp-form-card-verify">
                             <div class="cp-form-card-head">
-                                <span class="cp-form-step">ধাপ ১</span>
-                                <h3>আপনার অভিজ্ঞতা শেয়ার করুন</h3>
-                                <p>আমাদের সম্মানিত সদস্যদের জন্য। রিভিউ দিতে প্রথমে আপনার মেম্বারশিপ যাচাই করুন।</p>
+                                <span class="cp-form-step">Step 1</span>
+                                <h3>Share Your Experience</h3>
+                                <p>For our valued members. Verify your membership first to leave a review.</p>
                             </div>
 
                             <form id="memberVerificationForm" class="member-check-form">
                                 @csrf
 
                                 <div class="cp-field cp-field-highlight">
-                                    <label for="cardNumberCheck" class="cp-label">মেম্বারশিপ কার্ড নম্বর</label>
+                                    <label for="cardNumberCheck" class="cp-label">Membership Card Number</label>
                                     <input type="text" class="cp-input" id="cardNumberCheck" name="card_number" required
-                                        placeholder="যেমন: DD-XXXX-XXXX">
+                                        placeholder="e.g. DD-XXXX-XXXX">
                                 </div>
 
                                 <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm w-100" id="verifyBtn">
-                                    <span id="verifyBtnText">মেম্বারশিপ যাচাই করুন</span>
+                                    <span id="verifyBtnText">Verify Membership</span>
                                     <span id="verifyBtnSpinner" class="spinner-border spinner-border-sm ms-2 d-none"
                                         role="status" aria-hidden="true"></span>
                                 </button>
 
                                 <p class="cp-form-footnote text-center mb-0">
-                                    এখনও সদস্য হননি?
+                                    Not a member yet?
                                     <a href="{{ route('frontend.card.apply') }}" class="cp-link-gold">
-                                        মেম্বারশিপের জন্য আবেদন করুন
+                                        Apply for Membership
                                         <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </p>
@@ -153,9 +154,9 @@
                                 <div class="cp-alert-success mb-4" role="alert">
                                     <i class="bi bi-shield-check"></i>
                                     <div>
-                                        <strong>অ্যাক্সেস পাওয়া গেছে</strong>
-                                        <span>আপনার মেম্বারশিপ সফলভাবে যাচাই হয়েছে। আপনার মূল্যবান মতামত জানতে আমরা
-                                            আগ্রহী।</span>
+                                        <strong>Access Granted</strong>
+                                        <span>Your membership has been verified successfully. We would love to hear your
+                                            valuable feedback.</span>
                                     </div>
                                 </div>
 
@@ -164,7 +165,7 @@
                                     <input type="hidden" name="member_card_number" id="hiddenCardNumber">
 
                                     <div class="cp-field mb-4">
-                                        <label class="cp-label">আপনার রেটিং *</label>
+                                        <label class="cp-label">Your Rating *</label>
                                         <div class="cp-rating d-flex gap-2 mt-1">
                                             @for ($i = 1; $i <= 5; $i++)
                                                 <label class="cp-rating-option">
@@ -177,23 +178,23 @@
                                     </div>
 
                                     <div class="cp-field mb-4">
-                                        <label for="title" class="cp-label">রিভিউয়ের শিরোনাম (ঐচ্ছিক)</label>
+                                        <label for="title" class="cp-label">Review Title (Optional)</label>
                                         <input type="text" class="cp-input" id="title" name="title"
-                                            placeholder="যেমন: অসাধারণ স্বাদের অভিজ্ঞতা">
+                                            placeholder="e.g. An extraordinary taste experience">
                                     </div>
 
                                     <div class="cp-field mb-4">
-                                        <label for="comment" class="cp-label">আপনার রিভিউ *</label>
+                                        <label for="comment" class="cp-label">Your Review *</label>
                                         <textarea class="cp-input cp-textarea" id="comment" name="comment" rows="5" required
-                                            placeholder="আমাদের খাবার, পরিবেশ এবং আপনার অভিজ্ঞতা সম্পর্কে বিস্তারিত জানান..."></textarea>
-                                        <small class="cp-field-hint">কমপক্ষে ১০টি অক্ষর লিখুন।</small>
+                                            placeholder="Tell us in detail about our food, atmosphere, and your experience..."></textarea>
+                                        <small class="cp-field-hint">Write at least 10 characters.</small>
                                     </div>
 
                                     <div class="cp-form-actions">
                                         <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm flex-grow-1"
                                             id="submitReviewBtn">
                                             <span id="submitBtnText">
-                                                <i class="bi bi-send me-2"></i>রিভিউ প্রকাশ করুন
+                                                <i class="bi bi-send me-2"></i>Publish Review
                                             </span>
                                             <span id="submitBtnSpinner"
                                                 class="spinner-border spinner-border-sm ms-2 d-none" role="status"
@@ -202,7 +203,7 @@
 
                                         <button type="button" class="btn-dine btn-dine-outline btn-dine-sm"
                                             id="backBtn" onclick="goBackToVerification()">
-                                            <i class="bi bi-chevron-left"></i> পরিবর্তন করুন
+                                            <i class="bi bi-chevron-left"></i> Change
                                         </button>
                                     </div>
                                 </form>

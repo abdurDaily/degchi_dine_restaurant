@@ -35,8 +35,8 @@
             <div class="empty-state-wrap p-5">
                 <iconify-icon icon="solar:sad-smiley-outline" width="64" height="64"
                     class="text-white mb-3"></iconify-icon>
-                <h4 class="text-white">কোনো আইটেম পাওয়া যায়নি।</h4>
-                <p class="text-white">অন্য কোনো ক্যাটাগরি নির্বাচন করুন অথবা মূল্যসীমা পরিবর্তন করে আবার চেষ্টা করুন।
+                <h4 class="text-white">No items found.</h4>
+                <p class="text-white">Try selecting another category or changing the price range.
                 </p>
 
             </div>

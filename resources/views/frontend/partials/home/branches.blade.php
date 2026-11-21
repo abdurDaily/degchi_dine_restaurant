@@ -1,7 +1,7 @@
 <!-- BRANCHES -->
 <section class="branch-container" id="new_branch" style="margin-top: 2px;">
     <div class="container px-3 px-sm-4 px-lg-5">
-        <x-frontend.section-heading title="আমাদের শাখাগুলো" subtitle="পুরো শহরজুড়ে আমাদের বিশেষ অভিজ্ঞতা" />
+        <x-frontend.section-heading title="Our Branches" subtitle="Our special experience across the city" />
 
         <div class="row g-4">
             @forelse($branches as $branch)

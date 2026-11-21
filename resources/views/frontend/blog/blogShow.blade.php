@@ -106,7 +106,7 @@
                 <!-- Related Posts -->
                 @if($relatedPosts->count() > 0)
                     <div class="mt-5 pt-4">
-                        <h4 class="mb-3" style="color: var(--text-on-dark);">সম্পর্কিত পোস্ট</h4>
+                        <h4 class="mb-3" style="color: var(--text-on-dark);">Related Posts</h4>
                         <div class="row g-4 related-posts">
                             @foreach($relatedPosts as $related)
                                 <div class="col-md-4">
@@ -145,7 +145,7 @@
                                             </div>
 
                                             <a href="{{ route('frontend.blog.show', $related->slug) }}" class="blog-card-btn">
-                                                আরও পড়ুন<i class="ri-arrow-right-line ms-1"></i>
+                                                Read More<i class="ri-arrow-right-line ms-1"></i>
                                             </a>
                                         </div>
                                     </article>

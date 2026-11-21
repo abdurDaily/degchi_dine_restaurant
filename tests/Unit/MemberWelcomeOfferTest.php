@@ -505,7 +505,7 @@ class MemberWelcomeOfferTest extends TestCase
         $this->assertFalse($fallback['eligible']);
         $this->assertSame(0, $fallback['rate']);
         $this->assertFalse($fallback['welcome_discount_applicable']);
-        $this->assertStringContainsString('প্রথম অর্ডারের মেম্বারশিপ', $fallback['message']);
+        $this->assertStringContainsString('Your Membership/Student first-order discount has already been used', $fallback['message']);
 
         // (c) golden → unchanged
         $golden = $this->member(['type' => 'golden', 'expires_at' => now()->addYears(3)]);

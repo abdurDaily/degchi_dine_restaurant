@@ -31,7 +31,7 @@ class DashboardController extends Controller
             $rangeFrom = $from ? Carbon::parse($from)->startOfDay() : Carbon::parse($to)->startOfDay();
             $rangeTo   = $to ? Carbon::parse($to)->endOfDay() : Carbon::parse($from)->endOfDay();
 
-            // যদি from > to হয়ে যায় ভুলবশত, সোয়াপ করে দিন
+            // If from > to by mistake, swap them
             if ($rangeFrom->gt($rangeTo)) {
                 [$rangeFrom, $rangeTo] = [$rangeTo->copy()->startOfDay(), $rangeFrom->copy()->endOfDay()];
             }
@@ -61,7 +61,7 @@ class DashboardController extends Controller
         $monthlyRevenue = collect();
 
         if ($user->can('orders-show')) {
-            // Base order query — scoped to the user's branch, filtered হলে date range apply হবে, নাহলে সব order
+            // Base order query — scoped to the user's branch; apply the date range when filtered, otherwise include all orders
             $orderBase = Order::forUserBranch();
             if ($isFiltered) {
                 $orderBase->whereBetween('created_at', [$rangeFrom, $rangeTo]);
@@ -79,7 +79,7 @@ class DashboardController extends Controller
                 ->whereIn('status', ['confirmed', 'completed'])
                 ->sum('final_amount');
 
-            // "আজকের" মেট্রিক শুধু তখনই দেখানো হবে যখন কোনো ফিল্টার সিলেক্ট করা নেই
+            // "Today's" metrics are shown only when no filter is selected
             if (! $isFiltered) {
                 $stats['orders_today']  = Order::forUserBranch()->whereDate('created_at', today())->count();
                 $stats['revenue_today'] = (float) Order::forUserBranch()->whereIn('status', ['confirmed', 'completed'])
@@ -96,7 +96,7 @@ class DashboardController extends Controller
                 ->take(10)
                 ->get(['id', 'customer_name', 'customer_phone', 'final_amount', 'status', 'payment_status', 'created_at', 'viewed_at']);
 
-            // মাসিক রেভিনিউ চার্ট — শুধু unfiltered (default) view-তে দেখানো হবে
+            // Monthly revenue chart — shown only in the unfiltered (default) view
             if (! $isFiltered) {
                 $monthlyRevenue = Order::forUserBranch()
                     ->whereIn('status', ['confirmed', 'completed'])
@@ -134,7 +134,7 @@ class DashboardController extends Controller
             $stats['reviews_pending'] = (clone $reviewBase)->where('status', 'pending')->count();
         }
 
-        // ক্যাটালগ ডেটা — এগুলো "বর্তমান মোট সংখ্যা", ডেট ফিল্টার প্রযোজ্য নয়
+        // Catalog data — these are "current total counts"; the date filter does not apply
         if ($user->can('menu-list')) {
             $stats['menu_items'] = Menu::count();
         }

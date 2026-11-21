@@ -930,37 +930,37 @@
             <div class="container px-4 px-lg-5 text-center position-relative">
                 <a href="{{ route('frontend.home') }}" class="dd-apply-back-btn">
                     <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
-                    <span>হোমে ফিরে যান</span>
+                    <span>Back to Home</span>
                 </a>
 
-                <span class="dd-apply-badge">মেম্বার পোর্টাল</span>
-                <h1 class="dd-apply-headline">আবারও স্বাগতম, {{ explode(' ', $member->name)[0] }}</h1>
-                <p class="dd-apply-subhead">আপনার অর্ডার ট্র্যাক করুন, মেম্বারশিপের সুবিধাগুলো দেখুন এবং ডেক্সি ডাইনের
-                    রিওয়ার্ড পরিচালনা করুন।</p>
+                <span class="dd-apply-badge">Member Portal</span>
+                <h1 class="dd-apply-headline">Welcome back, {{ explode(' ', $member->name)[0] }}</h1>
+                <p class="dd-apply-subhead">Track your orders, view membership benefits, and manage your Degchi Dine
+                    rewards.</p>
 
                 <div class="md-hero-actions">
                     <a href="{{ route('frontend.order.track') }}" class="md-hero-btn md-hero-btn-outline">
                         <iconify-icon icon="solar:delivery-linear"></iconify-icon>
-                        অর্ডার ট্র্যাক করুন
+                        Track Order
                     </a>
                     <a href="{{ route('frontend.completeMenu') }}" class="md-hero-btn md-hero-btn-outline" data-tab="order">
                         <iconify-icon icon="solar:chef-hat-linear"></iconify-icon>
-                        খাবার অর্ডার করুন
+                        Order Food
                     </a>
                     <a href="{{ route('frontend.contact') }}" class="md-hero-btn md-hero-btn-outline">
                         <iconify-icon icon="solar:phone-calling-linear"></iconify-icon>
-                        যোগাযোগ করুন
+                        Contact Us
                     </a>
                     <button type="button" class="md-hero-btn md-hero-btn-outline border-0" id="mdEditProfileBtn"
                         data-tab="profile">
                         <iconify-icon icon="solar:user-edit-linear"></iconify-icon>
-                        প্রোফাইল সম্পাদনা
+                        Edit Profile
                     </button>
                     <form method="POST" action="{{ route('frontend.member.logout') }}">
                         @csrf
                         <button type="submit" class="md-hero-btn md-hero-btn-outline border-0">
                             <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
-                            লগআউট
+                            Log Out
                         </button>
                     </form>
                 </div>
@@ -978,7 +978,7 @@
                 <div class="md-profile-panel md-edit-panel">
                     <div class="md-panel-header">
                         <h3><iconify-icon icon="solar:user-edit-linear" class="me-2"
-                                style="color: var(--brand-secondary);"></iconify-icon>প্রোফাইল সম্পাদনা</h3>
+                                style="color: var(--brand-secondary);"></iconify-icon>Edit Profile</h3>
                     </div>
 
                     @if ($errors->any())
@@ -1007,7 +1007,7 @@
                                 </div>
                             @endif
                             <div class="md-field flex-grow-1 mb-0">
-                                <label for="profile_image">প্রোফাইল ছবি (ঐচ্ছিক)</label>
+                                <label for="profile_image">Profile Photo (Optional)</label>
                                 <input type="file" id="profile_image" name="profile_image"
                                     accept="image/webp,image/png,image/jpeg">
                             </div>
@@ -1015,38 +1015,38 @@
 
                         <div class="md-profile-grid">
                             <div class="md-field md-field-full">
-                                <label for="unique_card_number">মেম্বারশিপ কার্ড নম্বর</label>
+                                <label for="unique_card_number">Membership Card Number</label>
                                 <input type="text" id="unique_card_number" value="{{ $member->unique_card_number }}"
                                     readonly>
-                                <small>কার্ড নম্বর পরিবর্তন করা যাবে না।</small>
+                                <small>Card number cannot be changed.</small>
                             </div>
                             <div class="md-field">
-                                <label for="name">পূর্ণ নাম</label>
+                                <label for="name">Full Name</label>
                                 <input type="text" id="name" name="name"
                                     value="{{ old('name', $member->name) }}" required>
                             </div>
                             <div class="md-field">
-                                <label for="phone">ফোন নম্বর</label>
+                                <label for="phone">Phone Number</label>
                                 <input type="text" id="phone" name="phone"
                                     value="{{ old('phone', $member->phone) }}" required>
                             </div>
                             <div class="md-field">
-                                <label for="email">ইমেইল *</label>
+                                <label for="email">Email *</label>
                                 <input type="email" id="email" name="email"
                                     value="{{ old('email', $member->email) }}" required>
                             </div>
                             <div class="md-field">
-                                <label for="dob">জন্মতারিখ</label>
+                                <label for="dob">Date of Birth</label>
                                 <input type="date" id="dob" name="dob"
                                     value="{{ old('dob', optional($member->dob)->format('Y-m-d')) }}">
                             </div>
                             <div class="md-field">
-                                <label for="marriage_date">বিবাহের তারিখ</label>
+                                <label for="marriage_date">Marriage Date</label>
                                 <input type="date" id="marriage_date" name="marriage_date"
                                     value="{{ old('marriage_date', optional($member->marriage_date)->format('Y-m-d')) }}">
                             </div>
                             <div class="md-field md-field-full">
-                                <label for="address">ঠিকানা</label>
+                                <label for="address">Address</label>
                                 <textarea id="address" name="address" rows="3">{{ old('address', $member->address) }}</textarea>
                             </div>
                         </div>
@@ -1054,11 +1054,11 @@
                         <div class="md-profile-actions">
                             <button type="button" class="md-cancel-btn" id="mdCancelEditBtn">
                                 <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
-                                বাতিল
+                                Cancel
                             </button>
                             <button type="submit" class="md-save-btn">
                                 <iconify-icon icon="solar:diskette-linear"></iconify-icon>
-                                পরিবর্তন সংরক্ষণ করুন
+                                Save Changes
                             </button>
                         </div>
                     </form>
@@ -1072,57 +1072,57 @@
                     <div class="col-lg-4">
                         <div class="md-sidebar">
                             <div class="md-card-visual">
-                                <div class="md-card-label">আপনার মেম্বারশিপ কার্ড</div>
+                                <div class="md-card-label">Your Membership Card</div>
                                 <div class="md-card-number" id="memberCardNumberDisplay">
                                     {{ $member->unique_card_number }}</div>
                                 <button type="button" class="md-copy-btn" id="copyCardBtn">
-                                    <iconify-icon icon="solar:copy-linear" class="me-1"></iconify-icon> কার্ড নম্বর কপি
-                                    করুন
+                                    <iconify-icon icon="solar:copy-linear" class="me-1"></iconify-icon> Copy Card
+                                    Number
                                 </button>
                             </div>
 
                             <ul class="md-info-list">
                                 <li>
-                                    <span>মেম্বারের নাম</span>
+                                    <span>Member Name</span>
                                     <strong>{{ $member->name }}</strong>
                                 </li>
                                 <li>
-                                    <span>ফোন নম্বর</span>
+                                    <span>Phone Number</span>
                                     <strong>{{ $member->phone }}</strong>
                                 </li>
                                 <li>
-                                    <span>কার্ডের ধরন</span>
+                                    <span>Card Type</span>
                                     @if ($member->type === 'golden')
-                                        <span class="md-badge md-badge-golden">গোল্ডেন</span>
+                                        <span class="md-badge md-badge-golden">Golden</span>
                                     @else
-                                        <span class="md-badge md-badge-member">মেম্বারশিপ</span>
+                                        <span class="md-badge md-badge-member">Membership</span>
                                     @endif
                                 </li>
                                 @if ($member->is_student)
                                     <li>
-                                        <span>শিক্ষার্থী স্ট্যাটাস</span>
+                                        <span>Student Status</span>
                                         @if ($member->approval_status === 'approved')
-                                            <span class="md-badge md-badge-approved">অনুমোদিত</span>
+                                            <span class="md-badge md-badge-approved">Approved</span>
                                         @elseif ($member->approval_status === 'rejected')
-                                            <span class="md-badge md-badge-rejected">বাতিল</span>
+                                            <span class="md-badge md-badge-rejected">Cancel</span>
                                         @else
-                                            <span class="md-badge md-badge-pending-student">অপেক্ষমাণ</span>
+                                            <span class="md-badge md-badge-pending-student">Pending</span>
                                         @endif
                                     </li>
                                 @endif
                                 <li>
-                                    <span>মেয়াদ শেষ হবে</span>
-                                    <strong>{{ $member->expires_at?->format('d M Y') ?? 'প্রযোজ্য নয়' }}</strong>
+                                    <span>Expires</span>
+                                    <strong>{{ $member->expires_at?->format('d M Y') ?? 'N/A' }}</strong>
                                 </li>
                             </ul>
 
                             <div class="md-login-tip">
-                                <h6><iconify-icon icon="solar:key-linear" class="me-1"></iconify-icon> পরে আবার লগইন
-                                    করতে</h6>
+                                <h6><iconify-icon icon="solar:key-linear" class="me-1"></iconify-icon> To log in again
+                                    later</h6>
                                 <p>
-                                    <strong>/member/login</strong> ভিজিট করে আপনার <strong>ফোন নম্বর</strong> অথবা
-                                    <strong>কার্ড নম্বর</strong> এবং আবেদনের সময় তৈরি করা <strong>পাসওয়ার্ড</strong> ব্যবহার
-                                    করুন।
+                                    Visit <strong>/member/login</strong> and use your <strong>Phone Number</strong> or
+                                    <strong>Card Number</strong> with the <strong>Password</strong> you created when
+                                    applying.
                                 </p>
                             </div>
                         </div>
@@ -1135,13 +1135,13 @@
                                 <div class="md-stat-icon"><iconify-icon icon="solar:bag-check-linear"></iconify-icon>
                                 </div>
                                 <div class="md-stat-value">{{ $orders->total() }}</div>
-                                <div class="md-stat-label">মোট অর্ডার</div>
+                                <div class="md-stat-label">Total Orders</div>
                             </div>
                             <div class="md-stat-card">
                                 <div class="md-stat-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
                                 </div>
                                 <div class="md-stat-value">৳{{ number_format($member->total_purchase, 0) }}</div>
-                                <div class="md-stat-label">মোট খরচ</div>
+                                <div class="md-stat-label">Total Spent</div>
                             </div>
                             <div class="md-stat-card">
                                 <div class="md-stat-icon"><iconify-icon icon="solar:star-linear"></iconify-icon></div>
@@ -1173,13 +1173,13 @@
                                 </div>
                                 <div class="md-stat-label">
                                     @if ($member->type === 'golden')
-                                        গোল্ডেন ছাড়
+                                        Golden Discount
                                     @elseif ($tierShown)
-                                        প্রথম অর্ডারের ছাড়
+                                        First Order Discount
                                     @elseif ($welcomeShown)
-                                        নতুন সদস্য ছাড়
+                                        New Member Discount
                                     @else
-                                        পরবর্তী রিওয়ার্ড
+                                        Next Reward
                                     @endif
                                 </div>
                             </div>
@@ -1188,19 +1188,19 @@
                         <div class="md-orders-panel">
                             <div class="md-panel-header">
                                 <h3><iconify-icon icon="solar:clipboard-list-linear" class="me-2"
-                                        style="color: var(--brand-secondary);"></iconify-icon>আমার অর্ডার</h3>
-                                <a href="{{ route('frontend.completeMenu') }}" class="btn btn-sm btn-dark">+ নতুন
-                                    অর্ডার</a>
+                                        style="color: var(--brand-secondary);"></iconify-icon>My Orders</h3>
+                                <a href="{{ route('frontend.completeMenu') }}" class="btn btn-sm btn-dark">+ New
+                                    Order</a>
                             </div>
 
                             @if ($highlightOrder)
                                 <div class="md-order-success">
                                     <div class="md-order-success-icon">✓</div>
                                     <div>
-                                        <strong style="font-size: 1.05rem;">অর্ডার #{{ $highlightOrder->id }} সফলভাবে
-                                            সম্পন্ন হয়েছে!</strong>
+                                        <strong style="font-size: 1.05rem;">Order #{{ $highlightOrder->id }} completed
+                                            successfully!</strong>
                                         <p class="mb-0 mt-1 text-muted" style="font-size: 0.9rem;">
-                                            মোট ৳{{ number_format($highlightOrder->final_amount, 2) }} ·
+                                            Total ৳{{ number_format($highlightOrder->final_amount, 2) }} ·
                                             {{ strtoupper($highlightOrder->payment_method ?? 'N/A') }} ·
                                             {{ ucfirst($highlightOrder->status) }}
                                         </p>
@@ -1233,7 +1233,7 @@
                              data-qty-url="{{ route('frontend.member.orders.items.quantity', $order) }}" @endif>
                                     <div class="md-order-top">
                                         <div>
-                                            <div class="md-order-id">অর্ডার #{{ $order->id }}</div>
+                                            <div class="md-order-id">Order #{{ $order->id }}</div>
                                             <div class="md-order-date">{{ $order->created_at->format('d M Y · h:i A') }}
                                             </div>
                                         </div>
@@ -1249,14 +1249,14 @@
                                         </span>
                                         <span class="text-success js-order-saved"
                                             style="font-size: 0.82rem; {{ (float) $order->discount_amount > 0 ? '' : 'display:none;' }}">
-                                            সাশ্রয় ৳<span
+                                            Savings ৳<span
                                                 class="js-order-saved-val">{{ number_format($order->discount_amount, 2) }}</span>
                                         </span>
                                     </div>
                                     @if ($order->status === 'canceled' && !empty($order->status_remarks))
                                         <p class="text-danger mb-2 js-order-remarks"
                                             style="font-size: 0.78rem; line-height: 1.45;">
-                                            <strong>মন্তব্য:</strong> {{ $order->status_remarks }}
+                                            <strong>Remarks:</strong> {{ $order->status_remarks }}
                                         </p>
                                     @else
                                         <p class="text-danger mb-2 js-order-remarks"
@@ -1266,15 +1266,15 @@
                                     <div class="md-order-actions">
                                         <a href="{{ route('frontend.order.confirmation', $order) }}"
                                             class="btn btn-sm btn-outline-dark">
-                                            অর্ডারের বিস্তারিত দেখুন
+                                            View Order Details
                                         </a>
                                         @if ($isPending)
                                             <button type="button" class="btn btn-sm btn-dark js-manage-order-btn">
-                                                খাবার পরিচালনা করুন
+                                                Manage Items
                                             </button>
                                             <button type="button"
                                                 class="btn btn-sm btn-outline-danger js-cancel-order-btn">
-                                                অর্ডার বাতিল করুন
+                                                Cancel Order
                                             </button>
                                         @endif
                                     </div>
@@ -1284,7 +1284,7 @@
                                             <div class="js-manage-items">
                                                 @foreach ($orderItems as $index => $item)
                                                     @php
-                                                        $title = $item['title'] ?? ($item['name'] ?? 'খাবার');
+                                                        $title = $item['title'] ?? ($item['name'] ?? 'Item');
                                                         $price =
                                                             (float) ($item['original_price'] ?? ($item['price'] ?? 0));
                                                         $qty = max(1, (int) ($item['quantity'] ?? ($item['qty'] ?? 1)));
@@ -1307,7 +1307,7 @@
                                                                         class="text-danger fw-semibold">৳{{ number_format($discountedUnit, 2) }}</span>
                                                                     <span
                                                                         class="badge bg-danger-subtle text-danger">{{ $offerPercent }}%
-                                                                        ছাড়</span>
+                                                                        Discount</span>
                                                                 @else
                                                                     ৳{{ number_format($price, 2) }}
                                                                 @endif
@@ -1318,13 +1318,13 @@
                                                         </div>
                                                         <div class="md-qty-stepper">
                                                             <button type="button" class="js-qty-minus"
-                                                                aria-label="কমিয়ে দিন">−</button>
+                                                                aria-label="Decrease">−</button>
                                                             <span class="md-qty-value">{{ $qty }}</span>
                                                             <button type="button" class="js-qty-plus"
-                                                                aria-label="বাড়িয়ে দিন">+</button>
+                                                                aria-label="Increase">+</button>
                                                             <button type="button" class="md-qty-remove js-qty-remove"
-                                                                aria-label="মুছে ফেলুন"
-                                                                title="খাবারটি মুছে ফেলুন">×</button>
+                                                                aria-label="Remove"
+                                                                title="Remove Item">×</button>
                                                         </div>
                                                         <div class="md-item-price js-line-subtotal">
                                                             ৳{{ number_format($lineSubtotal, 2) }}</div>
@@ -1333,30 +1333,30 @@
                                             </div>
                                             <div class="md-manage-summary js-manage-summary">
                                                 <div class="md-manage-summary-row">
-                                                    <span>সাবটোটাল</span>
+                                                    <span>Subtotal</span>
                                                     <span
                                                         class="js-sum-subtotal">৳{{ number_format($displaySubtotal, 2) }}</span>
                                                 </div>
                                                 <div class="md-manage-summary-row js-sum-discount-row"
                                                     style="{{ (float) $order->discount_amount - $offerDiscountTotal > 0.004 || $offerDiscountTotal > 0.004 ? '' : 'display:none;' }}">
-                                                    <span>ছাড়</span>
+                                                    <span>Discount</span>
                                                     <span class="text-success js-sum-discount">-
                                                         ৳{{ number_format((float) $order->discount_amount, 2) }}</span>
                                                 </div>
                                                 <div class="md-manage-summary-row">
-                                                    <span>ডেলিভারি</span>
+                                                    <span>Delivery</span>
                                                     <span
                                                         class="js-sum-delivery">৳{{ number_format((float) ($order->delivery_charge ?? 0), 2) }}</span>
                                                 </div>
                                                 <div class="md-manage-summary-row">
-                                                    <span>মোট</span>
+                                                    <span>Total</span>
                                                     <span
                                                         class="js-sum-total">৳{{ number_format($order->final_amount, 2) }}</span>
                                                 </div>
                                             </div>
                                             <p class="text-muted mb-0 mt-2" style="font-size: 0.75rem;">
-                                                অর্ডারটি পেন্ডিং থাকা অবস্থায় আপনি খাবারের পরিমাণ পরিবর্তন বা খাবার মুছে
-                                                ফেলতে পারবেন। ডেলিভারি চার্জ অপরিবর্তিত থাকবে।
+                                                While the order is pending, you can change item quantities or remove
+                                                items. The delivery charge will remain unchanged.
                                             </p>
                                         </div>
                                     @endif
@@ -1364,11 +1364,11 @@
                             @empty
                                 <div class="md-empty-state">
                                     <iconify-icon icon="solar:bag-cross-linear"></iconify-icon>
-                                    <h5>এখনও কোনো অর্ডার নেই</h5>
-                                    <p>আপনার প্রথম অর্ডার সম্পন্ন করার পর এখানে আপনার অর্ডারের ইতিহাস দেখা যাবে।</p>
+                                    <h5>No Orders Yet</h5>
+                                    <p>Your order history will appear here after you place your first order.</p>
                                     <a href="{{ route('frontend.completeMenu') }}" class="dd-submit-btn"
                                         style="max-width: 220px; margin: 0 auto; text-decoration: none;">
-                                        <span>মেনু দেখুন</span>
+                                        <span>View Menu</span>
                                         <iconify-icon icon="solar:arrow-right-linear" class="dd-btn-icon"></iconify-icon>
                                     </a>
                                 </div>
@@ -1434,10 +1434,10 @@
                 copyBtn.addEventListener('click', function() {
                     navigator.clipboard.writeText(cardDisplay.textContent.trim()).then(function() {
                         copyBtn.innerHTML =
-                            '<iconify-icon icon="solar:check-circle-linear" class="me-1"></iconify-icon> কপি হয়েছে!';
+                            '<iconify-icon icon="solar:check-circle-linear" class="me-1"></iconify-icon> Copied!';
                         setTimeout(function() {
                             copyBtn.innerHTML =
-                                '<iconify-icon icon="solar:copy-linear" class="me-1"></iconify-icon> কার্ড নম্বর কপি করুন';
+                                '<iconify-icon icon="solar:copy-linear" class="me-1"></iconify-icon> Copy Card Number';
                         }, 2000);
                     });
                 });
@@ -1473,7 +1473,7 @@
                 var badge = card.querySelector('.js-order-status-badge');
                 if (badge) {
                     badge.className = 'md-badge md-badge-canceled js-order-status-badge';
-                    badge.textContent = 'বাতিল হয়েছে';
+                    badge.textContent = 'Canceled';
                 }
                 var amount = card.querySelector('.js-order-amount');
                 if (amount && order) amount.textContent = money(order.final_amount);
@@ -1481,7 +1481,7 @@
                 var remarks = card.querySelector('.js-order-remarks');
                 if (remarks && order && order.status_remarks) {
                     remarks.style.display = '';
-                    remarks.innerHTML = '<strong>মন্তব্য:</strong> ' + escapeHtml(order.status_remarks);
+                    remarks.innerHTML = '<strong>Remarks:</strong> ' + escapeHtml(order.status_remarks);
                 }
 
                 card.querySelectorAll('.js-manage-order-btn, .js-cancel-order-btn').forEach(function(btn) {
@@ -1489,7 +1489,7 @@
                 });
                 var panel = card.querySelector('.js-manage-panel');
                 if (panel) panel.remove();
-                notify('success', message || 'অর্ডারটি বাতিল করা হয়েছে।');
+                notify('success', message || 'The order has been canceled.');
             }
 
             function renderManagePanel(card, order) {
@@ -1516,7 +1516,7 @@
                             '<span class="text-danger fw-semibold">' + money(item.discounted_unit) +
                             '</span> ' +
                             '<span class="badge bg-danger-subtle text-danger">' + item.offer_percent +
-                            '% ছাড়</span>' :
+                            '% Discount</span>' :
                             money(item.price);
                         var noteHtml = item.note ? ' · ' + escapeHtml(item.note) : '';
 
@@ -1525,10 +1525,10 @@
                                 .title) + '</div>' +
                             '<div class="md-item-meta">' + priceHtml + noteHtml + '</div></div>' +
                             '<div class="md-qty-stepper">' +
-                            '<button type="button" class="js-qty-minus" aria-label="কমিয়ে দিন">−</button>' +
+                            '<button type="button" class="js-qty-minus" aria-label="Decrease">−</button>' +
                             '<span class="md-qty-value">' + item.quantity + '</span>' +
-                            '<button type="button" class="js-qty-plus" aria-label="বাড়িয়ে দিন">+</button>' +
-                            '<button type="button" class="md-qty-remove js-qty-remove" aria-label="মুছে ফেলুন" title="খাবারটি মুছে ফেলুন">×</button>' +
+                            '<button type="button" class="js-qty-plus" aria-label="Increase">+</button>' +
+                            '<button type="button" class="md-qty-remove js-qty-remove" aria-label="Remove" title="Remove Item">×</button>' +
                             '</div><div class="md-item-price js-line-subtotal">' + money(item
                                 .line_subtotal) + '</div></div>';
                     }).join('');
@@ -1575,7 +1575,7 @@
                     .then(function(result) {
                         if (!result.ok || !result.data.success) {
                             notify('error', (result.data && result.data.message) ||
-                                'খাবারটি আপডেট করা সম্ভব হয়নি।');
+                                'Could not update the item.');
                             setCardBusy(card, false);
                             return;
                         }
@@ -1588,7 +1588,7 @@
                         setCardBusy(card, false);
                     })
                     .catch(function() {
-                        notify('error', 'খাবারটি আপডেট করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                        notify('error', 'Could not update the item. Please try again.');
                         setCardBusy(card, false);
                     });
             }
@@ -1600,8 +1600,8 @@
                     var panel = card && card.querySelector('.js-manage-panel');
                     if (panel) {
                         panel.classList.toggle('is-open');
-                        manageBtn.textContent = panel.classList.contains('is-open') ? 'খাবারগুলো লুকান' :
-                            'খাবার পরিচালনা করুন';
+                        manageBtn.textContent = panel.classList.contains('is-open') ? 'Hide Items' :
+                            'Manage Items';
                     }
                     return;
                 }
@@ -1611,7 +1611,7 @@
                     var cancelCard = cancelBtnEl.closest('.md-order-card');
                     var cancelUrl = cancelCard && cancelCard.dataset.cancelUrl;
                     if (!cancelUrl) return;
-                    if (!confirm('এই অপেক্ষমাণ অর্ডারটি বাতিল করবেন? এটি আর ফিরিয়ে আনা যাবে না।')) return;
+                    if (!confirm('Cancel this pending order? This cannot be undone.')) return;
 
                     setCardBusy(cancelCard, true);
                     fetch(cancelUrl, {
@@ -1635,7 +1635,7 @@
                         .then(function(result) {
                             if (!result.ok || !result.data.success) {
                                 notify('error', (result.data && result.data.message) ||
-                                    'অর্ডারটি বাতিল করা সম্ভব হয়নি।');
+                                    'Could not cancel the order.');
                                 setCardBusy(cancelCard, false);
                                 return;
                             }
@@ -1643,7 +1643,7 @@
                         })
                         .catch(function() {
                             notify('error',
-                                'অর্ডারটি বাতিল করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                                'Could not cancel the order. Please try again.');
                             setCardBusy(cancelCard, false);
                         });
                     return;
@@ -1663,14 +1663,14 @@
                     10) || 1;
 
                 if (remove) {
-                    if (!confirm('এই খাবারটি অর্ডার থেকে মুছে ফেলবেন?')) return;
+                    if (!confirm('Remove this item from the order?')) return;
                     postQuantity(qtyCard, index, 0);
                     return;
                 }
 
                 var nextQty = plus ? currentQty + 1 : currentQty - 1;
                 if (nextQty <= 0) {
-                    if (!confirm('পরিমাণ ০ হয়ে যাবে — এই খাবারটি অর্ডার থেকে মুছে ফেলবেন?')) return;
+                    if (!confirm('The quantity will become 0 — remove this item from the order?')) return;
                     nextQty = 0;
                 }
                 postQuantity(qtyCard, index, nextQty);

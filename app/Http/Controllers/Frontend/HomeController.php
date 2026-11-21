@@ -800,10 +800,10 @@ class HomeController extends Controller
 
         $selectedCategorySlug = $selectedCategories[0] ?? null;
 
-        $offerFilter = $request->query('offer'); // নির্দিষ্ট offer ID দিয়ে filter
+        $offerFilter = $request->query('offer'); // Filter by a specific offer ID
         $offerOnly = filter_var($request->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
 
-        // Fresh visit কিনা চেক করা হচ্ছে (কোনো filter param URL-এ আছে কিনা)
+        // Check whether this is a fresh visit (whether any filter parameter exists in the URL)
         $hasAnyFilterParam = $request->has('categories')
             || $request->has('category')
             || $request->has('offer')
@@ -812,7 +812,7 @@ class HomeController extends Controller
             || $request->has('min_price')
             || $request->has('max_price');
 
-        // Fresh visit হলে Popular ডিফল্ট ফিল্টার হবে, নাহলে query থেকে নেওয়া হবে
+        // On a fresh visit, Popular is the default filter; otherwise take it from the query
         $popularOnly = $hasAnyFilterParam
             ? filter_var($request->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN)
             : true;
@@ -897,7 +897,7 @@ class HomeController extends Controller
             }
         }
 
-        // Popular items filter (ডিফল্ট বা ইউজার-সিলেক্টেড)
+        // Popular items filter (default or user-selected)
         if ($popularOnly) {
             $query->where('is_popular', 1);
         }

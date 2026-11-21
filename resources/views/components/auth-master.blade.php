@@ -21,7 +21,7 @@
                 <aside class="auth-split-brand">
                     <div class="auth-split-brand-inner">
                         <a href="{{ url('/') }}" class="auth-brand-logo" aria-label="Degchi Dine home">
-                            <img src="{{ asset('assets/frontend/images/logo.webp') }}" alt="Degchi Dine">
+                            <img src="{{ asset('assets/frontend/images/degchi-dine-logo.webp') }}" alt="Degchi Dine">
                         </a>
                         <h1 class="auth-brand-title">Degchi Dine</h1>
                         <p class="auth-brand-tagline">Secure admin access to manage your menu, orders, members, and restaurant settings.</p>
@@ -39,7 +39,7 @@
                 <main class="auth-split-main">
                     <div class="auth-mobile-logo">
                         <a href="{{ url('/') }}" class="auth-brand-logo" aria-label="Degchi Dine home">
-                            <img src="{{ asset('assets/frontend/images/logo.webp') }}" alt="Degchi Dine">
+                            <img src="{{ asset('assets/frontend/images/degchi-dine-logo.webp') }}" alt="Degchi Dine">
                         </a>
                     </div>
 

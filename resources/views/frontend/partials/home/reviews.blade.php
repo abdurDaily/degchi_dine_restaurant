@@ -1,7 +1,7 @@
 <!-- REVIEWS -->
 <section class="section-block reviews-section" id="testimonials">
     <div class="container px-4 px-lg-5">
-        <x-frontend.section-heading title="আমাদের অতিথিদের মন্তব্য" />
+        <x-frontend.section-heading title="What Our Guests Say" />
 
         <div class="reviews-slider">
             @forelse($reviews as $review)

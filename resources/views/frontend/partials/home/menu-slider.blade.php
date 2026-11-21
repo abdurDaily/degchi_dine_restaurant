@@ -1,12 +1,12 @@
 <!-- MENU -->
 <section class="menu-section section-block py-5"  id="menu">
     <div class="container px-4 px-lg-5">
-        <x-frontend.section-heading title="আমাদের জনপ্রিয় খাবার" subtitle="আমাদের সেরা খাবারগুলো যা আপনাকে বারবার ফিরিয়ে আনবে"
+        <x-frontend.section-heading title="Our Popular Dishes" subtitle="Our best dishes that will bring you back again and again"
             class="menu-section-header" />
 
         <div id="menuSlider" class="menu-slider reveal">
             <p class="menu-slider-mobile-hint d-md-none" aria-hidden="true">
-                <i class="bi bi-arrow-left-right me-1"></i> স্লাইড করুন বা তীর ব্যবহার করুন
+                <i class="bi bi-arrow-left-right me-1"></i> Swipe or use the arrows
             </p>
             <div class="menu-slider-viewport">
                 <div class="menu-slider-track">
@@ -47,8 +47,8 @@
                         <div class="menu-slide-item">
                             <div class="menu-offer-card">
                                 <div class="menu-offer-body">
-                                    <h5 class="menu-offer-title">শীঘ্রই আসছে</h5>
-                                    <p class="menu-offer-meta mb-0">নতুন খাবার শীঘ্রই যোগ করা হবে।</p>
+                                    <h5 class="menu-offer-title">Coming Soon</h5>
+                                    <p class="menu-offer-meta mb-0">New dishes will be added soon.</p>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
 
         <div class="menu-slider-footer reveal">
             <a href="{{ route('frontend.completeMenu') }}" class="btn-dine btn-dine-primary">
-                <span>সম্পূর্ণ মেনু দেখুন <i class="bi bi-arrow-right-short ms-1"></i></span>
+                <span>View Full Menu <i class="bi bi-arrow-right-short ms-1"></i></span>
             </a>
         </div>
     </div>

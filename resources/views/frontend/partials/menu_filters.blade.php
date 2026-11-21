@@ -1,7 +1,7 @@
 @php
     $suffix = $suffix ?? '';
 
-    // Fresh visit কিনা চেক করা হচ্ছে — মানে ইউজার এখনো কোনো filter apply করেনি
+    // Checking whether this is a fresh visit — meaning the user has not applied any filter yet
     $hasAnyFilterParam =
         request()->has('categories') ||
         request()->has('category') ||
@@ -11,11 +11,11 @@
         request()->has('min_price') ||
         request()->has('max_price');
 
-    // Offer popup থেকে redirect (?offer=<id>) এলে Offer checkbox auto-select হবে
+    // When redirected from the offer popup (?offer=<id>), the Offer checkbox will be auto-selected
     $isOfferSelected = request()->has('offer')
         || filter_var(request()->query('offerFilter', false), FILTER_VALIDATE_BOOLEAN);
 
-    // Fresh visit হলে Popular ডিফল্ট checked, নাহলে normal query value নেওয়া হবে
+    // On a fresh visit, Popular is checked by default; otherwise, the normal query value is used
     $isPopularSelected = $hasAnyFilterParam
         ? filter_var(request()->query('popularFilter', false), FILTER_VALIDATE_BOOLEAN)
         : true;
@@ -95,7 +95,7 @@
 
 </div>
 
-{{-- ================= SCRIPT (শুধু UI scroll visual effect) ================= --}}
+{{-- ================= SCRIPT (only UI scroll visual effect) ================= --}}
 <script>
     (function() {
         var list = document.getElementById('categoryListGroup{{ $suffix }}');

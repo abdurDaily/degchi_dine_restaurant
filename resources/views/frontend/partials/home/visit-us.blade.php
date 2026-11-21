@@ -17,23 +17,23 @@
             $contactPhoneDigits = preg_replace('/\D+/', '', $contactPhone);
         @endphp
 
-        <x-frontend.section-heading title="আমাদের ঠিকানা" subtitle="আমরা আপনাকে স্বাগত জানানোর অপেক্ষায় আছি।" />
+        <x-frontend.section-heading title="Our Address" subtitle="" />
 
         <div class="visit-us-grid reveal">
             <div class="visit-us-panel">
                 <div class="visit-us-panel-top">
                     <div>
                         <h3 class="visit-us-name">{{ $contactName }}</h3>
-                        <p class="visit-us-tagline">স্বতন্ত্র স্বাদ · আন্তরিক আতিথেয়তা</p>
+                        <p class="visit-us-tagline">Distinctive Flavors · Sincere Hospitality</p>
                     </div>
-                    <span class="visit-us-badge"><i class="bi bi-clock me-1"></i> প্রতিদিন খোলা</span>
+                    <span class="visit-us-badge"><i class="bi bi-clock me-1"></i> Open Daily</span>
                 </div>
 
                 <div class="visit-us-cards">
                     <article class="visit-us-card">
                         <div class="visit-us-card-icon"><i class="fa-solid fa-location-dot"></i></div>
                         <div class="visit-us-card-content">
-                            <h4>ঠিকানা</h4>
+                            <h4>Address</h4>
                             <p>{!! nl2br(e($contactAddress)) !!}</p>
                         </div>
                     </article>
@@ -41,7 +41,7 @@
                     <article class="visit-us-card">
                         <div class="visit-us-card-icon"><i class="fa-regular fa-clock"></i></div>
                         <div class="visit-us-card-content">
-                            <h4>খোলার সময়</h4>
+                            <h4>Opening Hours</h4>
                             <p>{{ $contactHours }}</p>
                         </div>
                     </article>
@@ -50,9 +50,9 @@
                         <div class="visit-us-card-icon visit-us-card-icon-gold"><i class="fa-solid fa-phone"></i>
                         </div>
                         <div class="visit-us-card-content">
-                            <h4>রিজার্ভেশন</h4>
+                            <h4>Reservations</h4>
                             <p><a href="tel:{{ $contactPhoneDigits }}">{{ $contactPhone }}</a></p>
-                            <span class="visit-us-card-note">টেবিল নিশ্চিত করতে আগে থেকেই কল করুন</span>
+                            <span class="visit-us-card-note">Contact us for orders or bookings.</span>
                         </div>
                     </article>
                 </div>
@@ -61,16 +61,16 @@
                     <a href="{{ $contactMapLink }}" target="_blank" rel="noopener noreferrer"
                         class="btn-dine btn-dine-ghost btn-dine-sm">
                         <i class="fa-solid fa-diamond-turn-right"></i>
-                        ম্যাপ দেখুন
+                        View Map
                     </a>
                     <a href="tel:{{ $contactPhoneDigits }}" class="btn-dine btn-dine-primary btn-dine-sm">
                         <i class="fa-solid fa-phone"></i>
-                        এখনই কল করুন
+                        Call Now
                     </a>
                 </div>
 
                 <div class="visit-us-socials">
-                    <span>আমাদের অনুসরণ করুন</span>
+                    <span>Follow Us</span>
                     <x-frontend.social-links :settings="$contactSettings" />
                 </div>
             </div>
@@ -78,7 +78,7 @@
             <div class="visit-us-map">
                 <div class="visit-us-map-label">
                     <i class="bi bi-pin-map-fill"></i>
-                    <span>হালিশহর, চট্টগ্রাম</span>
+                    <span>Halishahar, Chittagong</span>
                 </div>
                 <iframe src="{{ $contactMapEmbed }}" allowfullscreen="" loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade" title="{{ $contactName }} location map"></iframe>

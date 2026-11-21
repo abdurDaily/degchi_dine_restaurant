@@ -13,8 +13,8 @@
 
                 <!-- Title Panel -->
                 <div class="text-center my-5 reveal visible">
-                    <span class="luxury-meta-label mb-2">ডেক্সি রিওয়ার্ডস</span>
-                    <h1 class="luxury-title">আপনার ডাইনিং অভিজ্ঞতাকে আরও বিশেষ করে তুলুন</h1>
+                    <span class="luxury-meta-label mb-2">Degchi Rewards</span>
+                    <h1 class="luxury-title">Make Your Dining Experience Even More Special</h1>
                     <div class="luxury-accent-line mx-auto"></div>
                 </div>
 
@@ -24,26 +24,26 @@
                     <!-- Card Option 2: Membership Pass -->
                     <div class="col-12 col-md-6 col-lg-5">
                         <a href="{{ route('frontend.card.apply') }}" class="luxury-card-anchor"
-                            aria-label="মেম্বারশিপ কার্ড দেখুন">
+                            aria-label="View Membership Card">
                             <div class="luxury-interactive-card h-100">
 
                                 <!-- Clean Image Wrapper -->
                                 <div class="card-image-wrapper">
                                     <img src="{{ asset('assets/frontend/images/membership.svg') }}"
-                                        alt="ডেক্সি মেম্বারশিপ কার্ড" class="card-img-fit" />
+                                        alt="Degchi Dine Membership Card" class="card-img-fit" />
                                 </div>
 
                                 <!-- Text Details -->
                                 <div class="card-body-details p-4 p-lg-5">
                                     <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h3 class="card-main-title">মেম্বারশিপ কার্ড</h3>
+                                        <h3 class="card-main-title">Membership Card</h3>
                                         <div class="luxury-action-arrow">
                                             <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
                                         </div>
                                     </div>
                                     <p class="card-summary-text">
-                                        বিশেষ সদস্য সুবিধা, অগ্রাধিকার ভিত্তিতে টেবিল রিজার্ভেশন এবং
-                                        বিভিন্ন বিশেষ রিওয়ার্ড ও সুবিধা উপভোগ করুন।
+                                        Enjoy exclusive member benefits, priority table reservations,
+                                        and a variety of special rewards and perks.
                                     </p>
                                 </div>
 
@@ -54,26 +54,26 @@
                     <!-- Card Option 1: Golden Card (Privilege Pass) -->
                     <div class="col-12 col-md-6 col-lg-5">
                         <a href="#" class="luxury-card-anchor" data-bs-toggle="modal"
-                            data-bs-target="#goldenCardModal" aria-label="গোল্ডেন কার্ডের জন্য আবেদন করুন">
+                            data-bs-target="#goldenCardModal" aria-label="Apply for the Golden Card">
                             <div class="luxury-interactive-card h-100">
 
                                 <!-- Clean Image Wrapper -->
                                 <div class="card-image-wrapper">
                                     <img src="{{ asset('assets/frontend/images/privilege_card.svg') }}"
-                                        alt="ডেক্সি গোল্ডেন কার্ড" class="card-img-fit" />
+                                        alt="Degchi Dine Golden Card" class="card-img-fit" />
                                 </div>
 
                                 <!-- Text Details -->
                                 <div class="card-body-details p-4 p-lg-5">
                                     <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h3 class="card-main-title">গোল্ডেন কার্ড</h3>
+                                        <h3 class="card-main-title">Golden Card</h3>
                                         <div class="luxury-action-arrow">
                                             <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
                                         </div>
                                     </div>
                                     <p class="card-summary-text">
-                                        অগ্রাধিকার ভিত্তিতে টেবিল রিজার্ভেশন, বিশেষ রিওয়ার্ড এবং
-                                        ডেক্সি ডাইনে প্রতিবার ডাইনিংয়ে উপভোগ করুন অতিরিক্ত বিশেষ সুবিধা।
+                                        Priority table reservations, exclusive rewards and
+                                        extra special benefits on every visit to Degchi Dine.
                                     </p>
                                 </div>
 
@@ -96,9 +96,9 @@
                 <div class="modal-header border-0 pb-0">
                     <h4 class="modal-title fw-bold text-uppercase" id="goldenCardModalLabel"
                         style="letter-spacing: 1px; color: #1f1412; font-size: 1.25rem;">
-                        গোল্ডেন কার্ড আপগ্রেড
+                        Golden Card Upgrade
                     </h4>
-                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="বন্ধ করুন">
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -106,12 +106,12 @@
                     <div class="p-3 mb-4 rounded-3"
                         style="background: #faf8f5; border: 1px dashed rgba(223, 166, 83, 0.3);">
                         <h5 class="fw-bold mb-2 text-dark" style="font-size: 0.95rem;"><i
-                                class="bi bi-info-circle-fill text-warning me-2"></i>যোগ্যতা ও শর্তাবলি</h5>
+                                class="bi bi-info-circle-fill text-warning me-2"></i>Eligibility and Terms</h5>
                         <ul class="mb-0 text-muted ps-3" style="font-size: 0.85rem; line-height: 1.6;">
-                            <li>আপনার একটি সক্রিয় সাধারণ মেম্বারশিপ কার্ড থাকতে হবে।</li>
-                            <li>আপনার মোট ক্রয়ের পরিমাণ <strong>৳২,০০০.০০</strong> বা তার বেশি হতে হবে।</li>
-                            <li>আপগ্রেডের তারিখ থেকে গোল্ডেন কার্ডের মেয়াদ <strong>৫ বছর</strong>।</li>
-                            <li>গোল্ডেন কার্ডধারীরা সব খাবারের ওপর <strong>ফ্ল্যাট ১০% ছাড়</strong> পাবেন।</li>
+                            <li>You must have an active regular Membership Card.</li>
+                            <li>Your total purchases must be <strong>৳2,000.00</strong> or more.</li>
+                            <li>The Golden Card is valid for <strong>5 years</strong> from the upgrade date.</li>
+                            <li>Golden Card holders receive a <strong>flat 10% discount</strong> on all food.</li>
                         </ul>
                     </div>
 
@@ -119,9 +119,9 @@
                         @csrf
                         <div class="mb-3">
                             <label for="modal_card_number" class="form-label fw-bold text-dark mb-2"
-                                style="font-size: 0.85rem;">আপনার মেম্বারশিপ কার্ড নম্বর</label>
+                                style="font-size: 0.85rem;">Your Membership Card Number</label>
                             <input type="text" class="form-control py-3" name="unique_card_number" id="modal_card_number"
-                                placeholder="যেমন: MEM0001_1234" required
+                                placeholder="e.g. MEM0001_1234" required
                                 style="border-radius: 0.75rem; border: 1px solid #e6dfd7; background: #faf8f5; font-size: 0.95rem; padding-left: 1rem;">
                         </div>
 
@@ -131,7 +131,7 @@
                         <div class="d-grid mt-4">
                             <button type="submit" id="goldenUpgradeBtn" class="btn py-3 fw-bold text-white"
                                 style="background: #1f1412; border-radius: 0.75rem; transition: all 0.3s ease; border: none; font-size: 0.95rem;">
-                                কার্ড যাচাই ও আপগ্রেড করুন
+                                Verify and Upgrade Card
                             </button>
                         </div>
                     </form>
@@ -150,7 +150,7 @@
                     var feedback = $('#goldenFeedback');
 
                     submitBtn.prop('disabled', true).html(
-                        '<span class="spinner-border spinner-border-sm me-2"></span>প্রক্রিয়াধীন...');
+                        '<span class="spinner-border spinner-border-sm me-2"></span>Processing...');
                     feedback.addClass('d-none').removeClass('alert-success alert-danger');
 
                     $.ajax({
@@ -161,7 +161,7 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(res) {
-                            submitBtn.prop('disabled', false).text('কার্ড যাচাই ও আপগ্রেড করুন');
+                            submitBtn.prop('disabled', false).text('Verify and Upgrade Card');
                             if (res.success) {
                                 feedback.removeClass('d-none').addClass('alert-success').text(res
                                     .message);
@@ -175,9 +175,9 @@
                             }
                         },
                         error: function(xhr) {
-                            submitBtn.prop('disabled', false).text('কার্ড যাচাই ও আপগ্রেড করুন');
+                            submitBtn.prop('disabled', false).text('Verify and Upgrade Card');
                             var msg = xhr.responseJSON?.message ||
-                                'যাচাই ব্যর্থ হয়েছে। অনুগ্রহ করে আপনার কার্ড নম্বরটি সঠিকভাবে দিন।';
+                                'Verification failed. Please enter your card number correctly.';
                             feedback.removeClass('d-none').addClass('alert-danger').text(msg);
                             if (typeof toastr !== 'undefined') {
                                 toastr.error(msg);

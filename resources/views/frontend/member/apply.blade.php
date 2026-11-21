@@ -12,9 +12,9 @@
     @endpush
 
 @section('frontend_content')
-    <x-frontend.page-header title="আপনার মেম্বারশিপের জন্য আবেদন করুন" eyebrow="বিশেষ সদস্য সুবিধা"
-        subtitle="আমাদের বিশেষ সদস্যদের সঙ্গে যুক্ত হয়ে উপভোগ করুন আরও বিশেষ ডাইনিং অভিজ্ঞতা।" :backLink="route('frontend.cards')"
-        backText="মেম্বারশিপ কার্ডে ফিরে যান">
+    <x-frontend.page-header title="Apply for Your Membership" eyebrow="Exclusive Member Benefits"
+        subtitle="Join our exclusive members and enjoy an even more special dining experience." :backLink="route('frontend.cards')"
+        backText="Back to Membership Card">
         <x-slot:eyebrowIcon>
             <iconify-icon icon="solar:crown-star-bold"></iconify-icon>
         </x-slot:eyebrowIcon>
@@ -28,30 +28,30 @@
                     <div class="contact-page-info-panel">
                         <div class="contact-page-info-top">
                             <div>
-                                <h2 class="contact-page-info-title">ডেক্সি ডাইন</h2>
-                                <p class="contact-page-info-tagline">আন্তরিক আতিথেয়তা · খাঁটি স্বাদ</p>
+                                <h2 class="contact-page-info-title">Degchi Dine</h2>
+                                <p class="contact-page-info-tagline">Sincere Hospitality · Authentic Taste</p>
                             </div>
-                            <span class="contact-page-open-badge"><i class="bi bi-star-fill me-1"></i> প্রিমিয়াম</span>
+                            <span class="contact-page-open-badge"><i class="bi bi-star-fill me-1"></i> Premium</span>
                         </div>
 
                         <div class="dd-apply-stage-wrap">
                             <div class="dd-apply-card-stage">
                                 <div class="dd-apply-glow"></div>
-                                <img src="{{ asset('assets/frontend/images/membership.svg') }}" alt="ডেক্সি প্রিমিয়াম কার্ড"
+                                <img src="{{ asset('assets/frontend/images/membership.svg') }}" alt="Degchi Premium Card"
                                     class="dd-apply-card-img" />
                             </div>
                         </div>
 
                         <div style="margin-bottom: 1.25rem;">
-                            <h3 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">মেম্বারশিপের
-                                সুবিধা</h3>
+                            <h3 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 1rem;">Membership
+                                Benefits</h3>
 
                             <div class="dd-perk-row">
                                 <div class="dd-perk-icon"><iconify-icon icon="solar:verified-check-linear"></iconify-icon>
                                 </div>
                                 <div class="dd-perk-text">
-                                    <strong>অগ্রাধিকার ভিত্তিতে রিজার্ভেশন</strong>
-                                    <span>২৪/৭ বিশেষ বুকিং সুবিধায় অপেক্ষার তালিকা এড়িয়ে চলুন।</span>
+                                    <strong>Priority Reservations</strong>
+                                    <span>Skip the waiting list with 24/7 special booking privileges.</span>
                                 </div>
                             </div>
 
@@ -59,16 +59,16 @@
                                 <div class="dd-perk-icon"><iconify-icon icon="solar:wad-of-money-linear"></iconify-icon>
                                 </div>
                                 <div class="dd-perk-text">
-                                    <strong>বিশেষ মূল্য সুবিধা</strong>
-                                    <span>আপনার ডাইনিং বিল থেকে প্রযোজ্য ছাড় স্বয়ংক্রিয়ভাবে সমন্বয় করা হবে।</span>
+                                    <strong>Special Pricing Benefits</strong>
+                                    <span>Applicable discounts will be adjusted automatically on your dining bill.</span>
                                 </div>
                             </div>
 
                             <div class="dd-perk-row">
                                 <div class="dd-perk-icon"><iconify-icon icon="solar:gift-linear"></iconify-icon></div>
                                 <div class="dd-perk-text">
-                                    <strong>বিশেষ উপহার ও সারপ্রাইজ</strong>
-                                    <span>আপনার বিশেষ দিনগুলোতে উপভোগ করুন শেফের পক্ষ থেকে বিশেষ আপ্যায়ন।</span>
+                                    <strong>Special Gifts and Surprises</strong>
+                                    <span>Enjoy special treats from the chef on your special days.</span>
                                 </div>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                         <div class="contact-page-actions">
                             <a href="{{ route('frontend.contact') }}" class="btn-dine btn-dine-ghost btn-dine-sm">
                                 <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
-                                যোগাযোগ করুন
+                                Contact Us
                             </a>
                         </div>
                     </div>
@@ -87,9 +87,9 @@
                     <div class="contact-form-sticky">
                         <div class="cp-form-card cp-form-card-verify">
                             <div class="cp-form-card-head">
-                                <span class="cp-form-step">আবেদন ফর্ম</span>
-                                <h3>মেম্বারশিপের জন্য আবেদন করুন</h3>
-                                <p>নিচে আপনার তথ্যগুলো পূরণ করুন। সাধারণত এক কর্মদিবসের মধ্যে আবেদন যাচাই ও অনুমোদন করা হয়।
+                                <span class="cp-form-step">Application Form</span>
+                                <h3>Apply for Membership</h3>
+                                <p>Fill in your details below. Applications are usually verified and approved within one business day.
                                 </p>
                             </div>
 
@@ -101,27 +101,27 @@
                                 <div style="margin-bottom: 1.35rem;">
                                     <h3 class="cp-section-title">
                                         <iconify-icon icon="solar:user-circle-linear"></iconify-icon>
-                                        অ্যাকাউন্টের তথ্য
+                                        Account Details
                                     </h3>
 
                                     <div class="cp-field mb-3">
-                                        <label for="dd_name" class="cp-label">পূর্ণ নাম</label>
+                                        <label for="dd_name" class="cp-label">Full Name</label>
                                         <input type="text" name="name" id="dd_name" class="cp-input"
-                                            placeholder="যেমন: রহিম উদ্দিন" value="{{ old('name') }}" required
+                                            placeholder="e.g. Rahim Uddin" value="{{ old('name') }}" required
                                             autocomplete="name">
                                     </div>
 
                                     <div class="cp-grid-2">
                                         <div class="cp-field">
-                                            <label for="dd_phone" class="cp-label">ফোন নম্বর</label>
+                                            <label for="dd_phone" class="cp-label">Phone Number</label>
                                             <input type="tel" name="phone" id="dd_phone" class="cp-input"
-                                                placeholder="যেমন: ০১৭১২৩৪৫৬৭৮" value="{{ old('phone') }}" required
+                                                placeholder="e.g. 01712345678" value="{{ old('phone') }}" required
                                                 autocomplete="tel">
                                         </div>
                                         <div class="cp-field">
-                                            <label for="dd_email" class="cp-label">ইমেইল ঠিকানা</label>
+                                            <label for="dd_email" class="cp-label">Email Address</label>
                                             <input type="email" name="email" id="dd_email" class="cp-input"
-                                                placeholder="যেমন: you@email.com" value="{{ old('email') }}" required
+                                                placeholder="e.g. you@email.com" value="{{ old('email') }}" required
                                                 autocomplete="email">
                                         </div>
                                     </div>
@@ -129,33 +129,33 @@
                                     <div id="dd_phone_feedback" class="dd-phone-feedback d-none" role="status"></div>
 
                                     <p class="cp-field-hint">
-                                        পাসওয়ার্ড পুনরুদ্ধারের জন্য ইমেইল প্রয়োজন। আপনি
-                                        <a href="{{ route('frontend.member.login') }}">মেম্বার লগইন</a>
-                                        থেকে ইমেইল দিয়েও লগইন করতে পারবেন।
+                                        An email is required for password recovery. You can also log in using your email through the
+                                        <a href="{{ route('frontend.member.login') }}">Member Login</a>
+                                        page.
                                     </p>
 
                                     <div class="cp-grid-2">
                                         <div class="cp-field">
-                                            <label for="dd_password" class="cp-label">পাসওয়ার্ড তৈরি করুন</label>
+                                            <label for="dd_password" class="cp-label">Create Password</label>
                                             <input type="password" name="password" id="dd_password" class="cp-input"
-                                                placeholder="কমপক্ষে ৮ অক্ষর" required minlength="8"
+                                                placeholder="At least 8 characters" required minlength="8"
                                                 autocomplete="new-password">
                                         </div>
                                         <div class="cp-field">
-                                            <label for="dd_password_confirm" class="cp-label">পাসওয়ার্ড নিশ্চিত
-                                                করুন</label>
+                                            <label for="dd_password_confirm" class="cp-label">Confirm
+                                                Password</label>
                                             <input type="password" name="password_confirmation" id="dd_password_confirm"
-                                                class="cp-input" placeholder="আবার পাসওয়ার্ড দিন" required minlength="8"
+                                                class="cp-input" placeholder="Re-enter password" required minlength="8"
                                                 autocomplete="new-password">
                                         </div>
                                     </div>
 
                                     <p class="cp-field-hint">
-                                        কমপক্ষে ৮ অক্ষর হতে হবে। পরবর্তীতে আপনার
-                                        <strong style="color: #fff;">ফোন নম্বর</strong>,
-                                        <strong style="color: #fff;">ইমেইল</strong> অথবা
-                                        <strong style="color: #fff;">কার্ড নম্বর</strong> এবং এই পাসওয়ার্ড দিয়ে লগইন করতে
-                                        পারবেন।
+                                        Must be at least 8 characters. Later you can log in with your
+                                        <strong style="color: #fff;">Phone Number</strong>,
+                                        <strong style="color: #fff;">Email</strong> or
+                                        <strong style="color: #fff;">Card Number</strong> and this
+                                        password.
                                     </p>
                                 </div>
 
@@ -163,26 +163,26 @@
                                 <div style="margin-bottom: 1.35rem;">
                                     <h3 class="cp-section-title">
                                         <iconify-icon icon="solar:calendar-linear"></iconify-icon>
-                                        ব্যক্তিগত তথ্য
+                                        Personal Details
                                     </h3>
 
                                     <div class="cp-grid-2">
                                         <div class="cp-field">
-                                            <label for="dd_dob" class="cp-label">জন্মতারিখ</label>
+                                            <label for="dd_dob" class="cp-label">Date of Birth</label>
                                             <input type="date" name="dob" id="dd_dob" class="cp-input"
                                                 value="{{ old('dob') }}" required>
                                         </div>
                                         <div class="cp-field">
-                                            <label for="dd_marriage" class="cp-label">বিবাহের তারিখ (ঐচ্ছিক)</label>
+                                            <label for="dd_marriage" class="cp-label">Marriage Date (Optional)</label>
                                             <input type="date" name="marriage_date" id="dd_marriage" class="cp-input"
                                                 value="{{ old('marriage_date') }}">
                                         </div>
                                     </div>
 
                                     <div class="cp-field mt-3">
-                                        <label for="dd_address" class="cp-label">ঠিকানা</label>
+                                        <label for="dd_address" class="cp-label">Address</label>
                                         <textarea name="address" id="dd_address" class="cp-input cp-textarea" rows="2"
-                                            placeholder="আপনার সম্পূর্ণ ঠিকানা" required>{{ old('address') }}</textarea>
+                                            placeholder="Your full address" required>{{ old('address') }}</textarea>
                                     </div>
                                 </div>
 
@@ -190,7 +190,7 @@
                                 <div style="margin-bottom: 1.35rem;">
                                     <h3 class="cp-section-title">
                                         <iconify-icon icon="solar:camera-linear"></iconify-icon>
-                                        প্রোফাইল ছবি
+                                        Profile Photo
                                     </h3>
 
                                     <div class="cp-dropzone" id="profile_image_dropzone">
@@ -198,14 +198,14 @@
                                             class="cp-dropzone-input" accept="image/webp,image/png,image/jpeg">
                                         <iconify-icon icon="solar:gallery-add-linear"
                                             class="cp-dropzone-icon"></iconify-icon>
-                                        <p class="cp-dropzone-title">এখানে ছবি রাখুন অথবা <span>ব্রাউজ করুন</span></p>
-                                        <p class="cp-dropzone-sub">সমর্থিত ফরম্যাট: JPG, PNG, WebP (ঐচ্ছিক)</p>
+                                        <p class="cp-dropzone-title">Drop a photo here or <span>Browse</span></p>
+                                        <p class="cp-dropzone-sub">Supported formats: JPG, PNG, WebP (Optional)</p>
                                         <p class="cp-dropzone-name d-none" id="profile_image_file_name"></p>
                                     </div>
 
                                     <div class="d-none cp-preview" id="profile_image_preview_wrap">
-                                        <img id="profile_image_preview" src="" alt="প্রোফাইল ছবির প্রিভিউ" />
-                                        <div class="cp-preview-caption">আপনার প্রোফাইল ছবির প্রিভিউ</div>
+                                        <img id="profile_image_preview" src="" alt="Profile photo preview" />
+                                        <div class="cp-preview-caption">Your profile photo preview</div>
                                     </div>
                                 </div>
 
@@ -213,13 +213,13 @@
                                 <div style="margin-bottom: 1.35rem;">
                                     <h3 class="cp-section-title">
                                         <iconify-icon icon="solar:square-academic-cap-linear"></iconify-icon>
-                                        শিক্ষার্থী তথ্য
+                                        Student Details
                                     </h3>
 
                                     <label class="cp-student-toggle" for="dd_is_student">
                                         <input type="checkbox" name="is_student" id="dd_is_student" value="1"
                                             class="form-check-input" @checked(old('is_student'))>
-                                        <span>আমি একজন শিক্ষার্থী</span>
+                                        <span>I am a student</span>
                                     </label>
 
                                     <div id="student_extra_fields" class="{{ old('is_student') ? '' : 'd-none' }}">
@@ -228,20 +228,20 @@
                                                 <iconify-icon icon="solar:graduation-cap-bold"></iconify-icon>
                                                 <div>
                                                     @if ($studentPercent)
-                                                        <strong>শিক্ষার্থী সুবিধা — প্রথম অর্ডারে {{ $studentPercent }}% ছাড়!</strong>
+                                                        <strong>Student offer — {{ $studentPercent }}% off your first order!</strong>
                                                     @else
-                                                        <strong>শিক্ষার্থী সুবিধা</strong>
+                                                        <strong>Student Offer</strong>
                                                     @endif
                                                     <p>
                                                         @if ($studentPercent)
-                                                            শিক্ষার্থীরা প্রথম অর্ডারে <strong>{{ $studentPercent }}%</strong> ছাড় পাবেন।
+                                                            Students get <strong>{{ $studentPercent }}%</strong> off their first order.
                                                         @else
-                                                            শিক্ষার্থীদের প্রথম-অর্ডার ছাড় বর্তমানে চালু নেই।
+                                                            The first-order student discount is not currently available.
                                                         @endif
                                                         @if ($membershipPercent)
-                                                            অন্যান্য সদস্যদের জন্য প্রথম অর্ডারে <strong>{{ $membershipPercent }}%</strong> ছাড়।
+                                                            For other members, <strong>{{ $membershipPercent }}%</strong> off the first order.
                                                         @endif
-                                                        যাচাইয়ের জন্য আপনার স্টুডেন্ট আইডি আপলোড করুন।
+                                                        Upload your student ID for verification.
                                                     </p>
                                                 </div>
                                             </div>
@@ -253,16 +253,16 @@
                                                 accept="image/png,image/jpeg,image/jpg,application/pdf">
                                             <iconify-icon icon="solar:document-add-linear"
                                                 class="cp-dropzone-icon"></iconify-icon>
-                                            <p class="cp-dropzone-title">এখানে স্টুডেন্ট আইডি রাখুন অথবা <span>ব্রাউজ
-                                                    করুন</span></p>
-                                            <p class="cp-dropzone-sub">সমর্থিত ফরম্যাট: JPG, PNG, PDF</p>
+                                            <p class="cp-dropzone-title">Drop your student ID here or <span>Browse
+                                                    </span></p>
+                                            <p class="cp-dropzone-sub">Supported formats: JPG, PNG, PDF</p>
                                             <p class="cp-dropzone-name d-none" id="student_card_file_name"></p>
                                         </div>
 
                                         <div class="d-none mb-3" id="student_card_preview_wrap">
                                             <div id="student_card_img_preview" class="d-none cp-preview">
                                                 <img id="student_card_preview" src=""
-                                                    alt="স্টুডেন্ট কার্ডের প্রিভিউ" />
+                                                    alt="Student card preview" />
                                             </div>
                                             <div id="student_card_pdf_indicator" class="d-none"
                                                 style="text-align:center; padding:18px; border:1.5px dashed var(--secondary-30); border-radius:14px; background:var(--secondary-10);">
@@ -272,7 +272,7 @@
                                                     id="student_card_pdf_name"></div>
                                                 <div
                                                     style="font-size:.75rem; color:var(--text-on-dark-muted); margin-top:2px;">
-                                                    PDF আপলোডের জন্য প্রস্তুত</div>
+                                                    Ready for PDF upload</div>
                                             </div>
                                         </div>
                                     </div>
@@ -282,7 +282,7 @@
                                 <div class="dd-terms-section" id="ddTermsSection">
                                     <div class="dd-terms-required-note">
                                         <iconify-icon icon="solar:info-circle-linear"></iconify-icon>
-                                        <span>আবশ্যক — আবেদন জমা দেওয়ার আগে সম্মতি জানাতে নিচের বক্সে টিক দিন</span>
+                                        <span>Required — tick the box below to agree before submitting your application</span>
                                     </div>
 
                                     <label class="dd-terms-wrapper" id="ddTermsLabel" for="dd_terms">
@@ -292,29 +292,29 @@
                                             <iconify-icon icon="solar:check-read-linear"></iconify-icon>
                                         </div>
                                         <span class="dd-terms-text">
-                                            <strong>আমি {{ config('app.name') }} রিওয়ার্ডস প্রোগ্রামের শর্তাবলিতে
-                                                সম্মত।</strong>
-                                            এই আবেদনে দেওয়া সব তথ্য সঠিক ও সম্পূর্ণ বলে আমি নিশ্চিত করছি।
+                                            <strong>I agree to the {{ config('app.name') }} Rewards Program Terms and
+                                                Conditions.</strong>
+                                            I confirm that all information provided in this application is accurate and complete.
                                         </span>
                                     </label>
 
                                     <div class="dd-terms-error d-none" id="ddTermsError">
                                         <iconify-icon icon="solar:danger-circle-linear"></iconify-icon>
-                                        শর্তাবলিতে সম্মতি জানাতে উপরের বক্সে টিক দিন।
+                                        Tick the box above to agree to the Terms and Conditions.
                                     </div>
                                 </div>
 
                                 <button type="submit" id="privilegeSubmitBtn"
                                     class="btn-dine btn-dine-primary btn-dine-sm w-100">
-                                    <span class="dd-submit-text">আবেদন জমা দিন</span>
+                                    <span class="dd-submit-text">Submit Application</span>
                                     <iconify-icon icon="solar:arrow-right-linear" class="dd-submit-icon"></iconify-icon>
                                 </button>
                             </form>
 
                             <p class="cp-form-footnote text-center mt-4">
-                                ইতোমধ্যে মেম্বার হয়েছেন?
+                                Already a member?
                                 <a href="{{ route('frontend.member.login') }}">
-                                    মেম্বার লগইনে প্রবেশ করুন <i class="bi bi-arrow-right ms-1"></i>
+                                    Go to Member Login <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </p>
                         </div>
@@ -327,9 +327,9 @@
     <div id="applyProcessingOverlay" class="dd-apply-processing d-none" aria-live="polite" aria-busy="true">
         <div class="dd-apply-processing-inner">
             <div class="dd-apply-spinner" role="presentation"></div>
-            <strong>আপনার আবেদন প্রক্রিয়াধীন</strong>
-            <p>অনুগ্রহ করে অপেক্ষা করুন — আমরা আপনার মেম্বারশিপ তৈরি করে নিশ্চিতকরণ বার্তা পাঠাচ্ছি। এতে কয়েক সেকেন্ড সময়
-                লাগতে পারে।</p>
+            <strong>Your Application Is Processing</strong>
+            <p>Please wait — we are creating your membership and sending a confirmation message. This may
+                take a few seconds.</p>
         </div>
     </div>
 
@@ -358,7 +358,7 @@
                 }
 
                 setPhoneFeedback('checking',
-                    '<iconify-icon icon="svg-spinners:ring-resize"></iconify-icon> ফোন নম্বর যাচাই করা হচ্ছে…');
+                    '<iconify-icon icon="svg-spinners:ring-resize"></iconify-icon> Verifying phone number…');
 
                 $.get('{{ route('frontend.members.check-phone') }}', {
                         phone: phone
@@ -372,7 +372,7 @@
                         } else {
                             setPhoneFeedback('invalid',
                                 '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' + res
-                                .message + ' <a href="{{ route('frontend.member.login') }}">লগইন করুন</a>');
+                                .message + ' <a href="{{ route('frontend.member.login') }}">Log In</a>');
                         }
                     })
                     .fail(function() {
@@ -391,12 +391,12 @@
                 var overlay = $('#applyProcessingOverlay');
                 if (active) {
                     btn.prop('disabled', true).addClass('is-loading');
-                    btn.find('.dd-submit-text').text('জমা দেওয়া হচ্ছে…');
+                    btn.find('.dd-submit-text').text('Submitting…');
                     overlay.removeClass('d-none');
                     $('body').addClass('dd-apply-busy');
                 } else {
                     btn.prop('disabled', false).removeClass('is-loading');
-                    btn.find('.dd-submit-text').text('আবেদন জমা দিন');
+                    btn.find('.dd-submit-text').text('Submit Application');
                     overlay.addClass('d-none');
                     $('body').removeClass('dd-apply-busy');
                 }
@@ -515,20 +515,20 @@
                 }
 
                 if ($('#dd_password').val() !== $('#dd_password_confirm').val()) {
-                    showErrorPopup('পাসওয়ার্ড এবং নিশ্চিত করা পাসওয়ার্ড মিলছে না।');
+                    showErrorPopup('The password and confirmation password do not match.');
                     return;
                 }
 
                 var phone = $('#dd_phone').val().trim();
                 if (phone.length < 10) {
-                    showErrorPopup('অনুগ্রহ করে একটি সঠিক ফোন নম্বর দিন।');
+                    showErrorPopup('Please enter a valid phone number.');
                     return;
                 }
 
                 var email = $('#dd_email').val().trim();
                 if (!email || email.indexOf('@') === -1) {
                     showErrorPopup(
-                        'অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা দিন। পাসওয়ার্ড পুনরুদ্ধারের জন্য ইমেইল প্রয়োজন।'
+                        'Please enter a valid email address. An email is required for password recovery.'
                         );
                     return;
                 }
@@ -545,7 +545,7 @@
                             setPhoneFeedback('invalid',
                                 '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' +
                                 res.message +
-                                ' <a href="{{ route('frontend.member.login') }}">লগইন করুন</a>');
+                                ' <a href="{{ route('frontend.member.login') }}">Log In</a>');
                             showErrorPopup(res.message);
                             return;
                         }
@@ -554,7 +554,7 @@
                     })
                     .fail(function() {
                         setProcessing(false);
-                        showErrorPopup('ফোন নম্বর যাচাই করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                        showErrorPopup('Could not verify the phone number. Please try again.');
                     });
             });
 
@@ -593,13 +593,13 @@
                         var msg = xhr.responseJSON?.errors ?
                             Object.values(xhr.responseJSON.errors)[0][0] :
                             (xhr.responseJSON?.message ||
-                                'রেজিস্ট্রেশন করা সম্ভব হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+                                'Registration failed. Please try again.');
                         if (xhr.responseJSON?.errors?.phone) {
                             phoneAvailable = false;
                             setPhoneFeedback('invalid',
                                 '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' +
                                 msg +
-                                ' <a href="{{ route('frontend.member.login') }}">লগইন করুন</a>'
+                                ' <a href="{{ route('frontend.member.login') }}">Log In</a>'
                             );
                         }
                         showErrorPopup(msg);
@@ -613,28 +613,28 @@
                     'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;';
 
                 var cardHtml = cardNumber ?
-                    '<div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 20px;margin-bottom:16px;"><div style="font-size:.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">আপনার কার্ড নম্বর</div><div style="font-size:1.3rem;font-weight:800;color:#ff6b35;letter-spacing:.08em;">' +
+                    '<div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 20px;margin-bottom:16px;"><div style="font-size:.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Your Card Number</div><div style="font-size:1.3rem;font-weight:800;color:#ff6b35;letter-spacing:.08em;">' +
                     cardNumber +
-                    '</div><div style="font-size:.75rem;color:rgba(255,255,255,0.6);margin-top:4px;">এই নম্বরটি সংরক্ষণ করুন — ছাড় পেতে চেকআউটের সময় ব্যবহার করুন</div></div>' :
+                    '</div><div style="font-size:.75rem;color:rgba(255,255,255,0.6);margin-top:4px;">Save this number — use it at checkout to get a discount</div></div>' :
                     '';
 
                 var dashBtnHtml = dashboardUrl ? '<a href="' + dashboardUrl +
-                    '" style="display:block;background:linear-gradient(135deg,#ff6b35,#e63946);color:#fff;border:none;padding:13px 32px;border-radius:999px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;text-decoration:none;margin-bottom:10px;">আমার ড্যাশবোর্ডে যান</a>' :
+                    '" style="display:block;background:linear-gradient(135deg,#ff6b35,#e63946);color:#fff;border:none;padding:13px 32px;border-radius:999px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;text-decoration:none;margin-bottom:10px;">Go to My Dashboard</a>' :
                     '';
 
                 var box = document.createElement('div');
                 box.style.cssText =
                     'background:#0f4a55;border-radius:20px;padding:40px 36px;max-width:440px;width:90%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,0.08);animation:successPopIn .4s cubic-bezier(.34,1.56,.64,1);';
                 box.innerHTML = '<div style="font-size:3.5rem;margin-bottom:12px;">\uD83C\uDF89</div>' +
-                    '<h3 style="color:#fff;font-weight:800;margin-bottom:8px;">আবেদন সফলভাবে জমা হয়েছে!</h3>' +
+                    '<h3 style="color:#fff;font-weight:800;margin-bottom:8px;">Application Submitted Successfully!</h3>' +
                     '<p style="color:rgba(255,255,255,0.85);font-size:.93rem;line-height:1.6;margin-bottom:' + (
                         cardNumber ? '16px' : '24px') + ';">' + message + '</p>' +
                     cardHtml +
                     '<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 18px;margin-bottom:18px;text-align:left;">' +
-                    '<div style="font-size:.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">পরে আবার লগইন করতে</div>' +
-                    '<p style="font-size:.85rem;color:rgba(255,255,255,0.85);line-height:1.55;margin:0;">উপরের মেনু থেকে <strong style="color:#fff;">মেম্বার লগইন</strong> (অথবা <strong style="color:#fff;">/member/login</strong>) পেজে গিয়ে আপনার <strong style="color:#fff;">ফোন</strong>, <strong style="color:#fff;">ইমেইল</strong> অথবা <strong style="color:#fff;">কার্ড নম্বর</strong> এবং এইমাত্র তৈরি করা <strong style="color:#fff;">পাসওয়ার্ড</strong> ব্যবহার করুন।</p></div>' +
+                    '<div style="font-size:.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">To Log In Again Later</div>' +
+                    '<p style="font-size:.85rem;color:rgba(255,255,255,0.85);line-height:1.55;margin:0;">From the menu above, go to the <strong style="color:#fff;">Member Login</strong> page (or <strong style="color:#fff;">/member/login</strong>) and use your <strong style="color:#fff;">Phone</strong>, <strong style="color:#fff;">Email</strong> or <strong style="color:#fff;">Card Number</strong> along with the <strong style="color:#fff;">Password</strong> you just created.</p></div>' +
                     dashBtnHtml +
-                    '<button id="successPopupClose" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.15);padding:13px 32px;border-radius:999px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;">বন্ধ করুন</button>';
+                    '<button id="successPopupClose" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.15);padding:13px 32px;border-radius:999px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;">Close</button>';
 
                 overlay.appendChild(box);
                 document.body.appendChild(overlay);
@@ -662,10 +662,10 @@
                 box.style.cssText =
                     'background:#0f4a55;border-radius:20px;padding:36px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,0.08);';
                 box.innerHTML = '<div style="font-size:3rem;margin-bottom:10px;">\u26A0\uFE0F</div>' +
-                    '<h4 style="color:#ef4444;font-weight:700;margin-bottom:8px;">দুঃখিত!</h4>' +
+                    '<h4 style="color:#ef4444;font-weight:700;margin-bottom:8px;">Sorry!</h4>' +
                     '<p style="color:rgba(255,255,255,0.85);font-size:.9rem;line-height:1.55;margin-bottom:20px;">' +
                     message + '</p>' +
-                    '<button id="errPopupClose" style="background:linear-gradient(135deg,#ff6b35,#e63946);color:#fff;border:none;padding:11px 28px;border-radius:999px;font-size:.9rem;font-weight:700;cursor:pointer;">আবার চেষ্টা করুন</button>';
+                    '<button id="errPopupClose" style="background:linear-gradient(135deg,#ff6b35,#e63946);color:#fff;border:none;padding:11px 28px;border-radius:999px;font-size:.9rem;font-weight:700;cursor:pointer;">Try Again</button>';
 
                 overlay.appendChild(box);
                 document.body.appendChild(overlay);

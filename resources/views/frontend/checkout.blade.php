@@ -5,29 +5,29 @@
 
 @section('frontend_content')
 
-    <x-frontend.page-header title="অর্ডার সম্পন্ন করুন" subtitle="আপনার তথ্য যাচাই করে অর্ডারটি নিশ্চিত করুন।"
-        eyebrow="আপনার অর্ডার">
+    <x-frontend.page-header title="Complete Your Order" subtitle="Verify your details and confirm your order."
+        eyebrow="Your Order">
         <x-slot:eyebrowIcon>
             <iconify-icon icon="solar:bag-bold"></iconify-icon>
         </x-slot:eyebrowIcon>
         <x-slot:meta>
             <span>
                 <i class="bi bi-bag-check"></i>
-                কার্ট
+                Cart
             </span>
             <span>
                 <i class="bi bi-chevron-right"></i>
             </span>
             <span>
                 <i class="bi bi-credit-card"></i>
-                চেকআউট
+                Checkout
             </span>
             <span>
                 <i class="bi bi-chevron-right"></i>
             </span>
             <span style="opacity: 0.5;">
                 <i class="bi bi-check-circle"></i>
-                নিশ্চিত
+                Confirm
             </span>
         </x-slot:meta>
     </x-frontend.page-header>
@@ -72,20 +72,20 @@
                                 <span class="checkout-form-heading-icon" aria-hidden="true">
                                     <i class="bi bi-geo-alt-fill"></i>
                                 </span>
-                                ডেলিভারি ঠিকানা
+                                Delivery Address
                             </h6>
                             <div class="row g-3 g-md-4">
                                 <div class="col-md-6">
-                                    <label class="form-label">পূর্ণ নাম*</label>
+                                    <label class="form-label">Full Name*</label>
                                     <div class="checkout-input-wrap">
                                         <i class="bi bi-person checkout-input-icon"></i>
                                         <input class="form-control checkout-input" required type="text"
-                                            name="customer_name" id="customer_name" placeholder="যেমন: রহিম উদ্দিন"
+                                            name="customer_name" id="customer_name" placeholder="e.g. Rahim Uddin"
                                             value="{{ $loggedInMember->name ?? '' }}" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">ফোন নম্বর*</label>
+                                    <label class="form-label">Phone Number*</label>
                                     <div class="checkout-input-wrap">
                                         <i class="bi bi-telephone checkout-input-icon"></i>
                                         <input class="form-control checkout-input" required type="tel"
@@ -94,35 +94,35 @@
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">ডেলিভারি ঠিকানা*</label>
+                                    <label class="form-label">Delivery Address*</label>
                                     <div class="checkout-input-wrap checkout-textarea-wrap">
                                         <i class="bi bi-geo-alt checkout-input-icon checkout-textarea-icon"></i>
                                         <textarea class="form-control checkout-input" required rows="3" name="customer_address" id="customer_address"
-                                            placeholder="বাড়ি/ফ্ল্যাট, রোড, এলাকা, শহর"></textarea>
+                                            placeholder="House/Flat, Road, Area, City"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label">মেম্বারশিপ কার্ড</label>
+                                    <label class="form-label">Membership Card</label>
                                     @if ($loggedInMember ?? null)
                                         <div class="alert alert-success py-2 px-3 mb-2"
                                             style="font-size: 0.82rem; border-radius: 0.75rem;">
-                                            <strong>{{ $loggedInMember->name }}</strong> হিসেবে লগইন করা আছে। আপনার কার্ডটি
-                                            স্বয়ংক্রিয়ভাবে যুক্ত হয়েছে।
+                                            Logged in as <strong>{{ $loggedInMember->name }}</strong>. Your card has been
+                                            added automatically.
                                         </div>
                                     @endif
                                     <div class="checkout-input-wrap">
                                         <i class="bi bi-credit-card-2-front checkout-input-icon"></i>
                                         <input class="form-control checkout-input" type="text" name="member_card_number"
-                                            id="memberCardNumber" placeholder="রেজিস্টার করা কার্ড নম্বর দিন"
+                                            id="memberCardNumber" placeholder="Enter your registered card number"
                                             value="{{ $loggedInMember->unique_card_number ?? '' }}" />
                                     </div>
                                     <div id="membershipFeedback" class="form-text mt-2"
-                                        style="font-size: 0.75rem; color: rgba(255,255,255,0.55);">প্রথম অর্ডারে ৩০% বা ৩৫%
-                                        ছাড় প্রযোজ্য। মোট ক্রয় ৳২,০০০ পূর্ণ হলে গোল্ডেন মেম্বার হিসেবে প্রতিটি অর্ডারে ১০%
-                                        ছাড় পাবেন।</div>
+                                        style="font-size: 0.75rem; color: rgba(255,255,255,0.55);">Get 30% or 35% off on
+                                        your first order. Reach a total purchase of ৳2,000 to become a Golden Member and
+                                        enjoy 10% off on every order.</div>
                                 </div>
                                 <div class="col-md-12 d-none">
-                                    <label class="form-label">অর্ডারের মোট মূল্য (৳)</label>
+                                    <label class="form-label">Order Total (৳)</label>
                                     <div class="checkout-input-wrap">
                                         <i class="bi bi-cash-stack checkout-input-icon"></i>
                                         <input class="form-control checkout-input" required readonly type="number"
@@ -140,20 +140,20 @@
                                 <span class="checkout-form-heading-icon" aria-hidden="true">
                                     <i class="bi bi-ticket-perforated"></i>
                                 </span>
-                                কুপন কোড
+                                Coupon Code
                             </h6>
                             <div class="row g-3 g-md-4">
                                 <div class="col-md-8">
                                     <div class="checkout-input-wrap">
                                         <i class="bi bi-tag checkout-input-icon"></i>
                                         <input class="form-control checkout-input" type="text" id="couponCodeInput"
-                                            placeholder="কুপন কোড দিন" style="text-transform:uppercase;"
+                                            placeholder="Enter coupon code" style="text-transform:uppercase;"
                                             autocomplete="off" />
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <button type="button" id="applyCouponBtn" class="btn checkout-btn-primary w-100">
-                                        প্রয়োগ করুন
+                                        Apply
                                     </button>
                                 </div>
                             </div>
@@ -168,7 +168,7 @@
                                 <span class="checkout-form-heading-icon" aria-hidden="true">
                                     <i class="bi bi-wallet2"></i>
                                 </span>
-                                পেমেন্ট পদ্ধতি
+                                Payment Method
                             </h6>
                             <div class="checkout-payment-options">
                                 <label class="checkout-payment-card">
@@ -179,7 +179,7 @@
                                             <i class="bi bi-cash-coin"></i>
                                         </span>
                                         <span class="checkout-payment-text">
-                                            <strong>ক্যাশ অন ডেলিভারি</strong>
+                                            <strong>Cash on Delivery</strong>
                                         </span>
                                         <span class="checkout-payment-check" aria-hidden="true">
                                             <i class="bi bi-check-lg"></i>
@@ -194,7 +194,7 @@
                                             <i class="bi bi-credit-card-2-front"></i>
                                         </span>
                                         <span class="checkout-payment-text">
-                                            <strong>অনলাইন পেমেন্ট</strong>
+                                            <strong>Online Payment</strong>
                                         </span>
                                         <span class="checkout-payment-check" aria-hidden="true">
                                             <i class="bi bi-check-lg"></i>
@@ -210,7 +210,7 @@
                 <div class="col-lg-5">
                     <div class="checkout-summary-card checkout-summary-sticky">
                         <div class="checkout-summary-header">
-                            <i class="bi bi-bag-check me-2"></i> অর্ডারের সারাংশ
+                            <i class="bi bi-bag-check me-2"></i> Order Summary
                         </div>
 
                         <div class="checkout-summary-items-wrap" id="orderSummaryList">
@@ -236,51 +236,51 @@
                                 style="font-size: 0.9rem; color: rgba(255,255,255,0.45);">
                                 <i class="bi bi-bag"
                                     style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.3;"></i>
-                                আপনার বাছাই করা খাবারগুলো এখানে দেখা যাবে।
+                                Your selected food items will appear here.
                             </div>
                         </div>
 
                         <div class="checkout-summary-body">
                             <div class="checkout-summary-row">
-                                <span>সাবটোটাল <small class="ms-1" id="itemCount"
-                                        style="color: rgba(255,255,255,0.45);">(০টি খাবার)</small></span>
-                                <span id="checkoutSubtotal" class="checkout-summary-val">৳ ০.০০</span>
+                                <span>Subtotal <small class="ms-1" id="itemCount"
+                                        style="color: rgba(255,255,255,0.45);">(0 items)</small></span>
+                                <span id="checkoutSubtotal" class="checkout-summary-val">৳ 0.00</span>
                             </div>
                             <div class="checkout-summary-row">
-                                <span>মেম্বারশিপ ছাড়</span>
-                                <span id="checkoutDiscount" class=" fw-bold">- ৳ ০.০০</span>
+                                <span>Membership Discount</span>
+                                <span id="checkoutDiscount" class=" fw-bold">- ৳ 0.00</span>
                             </div>
                             <div class="checkout-summary-row" id="offerDiscountRow" style="display: none;">
                                 <span id="offerDiscountLabel">
-                                    <span id="offerName">অফারের ছাড়</span>
+                                    <span id="offerName">Offer Discount</span>
                                     <span class="badge ms-1" id="offerBadge"
                                         style="background:var(--brand-secondary);color:#fff;font-size:.68rem;padding:2px 7px;border-radius:20px;"></span>
                                 </span>
-                                <span id="checkoutOfferDiscount" class="text-danger fw-bold">- ৳ ০.০০</span>
+                                <span id="checkoutOfferDiscount" class="text-danger fw-bold">- ৳ 0.00</span>
                             </div>
                             <div class="checkout-summary-row" id="couponDiscountRow" style="display: none;">
                                 <span>
-                                    কুপন
+                                    Coupon
                                     <span class="badge ms-1" id="couponCodeBadge"
                                         style="background:var(--brand);color:#fff;font-size:.68rem;padding:2px 7px;border-radius:20px;"></span>
                                     <a href="#" id="removeCouponLink" class="ms-1 text-danger"
-                                        style="font-size:.7rem;text-decoration:underline;">মুছে ফেলুন</a>
+                                        style="font-size:.7rem;text-decoration:underline;">Remove</a>
                                 </span>
-                                <span id="checkoutCouponDiscount" class="text-success fw-bold">- ৳ ০.০০</span>
+                                <span id="checkoutCouponDiscount" class="text-success fw-bold">- ৳ 0.00</span>
                             </div>
                             <div class="checkout-summary-row">
-                                <span>ডেলিভারি চার্জ</span>
-                                <span id="shippingChargeDisplay" class="fw-bold">৳ ৬০.০০</span>
+                                <span>Delivery Charge</span>
+                                <span id="shippingChargeDisplay" class="fw-bold">৳ 60.00</span>
                             </div>
                             <div class="delivery-info-badge">
                                 <i class="bi bi-info-circle-fill"></i>
-                                ডেলিভারি লোকেশন ১ কিলোমিটারের বেশি হলে প্রতি কিলোমিটারে ২০ টাকা করে যুক্ত হবে।
+                                An additional ৳20 per kilometre will be charged if the delivery location is more than 1 km away.
                             </div>
                             <div class="checkout-summary-divider"></div>
                             <input type="hidden" name="shipping_charge" id="shippingChargeHidden" value="60" />
                             <div class="checkout-summary-total-row">
-                                <span>মোট</span>
-                                <strong id="checkoutTotal" class="checkout-summary-total-val">৳ ০.০০</strong>
+                                <span>Total</span>
+                                <strong id="checkoutTotal" class="checkout-summary-total-val">৳ 0.00</strong>
                             </div>
                             <p class="checkout-offer-notice" id="checkoutOfferNotice" hidden></p>
                         </div>
@@ -288,10 +288,10 @@
                         <div class="checkout-summary-footer">
                             <button type="submit" id="placeOrderBtn" form="checkoutForm"
                                 class="btn checkout-btn-primary w-100">
-                                <i class="bi bi-lock-fill me-2" style="opacity: 0.7;"></i> এখনই অর্ডার করুন
+                                <i class="bi bi-lock-fill me-2" style="opacity: 0.7;"></i> Place Order Now
                             </button>
                             <p class="text-center mt-3 mb-0" style="font-size: 0.78rem; color: rgba(255,255,255,0.45);">
-                                <i class="bi bi-shield-check me-1"></i> ১০০% নিরাপদ ও সুরক্ষিত চেকআউট
+                                <i class="bi bi-shield-check me-1"></i> 100% Safe and Secure Checkout
                             </p>
                         </div>
                     </div>
@@ -299,7 +299,7 @@
                     <div class="mt-4 text-center text-lg-start">
                         <a href="{{ route('frontend.addtocart') }}"
                             class="checkout-continue-link d-inline-flex align-items-center">
-                            <i class="bi bi-arrow-left me-2"></i> খাবার বাছাই চালিয়ে যান
+                            <i class="bi bi-arrow-left me-2"></i> Continue Choosing Food
                         </a>
                     </div>
                 </div>

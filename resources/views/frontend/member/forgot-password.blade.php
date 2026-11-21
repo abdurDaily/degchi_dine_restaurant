@@ -360,16 +360,16 @@
             <div class="container px-4 px-lg-5 position-relative">
                 <a href="{{ route('frontend.home') }}" class="dd-apply-back-btn">
                     <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
-                    <span>হোমে ফিরে যান</span>
+                    <span>Back to Home</span>
                 </a>
 
                 <div class="dd-apply-hero-content">
                     <div class="md-icon-ring">
                         <iconify-icon icon="solar:user-circle-bold"></iconify-icon>
                     </div>
-                    <h1 class="dd-apply-headline">পাসওয়ার্ড ভুলে গেছেন?</h1>
-                    <p class="dd-apply-subhead">আপনার মেম্বারশিপে ব্যবহৃত ইমেইল দিন। আমরা আপনাকে পাসওয়ার্ড পরিবর্তনের একটি
-                        লিংক পাঠাব।</p>
+                    <h1 class="dd-apply-headline">Forgot Your Password?</h1>
+                    <p class="dd-apply-subhead">Enter the email you used for your membership. We'll send you a link to reset your
+                        password.</p>
                 </div>
             </div>
         </div>
@@ -377,44 +377,44 @@
         <div class="container px-3 px-sm-4 px-lg-5 md-login-box">
             <div class="md-login-grid">
                 <div class="md-login-help">
-                    <h3>পাসওয়ার্ড পরিবর্তন কীভাবে করবেন</h3>
-                    <p>মেম্বারশিপ কার্ডের জন্য আবেদন করার সময় যে ইমেইল ঠিকানা ব্যবহার করেছিলেন, সেটিই দিন।</p>
+                    <h3>How to Reset Your Password</h3>
+                    <p>Use the same email address you provided when you applied for your membership card.</p>
 
                     <div class="md-step">
-                        <div class="md-step-num">১</div>
+                        <div class="md-step-num">1</div>
                         <div class="md-step-text">
-                            <strong>আপনার ইমেইল দিন</strong>
-                            <span>এটি আপনার মেম্বারশিপ অ্যাকাউন্টে সংরক্ষিত ইমেইলের সঙ্গে মিলতে হবে</span>
+                            <strong>Enter Your Email</strong>
+                            <span>It must match the email saved in your membership account</span>
                         </div>
                     </div>
 
                     <div class="md-step">
-                        <div class="md-step-num">২</div>
+                        <div class="md-step-num">2</div>
                         <div class="md-step-text">
-                            <strong>ইনবক্স চেক করুন</strong>
-                            <span>ডেক্সি ডাইন থেকে পাঠানো পাসওয়ার্ড পরিবর্তনের লিংকটি খুলুন (স্প্যাম ফোল্ডারও চেক
-                                করুন)</span>
+                            <strong>Check Your Inbox</strong>
+                            <span>Open the password reset link sent by Degchi Dine (also check your spam
+                                folder)</span>
                         </div>
                     </div>
 
                     <div class="md-step">
-                        <div class="md-step-num">৩</div>
+                        <div class="md-step-num">3</div>
                         <div class="md-step-text">
-                            <strong>নতুন পাসওয়ার্ড সেট করুন</strong>
-                            <span>এরপর আপনার ফোন/কার্ড নম্বর এবং নতুন পাসওয়ার্ড দিয়ে লগইন করুন</span>
+                            <strong>Set a New Password</strong>
+                            <span>Then log in with your phone/card number and your new password</span>
                         </div>
                     </div>
 
                     <div class="md-example-box">
-                        <h6>সাহায্য প্রয়োজন?</h6>
-                        <div class="md-example-row">যোগাযোগ: <code>support@degchidine.com</code></div>
+                        <h6>Need help?</h6>
+                        <div class="md-example-row">Contact: <code>support@degchidine.com</code></div>
                     </div>
                 </div>
 
                 <div class="md-login-form-side">
                     <div class="md-form-header">
-                        <h2>পাসওয়ার্ড পরিবর্তনের লিংক</h2>
-                        <p>আপনার মেম্বারশিপে ব্যবহৃত ইমেইলে আমরা একটি নিরাপদ পাসওয়ার্ড পরিবর্তনের লিংক পাঠাব।</p>
+                        <h2>Password Reset Link</h2>
+                        <p>We'll send a secure password reset link to the email used for your membership.</p>
                     </div>
 
                     @if ($errors->any())
@@ -432,22 +432,22 @@
                         <div class="dd-input-group">
                             <input type="email" name="email" id="member_reset_email" class="dd-input-field"
                                 placeholder=" " value="{{ old('email') }}" required autofocus autocomplete="email">
-                            <label for="member_reset_email" class="dd-floating-label">ইমেইল ঠিকানা</label>
+                            <label for="member_reset_email" class="dd-floating-label">Email Address</label>
                         </div>
 
-                        <p class="md-field-hint">আপনার মেম্বারশিপ প্রোফাইলে সংরক্ষিত ইমেইল ঠিকানাটি ব্যবহার করুন।</p>
+                        <p class="md-field-hint">Use the email address saved in your membership profile.</p>
 
                         <button type="submit" class="dd-submit-btn">
-                            <span>পরিবর্তনের লিংক পাঠান</span>
+                            <span>Send Reset Link</span>
                             <iconify-icon icon="solar:letter-linear" class="dd-btn-icon"></iconify-icon>
                         </button>
                     </form>
 
                     <div class="md-footer-cta">
-                        <p>পাসওয়ার্ড মনে পড়ে গেছে?</p>
+                        <p>Remember your password?</p>
                         <a href="{{ route('frontend.member.login') }}" class="md-apply-btn">
                             <iconify-icon icon="solar:login-2-linear"></iconify-icon>
-                            মেম্বার লগইনে ফিরে যান
+                            Back to Member Login
                         </a>
                     </div>
                 </div>

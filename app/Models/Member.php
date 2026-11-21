@@ -530,15 +530,15 @@ class Member extends Authenticatable
         return array_merge($base, [
             'message' => $firstOrderAlreadyUsed
                 ? ($remaining > 0
-                    ? 'প্রথম অর্ডারের মেম্বারশিপ/শিক্ষার্থী ছাড় ইতোমধ্যে ব্যবহার করা হয়েছে — এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়। গোল্ডেন কার্ড আনলক করতে আরও ৳'
+                    ? 'Your Membership/Student first-order discount has already been used — no membership discount applies to this order. Order ৳'
                     . number_format($remaining, 2)
-                    . ' মূল্যের খাবার অর্ডার করুন। এরপর প্রতিটি অর্ডারে ১০% ছাড় পাবেন।'
-                    : 'প্রথম অর্ডারের মেম্বারশিপ/শিক্ষার্থী ছাড় ইতোমধ্যে ব্যবহার করা হয়েছে — এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়।')
+                    . ' more worth of food to unlock the Golden Card. Then you will get 10% off on every order.'
+                    : 'Your Membership/Student first-order discount has already been used — no membership discount applies to this order.')
                 : ($remaining > 0
-                    ? 'এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়। গোল্ডেন কার্ড আনলক করতে আরও ৳'
+                    ? 'No membership discount applies to this order. Order ৳'
                     . number_format($remaining, 2)
-                    . ' মূল্যের খাবার অর্ডার করুন। এরপর প্রতিটি অর্ডারে ১০% ছাড় পাবেন।'
-                    : 'এই অর্ডারে কোনো মেম্বারশিপ ছাড় প্রযোজ্য নয়।'),
+                    . ' more worth of food to unlock the Golden Card. Then you will get 10% off on every order.'
+                    : 'No membership discount applies to this order.'),
         ]);
     }
 

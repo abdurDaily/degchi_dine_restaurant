@@ -46,7 +46,7 @@
 
         @if($badgeStyle === 'home' && $offerCount > 0)
             <span class="pcard-offer-count">
-                {{ $offerCount === 1 ? 'সেরা অফার' : $offerCount . ' টি অফার' }}
+                {{ $offerCount === 1 ? 'Best Offer' : $offerCount . ' Offers' }}
             </span>
         @endif
 
@@ -68,10 +68,10 @@
 
             @if($badgeStyle === 'home' && $offerCount > 1)
                 <div class="pcard-badge pcard-badge-multi">
-                    <i class="bi bi-tags-fill"></i> {{ $offerCount }} অফার
+                    <i class="bi bi-tags-fill"></i> {{ $offerCount }} Offers
                 </div>
                 <div class="pcard-badge pcard-badge-stacked">
-                    সর্বোচ্চ {{ $offerPercent }}% ছাড়
+                    Up to {{ $offerPercent }}% off
                 </div>
             @else
                 <div class="pcard-badge">

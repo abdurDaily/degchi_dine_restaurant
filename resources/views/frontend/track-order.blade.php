@@ -6,9 +6,9 @@
 
 @section('frontend_content')
 
-    <x-frontend.page-header title="অর্ডার ট্র্যাক করুন" eyebrow="অর্ডারের খোঁজ নিন"
-        subtitle="আপনার অর্ডার নম্বর ও ফোন নম্বর ব্যবহার করে যেকোনো সময় অর্ডারের বর্তমান অবস্থা দেখুন।" :backLink="route('frontend.home')"
-        backText="হোমে ফিরে যান">
+    <x-frontend.page-header title="Track Order" eyebrow="Find Your Order"
+        subtitle="Check the current status of your order at any time using your order number and phone number." :backLink="route('frontend.home')"
+        backText="Back to Home">
         <x-slot:eyebrowIcon>
             <iconify-icon icon="solar:delivery-bold"></iconify-icon>
         </x-slot:eyebrowIcon>
@@ -21,11 +21,11 @@
                     <div class="contact-page-info-panel">
                         <div class="contact-page-info-top">
                             <div>
-                                <h2 class="contact-page-info-title">যেভাবে কাজ করে</h2>
-                                <p class="contact-page-info-tagline">সহজেই অর্ডারের খোঁজ নিন</p>
+                                <h2 class="contact-page-info-title">How It Works</h2>
+                                <p class="contact-page-info-tagline">Find Your Order Easily</p>
                             </div>
                             <span class="contact-page-open-badge">
-                                <i class="bi bi-truck me-1"></i> লাইভ ট্র্যাকিং
+                                <i class="bi bi-truck me-1"></i> Live Tracking
                             </span>
                         </div>
 
@@ -35,8 +35,8 @@
                                     <i class="bi bi-1-circle-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>অর্ডার নম্বর খুঁজে নিন</h3>
-                                    <p>অর্ডার কনফার্মেশন পেজ বা SMS থেকে আপনার অর্ডার নম্বরটি নিন — যেমন: Order #6</p>
+                                    <h3>Find Your Order Number</h3>
+                                    <p>Get your order number from the order confirmation page or SMS — e.g. Order #6</p>
                                 </div>
                             </article>
 
@@ -45,8 +45,8 @@
                                     <i class="bi bi-2-circle-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>ফোন নম্বর দিন</h3>
-                                    <p>অর্ডার করার সময় যে ফোন নম্বরটি ব্যবহার করেছেন, সেটিই ব্যবহার করুন।</p>
+                                    <h3>Enter Your Phone Number</h3>
+                                    <p>Use the same phone number you used when placing your order.</p>
                                 </div>
                             </article>
 
@@ -55,8 +55,8 @@
                                     <i class="bi bi-3-circle-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>অর্ডারের বিস্তারিত দেখুন</h3>
-                                    <p>আপনার খাবার, মোট বিল, অর্ডারের বর্তমান অবস্থা এবং প্রয়োজনে যোগাযোগের তথ্য দেখুন।</p>
+                                    <h3>View Order Details</h3>
+                                    <p>See your food, total bill, current order status, and contact details if needed.</p>
                                 </div>
                             </article>
 
@@ -65,13 +65,13 @@
                                     <i class="bi bi-info-circle-fill"></i>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>উদাহরণ</h3>
+                                    <h3>Example</h3>
                                     <p>
-                                        অর্ডার:
+                                        Order:
                                         <span
                                             style="background: var(--secondary-30); color: #fff; padding: 2px 6px; border-radius: 4px;">6</span>
                                         &nbsp;
-                                        ফোন:
+                                        Phone:
                                         <span
                                             style="background: var(--secondary-30); color: #fff; padding: 2px 6px; border-radius: 4px;">017123**678</span>
                                     </p>
@@ -81,19 +81,18 @@
 
                         <p class="mt-3 mb-0" style="font-size: 0.82rem; color: #fff;">
                             @guest('member')
-                                রেজিস্টার করা সদস্যরা
+                                Registered members can
                                 <a href="{{ route('frontend.member.login') }}"
                                     style="color: var(--brand-secondary); font-weight: 600;">
-                                    লগইন
+                                    Log In
                                 </a>
-                                করে একটি ড্যাশবোর্ড থেকেই সব অর্ডার দেখতে পারবেন।
+                                view all orders from a single dashboard.
                             @else
-                                আপনার
+                                View all orders from your
                                 <a href="{{ route('frontend.member.dashboard') }}"
                                     style="color: var(--brand-gold); font-weight: 600;">
-                                    মেম্বার ড্যাশবোর্ড
-                                </a>
-                                থেকে সব অর্ডার দেখুন।
+                                    Member Dashboard
+                                </a>.
                             @endguest
                         </p>
                     </div>
@@ -103,22 +102,22 @@
                     <div class="contact-form-sticky">
                         <div class="cp-form-card cp-form-card-verify">
                             <div class="cp-form-card-head">
-                                <span class="cp-form-step">অর্ডার খুঁজুন</span>
-                                <h3>অর্ডার ট্র্যাক করুন</h3>
-                                <p>অর্ডারের বিস্তারিত দেখতে নিচের তথ্যগুলো দিন।</p>
+                                <span class="cp-form-step">Find Order</span>
+                                <h3>Track Order</h3>
+                                <p>Enter the details below to view your order.</p>
                             </div>
 
                             @auth('member')
                                 <div class="cp-alert-success text-white mb-4" role="alert">
                                     <i class="bi bi-person-check"></i>
                                     <div>
-                                        <strong>{{ $member->name }} হিসেবে লগইন করা আছে</strong>
+                                        <strong>Logged in as {{ $member->name }}</strong>
                                         <span>
-                                            আপনার ফোন নম্বর দেওয়া আছে। অর্ডারের বিস্তারিত দেখতে শুধু অর্ডার নম্বর দিন,
-                                            অথবা
+                                            Your phone number is already provided. Just enter the order number to view
+                                            details, or
                                             <a href="{{ route('frontend.member.dashboard') }}" style="color: var(--brand);">
-                                                সব অর্ডার দেখুন
-                                            </a>।
+                                                view all orders
+                                            </a>.
                                         </span>
                                     </div>
                                 </div>
@@ -143,52 +142,52 @@
                                 @csrf
 
                                 <div class="cp-field mb-4">
-                                    <label for="track_order_id" class="cp-label">অর্ডার নম্বর *</label>
+                                    <label for="track_order_id" class="cp-label">Order Number *</label>
                                     <input type="number" name="order_id" id="track_order_id" class="cp-input" required
-                                        min="1" placeholder="যেমন: 6"
+                                        min="1" placeholder="e.g. 6"
                                         value="{{ old('order_id', $prefillOrderId ?? '') }}">
                                 </div>
 
                                 <div class="cp-field mb-4">
-                                    <label for="track_phone" class="cp-label">অর্ডারের সময় ব্যবহৃত ফোন নম্বর *</label>
+                                    <label for="track_phone" class="cp-label">Phone Number Used for the Order *</label>
                                     <input type="tel" name="phone" id="track_phone" class="cp-input"
-                                        placeholder="যেমন: 01712345678" value="{{ old('phone', $prefillPhone ?? '') }}"
+                                        placeholder="e.g. 01712345678" value="{{ old('phone', $prefillPhone ?? '') }}"
                                         @guest('member') required @endguest
                                         @auth('member') @if ($prefillPhone) readonly @endif @endauth>
                                 </div>
 
                                 @auth('member')
                                     <p class="mb-3 text-white" style="font-size: 0.78rem; margin-top: -12px;">
-                                        আপনার অ্যাকাউন্টের সাথে অর্ডার যুক্ত থাকলে ফোন নম্বর দেওয়া ঐচ্ছিক।
-                                        ডিফল্টভাবে আপনার সদস্য নম্বরটি ব্যবহার করা হবে।
+                                        If the order is linked to your account, the phone number is optional.
+                                        Your member number will be used by default.
                                     </p>
                                 @endauth
 
                                 <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm w-100">
                                     <i class="bi bi-search me-2"></i>
-                                    <span>অর্ডার ট্র্যাক করুন</span>
+                                    <span>Track Order</span>
                                 </button>
                             </form>
 
                             <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--border-color);">
                                 @guest('member')
                                     <p class="mb-2" style="font-size: 0.85rem; color:#fff">
-                                        নিয়মিত অর্ডার করেন? মেম্বারশিপ কার্ড নিন।
+                                        Order regularly? Get a membership card.
                                     </p>
 
                                     <a href="{{ route('frontend.card.apply') }}"
                                         class="btn-dine btn-dine-outline btn-dine-sm me-2">
-                                        আবেদন করুন
+                                        Apply
                                     </a>
 
                                     <a href="{{ route('frontend.member.login') }}" class="btn-dine btn-dine-ghost btn-dine-sm">
-                                        মেম্বার লগইন
+                                        Member Login
                                     </a>
                                 @else
                                     <a href="{{ route('frontend.member.dashboard') }}"
                                         class="btn-dine btn-dine-ghost btn-dine-sm">
                                         <i class="bi bi-speedometer2 me-1"></i>
-                                        আমার ড্যাশবোর্ড
+                                        My Dashboard
                                     </a>
                                 @endguest
                             </div>

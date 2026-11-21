@@ -8,15 +8,15 @@
 
 @section('frontend_content')
 
-    <x-frontend.page-header title="অতিথিদের অভিজ্ঞতা" eyebrow="আপনাদের ভালোবাসা"
-        subtitle="ডেক্সি ডাইনে কাটানো সুন্দর মুহূর্ত ও খাবারের অভিজ্ঞতা শেয়ার করেছেন আমাদের প্রিয় অতিথিরা।" />
+    <x-frontend.page-header title="Guest Experiences" eyebrow="Your Love"
+        subtitle="Our cherished guests share the beautiful moments and food experiences they enjoyed at Degchi Dine." />
 
     <section class="blog-content-section">
         <div class="container">
             <div class="row g-4 justify-content-center">
                 <div class="col-lg-9">
                     <div class="blog-index-header">
-                        <h2 class="h4 mb-0">আমাদের অতিথিদের মতামত</h2>
+                        <h2 class="h4 mb-0">What Our Guests Say</h2>
                         <span class="post-count">{{ $reviews->total() }}
                             {{ Str::plural('review', $reviews->total()) }}</span>
                     </div>

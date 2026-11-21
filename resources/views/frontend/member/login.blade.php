@@ -39,9 +39,9 @@
 @endpush
 
 @section('frontend_content')
-    <x-frontend.page-header title="মেম্বার লগইন" eyebrow="মেম্বার অ্যাক্সেস"
-        subtitle="যেকোনো সময় আপনার অর্ডার ও মেম্বারশিপের বিস্তারিত দেখতে ড্যাশবোর্ডে প্রবেশ করুন।" :backLink="route('frontend.home')"
-        backText="হোমে ফিরে যান">
+    <x-frontend.page-header title="Member Login" eyebrow="Member Access"
+        subtitle="Log in to your dashboard to view your orders and membership details at any time." :backLink="route('frontend.home')"
+        backText="Back to Home">
         <x-slot:eyebrowIcon>
             <iconify-icon icon="solar:user-circle-bold"></iconify-icon>
         </x-slot:eyebrowIcon>
@@ -54,11 +54,11 @@
                     <div class="contact-page-info-panel">
                         <div class="contact-page-info-top">
                             <div>
-                                <h2 class="contact-page-info-title">ডেক্সি ডাইন</h2>
-                                <p class="contact-page-info-tagline">আন্তরিক আতিথেয়তা · খাঁটি স্বাদ</p>
+                                <h2 class="contact-page-info-title">Degchi Dine</h2>
+                                <p class="contact-page-info-tagline">Sincere Hospitality · Authentic Taste</p>
                             </div>
-                            <span class="contact-page-open-badge"><i class="bi bi-shield-lock-fill me-1"></i> নিরাপদ
-                                লগইন</span>
+                            <span class="contact-page-open-badge"><i class="bi bi-shield-lock-fill me-1"></i> Secure
+                                Login</span>
                         </div>
 
                         <div class="contact-page-cards">
@@ -66,8 +66,8 @@
                                 <div class="contact-page-card-icon"><iconify-icon icon="solar:phone-bold"></iconify-icon>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>ফোন নম্বর</h3>
-                                    <p>আপনার রেজিস্টার করা ফোন নম্বর ব্যবহার করুন</p>
+                                    <h3>Phone Number</h3>
+                                    <p>Use your registered phone number</p>
                                 </div>
                             </article>
 
@@ -75,8 +75,8 @@
                                 <div class="contact-page-card-icon"><iconify-icon icon="solar:letter-bold"></iconify-icon>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>ইমেইল ঠিকানা</h3>
-                                    <p>অথবা আপনার ইমেইল দিয়ে লগইন করুন</p>
+                                    <h3>Email Address</h3>
+                                    <p>Or log in with your email</p>
                                 </div>
                             </article>
 
@@ -84,8 +84,8 @@
                                 <div class="contact-page-card-icon"><iconify-icon icon="solar:card-2-bold"></iconify-icon>
                                 </div>
                                 <div class="contact-page-card-body">
-                                    <h3>কার্ড নম্বর</h3>
-                                    <p>মেম্বারশিপ কার্ডের নম্বর দিয়েও লগইন করা যাবে</p>
+                                    <h3>Card Number</h3>
+                                    <p>You can also log in with your membership card number</p>
                                 </div>
                             </article>
 
@@ -93,27 +93,27 @@
                                 <div class="contact-page-card-icon contact-page-card-icon-gold"><iconify-icon
                                         icon="solar:key-bold"></iconify-icon></div>
                                 <div class="contact-page-card-body">
-                                    <h3>পাসওয়ার্ড</h3>
-                                    <p>মেম্বারশিপের জন্য আবেদন করার সময় যে পাসওয়ার্ড সেট করেছেন</p>
+                                    <h3>Password</h3>
+                                    <p>The password you set when applying for membership</p>
                                 </div>
                             </article>
                         </div>
 
                         <div class="md-example-box">
-                            <h6>উদাহরণ</h6>
-                            <div class="md-example-row">ফোন: <code>01712345678</code></div>
-                            <div class="md-example-row">ইমেইল: <code>you@email.com</code></div>
-                            <div class="md-example-row">কার্ড: <code>MEM0001_5678</code></div>
+                            <h6>Example</h6>
+                            <div class="md-example-row">Phone: <code>01712345678</code></div>
+                            <div class="md-example-row">Email: <code>you@email.com</code></div>
+                            <div class="md-example-row">Card: <code>MEM0001_5678</code></div>
                         </div>
 
                         <div class="contact-page-actions">
                             <a href="{{ route('frontend.card.apply') }}" class="btn-dine btn-dine-primary btn-dine-sm">
                                 <iconify-icon icon="solar:card-2-linear"></iconify-icon>
-                                কার্ডের জন্য আবেদন করুন
+                                Apply for a Card
                             </a>
                             <a href="{{ route('frontend.contact') }}" class="btn-dine btn-dine-ghost btn-dine-sm">
                                 <iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon>
-                                যোগাযোগ করুন
+                                Contact Us
                             </a>
                         </div>
                     </div>
@@ -123,9 +123,9 @@
                     <div class="contact-form-sticky">
                         <div class="cp-form-card cp-form-card-verify">
                             <div class="cp-form-card-head">
-                                <span class="cp-form-step">মেম্বার পোর্টাল</span>
-                                <h3>লগইন করুন</h3>
-                                <p>নিচে আপনার ফোন, ইমেইল অথবা কার্ড নম্বর এবং পাসওয়ার্ড দিন।</p>
+                                <span class="cp-form-step">Member Portal</span>
+                                <h3>Log In</h3>
+                                <p>Enter your phone, email, or card number and password below.</p>
                             </div>
 
                             @if ($errors->any())
@@ -133,7 +133,7 @@
                                     style="background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3);">
                                     <i class="bi bi-exclamation-triangle-fill" style="color: var(--danger);"></i>
                                     <div>
-                                        <strong style="color: var(--danger);">লগইন ব্যর্থ হয়েছে</strong>
+                                        <strong style="color: var(--danger);">Login Failed</strong>
                                         <span>{{ $errors->first() }}</span>
                                     </div>
                                 </div>
@@ -143,7 +143,7 @@
                                 <div class="cp-alert-success mb-4" role="alert">
                                     <i class="bi bi-shield-check"></i>
                                     <div>
-                                        <strong>সফল হয়েছে</strong>
+                                        <strong>Success</strong>
                                         <span>{{ session('success') }}</span>
                                     </div>
                                 </div>
@@ -153,16 +153,16 @@
                                 @csrf
 
                                 <div class="cp-field mb-4">
-                                    <label for="member_login" class="cp-label">ফোন, ইমেইল অথবা কার্ড নম্বর</label>
+                                    <label for="member_login" class="cp-label">Phone, Email, or Card Number</label>
                                     <input type="text" name="login" id="member_login" class="cp-input"
-                                        placeholder="যেমন: 01712345678 অথবা you@email.com" value="{{ old('login') }}"
+                                        placeholder="e.g., 01712345678 or you@email.com" value="{{ old('login') }}"
                                         required autofocus autocomplete="username">
                                 </div>
 
                                 <div class="cp-field mb-4">
-                                    <label for="member_password" class="cp-label">পাসওয়ার্ড</label>
+                                    <label for="member_password" class="cp-label">Password</label>
                                     <input type="password" name="password" id="member_password" class="cp-input"
-                                        placeholder="আপনার পাসওয়ার্ড দিন" required autocomplete="current-password">
+                                        placeholder="Enter your password" required autocomplete="current-password">
                                 </div>
 
                                 <div class="d-flex align-items-center justify-content-between gap-3 mb-4 flex-wrap">
@@ -171,24 +171,24 @@
                                         <input class="form-check-input" type="checkbox" name="remember" id="member_remember"
                                             value="1" style="border-color: var(--brand);">
                                         <label class="form-check-label" for="member_remember"
-                                            style="font-size: 0.88rem; color: #fff; cursor: pointer;">লগইন মনে রাখুন</label>
+                                            style="font-size: 0.88rem; color: #fff; cursor: pointer;">Remember Login</label>
                                     </div>
                                     <a href="{{ route('frontend.member.password.request') }}" class="cp-link-gold"
                                         style="font-size: 0.88rem; font-weight: 600; white-space: nowrap;">
-                                        পাসওয়ার্ড ভুলে গেছেন? <i class="bi bi-arrow-right ms-1"></i>
+                                        Forgot Password? <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </div>
 
                                 <button type="submit" class="btn-dine btn-dine-primary btn-dine-sm w-100">
-                                    <span>ড্যাশবোর্ডে লগইন করুন</span>
+                                    <span>Log In to Dashboard</span>
                                     <iconify-icon icon="solar:login-2-linear"></iconify-icon>
                                 </button>
                             </form>
 
                             <p class="cp-form-footnote text-center mb-0 mt-4">
-                                এখনও মেম্বারশিপ নেননি?
+                                Don't have a membership yet?
                                 <a href="{{ route('frontend.card.apply') }}" class="cp-link-gold">
-                                    মেম্বারশিপের জন্য আবেদন করুন <i class="bi bi-arrow-right ms-1"></i>
+                                    Apply for Membership <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </p>
                         </div>

@@ -4,14 +4,14 @@
         <div class="reels-header-shell reveal mb-5 reels-section-header-block">
             <div class="reels-section-header">
                 <div class="reels-header-left">
-                    <x-frontend.section-heading title="ফেসবুকে আমাদের দেখুন"
-                        subtitle="ডেক্সিডাইন এর অতিথিদের প্রাণবন্ত পরিবেশ—প্রতি সপ্তাহে নতুন নতুন রিলস।" icon="line"
+                    <x-frontend.section-heading title="Find Us on Facebook"
+                        subtitle="The vibrant atmosphere of Degchi Dine's guests—new reels every week." icon="line"
                         align="start" :showDivider="false" />
                     <div class="reels-header-cta-mobile d-md-none mt-3">
                         <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"
                             class="btn-dine btn-dine-primary w-100 justify-content-center" target="_blank"
                             rel="noopener noreferrer">
-                            <i class="bi bi-facebook" aria-hidden="true"></i><span>ফেসবুকে অনুসরণ করুন</span>
+                            <i class="bi bi-facebook" aria-hidden="true"></i><span>Join Our Community</span>
                         </a>
                     </div>
                 </div>
@@ -19,8 +19,9 @@
                 <div class="reels-header-right d-none d-md-flex align-items-center">
                     <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"
                         class="btn-dine btn-dine-primary" target="_blank" rel="noopener noreferrer">
-                        <i class="bi bi-facebook" aria-hidden="true"></i><span>ফেসবুকে অনুসরণ করুন</span>
+                        <i class="bi bi-facebook" aria-hidden="true"></i><span>Join Our Community</span>
                     </a>
+                    
                 </div>
             </div>
         </div>

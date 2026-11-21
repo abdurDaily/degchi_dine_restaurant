@@ -72,10 +72,10 @@
                         <div class="about-img-overlay"></div>
                     </div>
 
-                    <div class="about-experience-badge text-center">
+                    {{-- <div class="about-experience-badge text-center">
                         <span class="exp-number">{{ $aboutExpNumber }}</span>
                         <span class="exp-text text-uppercase">{{ $aboutExpText }}</span>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>

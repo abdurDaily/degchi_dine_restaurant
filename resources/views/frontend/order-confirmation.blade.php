@@ -213,7 +213,7 @@
         }
     </style>
 
-    <x-frontend.page-header title="অর্ডার #{{ $order->id }}" :subtitle="!empty($needsPhoneVerification) ? 'আপনার অর্ডারের অবস্থা ও রসিদ দেখতে চেকআউটে ব্যবহৃত ফোন নম্বরটি দিন।' : ($order->status === 'canceled' ? 'এই অর্ডারটি বাতিল করা হয়েছে। নিচে বিস্তারিত দেখুন অথবা সহায়তার জন্য আমাদের সাথে যোগাযোগ করুন।' : 'হ্যালো ' . explode(' ', $order->customer_name)[0] . ' — আপনার অর্ডারের বর্তমান অবস্থা ও সম্পূর্ণ রসিদ নিচে দেখুন।')" eyebrow="অর্ডার নিশ্চিতকরণ">
+    <x-frontend.page-header title="Order #{{ $order->id }}" :subtitle="!empty($needsPhoneVerification) ? 'Enter the phone number used at checkout to view your order status and receipt.' : ($order->status === 'canceled' ? 'This order has been canceled. See the details below or contact us for assistance.' : 'Hello ' . explode(' ', $order->customer_name)[0] . ' — see the current status and full receipt for your order below.')" eyebrow="Order Confirmation">
         <x-slot:eyebrowIcon>
             @if (!empty($needsPhoneVerification))
                 <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon>
@@ -226,11 +226,11 @@
             @endif
         </x-slot:eyebrowIcon>
         <x-slot:meta>
-            <span><i class="bi bi-bag-check"></i> কার্ট</span>
+            <span><i class="bi bi-bag-check"></i> Cart</span>
             <span><i class="bi bi-chevron-right"></i></span>
-            <span><i class="bi bi-credit-card"></i> চেকআউট</span>
+            <span><i class="bi bi-credit-card"></i> Checkout</span>
             <span><i class="bi bi-chevron-right"></i></span>
-            <span style="opacity: 0.5;"><i class="bi bi-check-circle"></i> নিশ্চিত</span>
+            <span style="opacity: 0.5;"><i class="bi bi-check-circle"></i> Confirm</span>
         </x-slot:meta>
     </x-frontend.page-header>
 
@@ -243,13 +243,13 @@
                         <div class="checkout-form-panel">
                             <h5 class="checkout-form-heading">
                                 <span class="checkout-form-heading-icon"><i class="bi bi-shield-lock"></i></span>
-                                অর্ডার দেখতে যাচাই করুন
+                                Verify to View Order
                             </h5>
                             <p class="mb-4"
                                 style="color: var(--text-on-dark-muted); font-size: 0.9rem; line-height: 1.6;">
-                                আপনার নিরাপত্তার জন্য, ট্র্যাকিংয়ের বিস্তারিত দেখতে অর্ডার <strong
-                                    style="color: var(--text-on-dark);">#{{ $order->id }}</strong>-এর সাথে ব্যবহৃত ফোন
-                                নম্বরটি নিশ্চিত করুন।
+                                For your security, please confirm the phone number used for order <strong
+                                    style="color: var(--text-on-dark);">#{{ $order->id }}</strong> to view tracking
+                                details.
                             </p>
 
                             @if ($errors->any())
@@ -265,25 +265,25 @@
                                 <div class="checkout-input-wrap">
                                     <i class="bi bi-telephone checkout-input-icon"></i>
                                     <input type="tel" name="phone" id="oc_verify_phone"
-                                        class="form-control checkout-input" placeholder="চেকআউটে ব্যবহৃত ফোন নম্বর"
+                                        class="form-control checkout-input" placeholder="Phone number used at checkout"
                                         value="{{ old('phone') }}" required autofocus />
                                 </div>
 
                                 <button type="submit"
                                     class="btn checkout-btn-primary d-flex align-items-center justify-content-center gap-2">
-                                    <i class="bi bi-search"></i> অর্ডারের বিস্তারিত দেখুন
+                                    <i class="bi bi-search"></i> View Order Details
                                 </button>
                             </form>
 
                             <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--card-dark-border);">
-                                <p class="mb-3" style="color: var(--text-on-dark-muted); font-size: 0.85rem;">আপনার কি
-                                    মেম্বার অ্যাকাউন্ট আছে?</p>
+                                <p class="mb-3" style="color: var(--text-on-dark-muted); font-size: 0.85rem;">Do you have a
+                                    member account?</p>
                                 <div class="d-flex justify-content-center flex-wrap gap-3">
                                     <a href="{{ route('frontend.member.login') }}" class="checkout-continue-link">
-                                        <i class="bi bi-person me-1"></i> মেম্বার লগইন
+                                        <i class="bi bi-person me-1"></i> Member Login
                                     </a>
                                     <a href="{{ route('frontend.order.track') }}" class="checkout-continue-link">
-                                        <i class="bi bi-search me-1"></i> অন্য অর্ডার ট্র্যাক করুন
+                                        <i class="bi bi-search me-1"></i> Track Another Order
                                     </a>
                                 </div>
                             </div>
@@ -299,46 +299,46 @@
                             <h5 class="checkout-form-heading">
                                 <span class="checkout-form-heading-icon"><iconify-icon
                                         icon="solar:clipboard-list-linear"></iconify-icon></span>
-                                অর্ডারের বিস্তারিত
+                                Order Details
                             </h5>
 
                             <div class="checkout-summary-row">
-                                <span>অর্ডার নম্বর</span>
+                                <span>Order Number</span>
                                 <span class="checkout-summary-val">#{{ $order->id }}</span>
                             </div>
                             <div class="checkout-summary-row">
-                                <span>অর্ডারের সময়</span>
+                                <span>Order Time</span>
                                 <span class="checkout-summary-val">{{ $order->created_at->format('d M Y, h:i A') }}</span>
                             </div>
                             <div class="checkout-summary-row">
-                                <span>পেমেন্ট</span>
+                                <span>Payment</span>
                                 <span class="checkout-summary-val">{{ strtoupper($order->payment_method ?? 'N/A') }}</span>
                             </div>
                             <div class="checkout-summary-row">
-                                <span>অবস্থা</span>
+                                <span>Status</span>
                                 <span><span
                                         class="oc-badge {{ $statusClass }}">{{ ucfirst($order->status) }}</span></span>
                             </div>
                             @if ($order->status === 'canceled' && !empty($order->status_remarks))
                                 <div class="checkout-summary-row">
-                                    <span>বাতিলের কারণ</span>
+                                    <span>Cancellation Reason</span>
                                     <span class="checkout-summary-val"
                                         style="color: #ff6b6b; text-align: right;">{{ $order->status_remarks }}</span>
                                 </div>
                             @endif
                             <div class="checkout-summary-divider"></div>
                             <div class="checkout-summary-row">
-                                <span>ডেলিভারি ঠিকানা</span>
+                                <span>Delivery Address</span>
                                 <span class="checkout-summary-val"
                                     style="text-align: right; max-width: 60%;">{{ $order->customer_address }}</span>
                             </div>
                             <div class="checkout-summary-row">
-                                <span>গ্রাহকের ফোন</span>
+                                <span>Customer Phone</span>
                                 <span class="checkout-summary-val">{{ $order->customer_phone }}</span>
                             </div>
                             <div class="checkout-summary-divider"></div>
                             <div class="checkout-summary-total-row">
-                                <span>অর্ডারের মোট</span>
+                                <span>Order Total</span>
                                 <strong
                                     class="checkout-summary-total-val">৳{{ number_format($order->final_amount, 2) }}</strong>
                             </div>
@@ -349,7 +349,7 @@
                                 <h5 class="checkout-form-heading">
                                     <span class="checkout-form-heading-icon"><iconify-icon
                                             icon="solar:bag-3-linear"></iconify-icon></span>
-                                    অর্ডার করা খাবার
+                                    Ordered Food
                                 </h5>
 
                                 @foreach ($items as $item)
@@ -371,7 +371,7 @@
                                             <div class="checkout-order-top">
                                                 <p class="checkout-order-name">{{ $title }}</p>
                                                 <span
-                                                    class="checkout-order-tag">{{ $note }}{{ $note && $qty ? ' · ' : '' }}পরিমাণ:
+                                                    class="checkout-order-tag">{{ $note }}{{ $note && $qty ? ' · ' : '' }}Quantity:
                                                     {{ $qty }}</span>
                                             </div>
                                             <div class="checkout-order-bottom">
@@ -386,19 +386,19 @@
 
                                 <div class="mt-3 pt-2">
                                     <div class="checkout-summary-row">
-                                        <span>সাবটোটাল</span>
+                                        <span>Subtotal</span>
                                         <span
                                             class="checkout-summary-val">৳{{ number_format($order->total_amount, 2) }}</span>
                                     </div>
                                     @if ((float) $order->discount_amount > 0)
                                         <div class="checkout-summary-row fw-semibold">
-                                            <span>ছাড়</span>
+                                            <span>Discount</span>
                                             <span>- ৳{{ number_format($order->discount_amount, 2) }}</span>
                                         </div>
                                     @endif
                                     <div class="checkout-summary-divider"></div>
                                     <div class="checkout-summary-total-row">
-                                        <span>মোট পরিশোধ</span>
+                                        <span>Total Paid</span>
                                         <strong
                                             class="checkout-summary-total-val">৳{{ number_format($order->final_amount, 2) }}</strong>
                                     </div>
@@ -410,20 +410,20 @@
                             @auth('member')
                                 <a href="{{ route('frontend.member.dashboard', ['order' => $order->id]) }}"
                                     class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
-                                    <iconify-icon icon="solar:widget-5-linear"></iconify-icon> আমার ড্যাশবোর্ড
+                                    <iconify-icon icon="solar:widget-5-linear"></iconify-icon> My Dashboard
                                 </a>
                             @endauth
                             <a href="{{ route('frontend.order.invoice.download', $order->id) }}"
                                 class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
-                                <iconify-icon icon="solar:download-linear"></iconify-icon> ইনভয়েস ডাউনলোড করুন
+                                <iconify-icon icon="solar:download-linear"></iconify-icon> Download Invoice
                             </a>
                             <a href="{{ route('frontend.completeMenu') }}"
                                 class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
-                                <iconify-icon icon="solar:chef-hat-linear"></iconify-icon> আবার অর্ডার করুন
+                                <iconify-icon icon="solar:chef-hat-linear"></iconify-icon> Order Again
                             </a>
                             <a href="{{ route('frontend.home') }}"
                                 class="btn checkout-btn-primary oc-action-btn oc-action-btn-outline d-flex align-items-center justify-content-center gap-2">
-                                <iconify-icon icon="solar:home-2-linear"></iconify-icon> হোমে ফিরে যান
+                                <iconify-icon icon="solar:home-2-linear"></iconify-icon> Back to Home
                             </a>
                         </div>
                     </div>
@@ -434,7 +434,7 @@
                             <div class="checkout-summary-header">
                                 <iconify-icon icon="solar:delivery-linear" class="me-2"
                                     style="color: var(--brand-secondary); font-size: 1.3rem;"></iconify-icon>
-                                অর্ডারের অগ্রগতি
+                                Order Progress
                             </div>
                             <div class="checkout-summary-body">
                                 <div class="oc-timeline">
@@ -442,18 +442,18 @@
                                         $steps = [
                                             [
                                                 'key' => 'pending',
-                                                'label' => 'অর্ডার গ্রহণ করা হয়েছে',
-                                                'desc' => 'আমরা আপনার অর্ডার পেয়েছি',
+                                                'label' => 'Order Placed',
+                                                'desc' => 'We have received your order',
                                             ],
                                             [
                                                 'key' => 'confirmed',
-                                                'label' => 'নিশ্চিত হয়েছে',
-                                                'desc' => 'রান্নাঘরে আপনার খাবার প্রস্তুত করা হচ্ছে',
+                                                'label' => 'Confirmed',
+                                                'desc' => 'Your food is being prepared in the kitchen',
                                             ],
                                             [
                                                 'key' => 'completed',
-                                                'label' => 'ডেলিভারি সম্পন্ন',
-                                                'desc' => 'আপনার খাবার উপভোগ করুন!',
+                                                'label' => 'Delivery Completed',
+                                                'desc' => 'Enjoy your food!',
                                             ],
                                         ];
                                         $statusIndex = match ($order->status) {
@@ -468,17 +468,17 @@
                                     @if ($isCanceled)
                                         <div class="oc-timeline-step is-done">
                                             <div class="oc-timeline-dot"></div>
-                                            <strong>অর্ডার গ্রহণ করা হয়েছে</strong>
-                                            <span>আমরা আপনার অর্ডার পেয়েছি</span>
+                                            <strong>Order Placed</strong>
+                                            <span>We have received your order</span>
                                         </div>
                                         <div class="oc-timeline-step is-canceled">
                                             <div class="oc-timeline-dot"></div>
-                                            <strong>অর্ডার বাতিল করা হয়েছে</strong>
-                                            <span>এই অর্ডারটি ডেলিভারি করা হবে না।</span>
+                                            <strong>Order Canceled</strong>
+                                            <span>This order will not be delivered.</span>
                                         </div>
                                         @if (!empty($order->status_remarks))
                                             <div class="oc-remarks">
-                                                <small>মন্তব্য</small>
+                                                <small>Remarks</small>
                                                 <p>{{ $order->status_remarks }}</p>
                                             </div>
                                         @endif
@@ -504,18 +504,18 @@
                             <div class="checkout-summary-header">
                                 <i class="bi bi-phone me-2"
                                     style="color: var(--brand-secondary); font-size: 1.15rem;"></i>
-                                সাহায্য প্রয়োজন?
+                                Need Help?
                             </div>
                             <div class="checkout-summary-body">
                                 <p
                                     style="color: var(--text-on-dark-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem;">
-                                    অর্ডার <strong style="color: var(--text-on-dark);">#{{ $order->id }}</strong>-এর
-                                    আপডেট বা কোনো বিষয়ে জানতে আমাদের কল করুন এবং আপনার অর্ডার নম্বরটি উল্লেখ করুন।
+                                    For updates on order <strong style="color: var(--text-on-dark);">#{{ $order->id }}</strong>
+                                    or any questions, please call us and mention your order number.
                                 </p>
                                 <a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}"
                                     class="btn checkout-btn-primary oc-contact-btn">
                                     <iconify-icon icon="solar:phone-linear"></iconify-icon>
-                                    {{ $contactPhone }} নম্বরে কল করুন
+                                    Call {{ $contactPhone }}
                                 </a>
                             </div>
                         </div>
@@ -524,24 +524,24 @@
                             <div class="checkout-summary-header">
                                 <iconify-icon icon="solar:bookmark-linear" class="me-2"
                                     style="color: var(--brand-secondary); font-size: 1.3rem;"></iconify-icon>
-                                পরে এই অর্ডারটি দেখুন
+                                View This Order Later
                             </div>
                             <div class="checkout-summary-body">
                                 <p
                                     style="color: var(--text-on-dark-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem;">
-                                    আপনার <strong style="color: var(--text-on-dark);">অর্ডার #{{ $order->id }}</strong>
-                                    এবং ফোন নম্বর <strong
-                                        style="color: var(--text-on-dark);">{{ $order->customer_phone }}</strong> সংরক্ষণ
-                                    করে রাখুন।
-                                    যেকোনো সময় <a href="{{ route('frontend.order.track') }}"
+                                    Save your <strong style="color: var(--text-on-dark);">Order #{{ $order->id }}</strong>
+                                    and phone number <strong
+                                        style="color: var(--text-on-dark);">{{ $order->customer_phone }}</strong> for
+                                    future reference.
+                                    You can view this order again at any time on the
+                                    <a href="{{ route('frontend.order.track') }}"
                                         class="text-decoration-underline fw-semibold"
-                                        style="color: var(--brand-secondary);">অর্ডার ট্র্যাক করুন</a> পেজে গিয়ে আবার এই
-                                    অর্ডারটি দেখতে পারবেন।
+                                        style="color: var(--brand-secondary);">Track Order</a> page.
                                 </p>
                                 <a href="{{ route('frontend.order.track', ['order' => $order->id]) }}"
                                     class="btn checkout-btn-primary oc-action-btn-outline d-flex align-items-center justify-content-center gap-2">
                                     <iconify-icon icon="solar:magnifer-linear"></iconify-icon>
-                                    অর্ডার #{{ $order->id }} ট্র্যাক করুন
+                                    Track Order #{{ $order->id }}
                                 </a>
                             </div>
                         </div>
@@ -551,22 +551,22 @@
                                 <div class="checkout-summary-header">
                                     <iconify-icon icon="solar:card-2-linear" class="me-2"
                                         style="color: var(--brand-secondary); font-size: 1.3rem;"></iconify-icon>
-                                    মেম্বার অ্যাকাউন্ট খুলুন
+                                    Open a Member Account
                                 </div>
                                 <div class="checkout-summary-body">
                                     <p
                                         style="color: var(--text-on-dark-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem;">
-                                        একটি মেম্বারশিপ কার্ডের জন্য আবেদন করুন। এতে একটি ড্যাশবোর্ড থেকে আপনার সব অর্ডার
-                                        ট্র্যাক করতে পারবেন এবং বিশেষ ছাড় উপভোগ করতে পারবেন।
+                                        Apply for a membership card to track all your orders from one dashboard
+                                        and enjoy special discounts.
                                     </p>
                                     <div class="d-flex flex-wrap gap-2">
                                         <a href="{{ route('frontend.card.apply') }}"
                                             class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
-                                            এখনই আবেদন করুন
+                                            Apply Now
                                         </a>
                                         <a href="{{ route('frontend.member.login') }}"
                                             class="btn checkout-btn-primary oc-action-btn oc-action-btn-outline d-flex align-items-center justify-content-center gap-2">
-                                            মেম্বার লগইন
+                                            Member Login
                                         </a>
                                     </div>
                                 </div>
@@ -574,17 +574,17 @@
                                 <div class="checkout-summary-header">
                                     <iconify-icon icon="solar:widget-5-linear" class="me-2"
                                         style="color: var(--brand-secondary); font-size: 1.3rem;"></iconify-icon>
-                                    মেম্বার অ্যাকাউন্ট
+                                    Member Account
                                 </div>
                                 <div class="checkout-summary-body">
                                     <p
                                         style="color: var(--text-on-dark-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem;">
-                                        আপনার ড্যাশবোর্ড থেকে সব অর্ডার ও মেম্বারশিপের বিস্তারিত দেখুন।
+                                        View all your orders and membership details from your dashboard.
                                     </p>
                                     <a href="{{ route('frontend.member.dashboard') }}"
                                         class="btn checkout-btn-primary oc-action-btn d-flex align-items-center justify-content-center gap-2">
                                         <iconify-icon icon="solar:widget-5-linear"></iconify-icon>
-                                        ড্যাশবোর্ড খুলুন
+                                        Open Dashboard
                                     </a>
                                 </div>
                             @endguest

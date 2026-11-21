@@ -45,7 +45,7 @@ class NewOrderNotification extends Notification implements ShouldQueue
     {
         return [
             'order_id' => $this->order->id,
-            'message' => 'নতুন অর্ডার এসেছে',
+            'message' => 'New order received',
             'created_at' => now()->toIso8601String(),
         ];
     }

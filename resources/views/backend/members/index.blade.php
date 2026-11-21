@@ -135,7 +135,73 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-3">{{ $members->links() }}</div>
+                    @if ($members->hasPages())
+                        @php
+                            $currentPage = $members->currentPage();
+                            $lastPage = $members->lastPage();
+                            $pageWindow = 2;
+                            $startPage = max(1, $currentPage - $pageWindow);
+                            $endPage = min($lastPage, $currentPage + $pageWindow);
+
+                            if ($currentPage <= $pageWindow + 1) {
+                                $startPage = 1;
+                                $endPage = min($lastPage, ($pageWindow * 2) + 1);
+                            }
+
+                            if ($currentPage >= $lastPage - $pageWindow) {
+                                $startPage = max(1, $lastPage - ($pageWindow * 2));
+                                $endPage = $lastPage;
+                            }
+                        @endphp
+                        <nav class="members-pagination mt-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2" aria-label="Members pagination">
+                            <div class="small text-muted">
+                                Showing <span class="fw-semibold">{{ $members->firstItem() }}</span> to
+                                <span class="fw-semibold">{{ $members->lastItem() }}</span> of
+                                <span class="fw-semibold">{{ $members->total() }}</span> members
+                            </div>
+                            <ul class="pagination mb-0">
+                                <li class="page-item members-page-nav {{ $members->onFirstPage() ? 'disabled' : '' }}">
+                                    @if ($members->onFirstPage())
+                                        <span class="page-link"><i class="ri-arrow-left-line me-1"></i> Prev</span>
+                                    @else
+                                        <a class="page-link" href="{{ $members->previousPageUrl() }}" rel="prev"><i class="ri-arrow-left-line me-1"></i> Prev</a>
+                                    @endif
+                                </li>
+
+                                @if ($startPage > 1)
+                                    <li class="page-item"><a class="page-link" href="{{ $members->url(1) }}">1</a></li>
+                                    @if ($startPage > 2)
+                                        <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                                    @endif
+                                @endif
+
+                                @foreach ($members->getUrlRange($startPage, $endPage) as $page => $url)
+                                    <li class="page-item {{ $page == $currentPage ? 'active' : '' }}" @if ($page == $currentPage) aria-current="page" @endif>
+                                        @if ($page == $currentPage)
+                                            <span class="page-link">{{ $page }}</span>
+                                        @else
+                                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                        @endif
+                                    </li>
+                                @endforeach
+
+                                @if ($endPage < $lastPage)
+                                    @if ($endPage < $lastPage - 1)
+                                        <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                                    @endif
+                                    <li class="page-item"><a class="page-link" href="{{ $members->url($lastPage) }}">{{ $lastPage }}</a></li>
+                                @endif
+
+                                <li class="page-item members-page-nav {{ $members->hasMorePages() ? '' : 'disabled' }}">
+                                    @if ($members->hasMorePages())
+                                        <a class="page-link" href="{{ $members->nextPageUrl() }}" rel="next">Next <i class="ri-arrow-right-line ms-1"></i></a>
+                                    @else
+                                        <span class="page-link">Next <i class="ri-arrow-right-line ms-1"></i></span>
+                                    @endif
+                                </li>
+                            </ul>
+                        </nav>
+                    @endif
                 </div>
             </div>
         </div>
@@ -175,6 +241,44 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+<style>
+    .admin-crud-page .members-pagination .pagination {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin: 0;
+    }
+
+    .admin-crud-page .members-pagination .page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        min-width: 36px;
+        height: 34px;
+        white-space: nowrap;
+    }
+
+    .admin-crud-page .members-pagination .members-page-nav .page-link {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+        font-weight: 600;
+    }
+
+    .admin-crud-page .members-pagination .page-item.disabled .page-link {
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 575.98px) {
+        .admin-crud-page .members-pagination .page-link {
+            min-width: 32px;
+            height: 32px;
+            font-size: 0.78rem;
+        }
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>

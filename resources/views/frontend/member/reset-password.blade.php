@@ -360,16 +360,16 @@
             <div class="container px-4 px-lg-5 position-relative">
                 <a href="{{ route('frontend.home') }}" class="dd-apply-back-btn">
                     <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
-                    <span>হোমে ফিরে যান</span>
+                    <span>Back to Home</span>
                 </a>
 
                 <div class="dd-apply-hero-content">
                     <div class="md-icon-ring">
                         <iconify-icon icon="solar:user-circle-bold"></iconify-icon>
                     </div>
-                    <h1 class="dd-apply-headline">নতুন পাসওয়ার্ড সেট করুন</h1>
-                    <p class="dd-apply-subhead">আপনার ডেক্সি ডাইন মেম্বারশিপ অ্যাকাউন্টের জন্য একটি নতুন পাসওয়ার্ড নির্বাচন
-                        করুন।</p>
+                    <h1 class="dd-apply-headline">Set a New Password</h1>
+                    <p class="dd-apply-subhead">Choose a new password for your Degchi Dine membership
+                        account.</p>
                 </div>
             </div>
         </div>
@@ -377,38 +377,38 @@
         <div class="container px-3 px-sm-4 px-lg-5 md-login-box">
             <div class="md-login-grid">
                 <div class="md-login-help">
-                    <h3>পাসওয়ার্ডের পরামর্শ</h3>
-                    <p>আপনার অ্যাকাউন্টের জন্য আগে ব্যবহার করেননি এমন একটি শক্তিশালী পাসওয়ার্ড তৈরি করুন।</p>
+                    <h3>Password Tips</h3>
+                    <p>Create a strong password that you haven't used for your account before.</p>
 
                     <div class="md-step">
-                        <div class="md-step-num">১</div>
+                        <div class="md-step-num">1</div>
                         <div class="md-step-text">
-                            <strong>আপনার ইমেইল নিশ্চিত করুন</strong>
-                            <span>পাসওয়ার্ড পরিবর্তনের লিংকটি যে ইমেইলে পাঠানো হয়েছে, সেটির সঙ্গে মিলতে হবে</span>
+                            <strong>Confirm Your Email</strong>
+                            <span>It must match the email the password reset link was sent to</span>
                         </div>
                     </div>
 
                     <div class="md-step">
-                        <div class="md-step-num">২</div>
+                        <div class="md-step-num">2</div>
                         <div class="md-step-text">
-                            <strong>নতুন পাসওয়ার্ড নির্বাচন করুন</strong>
-                            <span>কমপক্ষে ৮ অক্ষরের হতে হবে</span>
+                            <strong>Choose a New Password</strong>
+                            <span>Must be at least 8 characters</span>
                         </div>
                     </div>
 
                     <div class="md-step">
-                        <div class="md-step-num">৩</div>
+                        <div class="md-step-num">3</div>
                         <div class="md-step-text">
-                            <strong>আবার লগইন করুন</strong>
-                            <span>নতুন পাসওয়ার্ডের সঙ্গে আপনার ফোন বা কার্ড নম্বর ব্যবহার করুন</span>
+                            <strong>Log In Again</strong>
+                            <span>Use your phone or card number with your new password</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="md-login-form-side">
                     <div class="md-form-header">
-                        <h2>নতুন পাসওয়ার্ড</h2>
-                        <p>নিচে আপনার ইমেইল ও নতুন পাসওয়ার্ড দিন।</p>
+                        <h2>New Password</h2>
+                        <p>Enter your email and new password below.</p>
                     </div>
 
                     @if ($errors->any())
@@ -423,33 +423,33 @@
                         <div class="dd-input-group">
                             <input type="email" name="email" id="member_reset_email" class="dd-input-field"
                                 placeholder=" " value="{{ old('email', $email) }}" required autofocus autocomplete="email">
-                            <label for="member_reset_email" class="dd-floating-label">ইমেইল ঠিকানা</label>
+                            <label for="member_reset_email" class="dd-floating-label">Email Address</label>
                         </div>
 
                         <div class="dd-input-group">
                             <input type="password" name="password" id="member_new_password" class="dd-input-field"
                                 placeholder=" " required minlength="8" autocomplete="new-password">
-                            <label for="member_new_password" class="dd-floating-label">নতুন পাসওয়ার্ড</label>
+                            <label for="member_new_password" class="dd-floating-label">New Password</label>
                         </div>
 
                         <div class="dd-input-group">
                             <input type="password" name="password_confirmation" id="member_new_password_confirm"
                                 class="dd-input-field" placeholder=" " required minlength="8" autocomplete="new-password">
-                            <label for="member_new_password_confirm" class="dd-floating-label">নতুন পাসওয়ার্ড নিশ্চিত
-                                করুন</label>
+                            <label for="member_new_password_confirm" class="dd-floating-label">Confirm
+                                Password</label>
                         </div>
 
                         <button type="submit" class="dd-submit-btn">
-                            <span>পাসওয়ার্ড আপডেট করুন</span>
+                            <span>Update Password</span>
                             <iconify-icon icon="solar:lock-password-linear" class="dd-btn-icon"></iconify-icon>
                         </button>
                     </form>
 
                     <div class="md-footer-cta">
-                        <p>লগইন করার জন্য প্রস্তুত?</p>
+                        <p>Ready to log in?</p>
                         <a href="{{ route('frontend.member.login') }}" class="md-apply-btn">
                             <iconify-icon icon="solar:login-2-linear"></iconify-icon>
-                            মেম্বার লগইনে ফিরে যান
+                            Back to Member Login
                         </a>
                     </div>
                 </div>

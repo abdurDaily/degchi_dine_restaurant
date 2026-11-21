@@ -5,7 +5,7 @@
           <div class="custom-modal-header">
               <div class="header-left">
                   <i class="fas fa-user-circle"></i>
-                  <span>সদস্য লগইন প্রয়োজন</span>
+                  <span>Member Login Required</span>
               </div>
               <button type="button" class="close-btn" data-bs-dismiss="modal">&times;</button>
           </div>
@@ -14,8 +14,8 @@
               <div class="message-box">
                   <i class="fas fa-gem"></i>
                   <p>
-                      এই অফারটি শুধুমাত্র সদস্যদের জন্য (ফার্স্ট অর্ডার অনলি ডিল সহ)। 
-                      দয়া করে সদস্য হিসেবে লগইন করুন এই আইটেমটি অফার মূল্যে যুক্ত করতে।
+                      This offer is for members only (including first-order-only deals). 
+                      Please log in as a member to add this item at the offer price.
                   </p>
               </div>
           </div>
@@ -23,14 +23,14 @@
           <div class="custom-modal-footer">
               <a href="{{ route('frontend.member.login') }}" class="btn-login">
                   <i class="fas fa-sign-in-alt"></i>
-                  সদস্য লগইন
+                  Member Login
               </a>
               <a href="{{ route('frontend.card.apply') }}" class="btn-register">
                   <i class="fas fa-user-plus"></i>
-                  নিবন্ধন
+                  Register
               </a>
               <button class="btn-close-outline" data-bs-dismiss="modal">
-                  ✕ বন্ধ করুন
+                  ✕ Close
               </button>
           </div>
       </div>

@@ -9,18 +9,18 @@
     <div class="menu-page">
 
         <x-frontend.page-header :title="isset($activeOfferDetails) && $activeOfferDetails
-            ? 'বিশেষ অফার'
+            ? 'Special Offers'
             : (!empty($offerOnly)
-                ? 'অফারের খাবারসমূহ'
+                ? 'Offer Dishes'
                 : (!empty($popularOnly)
-                    ? 'জনপ্রিয় খাবার'
-                    : 'আমাদের সম্পূর্ণ মেনু'))" :subtitle="isset($activeOfferDetails) && $activeOfferDetails
-            ? 'আপনার পছন্দের খাবারে উপভোগ করুন আমাদের বিশেষ অফার।'
+                    ? 'Popular Food'
+                    : 'Our Full Menu'))" :subtitle="isset($activeOfferDetails) && $activeOfferDetails
+            ? 'Enjoy our special offers on your favourite food.'
             : (!empty($offerOnly)
-                ? 'সাশ্রয়ী দামে পছন্দের খাবারের বিশেষ আয়োজন।'
+                ? 'Special selections of your favourite food at affordable prices.'
                 : (!empty($popularOnly)
-                    ? 'আমাদের অতিথিদের সবচেয়ে পছন্দের খাবারগুলো একসাথে।'
-                    : 'ডেক্সি ডাইনের সম্পূর্ণ মেনু থেকে বেছে নিন আপনার পছন্দের খাবার।'))" eyebrow="ডেক্সি ডাইন">
+                    ? 'The dishes our guests love most, all in one place.'
+                    : 'Choose your favourites from the Full Menu at Degchi Dine.'))" eyebrow="Degchi Dine">
             <x-slot:eyebrowIcon>
                 <iconify-icon icon="solar:plate-bold"></iconify-icon>
             </x-slot:eyebrowIcon>

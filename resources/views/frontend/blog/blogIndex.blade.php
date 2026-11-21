@@ -9,8 +9,8 @@
 
 @section('frontend_content')
 
-    <x-frontend.page-header title="আমাদের ব্লগ" eyebrow="আমাদের গল্প"
-        subtitle="ডেক্সি ডাইনের গল্প, আয়োজন ও খাবারের নানা খবর একসাথে।" />
+    <x-frontend.page-header title="Our Blog" eyebrow="Our Story"
+        subtitle="Degchi Dine's stories, events and food news, all in one place." />
 
     <section class="blog-content-section">
         <div class="container">

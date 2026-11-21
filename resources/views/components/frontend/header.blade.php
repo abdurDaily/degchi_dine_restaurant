@@ -12,36 +12,34 @@
         <ul class="navbar-nav flex-row desktop-nav2">
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('frontend.home') ? 'active' : '' }}"
-                    href="{{ route('frontend.home') }}#home">হোম</a>
+                    href="{{ route('frontend.home') }}#home">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}"
-                    href="{{ route('frontend.about') }}">আমাদের সম্পর্কে</a>
+                    href="{{ route('frontend.about') }}">About Us</a>
             </li>
+
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('frontend.blog.*') ? 'active' : '' }}"
-                    href="{{ route('frontend.blog.index') }}">ব্লগ</a>
+                <a class="nav-link {{ request()->routeIs('frontend.completeMenu') && !request()->has('offerFilter') ? 'active' : '' }}"
+                    href="{{ route('frontend.completeMenu') }}">Full Menu</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}"
-                    href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">অফার</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('frontend.completeMenu') && !request()->has('offerFilter') ? 'active' : '' }}"
-                    href="{{ route('frontend.completeMenu') }}">সম্পূর্ণ মেনু</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('frontend.reviews.index') ? 'active' : '' }}"
-                    href="{{ route('frontend.reviews.index') }}">রিভিউ</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('frontend.contact') ? 'active' : '' }}"
-                    href="{{ route('frontend.contact') }}">যোগাযোগ</a>
+                    href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('frontend.order.track') ? 'active' : '' }}"
-                    href="{{ route('frontend.order.track') }}">অর্ডার ট্র্যাক করুন</a>
+                    href="{{ route('frontend.order.track') }}">Track Order</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('frontend.reviews.index') ? 'active' : '' }}"
+                    href="{{ route('frontend.reviews.index') }}">Reviews</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('frontend.contact') ? 'active' : '' }}"
+                    href="{{ route('frontend.contact') }}">Contact</a>
+            </li>
+
         </ul>
 
 
@@ -121,59 +119,50 @@
             <li class="nav-item">
                 <a data-bs-dismiss="offcanvas"
                     class="nav-link {{ request()->routeIs('frontend.home') ? 'active' : '' }}"
-                    href="{{ route('frontend.home') }}#home">হোম</a>
+                    href="{{ route('frontend.home') }}#home">Home</a>
             </li>
             <li class="nav-item">
                 <a data-bs-dismiss="offcanvas"
                     class="nav-link {{ request()->routeIs('frontend.about') ? 'active' : '' }}"
-                    href="{{ route('frontend.about') }}">আমাদের সম্পর্কে</a>
-            </li>
-            <li class="nav-item">
-                <a data-bs-dismiss="offcanvas"
-                    class="nav-link {{ request()->routeIs('frontend.blog.*') ? 'active' : '' }}"
-                    href="{{ route('frontend.blog.index') }}">ব্লগ</a>
-            </li>
-            <li class="nav-item">
-                <a data-bs-dismiss="offcanvas"
-                    class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}"
-                    href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">অফার</a>
+                    href="{{ route('frontend.about') }}">About Us</a>
             </li>
             <li class="nav-item">
                 <a data-bs-dismiss="offcanvas"
                     class="nav-link {{ request()->routeIs('frontend.completeMenu') && !request()->has('offerFilter') ? 'active' : '' }}"
-                    href="{{ route('frontend.completeMenu') }}">সম্পূর্ণ মেনু</a>
+                    href="{{ route('frontend.completeMenu') }}">Full Menu</a>
             </li>
             <li class="nav-item">
                 <a data-bs-dismiss="offcanvas"
-                    class="nav-link {{ request()->routeIs('frontend.cards') ? 'active' : '' }}"
-                    href="{{ route('frontend.cards') }}">কার্ড</a>
-            </li>
-            <li class="nav-item">
-                <a data-bs-dismiss="offcanvas"
-                    class="nav-link {{ request()->routeIs('frontend.reviews.index') ? 'active' : '' }}"
-                    href="{{ route('frontend.reviews.index') }}">রিভিউ</a>
-            </li>
-            <li class="nav-item">
-                <a data-bs-dismiss="offcanvas"
-                    class="nav-link {{ request()->routeIs('frontend.contact') ? 'active' : '' }}"
-                    href="{{ route('frontend.contact') }}">যোগাযোগ</a>
+                    class="nav-link {{ request()->fullUrlIs(url('/menu?min_price=0&page=1&offerFilter=1')) ? 'active' : '' }}"
+                    href="{{ url('/menu?min_price=0&page=1&offerFilter=1') }}">Offers</a>
             </li>
             <li class="nav-item">
                 <a data-bs-dismiss="offcanvas"
                     class="nav-link {{ request()->routeIs('frontend.order.track') ? 'active' : '' }}"
-                    href="{{ route('frontend.order.track') }}">অর্ডার ট্র্যাক করুন</a>
+                    href="{{ route('frontend.order.track') }}">Track Order</a>
             </li>
+            <li class="nav-item">
+                <a data-bs-dismiss="offcanvas"
+                    class="nav-link {{ request()->routeIs('frontend.reviews.index') ? 'active' : '' }}"
+                    href="{{ route('frontend.reviews.index') }}">Reviews</a>
+            </li>
+            <li class="nav-item">
+                <a data-bs-dismiss="offcanvas"
+                    class="nav-link {{ request()->routeIs('frontend.contact') ? 'active' : '' }}"
+                    href="{{ route('frontend.contact') }}">Contact</a>
+            </li>
+
             @auth('member')
                 <li class="nav-item">
                     <a data-bs-dismiss="offcanvas"
                         class="nav-link {{ request()->routeIs('frontend.member.dashboard') ? 'active' : '' }}"
-                        href="{{ route('frontend.member.dashboard') }}">আমার ড্যাশবোর্ড</a>
+                        href="{{ route('frontend.member.dashboard') }}">My Dashboard</a>
                 </li>
             @else
                 <li class="nav-item">
                     <a data-bs-dismiss="offcanvas"
                         class="nav-link {{ request()->routeIs('frontend.member.login') ? 'active' : '' }}"
-                        href="{{ route('frontend.member.login') }}">মেম্বার লগইন</a>
+                        href="{{ route('frontend.member.login') }}">Member Login</a>
                 </li>
             @endauth
         </ul>
