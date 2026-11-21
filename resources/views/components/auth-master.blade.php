@@ -6,7 +6,7 @@
     <title>@yield('title', 'Sign In') | Degchi Dine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="shortcut icon" href="{{ Session::get('favicon') ?? asset('assets/frontend/images/logo.webp') }}">
+    <link rel="shortcut icon" href="{{ $siteFavicon ?? Session::get('favicon') ?? asset('assets/frontend/images/logo.webp') }}">
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link href="{{ asset('assets/css/auth-degchi.css') }}" rel="stylesheet" type="text/css" />

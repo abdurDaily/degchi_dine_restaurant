@@ -6,19 +6,19 @@
                 <div class="navbar-brand-box horizontal-logo">
                     <a href="{{ route('frontend.home') }}" class="logo logo-dark">
                         <span class="logo-sm">
-                            <img src="{{asset(Session::get('logo'))}}" alt="" height="22">
+                            <img src="{{ $siteLogo ?? (Session::get('logo') ?: asset('assets/frontend/images/logo.webp')) }}" alt="" height="22">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{asset(Session::get('logo'))}}" alt="" height="17">
+                            <img src="{{ $siteLogo ?? (Session::get('logo') ?: asset('assets/frontend/images/logo.webp')) }}" alt="" height="17">
                         </span>
                     </a>
 
                     <a href="{{ route('frontend.home') }}" class="logo logo-light">
                         <span class="logo-sm">
-                            <img src="{{asset(Session::get('logo'))}}" alt="" height="22">
+                            <img src="{{ $siteLogo ?? (Session::get('logo') ?: asset('assets/frontend/images/logo.webp')) }}" alt="" height="22">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{asset(Session::get('logo'))}}" alt="" height="17">
+                            <img src="{{ $siteLogo ?? (Session::get('logo') ?: asset('assets/frontend/images/logo.webp')) }}" alt="" height="17">
                         </span>
                     </a>
                 </div>

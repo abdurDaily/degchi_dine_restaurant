@@ -51,9 +51,9 @@
                     <div class="text-center card-body">
                         <div class="mx-auto avatar-xl col-sm-9">
                             <input type="file" class="filepond favicon-upload" name="favicon"
-                                accept="image/png, image/jpeg" />
+                                accept="image/png, image/jpeg, image/gif, image/svg+xml" />
                         </div>
-                        <span class="text-danger">Max upload size: 5MB. Use PNG or JPG (16x16 - 48x48), no .ico files.</span>
+                        <span class="text-danger">Max upload size: 5MB</span>
                     </div>
                 </div>
             </div>
@@ -157,25 +157,49 @@
                 });
 
                 const uploadOptions = {
+                    maxFiles: 1,
                     maxFileSize: '5MB',
                     fileSizeBase: 1024,
                     labelMaxFileSizeExceeded: 'File is too large',
                     labelMaxFileSize: 'Maximum file size is {filesize}'
                 };
 
-                FilePond.create(document.querySelector(".logo-upload"), {
-                    ...uploadOptions,
-                    name: 'logo',
-                    labelIdle: 'Drag & Drop logo or <span class="filepond--label-action">Browse</span>',
-                    server: buildServerConfig('{{ route('general-setting-logo.store') }}', 'Logo uploaded successfully')
-                });
+                const createUploadPond = (selector, fieldName, currentUrl, server, labelIdle) => {
+                    const pond = FilePond.create(document.querySelector(selector), {
+                        ...uploadOptions,
+                        name: fieldName,
+                        labelIdle: labelIdle,
+                        server: server
+                    });
 
-                FilePond.create(document.querySelector(".favicon-upload"), {
-                    ...uploadOptions,
-                    name: 'favicon',
-                    labelIdle: 'Drag & Drop favicon or <span class="filepond--label-action">Browse</span>',
-                    server: buildServerConfig('{{ route('general-setting-favicon.store') }}', 'Favicon uploaded successfully')
-                });
+                    // Show the saved image as the current file when the page loads.
+                    if (currentUrl) {
+                        fetch(currentUrl)
+                            .then(response => response.ok ? response.blob() : Promise.reject())
+                            .then(blob => {
+                                const file = new File([blob], fieldName + '-current', { type: blob.type });
+                                pond.addFile(file, { type: 'local' });
+                            })
+                            .catch(() => {});
+                    }
+
+                    return pond;
+                };
+
+                const currentLogo = @json($siteLogo);
+                const currentFavicon = @json($siteFavicon);
+
+                createUploadPond(
+                    ".logo-upload", 'logo', currentLogo,
+                    buildServerConfig('{{ route('general-setting-logo.store') }}', 'Logo uploaded successfully'),
+                    'Drag & Drop logo or <span class="filepond--label-action">Browse</span>'
+                );
+
+                createUploadPond(
+                    ".favicon-upload", 'favicon', currentFavicon,
+                    buildServerConfig('{{ route('general-setting-favicon.store') }}', 'Favicon uploaded successfully'),
+                    'Drag & Drop favicon or <span class="filepond--label-action">Browse</span>'
+                );
 
 
                 $(document).on('submit', '.general-setting-form', function(e) {

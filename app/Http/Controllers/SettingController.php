@@ -174,7 +174,7 @@ class SettingController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'favicon' => 'required|image|mimes:png,jpg,jpeg|max:5120|dimensions:min_width=16,min_height=16,max_width=48,max_height=48',
+            'favicon' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
         if ($validator->fails())

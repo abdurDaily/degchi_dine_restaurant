@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Setting;
 use App\Support\SeoSettings;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -32,6 +33,27 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('frontend.layout', function ($view) {
             $view->with('seoSettings', app(SeoSettings::class));
+        });
+
+        // Keep the uploaded logo/favicon visible everywhere, even in a new session.
+        View::composer('*', function ($view) {
+            try
+            {
+                $media = Setting::whereIn('key', ['logo', 'favicon'])->pluck('value', 'key');
+
+                $view->with([
+                    'siteLogo' => $media->get('logo')
+                        ? asset('storage/logo/' . $media->get('logo'))
+                        : null,
+                    'siteFavicon' => $media->get('favicon')
+                        ? asset('storage/favicon/' . $media->get('favicon'))
+                        : null,
+                ]);
+            }
+            catch (\Throwable $e)
+            {
+                $view->with(['siteLogo' => null, 'siteFavicon' => null]);
+            }
         });
 
         $this->configureRateLimiting();

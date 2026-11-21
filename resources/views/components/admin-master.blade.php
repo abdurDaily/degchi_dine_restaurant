@@ -63,7 +63,7 @@
         @endcan
     @endauth
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ Session::get('favicon') }}">
+    <link rel="shortcut icon" href="{{ $siteFavicon ?? Session::get('favicon') }}">
     <script>
         /*
          * Seed missing Velzon localStorage keys from the saved server theme,
@@ -195,18 +195,18 @@
             <div class="navbar-brand-box">
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
+                        <img src="{{ $siteLogo ?? Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
+                        <img src="{{ $siteLogo ?? Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                 </a>
                 <a href="{{ route('dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
+                        <img src="{{ $siteLogo ?? Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
+                        <img src="{{ $siteLogo ?? Session::get('logo') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==' }}" alt="Degchi">
                     </span>
                 </a>
                 <button type="button" class="p-0 btn btn-sm fs-20 header-item float-end btn-vertical-sm-hover"
