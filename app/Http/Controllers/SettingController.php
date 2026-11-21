@@ -128,7 +128,7 @@ class SettingController extends Controller
     public function logoUpload(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:200',
+            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1500',
         ]);
 
         if ($validator->fails())
