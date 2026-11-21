@@ -16,6 +16,7 @@ use App\Models\Order;
 use App\Models\Review;
 use App\Models\Setting;
 use App\Models\SignaturePlatter;
+use App\Rules\NoWebsiteLinks;
 use App\Services\OrderPricingService;
 use App\Services\SSLCommerzService;
 use App\Support\NotifyAdminsOfNewOrder;
@@ -228,7 +229,7 @@ class HomeController extends Controller
     public function registerMember(Request $request)
     {
         $rules = [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|min:1|max:14',
             'phone' => [
                 'required',
                 'string',
@@ -243,7 +244,7 @@ class HomeController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'dob' => 'required|date',
             'marriage_date' => 'nullable|date',
-            'address' => 'required|string|max:1000',
+            'address' => ['required', 'string', 'max:250', new NoWebsiteLinks],
             'is_student' => 'sometimes|boolean',
             'terms' => 'accepted',
             'profile_image' => 'nullable|file|image|mimes:webp,png,jpg|max:2048',

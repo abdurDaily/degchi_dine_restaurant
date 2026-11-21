@@ -7,12 +7,35 @@ use App\Models\Member;
 use App\Models\Order;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MemberAuthController extends Controller
 {
+    use ThrottlesLogins;
+
+    /**
+     * Member login is custom (phone/email/card), so Laravel's login throttling
+     * trait is used directly instead of adding a second middleware layer.
+     */
+    protected $maxAttempts = 5;
+
+    protected $decayMinutes = 1;
+
+    protected function username(): string
+    {
+        return 'login';
+    }
+
+    protected function throttleKey(Request $request): string
+    {
+        return 'member|'.Str::lower(trim((string) $request->input($this->username()))).'|'.$request->ip();
+    }
+
     public function showLoginForm()
     {
         if (Auth::guard('member')->check()) {
@@ -29,10 +52,26 @@ class MemberAuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            Log::warning('Member login throttled', [
+                'login' => trim((string) $request->input('login')),
+                'ip' => $request->ip(),
+            ]);
+
+            return $this->sendLockoutResponse($request);
+        }
+
         $login = trim($request->login);
         $member = Member::findByPhoneOrCard($login);
 
         if (!$member || !$member->password || !Hash::check($request->password, $member->password)) {
+            $this->incrementLoginAttempts($request);
+            Log::warning('Failed member login attempt', [
+                'login' => $login,
+                'ip' => $request->ip(),
+            ]);
+
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -60,7 +99,12 @@ class MemberAuthController extends Controller
             return back()->withErrors(['login' => $message])->withInput();
         }
 
+        $this->clearLoginAttempts($request);
         Auth::guard('member')->login($member, $request->boolean('remember'));
+
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         if ($request->ajax()) {
             return response()->json([

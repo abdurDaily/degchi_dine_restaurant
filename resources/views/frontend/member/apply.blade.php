@@ -91,6 +91,17 @@
                                 <h3>Apply for Membership</h3>
                                 <p>Fill in your details below. Applications are usually verified and approved within one business day.
                                 </p>
+
+                                @if ($errors->has('membership'))
+                                    <div class="cp-alert-success mb-4" role="alert"
+                                        style="background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3);">
+                                        <i class="bi bi-exclamation-triangle-fill" style="color: var(--danger);"></i>
+                                        <div>
+                                            <strong style="color: var(--danger);">Please wait</strong>
+                                            <span>{{ $errors->first('membership') }}</span>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
 
                             <form id="privilegeCardForm" method="POST" action="{{ route('frontend.members.register') }}"
@@ -108,7 +119,12 @@
                                         <label for="dd_name" class="cp-label">Full Name</label>
                                         <input type="text" name="name" id="dd_name" class="cp-input"
                                             placeholder="e.g. Rahim Uddin" value="{{ old('name') }}" required
-                                            autocomplete="name">
+                                            maxlength="14" autocomplete="name" aria-describedby="dd_name_error">
+                                        <p class="cp-field-hint d-none" id="dd_name_error" role="alert"
+                                            style="color: #ef4444;"></p>
+                                        @error('name')
+                                            <p class="cp-field-hint" role="alert" style="color: #ef4444;">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <div class="cp-grid-2">
@@ -182,7 +198,13 @@
                                     <div class="cp-field mt-3">
                                         <label for="dd_address" class="cp-label">Address</label>
                                         <textarea name="address" id="dd_address" class="cp-input cp-textarea" rows="2"
-                                            placeholder="Your full address" required>{{ old('address') }}</textarea>
+                                            placeholder="Your full address" required maxlength="250"
+                                            aria-describedby="dd_address_error">{{ old('address') }}</textarea>
+                                        <p class="cp-field-hint d-none" id="dd_address_error" role="alert"
+                                            style="color: #ef4444;"></p>
+                                        @error('address')
+                                            <p class="cp-field-hint" role="alert" style="color: #ef4444;">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
 
@@ -349,6 +371,34 @@
                     .html(message);
             }
 
+            function setFieldError(id, message) {
+                $('#' + id).removeClass('d-none').text(message || 'Please check this field.');
+            }
+
+            function clearFieldErrors() {
+                $('#dd_name_error, #dd_address_error').addClass('d-none').text('');
+            }
+
+            // Client-side feedback only; Laravel validation is authoritative.
+            function containsWebsiteLink(value) {
+                var text = String(value || '').trim();
+                var tld = 'com|net|org|edu|gov|mil|int|info|biz|io|co|ai|app|dev|ly|me|tv|xyz|online|site|tech|store|shop|blog|cloud|link|click|country|stream|download|ws|to|in|bd|uk|us|ca|au|nz|de|fr|it|es|nl|se|no|dk|fi|pl|ru|ua|tr|ir|pk|cn|jp|kr|sg|my|th|vn|id|ph|br|mx|ar|cl|za|ng|ke|eg|ae|sa|il|ch|at|be|eu';
+                var patterns = [
+                    /<[^>]*>/i,
+                    /&(?:lt|gt|#0*60|#x0*3c|#0*62|#x0*3e);/i,
+                    /(?:(?:https?|ftps?|sftp):\/\/|\/\/|javascript:|data:|vbscript:|file:|mailto:)/i,
+                    new RegExp('(^|[\\s(,;\\[])(?:www\\.)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+(?=$|[\\/:?#.,;)\\],])', 'i'),
+                    new RegExp('(^|[\\s(,;\\[])(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+(?:' + tld + ')(?=$|[\\/:?#.,;)\\],])', 'i'),
+                    /(^|[\s(,;\[])(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}(?::\d{1,5})?(?:[\/?#][^\s]*)?/,
+                    /(^|[\s(,;\[])localhost(?::\d{1,5})?(?:[\/?#][^\s]*)?/i,
+                    /\bon(?:error|load|click|mouseover|focus)\s*=|\b(?:alert|prompt|confirm|eval)\s*\(|\bdocument\.cookie\b/i
+                ];
+
+                return patterns.some(function(pattern) {
+                    return pattern.test(text);
+                });
+            }
+
             function checkPhoneAvailability() {
                 var phone = $('#dd_phone').val().trim();
                 if (phone.length < 10) {
@@ -505,6 +555,31 @@
                 var form = $(this);
                 var submitBtn = $('#privilegeSubmitBtn');
 
+                clearFieldErrors();
+
+                var name = $('#dd_name').val().trim();
+                if (name.length < 1 || name.length > 14) {
+                    var nameMessage = 'Please enter a name between 1 and 14 characters.';
+                    setFieldError('dd_name_error', nameMessage);
+                    showErrorPopup(nameMessage);
+                    return;
+                }
+
+                var address = $('#dd_address').val().trim();
+                if (address.length > 250) {
+                    var lengthMessage = 'Address must not exceed 250 characters.';
+                    setFieldError('dd_address_error', lengthMessage);
+                    showErrorPopup(lengthMessage);
+                    return;
+                }
+
+                if (containsWebsiteLink(address)) {
+                    var linkMessage = 'Address must not contain website URLs, links, HTML tags, or scripts.';
+                    setFieldError('dd_address_error', linkMessage);
+                    showErrorPopup(linkMessage);
+                    return;
+                }
+
                 if (!$('#dd_terms').is(':checked')) {
                     $('#ddTermsSection').addClass('is-error');
                     $('#ddTermsError').removeClass('d-none');
@@ -590,11 +665,21 @@
                     },
                     error: function(xhr) {
                         setProcessing(false);
-                        var msg = xhr.responseJSON?.errors ?
-                            Object.values(xhr.responseJSON.errors)[0][0] :
+                        clearFieldErrors();
+
+                        var errors = xhr.responseJSON?.errors || {};
+                        var msg = Object.keys(errors).length ?
+                            Object.values(errors)[0][0] :
                             (xhr.responseJSON?.message ||
                                 'Registration failed. Please try again.');
-                        if (xhr.responseJSON?.errors?.phone) {
+
+                        if (errors.name) {
+                            setFieldError('dd_name_error', errors.name[0]);
+                        }
+                        if (errors.address) {
+                            setFieldError('dd_address_error', errors.address[0]);
+                        }
+                        if (errors.phone) {
                             phoneAvailable = false;
                             setPhoneFeedback('invalid',
                                 '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> ' +

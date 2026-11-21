@@ -205,7 +205,7 @@ Route::name('frontend.')->group(function () {
     Route::get('/checkout', [HomeController::class, 'checkout'])->name('checkout');
     Route::get('/cards', [HomeController::class, 'cards'])->name('cards');
     Route::get('/card-apply', [HomeController::class, 'cardApply'])->name('card.apply');
-    Route::post('/members/register', [HomeController::class, 'registerMember'])->name('members.register');
+    Route::post('/members/register', [HomeController::class, 'registerMember'])->middleware('throttle:membership-application')->name('members.register');
     Route::get('/member/check-phone', [HomeController::class, 'checkMemberPhone'])->name('members.check-phone');
     Route::post('/golden-card/apply', [HomeController::class, 'applyGoldenCard'])->name('golden.card.apply');
     Route::post('/order', [HomeController::class, 'storeOrder'])->name('order.store');

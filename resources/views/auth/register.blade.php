@@ -7,6 +7,10 @@
             <p>Set up a new admin user for Degchi Dine.</p>
         </div>
 
+        @if ($errors->has('registration'))
+            <p class="auth-field-error mb-3" role="alert">{{ $errors->first('registration') }}</p>
+        @endif
+
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
