@@ -909,7 +909,7 @@ class HomeController extends Controller
         });
 
         // 5. Paginate
-        $menus = $query->orderBy('name')->paginate(9)->withQueryString();
+        $menus = $query->orderBy('name')->paginate(8)->withQueryString();
 
         // 6. Active offer details if filtering by offer
         $activeOfferDetails = null;
