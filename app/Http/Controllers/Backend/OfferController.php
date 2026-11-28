@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Offer;
 use App\Models\MenuVariation;
+use App\Services\SystemOfferService;
 use App\Services\UploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -22,7 +23,9 @@ class OfferController extends Controller
     public function index()
     {
         $offers = Offer::with('menuVariations')->latest()->get();
-        return view('backend.offers.index', compact('offers'));
+        $systemOffers = SystemOfferService::settings();
+
+        return view('backend.offers.index', compact('offers', 'systemOffers'));
     }
 
     public function create()
@@ -49,10 +52,7 @@ class OfferController extends Controller
             $offer->menuVariations()->sync($request->menu_variations);
         }
 
-        cache()->forget('home_categories');
-        cache()->forget('home_categories_v2');
-        cache()->forget('home_popup_offer');
-        cache()->forget('active_all_item_offers');
+        $this->clearOfferCaches();
 
         return redirect()->route('offers.index')->with('success', 'Offer created successfully.');
     }
@@ -90,10 +90,7 @@ class OfferController extends Controller
             $offer->menuVariations()->detach();
         }
 
-        cache()->forget('home_categories');
-        cache()->forget('home_categories_v2');
-        cache()->forget('home_popup_offer');
-        cache()->forget('active_all_item_offers');
+        $this->clearOfferCaches();
 
         return redirect()->route('offers.index')->with('success', 'Offer updated successfully.');
     }
@@ -106,10 +103,7 @@ class OfferController extends Controller
         $offer->menuVariations()->detach();
         $offer->delete();
 
-        cache()->forget('home_categories');
-        cache()->forget('home_categories_v2');
-        cache()->forget('home_popup_offer');
-        cache()->forget('active_all_item_offers');
+        $this->clearOfferCaches();
 
         return response()->json(['success' => true, 'message' => 'Offer deleted.']);
     }
@@ -117,11 +111,21 @@ class OfferController extends Controller
     public function toggleStatus(Offer $offer)
     {
         $offer->update(['is_active' => !$offer->is_active]);
+        $this->clearOfferCaches();
+        return response()->json(['success' => true, 'is_active' => $offer->is_active]);
+    }
+
+    /**
+     * All offer-derived snapshots must be rebuilt after any offer write,
+     * including the built-in offer panel and frontend benefit amounts.
+     */
+    private function clearOfferCaches(): void
+    {
         cache()->forget('home_categories');
         cache()->forget('home_categories_v2');
         cache()->forget('home_popup_offer');
         cache()->forget('active_all_item_offers');
-        return response()->json(['success' => true, 'is_active' => $offer->is_active]);
+        SystemOfferService::forgetCache();
     }
 
     private function validated(Request $request, ?int $ignoreId = null): array

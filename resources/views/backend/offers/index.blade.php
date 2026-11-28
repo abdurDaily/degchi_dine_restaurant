@@ -21,15 +21,43 @@
                             <ul class="mb-0 mt-2 small ps-3">
                                 <li><strong>Food item offers</strong> (Applies To: <em>All</em>) — All food items or
                                     Specific items. Largest % wins on the card.</li>
-                                <li><strong>Membership</strong> + <strong>First Order Only</strong> — 30% on the member’s
-                                    <em>first order only</em>. After that order: no membership discount.</li>
-                                <li><strong>Student</strong> + <strong>First Order Only</strong> — 35% on an approved
-                                    student’s <em>first order only</em>. After that order: no student discount.</li>
-                                <li><strong>Golden</strong> — 10% on every order after upgrade (not first-order limited).
+                                <li><strong>Membership</strong> + <strong>First Order Only</strong> —
+                                    @if ($systemOffers['membership_first']['percent'])
+                                        {{ $systemOffers['membership_first']['percent'] }}% on the member’s
+                                        <em>first order only</em>. After that order: no membership discount.
+                                    @else
+                                        <em>currently switched off — no membership first-order amount is shown.</em>
+                                    @endif
                                 </li>
-                                <li><strong>New Member Welcome</strong> — every order gets the discount % for N months
-                                    after that member's own registration date, then it expires automatically. If the
-                                    first-order discount has a higher %, the first order still uses that one.</li>
+                                <li><strong>Student</strong> + <strong>First Order Only</strong> —
+                                    @if ($systemOffers['student_first']['percent'])
+                                        {{ $systemOffers['student_first']['percent'] }}% on an approved
+                                        student’s <em>first order only</em>. After that order: no student discount.
+                                    @else
+                                        <em>currently switched off — no student first-order amount is shown.</em>
+                                    @endif
+                                </li>
+                                <li><strong>Golden</strong> —
+                                    @if ($systemOffers['golden']['active'] && $systemOffers['golden']['percent'] > 0)
+                                        {{ $systemOffers['golden']['percent'] }}% on every order after upgrade
+                                        @if ($systemOffers['golden']['threshold'] !== null)
+                                            (upgrade threshold ৳{{ number_format($systemOffers['golden']['threshold'], 2) }})
+                                        @endif
+                                        . Not first-order limited.
+                                    @else
+                                        <em>currently switched off — no Golden amount or threshold is shown.</em>
+                                    @endif
+                                </li>
+                                <li><strong>New Member Welcome</strong> —
+                                    @if ($systemOffers['welcome']['percent'])
+                                        every order gets {{ $systemOffers['welcome']['percent'] }}% for
+                                        {{ $systemOffers['welcome']['months'] }} months after that member's own
+                                        registration date, then it expires automatically. If the first-order discount
+                                        has a higher %, the first order still uses that one.
+                                    @else
+                                        <em>currently switched off — no welcome amount is shown.</em>
+                                    @endif
+                                </li>
                                 <li>Checkout takes the <strong>higher of</strong> food-item offer vs member-card benefit
                                     (not stacked).</li>
                                 <li><strong>Min Order Total</strong> is a <em>whole-cart</em> threshold, not a per-item one.
@@ -37,6 +65,53 @@
                                     Below it the discount is not applied, and the item is billed at full price. A blank
                                     value means no minimum.</li>
                             </ul>
+                        </div>
+
+                        {{-- Built-in offers: same rows as the table below, summarised live --}}
+                        <div class="border-bottom py-3 px-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="mb-0 fw-bold small text-uppercase text-muted">
+                                    <i class="ri-settings-3-line me-1"></i> Built-in offers
+                                </h6>
+                                <span class="small text-muted">Edit any value here; inactive rows hide their amounts on the website.</span>
+                            </div>
+                            <div class="row g-2">
+                                @foreach ($systemOffers as $setting)
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <div class="border rounded p-3 h-100">
+                                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                                <strong class="small">{{ $setting['label'] }}</strong>
+                                                <span class="badge {{ $setting['active'] ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary' }}">
+                                                    {{ $setting['active'] ? 'Active' : 'Inactive' }}
+                                                </span>
+                                            </div>
+                                            <div class="small text-muted mt-2">
+                                                @if (! $setting['active'])
+                                                    No amount shown on the website.
+                                                @elseif ($setting['key'] === 'golden')
+                                                    {{ $setting['percent'] }}% benefit
+                                                    @if ($setting['threshold'] !== null)
+                                                        · ৳{{ number_format($setting['threshold'], 2) }} threshold
+                                                    @endif
+                                                @elseif ($setting['key'] === 'welcome')
+                                                    {{ $setting['percent'] }}% for {{ $setting['months'] }} months
+                                                @else
+                                                    {{ $setting['percent'] }}% first order
+                                                @endif
+                                            </div>
+                                            <div class="mt-2">
+                                                @if ($setting['offer_id'])
+                                                    <a href="{{ route('offers.edit', $setting['offer_id']) }}" class="small text-decoration-none">
+                                                        <i class="ri-edit-line me-1"></i>Edit offer
+                                                    </a>
+                                                @else
+                                                    <span class="small text-muted">Not configured</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         @if ($offers->isEmpty())
                             <div class="text-center py-5 text-muted">

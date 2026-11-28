@@ -107,14 +107,29 @@
                         style="background: #faf8f5; border: 1px dashed rgba(223, 166, 83, 0.3);">
                         <h5 class="fw-bold mb-2 text-dark" style="font-size: 0.95rem;"><i
                                 class="bi bi-info-circle-fill text-warning me-2"></i>Eligibility and Terms</h5>
-                        <ul class="mb-0 text-muted ps-3" style="font-size: 0.85rem; line-height: 1.6;">
-                            <li>You must have an active regular Membership Card.</li>
-                            <li>Your total purchases must be <strong>৳2,000.00</strong> or more.</li>
-                            <li>The Golden Card is valid for <strong>5 years</strong> from the upgrade date.</li>
-                            <li>Golden Card holders receive a <strong>flat 10% discount</strong> on all food.</li>
-                        </ul>
+                        @if (! $systemOffers['golden']['active'])
+                            <p class="mb-0 text-muted" style="font-size: 0.85rem;">
+                                The Golden Card upgrade is currently unavailable.
+                            </p>
+                        @else
+                            <ul class="mb-0 text-muted ps-3" style="font-size: 0.85rem; line-height: 1.6;">
+                                <li>You must have an active regular Membership Card.</li>
+                                @if ($systemOffers['golden']['threshold'] !== null)
+                                    <li>Your total purchases must be
+                                        <strong>৳{{ number_format($systemOffers['golden']['threshold'], 2) }}</strong> or more.
+                                    </li>
+                                @endif
+                                <li>The Golden Card is valid for <strong>5 years</strong> from the upgrade date.</li>
+                                @if ($systemOffers['golden']['percent'] > 0)
+                                    <li>Golden Card holders receive a
+                                        <strong>flat {{ $systemOffers['golden']['percent'] }}% discount</strong> on all food.
+                                    </li>
+                                @endif
+                            </ul>
+                        @endif
                     </div>
 
+                    @if ($systemOffers['golden']['active'])
                     <form id="goldenCardApplyForm" action="{{ route('frontend.golden.card.apply') }}" method="POST">
                         @csrf
                         <div class="mb-3">
@@ -135,6 +150,7 @@
                             </button>
                         </div>
                     </form>
+                    @endif
                 </div>
             </div>
         </div>

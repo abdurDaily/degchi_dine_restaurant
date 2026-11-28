@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\Order;
 use App\Models\Setting;
+use App\Services\SystemOfferService;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
@@ -144,7 +145,14 @@ class MemberAuthController extends Controller
                 ->first();
         }
 
-        return view('frontend.member.dashboard', compact('member', 'orders', 'highlightOrder'));
+        $systemOffers = SystemOfferService::settings();
+
+        return view('frontend.member.dashboard', compact(
+            'member',
+            'orders',
+            'highlightOrder',
+            'systemOffers'
+        ));
     }
 
     public function updateProfile(Request $request)

@@ -112,7 +112,7 @@ class Member extends Authenticatable
     }
 
     /**
-     * Upgrade member to Golden Card (10% on every order, 5-year validity).
+     * Upgrade member to Golden Card (live Golden % on every order, 5-year validity).
      */
     public function upgradeToGolden(): bool
     {
@@ -129,7 +129,7 @@ class Member extends Authenticatable
     }
 
     /**
-     * Golden card holders receive 10% off the order subtotal.
+     * Golden card holders receive the configured Golden % off the order subtotal.
      */
     public function goldenDiscountAmount(float $orderTotal): float
     {
@@ -137,7 +137,9 @@ class Member extends Authenticatable
             return 0.0;
         }
 
-        return round($orderTotal * self::GOLDEN_DISCOUNT_RATE, 2);
+        $percent = $this->goldenDiscountPercent();
+
+        return $percent > 0 ? round($orderTotal * ($percent / 100), 2) : 0.0;
     }
 
     /**
@@ -213,13 +215,72 @@ class Member extends Authenticatable
     }
 
     /**
-     * Active Golden-tier offer row from the offers table, if one is configured.
-     * The golden 10% benefit itself is a built-in rate; this row is only used to
-     * carry a `min_total` threshold for the golden tier.
+     * Active, in-date Golden offer row. Unlike the first-order tiers, the
+     * seeded golden row historically carries 0% and only stores the upgrade
+     * threshold, so it must NOT be filtered by discount_percent here.
      */
     public function goldenTierOffer(): ?Offer
     {
-        return $this->tierOfferFor('golden');
+        return Offer::query()
+            ->active()
+            ->valid()
+            ->where('applicable_to', 'golden')
+            ->orderByDesc('min_total')
+            ->first();
+    }
+
+    /**
+     * A golden row exists at all (including a switched-off one). This lets us
+     * tell "admin switched the built-in offer off" apart from "never configured".
+     */
+    public function goldenOfferIsConfigured(): bool
+    {
+        return Offer::query()->where('applicable_to', 'golden')->exists();
+    }
+
+    /**
+     * The Golden benefit is available unless its built-in row was disabled.
+     * With no row configured the legacy built-in behaviour is kept.
+     */
+    public function goldenBenefitsAvailable(): bool
+    {
+        return ! $this->goldenOfferIsConfigured() || $this->goldenTierOffer() !== null;
+    }
+
+    /**
+     * Golden Card discount %, read from the live offers row when one is set.
+     * A legacy 0% row (or no row at all) keeps the original 10% rate; a row that
+     * exists but is inactive removes the benefit completely.
+     */
+    public function goldenDiscountPercent(): int
+    {
+        $offer = $this->goldenTierOffer();
+
+        if ($offer && (int) $offer->discount_percent > 0) {
+            return (int) $offer->discount_percent;
+        }
+
+        if ($offer || ! $this->goldenOfferIsConfigured()) {
+            return (int) round(self::GOLDEN_DISCOUNT_RATE * 100);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Whole-purchase Golden upgrade requirement. Null means the benefit is
+     * currently switched off, so no threshold should be advertised.
+     */
+    public function goldenUpgradeThreshold(): ?float
+    {
+        if (! $this->goldenBenefitsAvailable()) {
+            return null;
+        }
+
+        $offer = $this->goldenTierOffer();
+        $minimum = $offer?->minimumTotal();
+
+        return $minimum !== null ? $minimum : (float) self::GOLDEN_UPGRADE_THRESHOLD;
     }
 
     /**
@@ -394,8 +455,13 @@ class Member extends Authenticatable
 
     public function qualifiesForGoldenUpgrade(): bool
     {
-        return !$this->isGolden()
-            && $this->liveTotalPurchase() >= self::GOLDEN_UPGRADE_THRESHOLD;
+        $threshold = $this->goldenUpgradeThreshold();
+
+        if ($this->isGolden() || $threshold === null) {
+            return false;
+        }
+
+        return $this->liveTotalPurchase() >= $threshold;
     }
 
     /**
@@ -431,6 +497,13 @@ class Member extends Authenticatable
 
         // Golden = every order (not limited by First Order Only on Membership/Student offers)
         if ($this->isGolden()) {
+            // Switching the built-in Golden row off disables the benefit itself.
+            if (! $this->goldenBenefitsAvailable()) {
+                $base['message'] = 'The Golden Card discount is currently unavailable.';
+
+                return $base;
+            }
+
             // A configured golden offer row may carry a cart-level min_total.
             if (!$this->goldenTierAllowsOrder($subtotal)) {
                 $minimum = $this->goldenTierOffer()->minimumTotal();
@@ -443,7 +516,15 @@ class Member extends Authenticatable
                 return $base;
             }
 
-            $msg = 'Golden Card Holder: 10% discount on every order.';
+            $goldenPercent = $this->goldenDiscountPercent();
+
+            if ($goldenPercent <= 0) {
+                $base['message'] = 'The Golden Card discount is currently unavailable.';
+
+                return $base;
+            }
+
+            $msg = sprintf('Golden Card Holder: %d%% discount on every order.', $goldenPercent);
             if ($firstOrderAlreadyUsed) {
                 $msg .= ' (Your Membership/Student first-order discount was already used.)';
             }
@@ -451,7 +532,7 @@ class Member extends Authenticatable
             return array_merge($base, [
                 'eligible' => true,
                 'amount' => $this->goldenDiscountAmount($orderTotal),
-                'rate' => 10,
+                'rate' => $goldenPercent,
                 'member_type' => 'golden',
                 'message' => $msg,
             ]);
@@ -498,21 +579,24 @@ class Member extends Authenticatable
 
         // Eligible for golden by spend — only upgrade when explicitly allowed (after order credit)
         if ($this->qualifiesForGoldenUpgrade()) {
+            $goldenPercent = $this->goldenDiscountPercent();
+            $threshold = $this->goldenUpgradeThreshold() ?? (float) self::GOLDEN_UPGRADE_THRESHOLD;
+
             if ($autoUpgrade) {
                 $this->upgradeToGolden();
 
                 return array_merge($base, [
                     'eligible' => true,
-                    'amount' => round($orderTotal * self::GOLDEN_DISCOUNT_RATE, 2),
-                    'rate' => 10,
+                    'amount' => round($orderTotal * ($goldenPercent / 100), 2),
+                    'rate' => $goldenPercent,
                     'member_type' => 'golden',
-                    'message' => 'Golden Card unlocked: 10% discount on every order.',
+                    'message' => sprintf('Golden Card unlocked: %d%% discount on every order.', $goldenPercent),
                 ]);
             }
 
             $base['message'] = 'You have reached the Golden Card threshold (৳'
-                .number_format(self::GOLDEN_UPGRADE_THRESHOLD, 0)
-                .'). Complete this order to unlock 10% on every future order. '
+                .number_format($threshold, 0)
+                .'). Complete this order to unlock '.$goldenPercent.'% on every future order. '
                 .'Your Membership/Student first-order discount is already used.';
 
             return $base;
@@ -526,19 +610,20 @@ class Member extends Authenticatable
             return $this->welcomeDiscountResult($base, $welcomePercent, $orderTotal);
         }
 
-        $remaining = max(0, self::GOLDEN_UPGRADE_THRESHOLD - $this->liveTotalPurchase());
+        $threshold = $this->goldenUpgradeThreshold();
+        $goldenPercent = $this->goldenDiscountPercent();
+        $remaining = $threshold !== null
+            ? max(0, $threshold - $this->liveTotalPurchase())
+            : 0;
+        $unlockHint = $remaining > 0 && $goldenPercent > 0
+            ? ' Order ৳' . number_format($remaining, 2)
+                . ' more worth of food to unlock the Golden Card. Then you will get ' . $goldenPercent . '% off on every order.'
+            : '';
+
         return array_merge($base, [
             'message' => $firstOrderAlreadyUsed
-                ? ($remaining > 0
-                    ? 'Your Membership/Student first-order discount has already been used — no membership discount applies to this order. Order ৳'
-                    . number_format($remaining, 2)
-                    . ' more worth of food to unlock the Golden Card. Then you will get 10% off on every order.'
-                    : 'Your Membership/Student first-order discount has already been used — no membership discount applies to this order.')
-                : ($remaining > 0
-                    ? 'No membership discount applies to this order. Order ৳'
-                    . number_format($remaining, 2)
-                    . ' more worth of food to unlock the Golden Card. Then you will get 10% off on every order.'
-                    : 'No membership discount applies to this order.'),
+                ? 'Your Membership/Student first-order discount has already been used — no membership discount applies to this order.' . $unlockHint
+                : 'No membership discount applies to this order.' . $unlockHint,
         ]);
     }
 

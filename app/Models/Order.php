@@ -92,9 +92,13 @@ class Order extends Model
                     $member->first_order_discount_used = true;
                 }
 
-                // Auto-upgrade to Golden Card when total purchase reaches ৳2,000
-                if (!$member->isGolden() && $member->total_purchase >= Member::GOLDEN_UPGRADE_THRESHOLD) {
-                    $member->upgradeToGolden();
+                // Auto-upgrade to Golden Card at the admin-configured threshold.
+                // A disabled Golden offer row suppresses the upgrade entirely.
+                if (!$member->isGolden()) {
+                    $goldenThreshold = $member->goldenUpgradeThreshold();
+                    if ($goldenThreshold !== null && $member->total_purchase >= $goldenThreshold) {
+                        $member->upgradeToGolden();
+                    }
                 }
 
                 $member->save();

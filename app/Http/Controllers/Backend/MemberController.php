@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Member;
+use App\Services\SystemOfferService;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
@@ -79,13 +80,16 @@ class MemberController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $systemOffers = SystemOfferService::settings();
+
         return view('backend.members.index', compact(
             'members',
             'search',
             'statusFilter',
             'typeFilter',
             'studentFilter',
-            'approvalFilter'
+            'approvalFilter',
+            'systemOffers'
         ));
     }
 
@@ -220,7 +224,7 @@ class MemberController extends Controller
     }
 
     /**
-     * Upgrade a member to Golden Card (10% discount on every order, 5-year validity).
+     * Upgrade a member to Golden Card (live Golden % on every order, 5-year validity).
      */
     public function upgradeToGolden(Member $member)
     {
@@ -231,11 +235,19 @@ class MemberController extends Controller
             ], 400);
         }
 
+        $golden = SystemOfferService::settings()['golden'];
         $member->upgradeToGolden();
+
+        $message = 'Member upgraded to Golden Card.';
+        if ($golden['active'] && $golden['percent'] > 0) {
+            $message .= ' They now receive '.$golden['percent'].'% off every order for 5 years.';
+        } else {
+            $message .= ' The Golden Card discount is currently unavailable.';
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Member upgraded to Golden Card. They now receive 10% off every order for 5 years.',
+            'message' => $message,
             'type' => 'golden',
             'expires_at' => $member->expires_at?->format('Y-m-d'),
         ]);

@@ -5,6 +5,27 @@
 
 @section('frontend_content')
 
+    @php
+        $benefitParts = [];
+        if ($systemOffers['membership_first']['percent']) {
+            $benefitParts[] = 'Get ' . $systemOffers['membership_first']['percent'] . '% off on your first order.';
+        }
+        if ($systemOffers['student_first']['percent']) {
+            $benefitParts[] = 'Students get ' . $systemOffers['student_first']['percent'] . '% off on their first order.';
+        }
+        if ($systemOffers['golden']['active']
+            && $systemOffers['golden']['percent'] > 0
+            && $systemOffers['golden']['threshold'] !== null) {
+            $benefitParts[] = 'Reach a total purchase of ৳'
+                . number_format($systemOffers['golden']['threshold'], 0)
+                . ' to become a Golden Member and enjoy '
+                . $systemOffers['golden']['percent'] . '% off on every order.';
+        }
+        $benefitHint = $benefitParts
+            ? implode(' ', $benefitParts)
+            : 'Member offers are currently unavailable.';
+    @endphp
+
     <x-frontend.page-header title="Complete Your Order" subtitle="Verify your details and confirm your order."
         eyebrow="Your Order">
         <x-slot:eyebrowIcon>
@@ -117,9 +138,7 @@
                                             value="{{ $loggedInMember->unique_card_number ?? '' }}" />
                                     </div>
                                     <div id="membershipFeedback" class="form-text mt-2"
-                                        style="font-size: 0.75rem; color: rgba(255,255,255,0.55);">Get 30% or 35% off on
-                                        your first order. Reach a total purchase of ৳2,000 to become a Golden Member and
-                                        enjoy 10% off on every order.</div>
+                                        style="font-size: 0.75rem; color: rgba(255,255,255,0.55);">{{ $benefitHint }}</div>
                                 </div>
                                 <div class="col-md-12 d-none">
                                     <label class="form-label">Order Total (৳)</label>
@@ -938,8 +957,7 @@
                                 totalDisplay.textContent = '৳ 0.00';
                                 discountDisplay.textContent = '- ৳ 0.00';
                                 document.getElementById('itemCount').textContent = '(0 items)';
-                                membershipFeedback.textContent =
-                                    'Enter your membership card number to check eligibility for a 10% discount.';
+                                membershipFeedback.textContent = @json($benefitHint);
                                 membershipFeedback.classList.remove('text-success', 'text-danger');
                                 appliedCoupon = null;
                                 couponCodeInput.value = '';

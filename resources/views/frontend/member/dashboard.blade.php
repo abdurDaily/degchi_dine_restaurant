@@ -528,9 +528,8 @@
         }
 
         .member-dashboard .md-empty-state iconify-icon {
-            font-size: 3.5rem;
+            font-size: 1.5rem;
             color: var(--dd-border);
-            margin-bottom: 16px;
         }
 
         .member-dashboard .md-empty-state h5 {
@@ -874,7 +873,7 @@
             }
 
             .member-dashboard .md-empty-state iconify-icon {
-                font-size: 2.6rem;
+                font-size: 1.6rem;
             }
 
             .member-dashboard .md-login-tip {
@@ -1147,32 +1146,40 @@
                                 <div class="md-stat-icon"><iconify-icon icon="solar:star-linear"></iconify-icon></div>
                                 @php
                                     $welcomeOffer = $member->welcomeTierOffer();
+                                    $welcomeRate = $welcomeOffer ? (int) $welcomeOffer->discount_percent : 0;
                                     $welcomeActive = $welcomeOffer
                                         && ! $member->isExpired()
                                         && $member->withinWelcomePeriod($welcomeOffer)
                                         && (! $member->is_student || $member->approval_status === 'approved');
-                                    $tierRate = (int) ($member->is_student ? 35 : 30);
+
+                                    // null = the built-in row is switched off, so no amount is displayed.
+                                    $tierKey = $member->is_student ? 'student_first' : 'membership_first';
+                                    $tierRate = $systemOffers[$tierKey]['percent'];
+                                    $goldenRate = $systemOffers['golden']['percent'];
                                     $firstOrderPending = ! $member->first_order_discount_used;
+
                                     // Same precedence as Member::resolveMemberDiscount():
                                     // the tier rate wins ties, welcome only when strictly higher.
-                                    $tierShown = $firstOrderPending
-                                        && (! $welcomeActive || $tierRate >= (int) $welcomeOffer->discount_percent);
+                                    $tierShown = $tierRate !== null
+                                        && $firstOrderPending
+                                        && (! $welcomeActive || $tierRate >= $welcomeRate);
                                     $welcomeShown = $welcomeActive
-                                        && (! $firstOrderPending || (int) $welcomeOffer->discount_percent > $tierRate);
+                                        && (! $tierShown)
+                                        && (! $firstOrderPending || $welcomeRate > (int) ($tierRate ?? 0));
                                 @endphp
                                 <div class="md-stat-value">
-                                    @if ($member->type === 'golden')
-                                        10%
+                                    @if ($member->type === 'golden' && $goldenRate > 0)
+                                        {{ $goldenRate }}%
                                     @elseif ($tierShown)
                                         {{ $tierRate }}%
                                     @elseif ($welcomeShown)
-                                        {{ $welcomeOffer->discount_percent }}%
+                                        {{ $welcomeRate }}%
                                     @else
                                         —
                                     @endif
                                 </div>
                                 <div class="md-stat-label">
-                                    @if ($member->type === 'golden')
+                                    @if ($member->type === 'golden' && $goldenRate > 0)
                                         Golden Discount
                                     @elseif ($tierShown)
                                         First Order Discount

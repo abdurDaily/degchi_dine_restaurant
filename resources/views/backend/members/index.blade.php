@@ -2,6 +2,22 @@
 @section('title', 'Members')
 
 @section('content')
+    @php
+        $studentLabel = $systemOffers['student_first']['percent']
+            ? 'Student ('.$systemOffers['student_first']['percent'].'% first-order)'
+            : 'Student';
+        $membershipLabel = $systemOffers['membership_first']['percent']
+            ? 'Non-Student ('.$systemOffers['membership_first']['percent'].'% first-order)'
+            : 'Non-Student';
+        $goldenActive = $systemOffers['golden']['active'] && $systemOffers['golden']['percent'] > 0;
+        $goldenTitle = $goldenActive
+            ? 'Upgrade to Golden ('.$systemOffers['golden']['percent'].'% every order)'
+            : 'Upgrade to Golden (benefit currently unavailable)';
+        $goldenConfirm = $goldenActive
+            ? 'Upgrade this member to Golden Card? They will receive '.$systemOffers['golden']['percent'].'% off every order for 5 years.'
+            : 'Upgrade this member to Golden Card? The Golden Card discount is currently unavailable.';
+    @endphp
+
     <x-breadcrumb></x-breadcrumb>
     <div class="container-fluid py-4 admin-crud-page">
     <div class="row">
@@ -94,7 +110,7 @@
                                         </td>
 <td>
     <span class="badge bg-{{ $member->is_student ? 'success' : 'secondary' }}">
-        {{ $member->is_student ? 'Student (35% first-order)' : 'Non-Student (30% first-order)' }}
+        {{ $member->is_student ? $studentLabel : $membershipLabel }}
     </span>
 </td>
 <td>
@@ -121,7 +137,7 @@
                                                 <i class="ri-eye-line"></i>
                                             </button>
                                             @if($member->type !== 'golden')
-                                                <button type="button" class="btn btn-sm btn-outline-warning upgrade-golden-btn" data-id="{{ $member->id }}" data-url="{{ route('members.upgradeGolden', $member->id) }}" title="Upgrade to Golden (10% every order)" data-bs-toggle="tooltip">
+                                                <button type="button" class="btn btn-sm btn-outline-warning upgrade-golden-btn" data-id="{{ $member->id }}" data-url="{{ route('members.upgradeGolden', $member->id) }}" title="{{ $goldenTitle }}" data-bs-toggle="tooltip">
                                                     <i class="ri-vip-crown-line"></i>
                                                 </button>
                                             @endif
@@ -314,8 +330,8 @@ $(function () {
                         '<option value="suspended"' + (m.status === 'suspended' ? ' selected' : '') + '>Suspended</option>' +
                     '</select>';
                 var studentBadge = m.is_student
-                    ? '<span class="badge bg-success"><i class="ri-graduation-cap-line me-1"></i>Student (35% first-order)</span>'
-                    : '<span class="badge bg-secondary">Non-Student (30% first-order)</span>';
+                    ? '<span class="badge bg-success"><i class="ri-graduation-cap-line me-1"></i>' + @json($studentLabel) + '</span>'
+                    : '<span class="badge bg-secondary">' + @json($membershipLabel) + '</span>';
 
                 var approvalBadgeHtml = '';
                 if (m.is_student) {
@@ -608,7 +624,7 @@ $(function () {
 
     // ---- Upgrade to Golden ----
     function handleGoldenUpgrade(url, memberId, onSuccess) {
-        if (!confirm('Upgrade this member to Golden Card? They will receive 10% off every order for 5 years.')) {
+        if (!confirm(@json($goldenConfirm))) {
             return;
         }
 

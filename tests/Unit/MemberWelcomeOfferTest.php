@@ -525,6 +525,7 @@ class WelcomeTestMember extends Member
     public ?Offer $stubWelcomeOffer = null;
     public ?Offer $stubTierOffer = null;
     public bool $stubTierOfferConfigured = false;
+    public bool $stubGoldenOfferConfigured = false;
     public bool $stubHasCompletedOrders = false;
     public float $stubLiveTotalPurchase = 0.0;
     public bool $upgradedToGolden = false;
@@ -552,6 +553,13 @@ class WelcomeTestMember extends Member
     public function goldenTierOffer(): ?Offer
     {
         return null;
+    }
+
+    public function goldenOfferIsConfigured(): bool
+    {
+        // No golden row was ever configured in these in-memory scenarios, so the
+        // built-in 10% / ৳2,000 legacy behaviour stays pinned (no DB lookup).
+        return $this->stubGoldenOfferConfigured;
     }
 
     public function hasCompletedOrders(): bool

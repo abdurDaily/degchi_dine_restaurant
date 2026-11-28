@@ -19,6 +19,7 @@ use App\Models\SignaturePlatter;
 use App\Rules\NoWebsiteLinks;
 use App\Services\OrderPricingService;
 use App\Services\SSLCommerzService;
+use App\Services\SystemOfferService;
 use App\Support\NotifyAdminsOfNewOrder;
 use App\Support\OrderRedirect;
 use Illuminate\Http\Request;
@@ -172,24 +173,11 @@ class HomeController extends Controller
 
     public function cardApply()
     {
-        // Membership / student benefit rows are admin-editable, so the apply page
-        // must read the live percentages instead of hardcoding 30% / 35%.
-        $tierOffers = Offer::query()
-            ->active()
-            ->valid()
-            ->whereIn('applicable_to', ['membership', 'student'])
-            ->where('discount_percent', '>', 0)
-            ->orderByDesc('discount_percent')
-            ->get();
-
-        $studentPercent = $tierOffers->firstWhere('applicable_to', 'student')->discount_percent
-            ?? (Offer::query()->where('applicable_to', 'student')->exists()
-                ? null
-                : (int) (Member::FIRST_ORDER_RATE_STUDENT * 100));
-        $membershipPercent = $tierOffers->firstWhere('applicable_to', 'membership')->discount_percent
-            ?? (Offer::query()->where('applicable_to', 'membership')->exists()
-                ? null
-                : (int) (Member::FIRST_ORDER_RATE_STANDARD * 100));
+        // Both first-order rows are admin-editable; null means the built-in row
+        // is switched off, and the view then hides the percentage entirely.
+        $systemOffers = SystemOfferService::settings();
+        $studentPercent = $systemOffers['student_first']['percent'];
+        $membershipPercent = $systemOffers['membership_first']['percent'];
 
         return view('frontend.member.apply', compact('studentPercent', 'membershipPercent'));
     }
@@ -218,12 +206,21 @@ class HomeController extends Controller
             ? $loggedInMember->resolveMemberDiscount(1)
             : null;
 
-        return view('frontend.checkout', compact('activeOffers', 'loggedInMember', 'loggedInMemberDiscount'));
+        $systemOffers = SystemOfferService::settings();
+
+        return view('frontend.checkout', compact(
+            'activeOffers',
+            'loggedInMember',
+            'loggedInMemberDiscount',
+            'systemOffers'
+        ));
     }
 
     public function cards()
     {
-        return view('frontend.cards');
+        $systemOffers = SystemOfferService::settings();
+
+        return view('frontend.cards', compact('systemOffers'));
     }
 
     public function registerMember(Request $request)
@@ -296,10 +293,11 @@ class HomeController extends Controller
 
         $message = 'Membership registered successfully. Your card number is '.$member->unique_card_number;
 
+        $membershipPercent = SystemOfferService::settings()['membership_first']['percent'];
         if ($member->is_student) {
             $message .= '. Your student membership will be reviewed by admin. First-order discount will be available once approved.';
-        } else {
-            $message .= '. You can now use 30% first-order discount!';
+        } elseif ($membershipPercent) {
+            $message .= '. You can now use '.$membershipPercent.'% first-order discount!';
         }
 
         $message .= ' Use your phone number and password to access your member dashboard anytime. Keep your email safe — you will need it if you forget your password.';
@@ -394,12 +392,26 @@ class HomeController extends Controller
             return back()->withErrors(['unique_card_number' => $msg]);
         }
 
+        $golden = SystemOfferService::settings()['golden'];
+
+        // A switched-off built-in Golden row disables upgrades and hides every
+        // related threshold / discount amount in the UI.
+        if (! $golden['active']) {
+            $msg = 'The Golden Card upgrade is currently unavailable.';
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
+            return back()->withErrors(['unique_card_number' => $msg]);
+        }
+
         // Calculate total purchase dynamically from confirmed/completed orders
         $totalPurchase = $member->orders()
             ->whereIn('status', ['completed', 'confirmed'])
             ->sum('final_amount');
-        if ($totalPurchase < Member::GOLDEN_UPGRADE_THRESHOLD) {
-            $msg = 'You are not eligible for a Golden Card yet. Your total purchase is ৳'.number_format($totalPurchase, 2).', but the eligibility requirement is ৳'.number_format(Member::GOLDEN_UPGRADE_THRESHOLD, 2).'.';
+        $threshold = (float) ($golden['threshold'] ?? Member::GOLDEN_UPGRADE_THRESHOLD);
+        if ($totalPurchase < $threshold) {
+            $msg = 'You are not eligible for a Golden Card yet. Your total purchase is ৳'.number_format($totalPurchase, 2).', but the eligibility requirement is ৳'.number_format($threshold, 2).'.';
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $msg], 422);
             }
@@ -418,7 +430,7 @@ class HomeController extends Controller
 
         $member->upgradeToGolden();
 
-        $msg = 'Congratulations! Your membership has been upgraded to Golden Card. Your card is now valid for 5 years with a 10% flat discount.';
+        $msg = 'Congratulations! Your membership has been upgraded to Golden Card. Your card is now valid for 5 years with a '.$golden['percent'].'% flat discount.';
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $msg]);
         }

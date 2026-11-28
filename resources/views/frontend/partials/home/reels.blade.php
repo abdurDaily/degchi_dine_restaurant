@@ -1,4 +1,10 @@
 <!-- REELS -->
+@php
+    $facebookPageUrl = optional($contactSettings->get('contact_facebook_url'))->value
+        ?: 'https://www.facebook.com/DegchiDine';
+    $facebookGroupUrl = optional($contactSettings->get('contact_facebook_group_url'))->value
+        ?: 'https://www.facebook.com/groups/1347645484217487';
+@endphp
 <section class="section-block py-5 reels-section" id="video">
     <div class="container px-4 px-lg-5">
         <div class="reels-header-shell reveal mb-5 reels-section-header-block">
@@ -7,21 +13,27 @@
                     <x-frontend.section-heading title="Find Us on Facebook"
                         subtitle="The vibrant atmosphere of Degchi Dine's guests—new reels every week." icon="line"
                         align="start" :showDivider="false" />
-                    <div class="reels-header-cta-mobile d-md-none mt-3">
-                        <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"
-                            class="btn-dine btn-dine-primary w-100 justify-content-center" target="_blank"
-                            rel="noopener noreferrer">
+                    <div class="reels-header-cta-mobile d-grid gap-2 d-md-none mt-3">
+                        <a href="{{ $facebookPageUrl }}" class="btn-dine btn-dine-primary justify-content-center"
+                            target="_blank" rel="noopener noreferrer">
                             <i class="bi bi-facebook" aria-hidden="true"></i><span>Join Our Community</span>
+                        </a>
+                        <a href="{{ $facebookGroupUrl }}" class="btn-dine btn-dine-outline justify-content-center"
+                            target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-people-fill" aria-hidden="true"></i><span>Join Facebook Group</span>
                         </a>
                     </div>
                 </div>
 
-                <div class="reels-header-right d-none d-md-flex align-items-center">
-                    <a href="{{ $contactSettings['contact_facebook_url']->value ?? 'https://www.facebook.com/DegchiDine' }}"
-                        class="btn-dine btn-dine-primary" target="_blank" rel="noopener noreferrer">
+                <div class="reels-header-right d-none d-md-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ $facebookPageUrl }}" class="btn-dine btn-dine-primary" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="bi bi-facebook" aria-hidden="true"></i><span>Join Our Community</span>
                     </a>
-                    
+                    <a href="{{ $facebookGroupUrl }}" class="btn-dine btn-dine-outline" target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="bi bi-people-fill" aria-hidden="true"></i><span>Join Facebook Group</span>
+                    </a>
                 </div>
             </div>
         </div>
