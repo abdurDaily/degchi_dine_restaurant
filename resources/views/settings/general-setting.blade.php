@@ -95,6 +95,45 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-12">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Delivery Charges</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="deliveryCharge" class="form-label">Base Delivery Charge (৳)</label>
+                                    <input type="number" class="form-control" id="deliveryCharge" name="delivery_charge"
+                                           min="0" max="999999.99" step="0.01"
+                                           value="{{ old('delivery_charge', $deliverySettings['base_charge']) }}"
+                                           placeholder="60.00" required>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="deliveryPerKmCharge" class="form-label">Extra Charge per KM (৳)</label>
+                                    <input type="number" class="form-control" id="deliveryPerKmCharge"
+                                           name="delivery_per_km_charge" min="0" max="999999.99" step="0.01"
+                                           value="{{ old('delivery_per_km_charge', $deliverySettings['per_km_charge']) }}"
+                                           placeholder="20.00" required>
+                                    <span class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="deliveryIncludedKm" class="form-label">Included Distance (KM)</label>
+                                    <input type="number" class="form-control" id="deliveryIncludedKm"
+                                           name="delivery_included_km" min="0" max="1000" step="0.01"
+                                           value="{{ old('delivery_included_km', $deliverySettings['included_km']) }}"
+                                           placeholder="1" required>
+                                    <span class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-text mt-2">
+                                The base charge is added to every checkout order. The per-KM amount and included
+                                distance are shown to customers as the long-distance delivery notice.
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="mb-3 col-12">
                     <button type="submit" class="btn btn-primary">Save Setting</button>
                 </div>

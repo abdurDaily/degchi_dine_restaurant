@@ -27,7 +27,7 @@ use App\Models\Order;
  */
 class OrderPricingService
 {
-    /** Flat delivery fee charged at checkout (৳). */
+    /** Fallback flat delivery fee when general settings have no saved value (৳). */
     public const DEFAULT_DELIVERY_CHARGE = 60.0;
     /**
      * Best currently-active, member-eligible offer for a menu variation, or null.

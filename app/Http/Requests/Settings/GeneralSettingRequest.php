@@ -22,18 +22,42 @@ class GeneralSettingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company' => 'required|string|max:250',
-            'tagline' => 'required|string|max:250',
+            'company' => 'nullable|string|max:250',
+            'tagline' => 'nullable|string|max:250',
             'currency' => 'required|exists:currencies,id',
+            'delivery_charge' => 'nullable|numeric|min:0|max:999999.99',
+            'delivery_per_km_charge' => 'nullable|numeric|min:0|max:999999.99',
+            'delivery_included_km' => 'nullable|numeric|min:0|max:1000',
         ];
     }
 
     protected function passedValidation()
     {
-        $this->replace($this->only([
+        $data = $this->only([
             'company',
             'tagline',
             'currency',
-        ]));
+            'delivery_charge',
+            'delivery_per_km_charge',
+            'delivery_included_km',
+        ]);
+
+        // A blank delivery field means "leave the saved/default value alone",
+        // so it must not overwrite a previously configured amount with ''.
+        foreach ($data as $key => $value) {
+            if (str_starts_with($key, 'delivery_') && ($value === null || $value === '')) {
+                unset($data[$key]);
+            }
+        }
+
+        // Company and tagline are optional, but the settings.value column is
+        // NOT NULL. Normalize an empty submission to '' so it can be saved.
+        foreach (['company', 'tagline'] as $key) {
+            if (array_key_exists($key, $data) && $data[$key] === null) {
+                $data[$key] = '';
+            }
+        }
+
+        $this->replace($data);
     }
 }

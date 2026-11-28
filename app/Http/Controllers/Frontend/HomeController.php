@@ -17,6 +17,7 @@ use App\Models\Review;
 use App\Models\Setting;
 use App\Models\SignaturePlatter;
 use App\Rules\NoWebsiteLinks;
+use App\Services\DeliveryChargeService;
 use App\Services\OrderPricingService;
 use App\Services\SSLCommerzService;
 use App\Services\SystemOfferService;
@@ -207,12 +208,14 @@ class HomeController extends Controller
             : null;
 
         $systemOffers = SystemOfferService::settings();
+        $deliverySettings = DeliveryChargeService::settings();
 
         return view('frontend.checkout', compact(
             'activeOffers',
             'loggedInMember',
             'loggedInMemberDiscount',
-            'systemOffers'
+            'systemOffers',
+            'deliverySettings'
         ));
     }
 
@@ -602,12 +605,15 @@ class HomeController extends Controller
         }
 
         // Item offers → then Membership/Student/Golden discount stacked on top → then coupon.
-        // Delivery is a fixed fee added AFTER discounts (never discounted).
-        $deliveryCharge = OrderPricingService::DEFAULT_DELIVERY_CHARGE;
+        // Delivery is the backend-configured flat fee added AFTER discounts (never discounted).
+        // The posted hidden value is only accepted when it matches the saved base charge,
+        // so a tampered checkout form cannot change what the restaurant charges.
+        $deliveryCharge = DeliveryChargeService::baseCharge();
         if ($request->filled('shipping_charge')) {
-            // Accept the posted fee, but never go below 0. Distance-based extras
-            // are informational in the UI for now — checkout still posts the flat fee.
-            $deliveryCharge = max(0.0, round((float) $request->input('shipping_charge'), 2));
+            $postedCharge = max(0.0, round((float) $request->input('shipping_charge'), 2));
+            if (abs($postedCharge - $deliveryCharge) < 0.01) {
+                $deliveryCharge = $postedCharge;
+            }
         }
 
         $totals = $pricing->recalculateTotals($validItems, $member, $couponDiscount, $deliveryCharge);

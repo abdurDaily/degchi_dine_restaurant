@@ -24,6 +24,14 @@
         $benefitHint = $benefitParts
             ? implode(' ', $benefitParts)
             : 'Member offers are currently unavailable.';
+
+        $deliveryChargeLabel = '৳ ' . number_format($deliverySettings['base_charge'], 2);
+        $deliveryInfoText = $deliverySettings['per_km_charge'] > 0
+            ? 'An additional ৳' . number_format($deliverySettings['per_km_charge'], 2)
+                . ' per kilometre will be charged if the delivery location is more than '
+                . rtrim(rtrim(number_format($deliverySettings['included_km'], 2, '.', ''), '0'), '.')
+                . ' km away.'
+            : '';
     @endphp
 
     <x-frontend.page-header title="Complete Your Order" subtitle="Verify your details and confirm your order."
@@ -289,14 +297,17 @@
                             </div>
                             <div class="checkout-summary-row">
                                 <span>Delivery Charge</span>
-                                <span id="shippingChargeDisplay" class="fw-bold">৳ 60.00</span>
+                                <span id="shippingChargeDisplay" class="fw-bold">{{ $deliveryChargeLabel }}</span>
                             </div>
-                            <div class="delivery-info-badge">
-                                <i class="bi bi-info-circle-fill"></i>
-                                An additional ৳20 per kilometre will be charged if the delivery location is more than 1 km away.
-                            </div>
+                            @if ($deliveryInfoText !== '')
+                                <div class="delivery-info-badge">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                    {{ $deliveryInfoText }}
+                                </div>
+                            @endif
                             <div class="checkout-summary-divider"></div>
-                            <input type="hidden" name="shipping_charge" id="shippingChargeHidden" value="60" />
+                            <input type="hidden" name="shipping_charge" id="shippingChargeHidden"
+                                   value="{{ number_format($deliverySettings['base_charge'], 2, '.', '') }}" />
                             <div class="checkout-summary-total-row">
                                 <span>Total</span>
                                 <strong id="checkoutTotal" class="checkout-summary-total-val">৳ 0.00</strong>
@@ -339,10 +350,19 @@
                 const subtotalDisplay = document.getElementById('checkoutSubtotal');
                 const orderTotalInput = document.getElementById('order_total');
 
-                const SHIPPING_CHARGE = 60;
+                const SHIPPING_CHARGE = @json($deliverySettings['base_charge']);
+                const DELIVERY_PER_KM_CHARGE = @json($deliverySettings['per_km_charge']);
+                const DELIVERY_INCLUDED_KM = @json($deliverySettings['included_km']);
                 const shippingChargeDisplay = document.getElementById('shippingChargeDisplay');
                 const shippingChargeHidden = document.getElementById('shippingChargeHidden');
                 let shippingCharge = SHIPPING_CHARGE;
+
+                function setShippingCharge(amount) {
+                    shippingCharge = Math.max(0, Number(amount) || 0);
+                    if (shippingChargeDisplay) shippingChargeDisplay.textContent = '৳ ' + shippingCharge.toFixed(2);
+                    if (shippingChargeHidden) shippingChargeHidden.value = shippingCharge.toFixed(2);
+                    refreshCheckoutDiscounts();
+                }
 
                 function showToast(type, text) {
                     if (typeof toastr !== 'undefined') {
@@ -963,7 +983,7 @@
                                 couponCodeInput.value = '';
                                 couponFeedback.textContent = '';
                                 couponDiscountRow.style.display = 'none';
-                                shippingCharge = SHIPPING_CHARGE;
+                                setShippingCharge(SHIPPING_CHARGE);
                             }
                         } catch (error) {
                             showToast('error', error.message || 'Server error while placing order.');

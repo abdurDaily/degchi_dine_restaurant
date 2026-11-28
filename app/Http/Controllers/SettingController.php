@@ -6,6 +6,7 @@ use Session;
 use App\Models\Setting;
 use App\Models\Currency;
 use Illuminate\Http\Request;
+use App\Services\DeliveryChargeService;
 use App\Services\UploadService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -76,7 +77,9 @@ class SettingController extends Controller
     public function generalSetting(Request $request)
     {
         $currency_list = Currency::where('is_active', true)->get();
-        return view('settings.general-setting', compact('currency_list'));
+        $deliverySettings = DeliveryChargeService::settings();
+
+        return view('settings.general-setting', compact('currency_list', 'deliverySettings'));
     }
 
     /**
